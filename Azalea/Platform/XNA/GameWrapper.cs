@@ -1,15 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace Azalea;
+namespace Azalea.Platform.XNA;
 
 internal sealed class GameWrapper : Game
 {
-    internal GraphicsDeviceManager Graphics => graphics;
-    private readonly GraphicsDeviceManager graphics;
+    internal GraphicsDeviceManager Graphics => _graphics;
+    private readonly GraphicsDeviceManager _graphics;
 
     public GameWrapper()
     {
-        graphics = new GraphicsDeviceManager(this);
+        _graphics = new GraphicsDeviceManager(this);
         IsMouseVisible = true;
     }
 
