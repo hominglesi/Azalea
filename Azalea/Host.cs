@@ -5,17 +5,14 @@ namespace Azalea;
 
 public static class Host
 {
-    public static IGameHost CreateHost(HostType type)
+    public static IGameHost CreateHost(HostPreferences preferences)
     {
-        return type switch
+        return preferences.Type switch
         {
             HostType.XNA => new XNAGameHost(),
-            _ => throw new Exception($"Host of type {type} does not exist")
+            _ => throw new Exception($"Host of type {preferences.Type} does not exist")
         };
     }
 }
 
-public enum HostType
-{
-    XNA
-}
+
