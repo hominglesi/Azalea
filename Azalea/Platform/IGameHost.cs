@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azalea.Graphics.Rendering;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,7 @@ namespace Azalea.Platform;
 
 public interface IGameHost
 {
+    public IRenderer Renderer { get; }
+
     public void Run(AzaleaGame game);
 }

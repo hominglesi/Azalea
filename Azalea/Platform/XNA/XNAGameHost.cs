@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Azalea.Graphics.Rendering;
+using Azalea.Graphics.Rendering.XNA;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +10,14 @@ namespace Azalea.Platform.XNA;
 
 internal class XNAGameHost : GameHost
 {
+    public override IRenderer Renderer => _renderer;
+    private readonly XNARenderer _renderer;
+
     private readonly GameWrapper _gameWrapper;
 
     public XNAGameHost()
     {
+        _renderer = new XNARenderer();
         _gameWrapper = new GameWrapper();
     }
 
