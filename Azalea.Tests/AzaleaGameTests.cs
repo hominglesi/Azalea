@@ -1,5 +1,6 @@
 using Azalea;
 using Azalea.Platform;
+using Azalea.Tests.Platform;
 
 namespace Azalea.Tests
 {
@@ -11,7 +12,7 @@ namespace Azalea.Tests
         [SetUp]
         public void Setup()
         {
-            _host = Host.CreateHost();
+            _host = new DummyGameHost();
             _game = new TestGame();
         }
 
