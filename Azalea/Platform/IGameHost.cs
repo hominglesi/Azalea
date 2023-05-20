@@ -11,5 +11,7 @@ public interface IGameHost
 {
     public IRenderer Renderer { get; }
 
+    internal event Action Initialized;
+
     public void Run(AzaleaGame game);
 }

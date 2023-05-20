@@ -15,9 +15,12 @@ internal class XNAGameHost : GameHost
 
     private readonly GameWrapper _gameWrapper;
 
+    public override event Action? Initialized;
+
     public XNAGameHost()
     {
         _gameWrapper = new GameWrapper();
+        _gameWrapper.OnInitialize += () => Initialized?.Invoke();
 
         _renderer = new XNARenderer(_gameWrapper);
     }
