@@ -17,8 +17,9 @@ internal class XNAGameHost : GameHost
 
     public XNAGameHost()
     {
-        _renderer = new XNARenderer();
         _gameWrapper = new GameWrapper();
+
+        _renderer = new XNARenderer(_gameWrapper);
     }
 
     public override void Run(AzaleaGame game)
