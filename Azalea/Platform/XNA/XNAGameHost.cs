@@ -27,7 +27,7 @@ internal class XNAGameHost : GameHost
 
     public override void Run(AzaleaGame game)
     {
-        _gameWrapper.Run();
         base.Run(game);
+        _gameWrapper.Run();
     }
 }
