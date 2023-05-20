@@ -5,7 +5,7 @@ namespace Azalea;
 
 public static class Host
 {
-    public static IGameHost CreateHost(HostPreferences preferences)
+    public static IGameHost CreateHost(HostPreferences preferences = default)
     {
         return preferences.Type switch
         {
