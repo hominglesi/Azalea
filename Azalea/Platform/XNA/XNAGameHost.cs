@@ -1,6 +1,6 @@
 ﻿using Azalea.Graphics.Rendering;
-using Azalea.Graphics.Rendering.XNA;
-using Azalea.Graphics.Rendering.XNA.Batches;
+using Azalea.Graphics.XNA;
+using Azalea.Graphics.XNA.Batches;
 using Microsoft.Xna.Framework;
 
 namespace Azalea.Platform.XNA;
@@ -33,7 +33,7 @@ internal class XNAGameHost : GameHost
     private void onDraw(GameTime gameTime)
     {
         Renderer.Clear();
-        tempBatch.DrawRectangle(200, 300, 100, 150, new Graphics.Color(0.4f, 0.8f, 0.7f));
+        tempBatch.DrawRectangle(200, 300, 100, 150, Graphics.Color.Azalea);
         tempBatch.Draw();
     }
 

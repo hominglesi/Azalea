@@ -1,6 +1,7 @@
-﻿using Azalea.Platform.XNA;
+﻿using Azalea.Graphics.Rendering;
+using Azalea.Platform.XNA;
 
-namespace Azalea.Graphics.Rendering.XNA;
+namespace Azalea.Graphics.XNA;
 
 internal class XNARenderer : Renderer
 {

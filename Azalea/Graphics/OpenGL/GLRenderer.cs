@@ -1,6 +1,7 @@
-﻿using Silk.NET.OpenGL;
+﻿using Azalea.Graphics.Rendering;
+using Silk.NET.OpenGL;
 
-namespace Azalea.Graphics.Rendering.OpenGL;
+namespace Azalea.Graphics.OpenGL;
 
 internal class GLRenderer : Renderer
 {

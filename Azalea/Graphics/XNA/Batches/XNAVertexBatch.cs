@@ -1,8 +1,9 @@
-﻿using Azalea.Platform.XNA;
+﻿using Azalea.Graphics.Rendering;
+using Azalea.Platform.XNA;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Azalea.Graphics.Rendering.XNA.Batches;
+namespace Azalea.Graphics.XNA.Batches;
 
 internal class XNAVertexBatch : IVertexBatch
 {
