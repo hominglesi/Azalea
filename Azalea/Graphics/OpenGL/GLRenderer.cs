@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics.Rendering;
+using Azalea.Graphics.Rendering.Vertices;
 using Silk.NET.OpenGL;
 
 namespace Azalea.Graphics.OpenGL;
@@ -20,5 +21,10 @@ internal class GLRenderer : Renderer
     protected override void ClearImplementation(Color color)
     {
         _gl.Clear(ClearBufferMask.ColorBufferBit);
+    }
+
+    protected internal override IVertexBatch<PositionColorVertex> CreateQuadBatch(int size)
+    {
+        throw new NotImplementedException();
     }
 }

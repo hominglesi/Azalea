@@ -1,6 +1,5 @@
 ﻿using Azalea.Graphics.Rendering;
 using Azalea.Graphics.XNA;
-using Azalea.Graphics.XNA.Batches;
 using Microsoft.Xna.Framework;
 
 namespace Azalea.Platform.XNA;
@@ -23,18 +22,18 @@ internal class XNAGameHost : GameHost
         _renderer = new XNARenderer(_gameWrapper);
     }
 
-    XNAVertexBatch tempBatch;
     private void onInitialized()
     {
+        ((IRenderer)_renderer).Initialize();
         Initialized?.Invoke();
-        tempBatch = new XNAVertexBatch(_renderer, _gameWrapper);
     }
 
     private void onDraw(GameTime gameTime)
     {
         Renderer.Clear();
-        tempBatch.DrawRectangle(200, 300, 100, 150, Graphics.Color.Azalea);
-        tempBatch.Draw();
+        Renderer.DrawQuad(new System.Numerics.Vector2(200, 300), new System.Numerics.Vector2(100, 150), Graphics.Color.Azalea);
+        Renderer.DrawQuad(new System.Numerics.Vector2(500, 100), new System.Numerics.Vector2(200, 50), Graphics.Color.Azalea);
+        Renderer.FlushCurrentBatch();
     }
 
     public override void Run(AzaleaGame game)
