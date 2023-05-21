@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Azalea.Graphics;
+﻿namespace Azalea.Graphics;
 
 /// <summary>
 /// Represents a color with 4 floating-point components (Red, Green, Blue, Alpha)

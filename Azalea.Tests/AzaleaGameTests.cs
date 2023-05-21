@@ -1,4 +1,3 @@
-using Azalea;
 using Azalea.Platform;
 using Azalea.Tests.Platform;
 

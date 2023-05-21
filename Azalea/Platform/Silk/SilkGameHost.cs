@@ -3,11 +3,6 @@ using Azalea.Graphics.Rendering.Silk;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Azalea.Platform.Silk;
 
@@ -54,6 +49,6 @@ internal class SilkGameHost : GameHost
         base.Run(game);
         _window.Run();
     }
-    
-    
+
+
 }
