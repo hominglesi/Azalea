@@ -2,6 +2,8 @@
 
 internal abstract class Renderer : IRenderer
 {
+    private IVertexBatch? currentActiveBatch;
+
     private Color _clearColor;
     public Color ClearColor
     {
@@ -14,7 +16,7 @@ internal abstract class Renderer : IRenderer
         }
     }
 
-    protected virtual void SetClearColor(Color value) { }
+    protected internal virtual void SetClearColor(Color value) { }
 
     public void Clear()
     {
@@ -22,4 +24,11 @@ internal abstract class Renderer : IRenderer
     }
 
     protected abstract void ClearImplementation(Color color);
+
+    protected internal void FlushCurrentBatch()
+    {
+        currentActiveBatch?.Draw();
+    }
+
+    void IRenderer.FlushCurrentBatch() => FlushCurrentBatch();
 }

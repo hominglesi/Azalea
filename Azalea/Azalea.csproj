@@ -8,10 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303">
-      <PrivateAssets>All</PrivateAssets>
+      <PrivateAssets></PrivateAssets>
     </PackageReference>
     <PackageReference Include="Silk.NET" Version="2.17.1">
-      <PrivateAssets>All</PrivateAssets>
+      <PrivateAssets></PrivateAssets>
     </PackageReference>
   </ItemGroup>
   

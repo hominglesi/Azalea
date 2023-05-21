@@ -1,5 +1,5 @@
 ﻿using Azalea.Graphics.Rendering;
-using Azalea.Graphics.Rendering.Silk;
+using Azalea.Graphics.Rendering.OpenGL;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;

@@ -1,6 +1,6 @@
 ﻿using Silk.NET.OpenGL;
 
-namespace Azalea.Graphics.Rendering.Silk;
+namespace Azalea.Graphics.Rendering.OpenGL;
 
 internal class GLRenderer : Renderer
 {
@@ -11,7 +11,7 @@ internal class GLRenderer : Renderer
         _gl = gl;
     }
 
-    protected override void SetClearColor(Color value)
+    protected internal override void SetClearColor(Color value)
     {
         _gl.ClearColor(value.R, value.G, value.B, value.A);
     }
