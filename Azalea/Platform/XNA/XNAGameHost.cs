@@ -21,6 +21,7 @@ internal class XNAGameHost : GameHost
     {
         _gameWrapper = new GameWrapper();
         _gameWrapper.OnInitialize += () => Initialized?.Invoke();
+        _gameWrapper.OnDraw += (x) => Renderer.Clear();
 
         _renderer = new XNARenderer(_gameWrapper);
     }

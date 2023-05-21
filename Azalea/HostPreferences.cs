@@ -15,5 +15,6 @@ public struct HostPreferences
 
 public enum HostType
 {
-    XNA
+    XNA,
+    Silk
 }

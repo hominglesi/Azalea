@@ -8,7 +8,19 @@ namespace Azalea.Graphics.Rendering;
 
 internal abstract class Renderer : IRenderer
 {
-    public Color ClearColor { get; set; }
+    private Color _clearColor;
+    public Color ClearColor
+    {
+        get => _clearColor;
+        set
+        {
+            if (_clearColor == value) return;
+            _clearColor = value;
+            SetClearColor(value);
+        }
+    }
+
+    protected virtual void SetClearColor(Color value) { }
 
     public void Clear()
     {
