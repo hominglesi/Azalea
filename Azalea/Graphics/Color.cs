@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents a color with 4 floating-point components (Red, Green, Blue, Alpha)
 /// </summary>
-public struct Color
+public partial struct Color
 {
     /// <summary>
     /// The red component of this Color
