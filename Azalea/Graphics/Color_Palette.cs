@@ -3,8 +3,8 @@
 public partial struct Color
 {
     #region Flowers
-    public static Color Azalea => new(0.831f, 0.18f, 0.357f);
-    public static Color Cornflower => new(0.392f, 0.584f, 0.929f);
+    public static Color Azalea => new(201, 98, 143);
+    public static Color Cornflower => new(100, 149, 237);
 
     #endregion
 }

@@ -1,29 +1,29 @@
 ﻿namespace Azalea.Graphics;
 
 /// <summary>
-/// Represents a color with 4 floating-point components (Red, Green, Blue, Alpha)
+/// Represents a color with 4 byte components (Red, Green, Blue, Alpha)
 /// </summary>
 public partial struct Color
 {
     /// <summary>
     /// The red component of this Color
     /// </summary>
-    public float R;
+    public byte R;
 
     /// <summary>
     /// The green component of this Color
     /// </summary>
-    public float G;
+    public byte G;
 
     /// <summary>
     /// The blue color of this Color
     /// </summary>
-    public float B;
+    public byte B;
 
     /// <summary>
     /// The alpha component of this Color
     /// </summary>
-    public float A;
+    public byte A;
 
     /// <summary>
     /// Constructs a new Color from the specified components
@@ -32,7 +32,7 @@ public partial struct Color
     /// <param name="g">The green component of the new Color</param>
     /// <param name="b">The blue component of the new Color</param>
     /// <param name="a">The alphe component of the new Color</param>
-    public Color(float r, float g, float b, float a)
+    public Color(byte r, byte g, byte b, byte a)
     {
         R = r;
         G = g;
@@ -46,7 +46,7 @@ public partial struct Color
     /// <param name="r">The red component of the new Color</param>
     /// <param name="g">The green component of the new Color</param>
     /// <param name="b">The blue component of the new Color</param>
-    public Color(float r, float g, float b) : this(r, g, b, 1f) { }
+    public Color(byte r, byte g, byte b) : this(r, g, b, byte.MaxValue) { }
 
     public override bool Equals(object? obj)
     {
