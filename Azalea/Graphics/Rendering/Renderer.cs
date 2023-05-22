@@ -19,7 +19,7 @@ internal abstract class Renderer : IRenderer
         }
     }
 
-    void IRenderer.Initialize()
+    protected internal virtual void Initialize()
     {
         defaultQuadBatch = CreateQuadBatch(100);
         currentActiveBatch = defaultQuadBatch;
@@ -40,7 +40,7 @@ internal abstract class Renderer : IRenderer
     {
         currentActiveBatch?.Draw();
     }
-
+    void IRenderer.Initialize() => Initialize();
     IVertexBatch<PositionColorVertex> IRenderer.DefaultQuadBatch => defaultQuadBatch ?? throw new Exception("Cannot call DefaultQuadBatch before Initialization");
     void IRenderer.FlushCurrentBatch() => FlushCurrentBatch();
     IVertexBatch IRenderer.CreateQuadBatch(int size) => CreateQuadBatch(size);

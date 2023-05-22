@@ -10,6 +10,7 @@ internal class DummyGameHost : GameHost
     private readonly DummyRenderer _renderer;
 
     public override event Action? Initialized;
+    public override event Action? OnRender;
 
     public DummyGameHost()
     {
@@ -20,5 +21,6 @@ internal class DummyGameHost : GameHost
     {
         base.Run(game);
         Initialized?.Invoke();
+        OnRender?.Invoke();
     }
 }

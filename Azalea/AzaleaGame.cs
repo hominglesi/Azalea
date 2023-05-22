@@ -12,7 +12,10 @@ public abstract class AzaleaGame
         _host = host;
 
         _host.Initialized += OnInitialize;
+        _host.OnRender += OnRender;
     }
 
-    protected abstract void OnInitialize();
+    protected virtual void OnInitialize() { }
+
+    protected virtual void OnRender() { }
 }

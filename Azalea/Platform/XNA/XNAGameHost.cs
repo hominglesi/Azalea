@@ -12,6 +12,7 @@ internal class XNAGameHost : GameHost
     private readonly GameWrapper _gameWrapper;
 
     public override event Action? Initialized;
+    public override event Action? OnRender;
 
     public XNAGameHost()
     {
@@ -24,15 +25,13 @@ internal class XNAGameHost : GameHost
 
     private void onInitialized()
     {
-        ((IRenderer)_renderer).Initialize();
+        Renderer.Initialize();
         Initialized?.Invoke();
     }
 
     private void onDraw(GameTime gameTime)
     {
-        Renderer.Clear();
-        Renderer.DrawQuad(new System.Numerics.Vector2(200, 300), new System.Numerics.Vector2(100, 150), Graphics.Color.Azalea);
-        Renderer.DrawQuad(new System.Numerics.Vector2(500, 100), new System.Numerics.Vector2(200, 50), Graphics.Color.Azalea);
+        OnRender?.Invoke();
         Renderer.FlushCurrentBatch();
     }
 

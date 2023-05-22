@@ -11,7 +11,7 @@ public interface IRenderer
     internal IVertexBatch<PositionColorVertex> DefaultQuadBatch { get; }
 
     internal void Initialize();
-    internal void Clear();
+    public void Clear();
     internal void FlushCurrentBatch();
 
     internal IVertexBatch CreateQuadBatch(int size);

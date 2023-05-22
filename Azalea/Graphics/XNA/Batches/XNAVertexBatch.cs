@@ -38,8 +38,6 @@ internal class XNAVertexBatch<TVertex> : IVertexBatch<TVertex>
             _indices[j + 5] = i + 1;
         }
 
-        _gameWrapper.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
-
         var viewport = _gameWrapper.GraphicsDevice.Viewport;
         _effect = new BasicEffect(_gameWrapper.GraphicsDevice)
         {
@@ -49,7 +47,7 @@ internal class XNAVertexBatch<TVertex> : IVertexBatch<TVertex>
             VertexColorEnabled = true,
             World = Matrix.Identity,
             View = Matrix.Identity,
-            Projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, 0, viewport.Height, 0, 1)
+            Projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1)
         };
 
         AddAction = Add;

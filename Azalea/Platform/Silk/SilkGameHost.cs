@@ -17,6 +17,7 @@ internal class SilkGameHost : GameHost
     private GL? _gl;
 
     public override event Action? Initialized;
+    public override event Action? OnRender;
 
     public SilkGameHost()
     {
@@ -41,7 +42,7 @@ internal class SilkGameHost : GameHost
 
     private void onRender(double deltaTime)
     {
-        Renderer.Clear();
+        OnRender?.Invoke();
     }
 
     public override void Run(AzaleaGame game)

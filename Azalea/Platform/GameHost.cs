@@ -6,7 +6,8 @@ internal abstract class GameHost : IGameHost
 {
     public abstract IRenderer Renderer { get; }
 
-    public abstract event Action Initialized;
+    public abstract event Action? Initialized;
+    public abstract event Action? OnRender;
 
     public virtual void Run(AzaleaGame game)
     {
