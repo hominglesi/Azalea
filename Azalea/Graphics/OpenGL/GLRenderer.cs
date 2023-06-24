@@ -19,11 +19,7 @@ internal class GLRenderer : Renderer
 
     protected internal override void SetClearColor(Color value)
     {
-        _gl.ClearColor((
-            value.R / (float)byte.MaxValue), 
-            value.G / (float)byte.MaxValue, 
-            value.B / (float)byte.MaxValue,
-            value.A / (float)byte.MaxValue);
+        _gl.ClearColor(value.RNormalized, value.GNormalized, value.BNormalized, value.ANormalized );
     }
 
     protected override void ClearImplementation(Color color)

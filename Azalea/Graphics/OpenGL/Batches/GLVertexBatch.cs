@@ -160,9 +160,9 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
 
         _vertices[_vertexCount * 5] = pcVertex.Position.X;
         _vertices[(_vertexCount * 5) + 1] = pcVertex.Position.Y;
-        _vertices[(_vertexCount * 5) + 2] = (pcVertex.Color.R / (float)byte.MaxValue);
-        _vertices[(_vertexCount * 5) + 3] = (pcVertex.Color.G / (float)byte.MaxValue);
-        _vertices[(_vertexCount * 5) + 4] = (pcVertex.Color.B / (float)byte.MaxValue);
+        _vertices[(_vertexCount * 5) + 2] = pcVertex.Color.RNormalized;
+        _vertices[(_vertexCount * 5) + 3] = pcVertex.Color.GNormalized;
+        _vertices[(_vertexCount * 5) + 4] = pcVertex.Color.BNormalized;
         _vertexCount++;
     }
 

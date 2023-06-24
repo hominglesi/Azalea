@@ -48,6 +48,11 @@ public partial struct Color
     /// <param name="b">The blue component of the new Color</param>
     public Color(byte r, byte g, byte b) : this(r, g, b, byte.MaxValue) { }
 
+    public readonly float RNormalized => (float)R / byte.MaxValue;
+    public readonly float GNormalized => (float)G / byte.MaxValue;
+    public readonly float BNormalized => (float)B / byte.MaxValue;
+    public readonly float ANormalized => (float)A / byte.MaxValue;
+
     public override bool Equals(object? obj)
     {
         if (obj is not Color color) return false;
