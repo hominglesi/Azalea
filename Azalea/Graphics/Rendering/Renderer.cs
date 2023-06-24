@@ -19,6 +19,8 @@ internal abstract class Renderer : IRenderer
         }
     }
 
+    public bool AutomaticallyClear { get; set; } = true;
+
     protected internal virtual void Initialize()
     {
         defaultQuadBatch = CreateQuadBatch(100);

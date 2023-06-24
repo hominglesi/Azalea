@@ -9,9 +9,6 @@ internal class DummyGameHost : GameHost
     public override IRenderer Renderer => _renderer;
     private readonly DummyRenderer _renderer;
 
-    public override event Action? Initialized;
-    public override event Action? OnRender;
-
     public DummyGameHost()
     {
         _renderer = new DummyRenderer();
@@ -20,7 +17,7 @@ internal class DummyGameHost : GameHost
     public override void Run(AzaleaGame game)
     {
         base.Run(game);
-        Initialized?.Invoke();
-        OnRender?.Invoke();
+        CallInitialized();
+        CallOnRender();
     }
 }

@@ -16,9 +16,6 @@ internal class SilkGameHost : GameHost
     private GL Gl => _gl ?? throw new Exception("Cannot use GL before it is initialized");
     private GL? _gl;
 
-    public override event Action? Initialized;
-    public override event Action? OnRender;
-
     public SilkGameHost()
     {
         var windowOptions = WindowOptions.Default with
@@ -28,21 +25,16 @@ internal class SilkGameHost : GameHost
         };
 
         _window = Window.Create(windowOptions);
-        _window.Load += onLoad;
-        _window.Render += onRender;
+        _window.Load += CallInitialized;
+        _window.Render += (_) => CallOnRender();
     }
 
-    private void onLoad()
+    public override void CallInitialized()
     {
         _gl = _window.CreateOpenGL();
         _renderer = new GLRenderer(_gl);
 
-        Initialized?.Invoke();
-    }
-
-    private void onRender(double deltaTime)
-    {
-        OnRender?.Invoke();
+        base.CallInitialized();
     }
 
     public override void Run(AzaleaGame game)

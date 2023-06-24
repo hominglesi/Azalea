@@ -11,27 +11,24 @@ internal class XNAGameHost : GameHost
 
     private readonly GameWrapper _gameWrapper;
 
-    public override event Action? Initialized;
-    public override event Action? OnRender;
-
     public XNAGameHost()
     {
         _gameWrapper = new GameWrapper();
-        _gameWrapper.OnInitialize += onInitialized;
-        _gameWrapper.OnDraw += onDraw;
+        _gameWrapper.OnInitialize += CallInitialized;
+        _gameWrapper.OnDraw += (_) => CallOnRender();
 
         _renderer = new XNARenderer(_gameWrapper);
     }
 
-    private void onInitialized()
+    public override void CallInitialized()
     {
         Renderer.Initialize();
-        Initialized?.Invoke();
+        base.CallInitialized();
     }
 
-    private void onDraw(GameTime gameTime)
+    public override void CallOnRender()
     {
-        OnRender?.Invoke();
+        base.CallOnRender();
         Renderer.FlushCurrentBatch();
     }
 

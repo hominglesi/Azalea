@@ -8,6 +8,7 @@ public interface IRenderer
     public const int INDICES_PER_QUAD = VERTICES_PER_QUAD + 2;
 
     public Color ClearColor { get; set; }
+    public bool AutomaticallyClear { get; set; }
     internal IVertexBatch<PositionColorVertex> DefaultQuadBatch { get; }
 
     internal void Initialize();
