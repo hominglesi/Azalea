@@ -17,6 +17,7 @@ internal abstract class GameHost : IGameHost
 
     public virtual void CallInitialized()
     {
+        Renderer.Initialize();
         Initialized?.Invoke();
     }
 
@@ -24,5 +25,6 @@ internal abstract class GameHost : IGameHost
     {
         if (Renderer.AutomaticallyClear) Renderer.Clear();
         OnRender?.Invoke();
+        Renderer.FlushCurrentBatch();
     }
 }

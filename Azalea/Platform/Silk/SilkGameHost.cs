@@ -32,7 +32,7 @@ internal class SilkGameHost : GameHost
     public override void CallInitialized()
     {
         _gl = _window.CreateOpenGL();
-        _renderer = new GLRenderer(_gl);
+        _renderer = new GLRenderer(_gl, _window);
 
         base.CallInitialized();
     }

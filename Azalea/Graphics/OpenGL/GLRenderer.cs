@@ -1,21 +1,29 @@
-﻿using Azalea.Graphics.Rendering;
+﻿using Azalea.Graphics.OpenGL.Batches;
+using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Silk.NET.OpenGL;
+using Silk.NET.Windowing;
 
 namespace Azalea.Graphics.OpenGL;
 
 internal class GLRenderer : Renderer
 {
     private readonly GL _gl;
+    private readonly IWindow _window;
 
-    public GLRenderer(GL gl)
+    public GLRenderer(GL gl, IWindow window)
     {
         _gl = gl;
+        _window = window;
     }
 
     protected internal override void SetClearColor(Color value)
     {
-        _gl.ClearColor(value.R, value.G, value.B, value.A);
+        _gl.ClearColor((
+            value.R / (float)byte.MaxValue), 
+            value.G / (float)byte.MaxValue, 
+            value.B / (float)byte.MaxValue,
+            value.A / (float)byte.MaxValue);
     }
 
     protected override void ClearImplementation(Color color)
@@ -24,7 +32,5 @@ internal class GLRenderer : Renderer
     }
 
     protected internal override IVertexBatch<PositionColorVertex> CreateQuadBatch(int size)
-    {
-        throw new NotImplementedException();
-    }
+        => new GLVertexBatch<PositionColorVertex>(this, _gl, _window, size);
 }

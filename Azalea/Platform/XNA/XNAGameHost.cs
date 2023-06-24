@@ -20,18 +20,6 @@ internal class XNAGameHost : GameHost
         _renderer = new XNARenderer(_gameWrapper);
     }
 
-    public override void CallInitialized()
-    {
-        Renderer.Initialize();
-        base.CallInitialized();
-    }
-
-    public override void CallOnRender()
-    {
-        base.CallOnRender();
-        Renderer.FlushCurrentBatch();
-    }
-
     public override void Run(AzaleaGame game)
     {
         base.Run(game);
