@@ -12,6 +12,6 @@ internal class DummyRenderer : Renderer
 
     }
 
-    protected internal override IVertexBatch<PositionColorVertex> CreateQuadBatch(int size)
-        => new DummyVertexBatch<PositionColorVertex>();
+    protected internal override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
+        => new DummyVertexBatch<TexturedVertex2D>();
 }

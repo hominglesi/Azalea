@@ -9,7 +9,7 @@ public interface IRenderer
 
     public Color ClearColor { get; set; }
     public bool AutomaticallyClear { get; set; }
-    internal IVertexBatch<PositionColorVertex> DefaultQuadBatch { get; }
+    internal IVertexBatch<TexturedVertex2D> DefaultQuadBatch { get; }
 
     internal void Initialize();
     public void Clear();

@@ -4,7 +4,7 @@ namespace Azalea.Graphics.Rendering;
 
 internal abstract class Renderer : IRenderer
 {
-    private IVertexBatch<PositionColorVertex>? defaultQuadBatch;
+    private IVertexBatch<TexturedVertex2D>? defaultQuadBatch;
     private IVertexBatch? currentActiveBatch;
 
     private Color _clearColor;
@@ -27,7 +27,7 @@ internal abstract class Renderer : IRenderer
         currentActiveBatch = defaultQuadBatch;
     }
 
-    protected internal abstract IVertexBatch<PositionColorVertex> CreateQuadBatch(int size);
+    protected internal abstract IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size);
 
     protected internal virtual void SetClearColor(Color value) { }
 
@@ -43,7 +43,7 @@ internal abstract class Renderer : IRenderer
         currentActiveBatch?.Draw();
     }
     void IRenderer.Initialize() => Initialize();
-    IVertexBatch<PositionColorVertex> IRenderer.DefaultQuadBatch => defaultQuadBatch ?? throw new Exception("Cannot call DefaultQuadBatch before Initialization");
+    IVertexBatch<TexturedVertex2D> IRenderer.DefaultQuadBatch => defaultQuadBatch ?? throw new Exception("Cannot call DefaultQuadBatch before Initialization");
     void IRenderer.FlushCurrentBatch() => FlushCurrentBatch();
     IVertexBatch IRenderer.CreateQuadBatch(int size) => CreateQuadBatch(size);
 }

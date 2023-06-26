@@ -27,6 +27,6 @@ internal class GLRenderer : Renderer
         _gl.Clear(ClearBufferMask.ColorBufferBit);
     }
 
-    protected internal override IVertexBatch<PositionColorVertex> CreateQuadBatch(int size)
-        => new GLVertexBatch<PositionColorVertex>(this, _gl, _window, size);
+    protected internal override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
+        => new GLVertexBatch<TexturedVertex2D>(this, _gl, _window, size);
 }

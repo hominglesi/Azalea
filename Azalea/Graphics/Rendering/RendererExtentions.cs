@@ -14,28 +14,32 @@ public static class RendererExtentions
 
         var vertexAction = renderer.DefaultQuadBatch.AddAction;
 
-        vertexAction(new PositionColorVertex
+        vertexAction(new TexturedVertex2D
         {
             Position = new(left, top),
-            Color = color
+            Color = color,
+            TexturePosition = new(0, 0)
         });
 
-        vertexAction(new PositionColorVertex
+        vertexAction(new TexturedVertex2D
         {
             Position = new(right, top),
-            Color = color
+            Color = color,
+            TexturePosition = new(1, 0)
         });
 
-        vertexAction(new PositionColorVertex
+        vertexAction(new TexturedVertex2D
         {
             Position = new(right, bottom),
-            Color = color
+            Color = color,
+            TexturePosition = new(1, 1)
         });
 
-        vertexAction(new PositionColorVertex
+        vertexAction(new TexturedVertex2D
         {
             Position = new(left, bottom),
-            Color = color
+            Color = color,
+            TexturePosition = new(0, 1)
         });
     }
 }
