@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics.Rendering.Vertices;
+using Azalea.Graphics.Textures;
 
 namespace Azalea.Graphics.Rendering;
 
@@ -16,4 +17,5 @@ public interface IRenderer
     internal void FlushCurrentBatch();
 
     internal IVertexBatch CreateQuadBatch(int size);
+    internal Texture CreateTexture(int width, int height);
 }

@@ -7,11 +7,11 @@ namespace Azalea.Tests.Rendering;
 
 internal class DummyRenderer : Renderer
 {
-    protected override void ClearImplementation(Color color)
-    {
-
-    }
+    protected override void ClearImplementation(Color color) { }
 
     protected internal override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
         => new DummyVertexBatch<TexturedVertex2D>();
+
+    protected override INativeTexture CreateNativeTexture(int width, int height)
+        => new DummyTexture(this);
 }

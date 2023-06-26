@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics.OpenGL.Batches;
+using Azalea.Graphics.OpenGL.Textures;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Silk.NET.OpenGL;
@@ -29,4 +30,7 @@ internal class GLRenderer : Renderer
 
     protected internal override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
         => new GLVertexBatch<TexturedVertex2D>(this, _gl, _window, size);
+
+    protected override INativeTexture CreateNativeTexture(int width, int height)
+        => new GLTexture(this, _gl, width, height);
 }

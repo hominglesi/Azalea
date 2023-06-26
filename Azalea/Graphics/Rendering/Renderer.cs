@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics.Rendering.Vertices;
+using Azalea.Graphics.Textures;
 
 namespace Azalea.Graphics.Rendering;
 
@@ -28,6 +29,13 @@ internal abstract class Renderer : IRenderer
     }
 
     protected internal abstract IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size);
+
+    protected abstract INativeTexture CreateNativeTexture(int width, int height);
+    public Texture CreateTexture(int width, int height)
+        => CreateTexture(CreateNativeTexture(width, height));
+
+    internal Texture CreateTexture(INativeTexture nativeTexture)
+        => new(nativeTexture);
 
     protected internal virtual void SetClearColor(Color value) { }
 

@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.Rendering;
+﻿using Azalea.Graphics.OpenGL.Textures;
+using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Microsoft.Xna.Framework.Graphics;
 using Silk.NET.Maths;
@@ -21,7 +22,7 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
     private readonly uint _vbo;
     private readonly uint _ebo;
     private readonly uint _shader;
-    private readonly uint _texture;
+    private readonly Graphics.Textures.Texture _texture;
 
     public Action<TVertex> AddAction;
 
@@ -71,6 +72,9 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
         _renderer = renderer;
         _gl = gl;
         _window = window;
+
+        using var stream = File.OpenRead("wall.png") ?? throw new Exception("File does not exist");
+        _texture = Graphics.Textures.Texture.FromStream(_renderer, stream) ?? throw new Exception("Could not create texture");
 
         AddAction = Add;
 
@@ -134,30 +138,6 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
         _gl.EnableVertexAttribArray(1);
         _gl.EnableVertexAttribArray(2);
 
-        _gl.GenTexture();
-        _gl.ActiveTexture(TextureUnit.Texture0);
-        _gl.BindTexture(TextureTarget.Texture2D, _texture);
-
-        using var image = Image.Load<Rgba32>(File.ReadAllBytes("wall.png"));
-        var pixels = new byte[4 * image.Width * image.Height];
-        image.CopyPixelDataTo(pixels);
-
-        fixed(byte* ptr = pixels)
-        {
-            _gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba, (uint)image.Width,
-                (uint)image.Height, 0, Silk.NET.OpenGL.PixelFormat.Rgba, Silk.NET.OpenGL.PixelType.UnsignedByte, ptr);
-        }
-
-        _gl.TextureParameter(_texture, TextureParameterName.TextureWrapS, (int) TextureWrapMode.Repeat);
-        _gl.TextureParameter(_texture, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-
-        _gl.TextureParameter(_texture, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
-        _gl.TextureParameter(_texture, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-
-        _gl.GenerateMipmap(TextureTarget.Texture2D);
-
-        _gl.BindTexture(TextureTarget.Texture2D, 0);
-
         _gl.Enable(EnableCap.Blend);
         _gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
     }
@@ -174,7 +154,7 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
             _gl.BufferData(BufferTargetARB.ArrayBuffer, (nuint)(_vertexCount * 7 * sizeof(float)), v, BufferUsageARB.StreamDraw);
 
         _gl.ActiveTexture(TextureUnit.Texture0);
-        _gl.BindTexture(TextureTarget.Texture2D, _texture);
+        _gl.BindTexture(TextureTarget.Texture2D, ((GLTexture)_texture.NativeTexture).TextureId);
 
         var windowSize = _window.Size;
         var projection = Matrix4x4.CreateOrthographicOffCenter(0, windowSize.X, windowSize.Y, 0, 0.1f, 100);

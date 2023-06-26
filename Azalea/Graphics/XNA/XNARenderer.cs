@@ -28,4 +28,7 @@ internal class XNARenderer : Renderer
 
     protected internal override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
         => new XNAVertexBatch<TexturedVertex2D>(this, _gameWrapper, size);
+
+    protected override INativeTexture CreateNativeTexture(int width, int height)
+        => throw new NotImplementedException();
 }
