@@ -1,10 +1,11 @@
 ﻿using Azalea.Graphics.Rendering.Vertices;
+using Azalea.Graphics.Textures;
 
 namespace Azalea.Graphics.Rendering;
 
 internal abstract class Renderer : IRenderer
 {
-    private IVertexBatch<PositionColorVertex>? defaultQuadBatch;
+    private IVertexBatch<TexturedVertex2D>? defaultQuadBatch;
     private IVertexBatch? currentActiveBatch;
 
     private Color _clearColor;
@@ -27,7 +28,15 @@ internal abstract class Renderer : IRenderer
         currentActiveBatch = defaultQuadBatch;
     }
 
-    protected internal abstract IVertexBatch<PositionColorVertex> CreateQuadBatch(int size);
+    protected abstract bool SetTextureImplementation(INativeTexture? texture, int unit);
+
+    protected abstract IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size);
+    protected abstract INativeTexture CreateNativeTexture(int width, int height);
+    public Texture CreateTexture(int width, int height)
+        => CreateTexture(CreateNativeTexture(width, height));
+
+    internal Texture CreateTexture(INativeTexture nativeTexture)
+        => new(nativeTexture);
 
     protected internal virtual void SetClearColor(Color value) { }
 
@@ -42,8 +51,22 @@ internal abstract class Renderer : IRenderer
     {
         currentActiveBatch?.Draw();
     }
+
+    internal bool BindTexture(Texture texture)
+    {
+        return BindTexture(texture.NativeTexture);
+    } 
+
+    internal bool BindTexture(INativeTexture nativeTexture)
+    {
+        FlushCurrentBatch();
+        SetTextureImplementation(nativeTexture, 0);
+        return true;
+    }
+
     void IRenderer.Initialize() => Initialize();
-    IVertexBatch<PositionColorVertex> IRenderer.DefaultQuadBatch => defaultQuadBatch ?? throw new Exception("Cannot call DefaultQuadBatch before Initialization");
+    IVertexBatch<TexturedVertex2D> IRenderer.DefaultQuadBatch => defaultQuadBatch ?? throw new Exception("Cannot call DefaultQuadBatch before Initialization");
     void IRenderer.FlushCurrentBatch() => FlushCurrentBatch();
     IVertexBatch IRenderer.CreateQuadBatch(int size) => CreateQuadBatch(size);
+    bool IRenderer.BindTexture(Azalea.Graphics.Textures.Texture texture) => BindTexture(texture);
 }

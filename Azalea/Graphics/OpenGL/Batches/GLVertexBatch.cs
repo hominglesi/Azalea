@@ -1,10 +1,12 @@
-﻿using Azalea.Graphics.Rendering;
+﻿using Azalea.Graphics.OpenGL.Textures;
+using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Microsoft.Xna.Framework.Graphics;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.SDL;
 using Silk.NET.Windowing;
+using SixLabors.ImageSharp.Formats;
 using System.Numerics;
 
 namespace Azalea.Graphics.OpenGL.Batches;
@@ -32,28 +34,35 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
         #version 330 core
         layout (location = 0) in vec2 vPos;
         layout (location = 1) in vec3 vCol;
+        layout (location = 2) in vec2 vTex;
         
         uniform mat4 uProjection;
 
         out vec3 oCol;
+        out vec2 oTex;
 
         void main()
         {
             gl_Position = uProjection * vec4(vPos.x, vPos.y, 1.0, 1.0);
             oCol = vCol;
+            oTex = vTex;
         }
         ";
 
     //Fragment shaders are run on each fragment/pixel of the geometry.
     private static readonly string FragmentShaderSource = @"
         #version 330 core
-        out vec4 FragColor;
-
         in vec3 oCol;
+        in vec2 oTex;
+
+        uniform sampler2D uTexture;
+
+        out vec4 FragColor;
 
         void main()
         {
             FragColor = vec4(oCol.x, oCol.y, oCol.z, 1.0);
+            FragColor = texture(uTexture, oTex);
         }
         ";
 
@@ -63,7 +72,9 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
         _gl = gl;
         _window = window;
 
-        _vertices = new float[size * IRenderer.VERTICES_PER_QUAD * 5];
+        AddAction = Add;
+
+        _vertices = new float[size * IRenderer.VERTICES_PER_QUAD * 7];
         _indices = new uint[size * IRenderer.INDICES_PER_QUAD];
 
         for (uint i = 0, j = 0; i < size * IRenderer.VERTICES_PER_QUAD; i += IRenderer.VERTICES_PER_QUAD, j += IRenderer.INDICES_PER_QUAD)
@@ -116,12 +127,15 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
         _gl.DeleteShader(vertexShader);
         _gl.DeleteShader(fragmentShader);
 
-        _gl.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), (void*) 0);
-        _gl.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), (void*) (2 * sizeof(float)));
+        _gl.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 7 * sizeof(float), (void*) 0);
+        _gl.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 7 * sizeof(float), (void*)(2 * sizeof(float)));
+        _gl.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 7 * sizeof(float), (void*)(5 * sizeof(float)));
         _gl.EnableVertexAttribArray(0);
         _gl.EnableVertexAttribArray(1);
+        _gl.EnableVertexAttribArray(2);
 
-        AddAction = Add;
+        _gl.Enable(EnableCap.Blend);
+        _gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
     }
 
     public unsafe int Draw()
@@ -133,7 +147,7 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
         _gl.UseProgram(_shader);
 
         fixed (void* v = &_vertices[0])
-            _gl.BufferData(BufferTargetARB.ArrayBuffer, (nuint)(_vertexCount * 5 * sizeof(float)), v, BufferUsageARB.StreamDraw);
+            _gl.BufferData(BufferTargetARB.ArrayBuffer, (nuint)(_vertexCount * 7 * sizeof(float)), v, BufferUsageARB.StreamDraw);
 
         var windowSize = _window.Size;
         var projection = Matrix4x4.CreateOrthographicOffCenter(0, windowSize.X, windowSize.Y, 0, 0.1f, 100);
@@ -141,6 +155,10 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
         var projectionUniform = _gl.GetUniformLocation(_shader, "uProjection");
         if (projectionUniform == -1) throw new Exception($"uProjection uniform not found in shader");
         _gl.UniformMatrix4(projectionUniform, 1, false, (float*)&projection);
+
+        int textureLocation = _gl.GetUniformLocation(_shader, "uTexture");
+        if (textureLocation == -1) throw new Exception($"uTexture uniform not found in shader");
+        _gl.Uniform1(textureLocation, 0);
 
         _gl.DrawElements(Silk.NET.OpenGL.PrimitiveType.Triangles, (uint)((_vertexCount / 4) * 6), DrawElementsType.UnsignedInt, null);
 
@@ -151,18 +169,20 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
 
     public void Add(TVertex vertex)
     {
-        if (vertex is not PositionColorVertex pcVertex) throw new Exception("Only position color vertex is implemented");
+        if (vertex is not TexturedVertex2D tVertex) throw new Exception("Only TexturedVertex2D is implemented");
 
-        if (_vertexCount >= _vertices.Length / 5)
+        if (_vertexCount >= _vertices.Length / 7)
         {
             Draw();
         }
 
-        _vertices[_vertexCount * 5] = pcVertex.Position.X;
-        _vertices[(_vertexCount * 5) + 1] = pcVertex.Position.Y;
-        _vertices[(_vertexCount * 5) + 2] = pcVertex.Color.RNormalized;
-        _vertices[(_vertexCount * 5) + 3] = pcVertex.Color.GNormalized;
-        _vertices[(_vertexCount * 5) + 4] = pcVertex.Color.BNormalized;
+        _vertices[_vertexCount * 7] = tVertex.Position.X;
+        _vertices[(_vertexCount * 7) + 1] = tVertex.Position.Y;
+        _vertices[(_vertexCount * 7) + 2] = tVertex.Color.RNormalized;
+        _vertices[(_vertexCount * 7) + 3] = tVertex.Color.GNormalized;
+        _vertices[(_vertexCount * 7) + 4] = tVertex.Color.BNormalized;
+        _vertices[(_vertexCount * 7) + 5] = tVertex.TexturePosition.X;
+        _vertices[(_vertexCount * 7) + 6] = tVertex.TexturePosition.Y;
         _vertexCount++;
     }
 

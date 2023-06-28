@@ -26,6 +26,14 @@ internal class XNARenderer : Renderer
         _gameWrapper.GraphicsDevice.Clear(color.ToXNAColor());
     }
 
-    protected internal override IVertexBatch<PositionColorVertex> CreateQuadBatch(int size)
-        => new XNAVertexBatch<PositionColorVertex>(this, _gameWrapper, size);
+    protected override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
+        => new XNAVertexBatch<TexturedVertex2D>(this, _gameWrapper, size);
+
+    protected override INativeTexture CreateNativeTexture(int width, int height)
+        => throw new NotImplementedException();
+
+    protected override bool SetTextureImplementation(INativeTexture? texture, int unit)
+    {
+        throw new NotImplementedException();
+    }
 }
