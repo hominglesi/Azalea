@@ -22,7 +22,6 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
     private readonly uint _vbo;
     private readonly uint _ebo;
     private readonly uint _shader;
-    private readonly Graphics.Textures.Texture _texture;
 
     public Action<TVertex> AddAction;
 
@@ -72,9 +71,6 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
         _renderer = renderer;
         _gl = gl;
         _window = window;
-
-        using var stream = File.OpenRead("wall.png") ?? throw new Exception("File does not exist");
-        _texture = Graphics.Textures.Texture.FromStream(_renderer, stream) ?? throw new Exception("Could not create texture");
 
         AddAction = Add;
 
@@ -152,9 +148,6 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
 
         fixed (void* v = &_vertices[0])
             _gl.BufferData(BufferTargetARB.ArrayBuffer, (nuint)(_vertexCount * 7 * sizeof(float)), v, BufferUsageARB.StreamDraw);
-
-        _gl.ActiveTexture(TextureUnit.Texture0);
-        _gl.BindTexture(TextureTarget.Texture2D, ((GLTexture)_texture.NativeTexture).TextureId);
 
         var windowSize = _window.Size;
         var projection = Matrix4x4.CreateOrthographicOffCenter(0, windowSize.X, windowSize.Y, 0, 0.1f, 100);

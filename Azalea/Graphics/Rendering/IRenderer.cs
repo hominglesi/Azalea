@@ -18,4 +18,5 @@ public interface IRenderer
 
     internal IVertexBatch CreateQuadBatch(int size);
     internal Texture CreateTexture(int width, int height);
+    internal bool BindTexture(Texture texture);
 }

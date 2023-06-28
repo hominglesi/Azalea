@@ -1,12 +1,15 @@
 ﻿using Azalea.Graphics.Rendering.Vertices;
+using Azalea.Graphics.Textures;
 using System.Numerics;
 
 namespace Azalea.Graphics.Rendering;
 
 public static class RendererExtentions
 {
-    public static void DrawQuad(this IRenderer renderer, Vector2 position, Vector2 size, Color color)
+    public static void DrawQuad(this IRenderer renderer, Texture texture, Vector2 position, Vector2 size, Color color)
     {
+        renderer.BindTexture(texture);
+
         float left = position.X;
         float right = position.X + size.X;
         float top = position.Y;

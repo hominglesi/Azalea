@@ -28,9 +28,32 @@ internal class GLRenderer : Renderer
         _gl.Clear(ClearBufferMask.ColorBufferBit);
     }
 
-    protected internal override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
+    protected override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
         => new GLVertexBatch<TexturedVertex2D>(this, _gl, _window, size);
 
     protected override INativeTexture CreateNativeTexture(int width, int height)
         => new GLTexture(this, _gl, width, height);
+
+    protected override bool SetTextureImplementation(INativeTexture? texture, int unit)
+    {
+        if(texture is null)
+        {
+            _gl.ActiveTexture(TextureUnit.Texture0 + unit);
+            _gl.BindTexture(TextureTarget.Texture2D, 0);
+            return true;
+        }
+
+        switch (texture)
+        {
+            case GLTexture glTexture:
+                if (glTexture.TextureId <= 0)
+                    return false;
+
+                _gl.ActiveTexture(TextureUnit.Texture0 + unit);
+                _gl.BindTexture(TextureTarget.Texture2D, glTexture.TextureId);
+                break;
+        }
+
+        return true;
+    }
 }
