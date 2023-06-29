@@ -1,5 +1,7 @@
 ﻿using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.Rendering;
+using Azalea.Inputs;
+using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
@@ -15,6 +17,8 @@ internal class SilkGameHost : GameHost
 
     private GL Gl => _gl ?? throw new Exception("Cannot use GL before it is initialized");
     private GL? _gl;
+
+    private SilkInputManager? _inputManager;
 
     public SilkGameHost()
     {
@@ -33,6 +37,8 @@ internal class SilkGameHost : GameHost
     {
         _gl = _window.CreateOpenGL();
         _renderer = new GLRenderer(_gl, _window);
+
+        _inputManager = new SilkInputManager(_window.CreateInput());
 
         base.CallInitialized();
     }

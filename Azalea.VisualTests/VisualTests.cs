@@ -2,6 +2,8 @@
 using Azalea.Graphics.Textures;
 using System.Numerics;
 using Azalea.Graphics.Rendering;
+using Azalea.Inputs;
+using System.Diagnostics;
 
 namespace Azalea.VisualTests;
 
@@ -22,7 +24,8 @@ internal class VisualTests : AzaleaGame
 
     protected override void OnRender()
     {
-        Host.Renderer.DrawQuad(_tex1, new Vector2(100, 100), new Vector2(100, 200), new Color(150, 100, 255, 0));
-        Host.Renderer.DrawQuad(_tex2, new Vector2(150, 150), new Vector2(100, 200), new Color(150, 255, 50, 255));
+        Host.Renderer.DrawQuad(_tex1, Input.MousePosition, new Vector2(100, 200), new Color(150, 100, 255, 0));
+        if(Input.IsKeyPressed(Keys.A))
+            Host.Renderer.DrawQuad(_tex2, new Vector2(150, 150), new Vector2(100, 200), new Color(150, 255, 50, 255));
     }
 }
