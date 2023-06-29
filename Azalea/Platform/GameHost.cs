@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics.Rendering;
+using Azalea.IO.Assets;
 using Microsoft.Xna.Framework;
 
 namespace Azalea.Platform;
@@ -19,6 +20,7 @@ internal abstract class GameHost : IGameHost
     public virtual void CallInitialized()
     {
         Renderer.Initialize();
+        Assets.RENDERER = Renderer;
         Initialized?.Invoke();
     }
 
