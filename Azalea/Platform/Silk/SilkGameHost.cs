@@ -43,6 +43,13 @@ internal class SilkGameHost : GameHost
         base.CallInitialized();
     }
 
+    public override void CallOnRender()
+    {
+        base.CallOnRender();
+
+        _inputManager?.Update();
+    }
+
     public override void Run(AzaleaGame game)
     {
         base.Run(game);

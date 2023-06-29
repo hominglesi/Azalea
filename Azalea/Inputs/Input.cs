@@ -1,5 +1,6 @@
 ﻿using Silk.NET.GLFW;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -11,13 +12,13 @@ namespace Azalea.Inputs;
 public static class Input
 {
     internal static Vector2 MOUSE_POSITION;
-    internal static List<Keys> PRESSED_KEYS = new();
+    internal static ButtonState[] MOUSE_BUTTONS = new ButtonState[5];
+
+    internal static Dictionary<int, ButtonState> KEYBOARD_KEYS = new();
 
     public static Vector2 MousePosition => MOUSE_POSITION;
-    public static List<Keys> PressedKeys => PRESSED_KEYS;
 
-    public static bool IsKeyPressed(Keys key)
-    {
-        return PRESSED_KEYS.Contains(key);
-    }
+    public static ButtonState GetKey(Keys key) => GetKey((int)key);
+    public static ButtonState GetKey(int keycode) => KEYBOARD_KEYS[keycode];
+    public static ButtonState GetMouseButton(int index) => MOUSE_BUTTONS[index];
 }

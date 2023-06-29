@@ -23,9 +23,20 @@ internal class SilkInputManager
 
     private void Initialize()
     {
+        for (int i = 0; i < Input.MOUSE_BUTTONS.Length; i++)
+        {
+            Input.MOUSE_BUTTONS[i] = new ButtonState();
+        }
+        foreach (Keys key in (Keys[])Enum.GetValues(typeof(Keys)))
+        {
+            Input.KEYBOARD_KEYS.Add((int)key, new ButtonState());
+        }
+
         foreach (var mouse in _input.Mice)
         {
             mouse.MouseMove += ProcessMouseMove;
+            mouse.MouseDown += ProcessMouseDown;
+            mouse.MouseUp += ProcessMouseUp;
         }
         foreach (var keyboard in _input.Keyboards)
         {
@@ -39,17 +50,46 @@ internal class SilkInputManager
         Input.MOUSE_POSITION = position;
     }
 
+    private void ProcessMouseDown(IMouse mouse, MouseButton button)
+    {
+        var buttonIndex = (int)button;
+        if (buttonIndex > 4) return;
+
+        Input.MOUSE_BUTTONS[buttonIndex].SetDown();
+    }
+
+    private void ProcessMouseUp(IMouse mouse, MouseButton button)
+    {
+        var buttonIndex = (int)button;
+        if (buttonIndex > 4) return;
+
+        Input.MOUSE_BUTTONS[buttonIndex].SetUp();
+    }
+
     private void ProcessKeyDown(IKeyboard keyboard, Key key, int _)
     {
-        var pressedKey = (Keys)key;
-        if (Input.PRESSED_KEYS.Contains(pressedKey) == false)
-            Input.PRESSED_KEYS.Add(pressedKey);
+        var pressedKey = (int)key;
+        if (Input.KEYBOARD_KEYS.ContainsKey(pressedKey) == false) return;
+        Input.KEYBOARD_KEYS[pressedKey].SetDown();
     }
 
     private void ProcessKeyUp(IKeyboard keyboard, Key key, int _)
     {
-        var pressedKey = (Keys)key;
-        if (Input.PRESSED_KEYS.Contains(pressedKey))
-            Input.PRESSED_KEYS.Remove(pressedKey);
+        var pressedKey = (int)key;
+        if (Input.KEYBOARD_KEYS.ContainsKey(pressedKey) == false) return;
+        Input.KEYBOARD_KEYS[pressedKey].SetUp();
+    }
+
+    public void Update()
+    {
+        foreach (var key in Input.KEYBOARD_KEYS)
+        {
+            key.Value.Update();
+        }
+
+        foreach (var mouseButton in Input.MOUSE_BUTTONS)
+        {
+            mouseButton.Update();
+        }
     }
 }
