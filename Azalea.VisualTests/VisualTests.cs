@@ -24,9 +24,9 @@ internal class VisualTests : AzaleaGame
 
     protected override void OnRender()
     {
-        Host.Renderer.DrawQuad(_tex1, Input.MousePosition, new Vector2(100, 200), new Color(150, 100, 255, 0));
+        Host.Renderer.DrawQuad(_tex1, Input.MousePosition, new Vector2(100, 200));
         if (Input.GetKey(Keys.A).Pressed || Input.GetMouseButton(0).Pressed)
-            Host.Renderer.DrawQuad(_tex2, new Vector2(150, 150), new Vector2(100, 200), new Color(150, 255, 50, 255));
+            Host.Renderer.DrawQuad(_tex2, new Vector2(150, 150), new Vector2(100, 200));
 
     }
 }
