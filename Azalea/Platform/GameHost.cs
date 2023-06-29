@@ -9,6 +9,7 @@ internal abstract class GameHost : IGameHost
 
     public event Action? Initialized;
     public event Action? OnRender;
+    public event Action? OnUpdate;
 
     public virtual void Run(AzaleaGame game)
     {
@@ -26,5 +27,10 @@ internal abstract class GameHost : IGameHost
         if (Renderer.AutomaticallyClear) Renderer.Clear();
         OnRender?.Invoke();
         Renderer.FlushCurrentBatch();
+    }
+
+    public virtual void CallOnUpdate()
+    {
+        OnUpdate?.Invoke();
     }
 }

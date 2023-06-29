@@ -43,9 +43,9 @@ internal class SilkGameHost : GameHost
         base.CallInitialized();
     }
 
-    public override void CallOnRender()
+    public override void CallOnUpdate()
     {
-        base.CallOnRender();
+        base.CallOnUpdate();
 
         _inputManager?.Update();
     }

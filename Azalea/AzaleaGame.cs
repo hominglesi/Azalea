@@ -13,9 +13,12 @@ public abstract class AzaleaGame
 
         _host.Initialized += OnInitialize;
         _host.OnRender += OnRender;
+        _host.OnUpdate += OnUpdate;
     }
 
     protected virtual void OnInitialize() { }
 
     protected virtual void OnRender() { }
+
+    protected virtual void OnUpdate() { }
 }
