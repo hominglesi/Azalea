@@ -58,7 +58,7 @@ internal abstract class Renderer : IRenderer
     internal bool BindTexture(Texture texture, int unit = 0)
     {
         return BindTexture(texture.NativeTexture, unit);
-    } 
+    }
 
     internal bool BindTexture(INativeTexture nativeTexture, int unit = 0)
     {

@@ -1,9 +1,8 @@
 ﻿using Azalea.Extentions.ImageExtentions;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace Azalea.Graphics.Textures;
 
@@ -36,7 +35,7 @@ internal class TextureUpload : ITextureUpload
     }
 
     private bool disposed;
-    
+
     public void Dispose()
     {
         Dispose(true);

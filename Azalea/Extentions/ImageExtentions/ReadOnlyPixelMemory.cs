@@ -1,10 +1,8 @@
-﻿using System;
+﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Azalea.Extentions.ImageExtentions;
 
@@ -18,7 +16,7 @@ internal struct ReadOnlyPixelMemory<TPixel> : IDisposable
     internal ReadOnlyPixelMemory(Image<TPixel> image)
     {
         _image = image;
-        if(_image.DangerousTryGetSinglePixelMemory(out _))
+        if (_image.DangerousTryGetSinglePixelMemory(out _))
         {
             _owner = null;
             _memory = null;

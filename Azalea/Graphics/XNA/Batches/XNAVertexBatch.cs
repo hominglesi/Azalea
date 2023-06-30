@@ -3,6 +3,7 @@ using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Platform.XNA;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace Azalea.Graphics.XNA.Batches;
 

@@ -20,7 +20,7 @@ internal class GLRenderer : Renderer
 
     protected internal override void SetClearColor(Color value)
     {
-        _gl.ClearColor(value.RNormalized, value.GNormalized, value.BNormalized, value.ANormalized );
+        _gl.ClearColor(value.RNormalized, value.GNormalized, value.BNormalized, value.ANormalized);
     }
 
     protected override void ClearImplementation(Color color)
@@ -36,7 +36,7 @@ internal class GLRenderer : Renderer
 
     protected override bool SetTextureImplementation(INativeTexture? texture, int unit)
     {
-        if(texture is null)
+        if (texture is null)
         {
             _gl.ActiveTexture(TextureUnit.Texture0 + unit);
             _gl.BindTexture(TextureTarget.Texture2D, 0);

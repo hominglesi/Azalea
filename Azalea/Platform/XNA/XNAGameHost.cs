@@ -1,6 +1,5 @@
 ﻿using Azalea.Graphics.Rendering;
 using Azalea.Graphics.XNA;
-using Microsoft.Xna.Framework;
 
 namespace Azalea.Platform.XNA;
 

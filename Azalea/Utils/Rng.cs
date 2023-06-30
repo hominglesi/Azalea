@@ -1,5 +1,6 @@
-﻿using System.Numerics;
-using Azalea.Graphics;
+﻿using Azalea.Graphics;
+using System;
+using System.Numerics;
 
 namespace Azalea.Utils;
 
@@ -88,8 +89,8 @@ public static class Rng
     /// Generates a random Color structure
     /// </summary>
     /// <returns>A random Color structure</returns>
-    public static Azalea.Graphics.Color Color()
+    public static Color Color()
     {
-        return new Azalea.Graphics.Color(Byte(), Byte(), Byte());
+        return new Color(Byte(), Byte(), Byte());
     }
 }

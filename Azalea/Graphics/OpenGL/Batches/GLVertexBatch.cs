@@ -1,12 +1,8 @@
-﻿using Azalea.Graphics.OpenGL.Textures;
-using Azalea.Graphics.Rendering;
+﻿using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
-using Microsoft.Xna.Framework.Graphics;
-using Silk.NET.Maths;
 using Silk.NET.OpenGL;
-using Silk.NET.SDL;
 using Silk.NET.Windowing;
-using SixLabors.ImageSharp.Formats;
+using System;
 using System.Numerics;
 
 namespace Azalea.Graphics.OpenGL.Batches;
@@ -127,7 +123,7 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
         _gl.DeleteShader(vertexShader);
         _gl.DeleteShader(fragmentShader);
 
-        _gl.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 7 * sizeof(float), (void*) 0);
+        _gl.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 7 * sizeof(float), (void*)0);
         _gl.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 7 * sizeof(float), (void*)(2 * sizeof(float)));
         _gl.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 7 * sizeof(float), (void*)(5 * sizeof(float)));
         _gl.EnableVertexAttribArray(0);

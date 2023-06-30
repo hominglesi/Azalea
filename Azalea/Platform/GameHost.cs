@@ -1,6 +1,6 @@
 ﻿using Azalea.Graphics.Rendering;
 using Azalea.IO.Assets;
-using Microsoft.Xna.Framework;
+using System;
 
 namespace Azalea.Platform;
 
