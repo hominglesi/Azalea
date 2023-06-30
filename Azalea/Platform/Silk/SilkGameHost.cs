@@ -31,6 +31,7 @@ internal class SilkGameHost : GameHost
         _window = Window.Create(windowOptions);
         _window.Load += CallInitialized;
         _window.Render += (_) => CallOnRender();
+        _window.Update += (_) => CallOnUpdate();
     }
 
     public override void CallInitialized()
