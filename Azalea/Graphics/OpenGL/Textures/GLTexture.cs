@@ -1,6 +1,7 @@
 ﻿using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Textures;
 using Silk.NET.OpenGL;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace Azalea.Graphics.OpenGL.Textures;
 

@@ -1,6 +1,7 @@
 ﻿using Azalea.Platform;
 using Azalea.Platform.Silk;
 using Azalea.Platform.XNA;
+using System;
 
 namespace Azalea;
 
