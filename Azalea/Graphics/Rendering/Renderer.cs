@@ -8,6 +8,9 @@ internal abstract class Renderer : IRenderer
     private IVertexBatch<TexturedVertex2D>? defaultQuadBatch;
     private IVertexBatch? currentActiveBatch;
 
+    private readonly INativeTexture[] lastBoundTexture = new INativeTexture[16];
+    private int lastActiveTextureUnit = -1;
+
     private Color _clearColor;
     public Color ClearColor
     {
@@ -52,15 +55,23 @@ internal abstract class Renderer : IRenderer
         currentActiveBatch?.Draw();
     }
 
-    internal bool BindTexture(Texture texture)
+    internal bool BindTexture(Texture texture, int unit = 0)
     {
-        return BindTexture(texture.NativeTexture);
+        return BindTexture(texture.NativeTexture, unit);
     } 
 
-    internal bool BindTexture(INativeTexture nativeTexture)
+    internal bool BindTexture(INativeTexture nativeTexture, int unit = 0)
     {
+        if (lastActiveTextureUnit == unit && lastBoundTexture[unit] == nativeTexture)
+            return true;
+
         FlushCurrentBatch();
-        SetTextureImplementation(nativeTexture, 0);
+        if (SetTextureImplementation(nativeTexture, unit) == false)
+            return false;
+
+        lastBoundTexture[unit] = nativeTexture;
+        lastActiveTextureUnit = unit;
+
         return true;
     }
 
@@ -68,5 +79,5 @@ internal abstract class Renderer : IRenderer
     IVertexBatch<TexturedVertex2D> IRenderer.DefaultQuadBatch => defaultQuadBatch ?? throw new Exception("Cannot call DefaultQuadBatch before Initialization");
     void IRenderer.FlushCurrentBatch() => FlushCurrentBatch();
     IVertexBatch IRenderer.CreateQuadBatch(int size) => CreateQuadBatch(size);
-    bool IRenderer.BindTexture(Azalea.Graphics.Textures.Texture texture) => BindTexture(texture);
+    bool IRenderer.BindTexture(Texture texture, int unit) => BindTexture(texture, unit);
 }
