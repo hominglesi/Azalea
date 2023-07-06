@@ -1,48 +1,45 @@
-﻿using Azalea.Graphics.Rendering.Vertices;
+﻿using Azalea.Graphics.Primitives;
+using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Graphics.Textures;
-using System.Numerics;
 
 namespace Azalea.Graphics.Rendering;
 
 public static class RendererExtentions
 {
-    public static void DrawQuad(this IRenderer renderer, Texture texture, Vector2 position, Vector2 size, Color drawColor = default)
+    public static void DrawQuad(this IRenderer renderer, Texture texture, Quad vertexQuad, DrawColorInfo drawColorInfo)
     {
-        renderer.BindTexture(texture);
+        if (drawColorInfo.Alpha <= 0) return;
 
-        float left = position.X;
-        float right = position.X + size.X;
-        float top = position.Y;
-        float bottom = position.Y + size.Y;
+        renderer.BindTexture(texture);
 
         var vertexAction = renderer.DefaultQuadBatch.AddAction;
 
         vertexAction(new TexturedVertex2D
         {
-            Position = new(left, top),
-            Color = drawColor,
-            TexturePosition = new(0, 0)
+            Position = vertexQuad.BottomLeft,
+            Color = new Color(255, 255, 255, (byte)(drawColorInfo.Alpha * byte.MaxValue)),
+            TexturePosition = new(0, 1)
         });
 
         vertexAction(new TexturedVertex2D
         {
-            Position = new(right, top),
-            Color = drawColor,
-            TexturePosition = new(1, 0)
-        });
-
-        vertexAction(new TexturedVertex2D
-        {
-            Position = new(right, bottom),
-            Color = drawColor,
+            Position = vertexQuad.BottomRight,
+            Color = new Color(255, 255, 255, (byte)(drawColorInfo.Alpha * byte.MaxValue)),
             TexturePosition = new(1, 1)
         });
 
         vertexAction(new TexturedVertex2D
         {
-            Position = new(left, bottom),
-            Color = drawColor,
-            TexturePosition = new(0, 1)
+            Position = vertexQuad.TopRight,
+            Color = new Color(255, 255, 255, (byte)(drawColorInfo.Alpha * byte.MaxValue)),
+            TexturePosition = new(1, 0)
+        });
+
+        vertexAction(new TexturedVertex2D
+        {
+            Position = vertexQuad.TopLeft,
+            Color = new Color(255, 255, 255, (byte)(drawColorInfo.Alpha * byte.MaxValue)),
+            TexturePosition = new(0, 0)
         });
     }
 }
