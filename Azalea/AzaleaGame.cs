@@ -1,9 +1,10 @@
-﻿using Azalea.Platform;
+﻿using Azalea.Graphics.Containers;
+using Azalea.Platform;
 using System;
 
 namespace Azalea;
 
-public abstract class AzaleaGame
+public abstract class AzaleaGame : Container
 {
     public IGameHost Host => _host ?? throw new Exception("GameHost has not been set");
     private GameHost? _host;

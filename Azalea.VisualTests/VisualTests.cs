@@ -1,5 +1,4 @@
 ﻿using Azalea.Graphics;
-using Azalea.Graphics.Containers;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.IO.Assets;
@@ -9,8 +8,6 @@ namespace Azalea.VisualTests;
 
 internal class VisualTests : AzaleaGame
 {
-    private Container container;
-
     private Sprite cursor;
     private Sprite hidden;
 
@@ -18,24 +15,20 @@ internal class VisualTests : AzaleaGame
     {
         Host.Renderer.ClearColor = Color.Azalea;
 
-        container = new Container();
 
-        cursor = new Sprite()
+        Add(cursor = new Sprite()
         {
             Texture = Assets.GetTexture("wall.png"),
             Position = Input.MousePosition,
             Size = new Vector2(100, 200)
-        };
+        });
 
-        hidden = new Sprite()
+        Add(hidden = new Sprite()
         {
             Texture = Assets.GetTexture("wall2.png"),
             Position = new Vector2(150, 150),
             Size = new Vector2(100, 200)
-        };
-
-        container.Add(cursor);
-        container.Add(hidden);
+        });
     }
 
     protected override void OnUpdate()
@@ -45,11 +38,5 @@ internal class VisualTests : AzaleaGame
         if (Input.GetKey(Keys.A).Pressed || Input.GetMouseButton(0).Pressed)
             hidden.Alpha = 1;
         else hidden.Alpha = 0;
-    }
-
-    protected override void OnRender()
-    {
-        var node = container.GenerateDrawNodeSubtree();
-        node?.Draw(Host.Renderer);
     }
 }
