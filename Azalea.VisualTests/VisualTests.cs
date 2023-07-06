@@ -36,7 +36,7 @@ internal class VisualTests : AzaleaGame
     {
         cursor.Position = Input.MousePosition;
 
-        if (Input.GetKey(Keys.A).Pressed || Input.GetMouseButton(0).Pressed)
+        if (Input.GetKey(Keys.ShiftLeft).Pressed || Input.GetMouseButton(0).Pressed)
             hidden.Alpha = 1;
         else hidden.Alpha = 0;
     }

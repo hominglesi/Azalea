@@ -24,6 +24,8 @@ internal class SilkInputManager
         }
         foreach (Keys key in (Keys[])Enum.GetValues(typeof(Keys)))
         {
+            if (Input.KEYBOARD_KEYS.ContainsKey((int)key)) continue;
+
             Input.KEYBOARD_KEYS.Add((int)key, new ButtonState());
         }
 
