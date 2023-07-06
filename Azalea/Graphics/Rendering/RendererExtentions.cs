@@ -6,7 +6,7 @@ namespace Azalea.Graphics.Rendering;
 
 public static class RendererExtentions
 {
-    public static void DrawQuad(this IRenderer renderer, Texture texture, Quad vertexQuad, DrawColorInfo drawColorInfo)
+    internal static void DrawQuad(this IRenderer renderer, Texture texture, Quad vertexQuad, DrawColorInfo drawColorInfo)
     {
         if (drawColorInfo.Alpha <= 0) return;
 
