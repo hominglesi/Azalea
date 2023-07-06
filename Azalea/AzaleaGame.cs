@@ -20,7 +20,5 @@ public abstract class AzaleaGame : Container
 
     protected virtual void OnInitialize() { }
 
-    protected virtual void OnRender() { }
-
     protected virtual void OnUpdate() { }
 }

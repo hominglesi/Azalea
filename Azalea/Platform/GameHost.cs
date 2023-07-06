@@ -10,7 +10,6 @@ internal abstract class GameHost : IGameHost
     public abstract IRenderer Renderer { get; }
 
     public event Action? Initialized;
-    public event Action? OnRender;
     public event Action? OnUpdate;
 
     public Container Root => _root ?? throw new Exception("Cannot use root before the game has started");
@@ -41,7 +40,6 @@ internal abstract class GameHost : IGameHost
         var node = Root.GenerateDrawNodeSubtree();
         node?.Draw(Renderer);
 
-        OnRender?.Invoke();
         Renderer.FlushCurrentBatch();
     }
 
