@@ -15,19 +15,19 @@ internal class VisualTests : AzaleaGame
     {
         Host.Renderer.ClearColor = Color.Azalea;
 
-
-        Add(cursor = new Sprite()
-        {
-            Texture = Assets.GetTexture("wall.png"),
-            Position = Input.MousePosition,
-            Size = new Vector2(100, 200)
-        });
-
-        Add(hidden = new Sprite()
-        {
-            Texture = Assets.GetTexture("wall2.png"),
-            Position = new Vector2(150, 150),
-            Size = new Vector2(100, 200)
+        AddRange(new[]{
+            cursor = new Sprite()
+            {
+                Texture = Assets.GetTexture("wall.png"),
+                Position = Input.MousePosition,
+                Size = new Vector2(100, 200)
+            },
+            hidden = new Sprite()
+            {
+                Texture = Assets.GetTexture("wall2.png"),
+                Position = new Vector2(150, 150),
+                Size = new Vector2(100, 200)
+            }
         });
     }
 

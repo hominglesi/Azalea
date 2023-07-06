@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Azalea.Graphics.Containers;
 
@@ -27,11 +28,17 @@ public class Container<T> : CompositeGameObject
             Content.Add(drawable);
     }
 
+    public virtual void AddRange(IEnumerable<T> range)
+    {
+        foreach (T drawable in range)
+            Add(drawable);
+    }
+
     protected override void AddInternal(GameObject gameObject)
     {
         if (Content == this && gameObject != null && (gameObject is T) == false)
         {
-
+            throw new Exception("Cannot add Game Object");
         }
 
         enumeratorVersion++;

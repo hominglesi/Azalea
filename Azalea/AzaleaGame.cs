@@ -14,7 +14,6 @@ public abstract class AzaleaGame : Container
         _host = host;
 
         _host.Initialized += OnInitialize;
-        _host.OnRender += OnRender;
         _host.OnUpdate += OnUpdate;
     }
 
