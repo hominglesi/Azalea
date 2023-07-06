@@ -1,30 +1,42 @@
 ﻿using Azalea.Graphics;
-using Azalea.Graphics.Textures;
-using System.Numerics;
-using Azalea.Graphics.Rendering;
+using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
-using System.Diagnostics;
 using Azalea.IO.Assets;
+using System.Numerics;
 
 namespace Azalea.VisualTests;
 
 internal class VisualTests : AzaleaGame
 {
-    private Texture _tex1;
-    private Texture _tex2;
+    private Sprite cursor;
+    private Sprite hidden;
 
     protected override void OnInitialize()
     {
         Host.Renderer.ClearColor = Color.Azalea;
 
-        _tex1 = Assets.GetTexture("wall.png");
-        _tex2 = Assets.GetTexture("wall2.png");
+        AddRange(new[]{
+            cursor = new Sprite()
+            {
+                Texture = Assets.GetTexture("wall.png"),
+                Position = Input.MousePosition,
+                Size = new Vector2(100, 200)
+            },
+            hidden = new Sprite()
+            {
+                Texture = Assets.GetTexture("wall2.png"),
+                Position = new Vector2(150, 150),
+                Size = new Vector2(100, 200)
+            }
+        });
     }
 
-    protected override void OnRender()
+    protected override void OnUpdate()
     {
-        Host.Renderer.DrawQuad(_tex1, Input.MousePosition, new Vector2(100, 200));
+        cursor.Position = Input.MousePosition;
+
         if (Input.GetKey(Keys.A).Pressed || Input.GetMouseButton(0).Pressed)
-            Host.Renderer.DrawQuad(_tex2, new Vector2(150, 150), new Vector2(100, 200));
+            hidden.Alpha = 1;
+        else hidden.Alpha = 0;
     }
 }

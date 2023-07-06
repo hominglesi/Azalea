@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.Rendering;
+﻿using Azalea.Graphics.Containers;
+using Azalea.Graphics.Rendering;
 using Azalea.IO.Assets;
 using System;
 
@@ -9,12 +10,20 @@ internal abstract class GameHost : IGameHost
     public abstract IRenderer Renderer { get; }
 
     public event Action? Initialized;
-    public event Action? OnRender;
     public event Action? OnUpdate;
+
+    public Container Root => _root ?? throw new Exception("Cannot use root before the game has started");
+
+    private Container? _root;
 
     public virtual void Run(AzaleaGame game)
     {
+        var root = new Container();
+        root.Add(game);
+
         game.SetHost(this);
+
+        _root = root;
     }
 
     public virtual void CallInitialized()
@@ -27,7 +36,10 @@ internal abstract class GameHost : IGameHost
     public virtual void CallOnRender()
     {
         if (Renderer.AutomaticallyClear) Renderer.Clear();
-        OnRender?.Invoke();
+
+        var node = Root.GenerateDrawNodeSubtree();
+        node?.Draw(Renderer);
+
         Renderer.FlushCurrentBatch();
     }
 
