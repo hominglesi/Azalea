@@ -104,7 +104,20 @@ public abstract class GameObject : IGameObject
 
     #endregion
 
-    #region Alpha
+    #region Color & Alpha
+
+    private Color color = Color.White;
+
+    public Color Color
+    {
+        get => color;
+        set
+        {
+            if (color == value) return;
+
+            color = value;
+        }
+    }
 
     private float alpha = 1.0f;
 
@@ -149,7 +162,7 @@ public abstract class GameObject : IGameObject
 
     private DrawColorInfo computeDrawColorInfo()
     {
-        return new DrawColorInfo(Alpha);
+        return new DrawColorInfo(Color, Alpha);
     }
 
     private DrawNode? drawNode;

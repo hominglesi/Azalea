@@ -57,8 +57,7 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
 
         void main()
         {
-            FragColor = vec4(oCol.x, oCol.y, oCol.z, 1.0);
-            FragColor = texture(uTexture, oTex);
+            FragColor = texture(uTexture, oTex) * vec4(oCol.x, oCol.y, oCol.z, 1.0);
         }
         ";
 

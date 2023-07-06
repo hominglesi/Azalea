@@ -17,28 +17,28 @@ public static class RendererExtentions
         vertexAction(new TexturedVertex2D
         {
             Position = vertexQuad.BottomLeft,
-            Color = new Color(255, 255, 255, (byte)(drawColorInfo.Alpha * byte.MaxValue)),
+            Color = drawColorInfo.AlphaAdjustedColor,
             TexturePosition = new(0, 1)
         });
 
         vertexAction(new TexturedVertex2D
         {
             Position = vertexQuad.BottomRight,
-            Color = new Color(255, 255, 255, (byte)(drawColorInfo.Alpha * byte.MaxValue)),
+            Color = drawColorInfo.AlphaAdjustedColor,
             TexturePosition = new(1, 1)
         });
 
         vertexAction(new TexturedVertex2D
         {
             Position = vertexQuad.TopRight,
-            Color = new Color(255, 255, 255, (byte)(drawColorInfo.Alpha * byte.MaxValue)),
+            Color = drawColorInfo.AlphaAdjustedColor,
             TexturePosition = new(1, 0)
         });
 
         vertexAction(new TexturedVertex2D
         {
             Position = vertexQuad.TopLeft,
-            Color = new Color(255, 255, 255, (byte)(drawColorInfo.Alpha * byte.MaxValue)),
+            Color = drawColorInfo.AlphaAdjustedColor,
             TexturePosition = new(0, 0)
         });
     }

@@ -26,7 +26,8 @@ internal class VisualTests : AzaleaGame
             {
                 Texture = Assets.GetTexture("wall.png"),
                 Position = Input.MousePosition,
-                Size = new Vector2(100, 200)
+                Size = new Vector2(100, 200),
+                Color = Color.Red
             }
         });
     }
