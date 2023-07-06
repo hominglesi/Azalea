@@ -5,6 +5,7 @@ namespace Azalea.Platform.XNA;
 
 internal class XNAGameHost : GameHost
 {
+    public override IWindow Window => throw new System.NotImplementedException();
     public override IRenderer Renderer => _renderer;
     private readonly XNARenderer _renderer;
 

@@ -7,6 +7,7 @@ namespace Azalea.Platform;
 
 internal abstract class GameHost : IGameHost
 {
+    public abstract IWindow Window { get; }
     public abstract IRenderer Renderer { get; }
 
     public event Action? Initialized;

@@ -1,7 +1,6 @@
 ﻿using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.Rendering;
 using Silk.NET.Input;
-using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 using System;
@@ -10,10 +9,11 @@ namespace Azalea.Platform.Silk;
 
 internal class SilkGameHost : GameHost
 {
+    public override IWindow Window => _window ?? throw new Exception("Cannot use Window before it is initialized");
+    private SilkWindow _window;
+
     public override IRenderer Renderer => _renderer ?? throw new Exception("Cannot use Renderer before it is initialized");
     private GLRenderer? _renderer;
-
-    private readonly IWindow _window;
 
     private GL Gl => _gl ?? throw new Exception("Cannot use GL before it is initialized");
     private GL? _gl;
@@ -22,24 +22,19 @@ internal class SilkGameHost : GameHost
 
     public SilkGameHost()
     {
-        var windowOptions = WindowOptions.Default with
-        {
-            Size = new Vector2D<int>(800, 600),
-            Title = "Game"
-        };
+        _window = new SilkWindow();
 
-        _window = Window.Create(windowOptions);
-        _window.Load += CallInitialized;
-        _window.Render += (_) => CallOnRender();
-        _window.Update += (_) => CallOnUpdate();
+        _window.Window.Load += CallInitialized;
+        _window.Window.Render += (_) => CallOnRender();
+        _window.Window.Update += (_) => CallOnUpdate();
     }
 
     public override void CallInitialized()
     {
-        _gl = _window.CreateOpenGL();
-        _renderer = new GLRenderer(_gl, _window);
+        _gl = _window.Window.CreateOpenGL();
+        _renderer = new GLRenderer(_gl, _window.Window);
 
-        _inputManager = new SilkInputManager(_window.CreateInput());
+        _inputManager = new SilkInputManager(_window.Window.CreateInput());
 
         base.CallInitialized();
     }
@@ -54,7 +49,7 @@ internal class SilkGameHost : GameHost
     public override void Run(AzaleaGame game)
     {
         base.Run(game);
-        _window.Run();
+        _window.Window.Run();
     }
 
 
