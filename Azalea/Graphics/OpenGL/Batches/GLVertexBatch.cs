@@ -1,7 +1,7 @@
 ﻿using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
+using Azalea.Platform;
 using Silk.NET.OpenGL;
-using Silk.NET.Windowing;
 using System;
 using System.Numerics;
 
@@ -144,7 +144,7 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
         fixed (void* v = &_vertices[0])
             _gl.BufferData(BufferTargetARB.ArrayBuffer, (nuint)(_vertexCount * 7 * sizeof(float)), v, BufferUsageARB.StreamDraw);
 
-        var windowSize = _window.Size;
+        var windowSize = _window.ClientSize;
         var projection = Matrix4x4.CreateOrthographicOffCenter(0, windowSize.X, windowSize.Y, 0, 0.1f, 100);
 
         var projectionUniform = _gl.GetUniformLocation(_shader, "uProjection");
@@ -155,7 +155,7 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
         if (textureLocation == -1) throw new Exception($"uTexture uniform not found in shader");
         _gl.Uniform1(textureLocation, 0);
 
-        _gl.DrawElements(Silk.NET.OpenGL.PrimitiveType.Triangles, (uint)((_vertexCount / 4) * 6), DrawElementsType.UnsignedInt, null);
+        _gl.DrawElements(PrimitiveType.Triangles, (uint)((_vertexCount / 4) * 6), DrawElementsType.UnsignedInt, null);
 
         _vertexCount = 0;
 

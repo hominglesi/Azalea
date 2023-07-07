@@ -1,6 +1,5 @@
 ﻿using Silk.NET.Maths;
 using Silk.NET.Windowing;
-using System.Numerics;
 using IWindowSilk = Silk.NET.Windowing.IWindow;
 using WindowSilk = Silk.NET.Windowing.Window;
 
@@ -19,9 +18,14 @@ internal class SilkWindow : IWindow
         };
 
         Window = WindowSilk.Create(windowOptions);
+        Window.WindowBorder = WindowBorder.Fixed;
     }
 
-    public Vector2 ClientSize => new(Window.Size.X, Window.Size.Y);
+    public Vector2Int ClientSize
+    {
+        get => Window.Size;
+        set => Window.Size = value;
+    }
 
     public string Title
     {

@@ -2,8 +2,8 @@
 using Azalea.Graphics.OpenGL.Textures;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
+using Azalea.Platform;
 using Silk.NET.OpenGL;
-using Silk.NET.Windowing;
 
 namespace Azalea.Graphics.OpenGL;
 

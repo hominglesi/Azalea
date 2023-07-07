@@ -1,10 +1,8 @@
-﻿using System.Numerics;
-
-namespace Azalea.Platform;
+﻿namespace Azalea.Platform;
 
 public interface IWindow
 {
-    Vector2 ClientSize { get; }
+    Vector2Int ClientSize { get; set; }
 
     string Title { get; set; }
 }
