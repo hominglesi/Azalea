@@ -154,6 +154,25 @@ public abstract class GameObject : IGameObject
         }
     }
 
+    private CompositeGameObject? parent;
+
+    public CompositeGameObject? Parent
+    {
+        get => parent;
+        set
+        {
+            if (value == null)
+                ChildID = 0;
+
+            if (parent == value) return;
+
+            if (value != null && parent != null)
+                throw new Exception("Cannot add GameObject to multiple containers");
+
+            parent = value;
+        }
+    }
+
     protected virtual DrawNode CreateDrawNode() => new(this);
 
     public virtual Quad ScreenSpaceDrawQuad => new(Position, Size);

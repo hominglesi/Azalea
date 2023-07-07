@@ -32,7 +32,7 @@ public partial class CompositeGameObject : GameObject
             throw new InvalidOperationException($"Cannot add Game Object to multiple containers.");
 
         gameObject.ChildID = ++currentChildID;
-        //gameObject.Parent = this;
+        gameObject.Parent = this;
 
         internalChildren.Add(gameObject);
     }
