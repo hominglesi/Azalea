@@ -14,11 +14,11 @@ internal class SilkWindow : IWindow
         var windowOptions = WindowOptions.Default with
         {
             Size = new Vector2D<int>(800, 600),
-            Title = "Game"
+            Title = "Game",
+            WindowBorder = WindowBorder.Fixed
         };
 
         Window = WindowSilk.Create(windowOptions);
-        Window.WindowBorder = WindowBorder.Fixed;
     }
 
     public Vector2Int ClientSize
