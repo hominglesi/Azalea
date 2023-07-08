@@ -15,7 +15,6 @@ internal class SilkGameHost : GameHost
     public override IRenderer Renderer => _renderer ?? throw new Exception("Cannot use Renderer before it is initialized");
     private GLRenderer? _renderer;
 
-    private GL Gl => _gl ?? throw new Exception("Cannot use GL before it is initialized");
     private GL? _gl;
 
     private SilkInputManager? _inputManager;
