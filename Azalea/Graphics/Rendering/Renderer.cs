@@ -1,5 +1,7 @@
 ﻿using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Graphics.Textures;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System;
 
 namespace Azalea.Graphics.Rendering;
@@ -30,6 +32,16 @@ internal abstract class Renderer : IRenderer
     {
         defaultQuadBatch = CreateQuadBatch(100);
         currentActiveBatch = defaultQuadBatch;
+    }
+
+    private Texture? whitePixel;
+    public Texture WhitePixel => whitePixel ??= generateWhitePixel();
+    private Texture generateWhitePixel()
+    {
+        var whitePixel = CreateTexture(1, 1);
+        var whitePixelData = new Image<Rgba32>(1, 1, new Rgba32 { R = 255, G = 255, B = 255, A = 255 });
+        whitePixel.SetData(new TextureUpload(whitePixelData));
+        return whitePixel;
     }
 
     protected abstract bool SetTextureImplementation(INativeTexture? texture, int unit);

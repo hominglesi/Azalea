@@ -10,6 +10,7 @@ internal class VisualTests : AzaleaGame
 {
     private Sprite cursor;
     private Sprite hidden;
+    private Sprite solid;
 
     protected override void OnInitialize()
     {
@@ -22,6 +23,13 @@ internal class VisualTests : AzaleaGame
                 Texture = Assets.GetTexture("wall2.png"),
                 Position = Vector2.Zero,
                 Size = Host.Window.ClientSize
+            },
+            solid = new Sprite()
+            {
+                Texture = Host.Renderer.WhitePixel,
+                Position = new Vector2(200, 200),
+                Size = new Vector2(300, 50),
+                Color = Color.Azalea
             },
             cursor = new Sprite()
             {

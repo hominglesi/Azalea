@@ -11,6 +11,7 @@ public interface IRenderer
     public Color ClearColor { get; set; }
     public bool AutomaticallyClear { get; set; }
     internal IVertexBatch<TexturedVertex2D> DefaultQuadBatch { get; }
+    public Texture WhitePixel { get; }
 
     internal void Initialize();
     public void Clear();
