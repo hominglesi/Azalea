@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using Azalea.Numerics;
+using System.Numerics;
 
 namespace Azalea.Graphics.Primitives;
 
@@ -27,4 +28,18 @@ public readonly struct Quad
 
     public Quad(Vector2 position, Vector2 size)
         : this(position.X, position.Y, size.X, size.Y) { }
+
+    public static implicit operator Quad(Rectangle r) => FromRectangle(r);
+
+    public static Quad FromRectangle(Rectangle rectangle) =>
+        new(rectangle.TopLeft,
+            rectangle.BottomLeft,
+            rectangle.BottomRight,
+            rectangle.TopRight);
+
+    public static Quad operator *(Quad r, Matrix3 m) =>
+        new(Vector2Extentions.Transform(r.TopLeft, m),
+            Vector2Extentions.Transform(r.BottomLeft, m),
+            Vector2Extentions.Transform(r.BottomRight, m),
+            Vector2Extentions.Transform(r.TopRight, m));
 }

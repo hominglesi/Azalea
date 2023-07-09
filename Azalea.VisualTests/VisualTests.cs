@@ -15,7 +15,6 @@ internal class VisualTests : AzaleaGame
     protected override void OnInitialize()
     {
         Host.Renderer.ClearColor = Color.Azalea;
-        //Host.Window.ClientSize = new Vector2Int(1280, 720);
 
         AddRange(new[]{
             hidden = new Sprite()

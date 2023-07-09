@@ -1,5 +1,6 @@
 ﻿using Azalea.Graphics.Containers;
 using Azalea.Graphics.Primitives;
+using Azalea.Numerics;
 using System;
 using System.Numerics;
 
@@ -102,6 +103,8 @@ public abstract class GameObject : IGameObject
         }
     }
 
+    public Rectangle DrawRectangle => new(0, 0, Size.X, Size.Y);
+
     #endregion
 
     #region Color & Alpha
@@ -175,7 +178,29 @@ public abstract class GameObject : IGameObject
 
     protected virtual DrawNode CreateDrawNode() => new(this);
 
-    public virtual Quad ScreenSpaceDrawQuad => new(Position, Size);
+    private DrawInfo? drawInfo;
+    public DrawInfo DrawInfo => (DrawInfo)(drawInfo = computeDrawInfo());
+    private DrawInfo computeDrawInfo()
+    {
+        DrawInfo di = Parent?.DrawInfo ?? new DrawInfo(null);
+
+        Vector2 pos = Position;
+
+        di.ApplyTransformations(pos, Vector2.One, 0, Vector2.Zero, Vector2.Zero);
+
+        return di;
+    }
+
+
+    #region DrawInfo-based conversions
+
+    public Vector2 ToScreenSpace(Vector2 input) => Vector2Extentions.Transform(input, DrawInfo.Matrix);
+
+    public Quad ToScreenSpace(Rectangle input) => Quad.FromRectangle(input) * DrawInfo.Matrix;
+
+    #endregion
+
+    public virtual Quad ScreenSpaceDrawQuad => ToScreenSpace(DrawRectangle);
 
     public virtual DrawColorInfo DrawColorInfo => computeDrawColorInfo();
 
