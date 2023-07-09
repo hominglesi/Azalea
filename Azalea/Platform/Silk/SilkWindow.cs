@@ -13,7 +13,7 @@ internal class SilkWindow : IWindow
     {
         var windowOptions = WindowOptions.Default with
         {
-            Size = new Vector2D<int>(800, 600),
+            Size = new Vector2D<int>(1280, 720),
             Title = "Game",
             WindowBorder = WindowBorder.Fixed
         };
@@ -24,7 +24,7 @@ internal class SilkWindow : IWindow
     public Vector2Int ClientSize
     {
         get => Window.Size;
-        set => Window.Size = value;
+        //set => Window.Size = value;
     }
 
     public string Title
