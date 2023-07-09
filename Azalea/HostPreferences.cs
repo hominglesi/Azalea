@@ -2,7 +2,7 @@
 
 public struct HostPreferences
 {
-    public HostType Type = HostType.XNA;
+    public HostType Type = HostType.Silk;
 
     public HostPreferences() { }
 }
