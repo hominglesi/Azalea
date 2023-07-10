@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Azalea.Graphics.Textures;
 
-internal class TextureUpload : ITextureUpload
+public class TextureUpload : ITextureUpload
 {
     public ReadOnlySpan<Rgba32> Data => _pixelMemory.Span;
 

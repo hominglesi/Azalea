@@ -8,6 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\wall.png" />
+    <None Remove="Resources\wall2.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\wall.png" />
+    <EmbeddedResource Include="Resources\wall2.png" />
+  </ItemGroup>
+
+  <ItemGroup>
 	  <ProjectReference Include="..\Azalea\Azalea.csproj">
 		  <ExcludeAssets>compile</ExcludeAssets>
 	  </ProjectReference>

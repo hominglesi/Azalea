@@ -1,28 +1,12 @@
 ﻿using Azalea.Graphics.Textures;
-using System;
-using System.Diagnostics;
 using System.IO;
 
 namespace Azalea.IO.Assets;
 
 public static partial class Assets
 {
-    public static Texture GetTexture(string path)
-    {
-        if (RESOURCE_STORE.ContainsKey(path) == false) loadTexture(path);
+    public static Texture? GetTexture(string path) => Textures.Get(path);
 
-        return (Texture)RESOURCE_STORE[path];
-    }
-
-    private static void loadTexture(string path)
-    {
-        using var stream = File.OpenRead(path);
-
-        Debug.Assert(RENDERER != null);
-        var texture = Texture.FromStream(RENDERER, stream)
-            ?? throw new Exception("Could not load texture at " + path);
-
-        RESOURCE_STORE.Add(path, texture);
-    }
+    public static Stream? GetTextureStream(string path) => Textures.GetStream(path);
 }
 

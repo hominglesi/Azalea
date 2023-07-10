@@ -1,5 +1,12 @@
-﻿using Silk.NET.Maths;
+﻿using Silk.NET.Core;
+using Silk.NET.Maths;
 using Silk.NET.Windowing;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Advanced;
+using SixLabors.ImageSharp.PixelFormats;
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using IWindowSilk = Silk.NET.Windowing.IWindow;
 using WindowSilk = Silk.NET.Windowing.Window;
 
@@ -19,6 +26,24 @@ internal class SilkWindow : IWindow
         };
 
         Window = WindowSilk.Create(windowOptions);
+    }
+
+    public unsafe void SetIconFromStream(Stream imageStream)
+    {
+        using var image = Image.Load<Rgba32>(imageStream);
+
+        var memoryGroup = image.GetPixelMemoryGroup();
+        Memory<byte> array = new byte[memoryGroup.TotalLength * sizeof(Rgba32)];
+        var block = MemoryMarshal.Cast<byte, Rgba32>(array.Span);
+        foreach (var memory in memoryGroup)
+        {
+            memory.Span.CopyTo(block);
+            block = block[memory.Length..];
+        }
+
+        var icon = new RawImage(image.Width, image.Height, array);
+
+        Window.SetWindowIcon(ref icon);
     }
 
     public Vector2Int ClientSize

@@ -1,11 +1,12 @@
 ﻿using Azalea.Graphics.Containers;
 using Azalea.Graphics.Rendering;
-using Azalea.IO.Assets;
+using Azalea.Graphics.Textures;
+using Azalea.IO.Stores;
 using System;
 
 namespace Azalea.Platform;
 
-internal abstract class GameHost : IGameHost
+public abstract class GameHost
 {
     public abstract IWindow Window { get; }
     public abstract IRenderer Renderer { get; }
@@ -30,7 +31,6 @@ internal abstract class GameHost : IGameHost
     public virtual void CallInitialized()
     {
         Renderer.Initialize();
-        Assets.RENDERER = Renderer;
         Initialized?.Invoke();
     }
 
@@ -48,4 +48,7 @@ internal abstract class GameHost : IGameHost
     {
         OnUpdate?.Invoke();
     }
+
+    public virtual IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore)
+        => new TextureLoaderStore(underlyingStore);
 }

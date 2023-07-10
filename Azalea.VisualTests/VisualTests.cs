@@ -2,6 +2,7 @@
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.IO.Assets;
+using Azalea.IO.Stores;
 using System.Numerics;
 
 namespace Azalea.VisualTests;
@@ -14,12 +15,14 @@ internal class VisualTests : AzaleaGame
 
     protected override void OnInitialize()
     {
+        Resources.AddStore(new DllResourceStore(typeof(VisualTests).Assembly));
+
         Host.Renderer.ClearColor = Color.Azalea;
 
         AddRange(new[]{
             hidden = new Sprite()
             {
-                Texture = Assets.GetTexture("wall2.png"),
+                Texture = Assets.GetTexture("Resources/wall2.png"),
                 Position = Vector2.Zero,
                 Size = Host.Window.ClientSize
             },
@@ -32,7 +35,7 @@ internal class VisualTests : AzaleaGame
             },
             cursor = new Sprite()
             {
-                Texture = Assets.GetTexture("wall.png"),
+                Texture = Assets.GetTexture("Resources/wall.png"),
                 Position = Input.MousePosition,
                 Size = new Vector2(100, 200),
                 Color = Color.Red

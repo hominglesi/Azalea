@@ -15,7 +15,6 @@ public struct DrawInfo
     {
         Matrix = matrix ?? Matrix3.Identity;
         MatrixInverse = matrixInverse ?? Matrix3.Identity;
-        Console.WriteLine(Matrix3.Identity.Row0);
     }
 
     public void ApplyTransformations(Vector2 translation, Vector2 scale, float rotation, Vector2 shear, Vector2 origin)
