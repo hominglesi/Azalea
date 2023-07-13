@@ -21,6 +21,9 @@ public struct Rectangle : IEquatable<Rectangle>
         Height = height;
     }
 
+    public Rectangle(Vector2 position, Vector2 size)
+        : this(position.X, position.Y, size.X, size.Y) { }
+
     public readonly float Left => X;
     public readonly float Top => Y;
     public readonly float Right => X + Width;
@@ -30,6 +33,9 @@ public struct Rectangle : IEquatable<Rectangle>
     public readonly Vector2 TopRight => new(Right, Top);
     public readonly Vector2 BottomLeft => new(Left, Bottom);
     public readonly Vector2 BottomRight => new(Right, Bottom);
+
+    public readonly Rectangle Offset(Vector2 pos) => Offset(pos.X, pos.Y);
+    public readonly Rectangle Offset(float x, float y) => new Rectangle(X + x, Y + y, Width, Height);
 
     public readonly bool Equals(Rectangle other)
         => X.Equals(other.X) && Y.Equals(other.Y) && Width.Equals(other.Width) && Height.Equals(other.Height);

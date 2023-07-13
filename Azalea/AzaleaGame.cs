@@ -17,6 +17,11 @@ public abstract class AzaleaGame : Container
     public TextureStore Textures => _textures ?? throw new Exception("Game has not been initialized");
     private TextureStore? _textures;
 
+    public FontStore Fonts => _fonts ?? throw new Exception("Game has not been initialized");
+    private FontStore? _fonts;
+
+    private FontStore? _localFonts;
+
     internal virtual void SetHost(GameHost host)
     {
         _host = host;
@@ -33,12 +38,23 @@ public abstract class AzaleaGame : Container
         _textures = new TextureStore(Host.Renderer,
             Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, "Textures")));
 
-        Host.Window.SetIconFromStream(Textures.GetStream("Resources/azalea-icon.png")!);
+        _fonts = new FontStore(Host.Renderer);
+        _fonts.AddStore(_localFonts = new FontStore(Host.Renderer));
+
+        addFont(_localFonts, Resources, @"Resources/Fonts/Roboto-Regular");
 
         Assets.InitializeAssets(this);
 
+        Host.Window.SetIconFromStream(Textures.GetStream("Resources/azalea-icon.png")!);
+
         OnInitialize();
     }
+
+    public void AddFont(ResourceStore<byte[]> store, string? assetName = null, FontStore? target = null)
+        => addFont(target ?? Fonts, store, assetName);
+
+    private void addFont(FontStore target, ResourceStore<byte[]> store, string? assetName = null)
+        => target.AddTextureSource(new GlyphStore(store, assetName, Host.CreateTextureLoaderStore(store)));
 
     protected virtual void OnInitialize() { }
 

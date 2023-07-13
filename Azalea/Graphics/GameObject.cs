@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.Containers;
+﻿using Azalea.Extentions.EnumExtentions;
+using Azalea.Graphics.Containers;
 using Azalea.Graphics.Primitives;
 using Azalea.Numerics;
 using System;
@@ -70,7 +71,7 @@ public abstract class GameObject : IGameObject
         }
     }
 
-    public Vector2 Size
+    public virtual Vector2 Size
     {
         get => size;
         set
@@ -81,7 +82,7 @@ public abstract class GameObject : IGameObject
         }
     }
 
-    public float Width
+    public virtual float Width
     {
         get => width;
         set
@@ -92,7 +93,7 @@ public abstract class GameObject : IGameObject
         }
     }
 
-    public float Height
+    public virtual float Height
     {
         get => height;
         set
@@ -103,9 +104,109 @@ public abstract class GameObject : IGameObject
         }
     }
 
+    private Axes _relativeSizeAxes;
+
+    public virtual Axes RelativeSizeAxes
+    {
+        get => _relativeSizeAxes;
+        set
+        {
+            if (_relativeSizeAxes == value) return;
+
+
+            _relativeSizeAxes = value;
+        }
+    }
+
     public Rectangle DrawRectangle => new(0, 0, Size.X, Size.Y);
 
+    protected Vector2 ApplyRelativeAxes(Axes relativeAxes, Vector2 v, FillMode fillMode)
+    {
+        if (relativeAxes != Axes.None)
+        {
+            Vector2 conversion = _relativeToAbsoluteFactor;
+
+            if (relativeAxes.HasFlagFast(Axes.X))
+                v.X *= conversion.X;
+
+            if (relativeAxes.HasFlagFast(Axes.Y))
+                v.Y *= conversion.Y;
+
+            if (relativeAxes == Axes.Both && fillMode != FillMode.Stretch)
+            {
+                if (fillMode == FillMode.Fill)
+                    v = new Vector2(Math.Max(v.X, v.Y * _fillAspectRatio));
+                else if (fillMode == FillMode.Fit)
+                    v = new Vector2(Math.Min(v.X, v.Y * _fillAspectRatio));
+                v.Y /= _fillAspectRatio;
+            }
+        }
+
+        return v;
+    }
+
+    private Vector2 _relativeToAbsoluteFactor => /*Parent?.RelativeToAbsoluteFactor ??*/ Vector2.One;
+
+    private float _fillAspectRatio = 1;
+
+    public float FillAspectRatio
+    {
+        get => _fillAspectRatio;
+        set
+        {
+            if (_fillAspectRatio == value) return;
+
+            if (float.IsFinite(value) == false) throw new ArgumentException($"{nameof(FillAspectRatio)} must be finite, but is {value}.");
+            if (value == 0) throw new ArgumentException($@"{nameof(FillAspectRatio)} must be non-zero.");
+
+            _fillAspectRatio = value;
+            /*
+            if (_fillMode != FillMode.Stretch && RelativeSizeAxes == Axes.Both)
+                Invalidate(Invalidation.DrawSize);*/
+        }
+    }
+
     #endregion
+
+    private Vector2 _scale = Vector2.One;
+
+    public Vector2 Scale
+    {
+        get => _scale;
+        set
+        {
+            if (_scale == value) return;
+
+            //if(Validation.IsFinite(value) == false) throw new ArgumentException($@"{nameof(Scale)} must be finite, but is {value}.");
+
+            bool wasPresent = IsPresent;
+
+            _scale = value;
+
+            /*
+            if (IsPresent != wasPresent)
+                Invalidate(Invalidation.MiscGeometry | Invalidation.Presence);
+            else
+                Invalidate(Invalidation.MiscGeomerty);*/
+        }
+    }
+
+    private FillMode _fillMode;
+
+    public FillMode FillMode
+    {
+        get => _fillMode;
+        set
+        {
+            if (_fillMode == value) return;
+
+            _fillMode = value;
+
+            //Invalidate(Invalidation.DrawSize);
+        }
+    }
+
+    protected virtual Vector2 DrawScale => Scale;
 
     #region Color & Alpha
 
@@ -176,6 +277,29 @@ public abstract class GameObject : IGameObject
         }
     }
 
+    private const float visibility_cutoff = 0.0001f;
+
+    public virtual bool IsPresent => AlwaysPresent || (Alpha > visibility_cutoff && DrawScale.X != 0 && DrawScale.Y != 0);
+
+    private bool _alwaysPresent;
+
+    public bool AlwaysPresent
+    {
+        get => _alwaysPresent;
+        set
+        {
+            if (_alwaysPresent == value) return;
+
+            bool wasPresent = IsPresent;
+
+            _alwaysPresent = value;
+
+            /*
+            if (IsPresent != wasPresent)
+                Invalidate(Invalidation.Presence)*/
+        }
+    }
+
     protected virtual DrawNode CreateDrawNode() => new(this);
 
     private DrawInfo? drawInfo;
@@ -217,4 +341,22 @@ public abstract class GameObject : IGameObject
 
         return drawNode;
     }
+}
+
+[Flags]
+public enum Axes
+{
+    None = 0,
+
+    X = 1,
+    Y = 1 << 1,
+
+    Both = X | Y
+}
+
+public enum FillMode
+{
+    Stretch,
+    Fill,
+    Fit
 }

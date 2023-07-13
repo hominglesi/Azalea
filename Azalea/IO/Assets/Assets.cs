@@ -12,9 +12,13 @@ public static partial class Assets
     public static ITextureStore Textures => _textures ?? throw new Exception("Game has not been initialized yet");
     private static ITextureStore? _textures;
 
+    public static FontStore Fonts => _fonts ?? throw new Exception("Game has not been initialized yet");
+    private static FontStore? _fonts;
+
     internal static void InitializeAssets(AzaleaGame game)
     {
         _resources = game.Resources;
         _textures = game.Textures;
+        _fonts = game.Fonts;
     }
 }

@@ -8,6 +8,12 @@ namespace Azalea.Graphics.Textures;
 public class Texture : IDisposable
 {
     internal virtual INativeTexture NativeTexture { get; }
+    public string AssetName = string.Empty;
+
+    public float ScaleAdjust = 1;
+
+    public float DisplayWidth => Width / ScaleAdjust;
+    public float DisplayHeight => Height / ScaleAdjust;
 
     internal Texture(INativeTexture nativeTexture)
     {
@@ -37,6 +43,8 @@ public class Texture : IDisposable
     {
         NativeTexture.SetData(upload);
     }
+
+    public override string ToString() => $@"{AssetName} ({Width}, {Height})";
 
     public void Dispose()
     {

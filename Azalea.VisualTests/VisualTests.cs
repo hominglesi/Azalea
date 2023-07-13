@@ -12,6 +12,7 @@ internal class VisualTests : AzaleaGame
     private Sprite cursor;
     private Sprite hidden;
     private Sprite solid;
+    private SpriteText text;
 
     protected override void OnInitialize()
     {
@@ -19,7 +20,7 @@ internal class VisualTests : AzaleaGame
 
         Host.Renderer.ClearColor = Color.Azalea;
 
-        AddRange(new[]{
+        AddRange(new GameObject[]{
             hidden = new Sprite()
             {
                 Texture = Assets.GetTexture("Resources/wall2.png"),
@@ -39,6 +40,12 @@ internal class VisualTests : AzaleaGame
                 Position = Input.MousePosition,
                 Size = new Vector2(100, 200),
                 Color = Color.Red
+            },
+            text = new SpriteText()
+            {
+                Text = "Ide Gas",
+                Font = FontUsage.Default.With(size: 48),
+                Position = new Vector2(200, 200)
             }
         });
     }
