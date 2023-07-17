@@ -8,9 +8,4 @@ internal class TestGame : AzaleaGame
     {
         OnInitializeRan = true;
     }
-
-    protected override void OnRender()
-    {
-
-    }
 }

@@ -5,7 +5,7 @@ namespace Azalea.Tests
 {
     public class Tests
     {
-        private IGameHost _host;
+        private GameHost _host;
         private TestGame _game;
 
         [SetUp]

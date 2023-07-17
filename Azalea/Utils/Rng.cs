@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace Azalea.Utils;
+namespace Azalea;
 
 /// <summary>
 /// Class used for generating simple random values

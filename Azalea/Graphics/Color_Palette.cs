@@ -1,4 +1,4 @@
-﻿namespace Azalea.Graphics;
+﻿namespace Azalea;
 
 public partial struct Color
 {
