@@ -1,5 +1,6 @@
 ﻿using Azalea.Graphics;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Utils;
@@ -92,5 +93,15 @@ public static class Rng
     public static Color Color()
     {
         return new Color(Byte(), Byte(), Byte());
+    }
+
+    /// <summary>
+    /// Returns a random object from a List collection
+    /// </summary>
+    public static T Random<T>(this IList<T> list)
+    {
+        if (list.Count <= 0) throw new ArgumentException("Cannot get a random value from an empty list");
+
+        return list[Int(list.Count)];
     }
 }
