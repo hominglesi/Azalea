@@ -39,6 +39,17 @@ public partial class CompositeGameObject : GameObject
 
     #endregion
 
+    public override bool UpdateSubTree()
+    {
+        if (base.UpdateSubTree() == false) return false;
+
+        for (int i = 0; i < internalChildren.Count; ++i)
+        {
+            internalChildren[i].UpdateSubTree();
+        }
+        return true;
+    }
+
     protected override DrawNode CreateDrawNode() => new CompositeGameObjectDrawNode(this);
 
     public override DrawNode? GenerateDrawNodeSubtree()

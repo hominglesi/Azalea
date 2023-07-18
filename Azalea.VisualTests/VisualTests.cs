@@ -50,7 +50,7 @@ internal class VisualTests : AzaleaGame
         });
     }
 
-    protected override void OnUpdate()
+    protected override void Update()
     {
         cursor.Position = Input.MousePosition;
 

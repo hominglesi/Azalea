@@ -27,7 +27,6 @@ public abstract class AzaleaGame : Container
         _host = host;
 
         Host.Initialized += CallInitialize;
-        Host.OnUpdate += OnUpdate;
     }
 
     internal void CallInitialize()
@@ -57,6 +56,4 @@ public abstract class AzaleaGame : Container
         => target.AddTextureSource(new GlyphStore(store, assetName, Host.CreateTextureLoaderStore(store)));
 
     protected virtual void OnInitialize() { }
-
-    protected virtual void OnUpdate() { }
 }

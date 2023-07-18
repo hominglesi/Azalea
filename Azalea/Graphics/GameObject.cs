@@ -9,6 +9,16 @@ namespace Azalea.Graphics;
 
 public abstract class GameObject : IGameObject
 {
+    public event Action<GameObject>? OnUpdate;
+
+    public virtual bool UpdateSubTree()
+    {
+        Update();
+        OnUpdate?.Invoke(this);
+        return true;
+    }
+
+    protected virtual void Update() { }
 
     #region Position & Size
 

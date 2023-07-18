@@ -12,7 +12,6 @@ public abstract class GameHost
     public abstract IRenderer Renderer { get; }
 
     public event Action? Initialized;
-    public event Action? OnUpdate;
 
     public Container Root => _root ?? throw new Exception("Cannot use root before the game has started");
 
@@ -46,7 +45,7 @@ public abstract class GameHost
 
     public virtual void CallOnUpdate()
     {
-        OnUpdate?.Invoke();
+        Root.UpdateSubTree();
     }
 
     public virtual IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore)
