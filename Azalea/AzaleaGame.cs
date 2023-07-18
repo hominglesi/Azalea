@@ -1,5 +1,6 @@
 ﻿using Azalea.Graphics.Containers;
 using Azalea.Graphics.Textures;
+using Azalea.Inputs;
 using Azalea.IO.Assets;
 using Azalea.IO.Stores;
 using Azalea.Platform;
@@ -9,6 +10,9 @@ namespace Azalea;
 
 public abstract class AzaleaGame : Container
 {
+    public static AzaleaGame Main => _main ?? throw new Exception("No game has been initialized");
+    private static AzaleaGame? _main;
+
     public GameHost Host => _host ?? throw new Exception("GameHost has not been set");
     private GameHost? _host;
 
@@ -24,6 +28,8 @@ public abstract class AzaleaGame : Container
 
     internal virtual void SetHost(GameHost host)
     {
+        if (_main is null) _main = this;
+
         _host = host;
 
         Host.Initialized += CallInitialize;
@@ -48,6 +54,8 @@ public abstract class AzaleaGame : Container
 
         OnInitialize();
     }
+
+    protected internal virtual UserInputManager CreateUserInputManager() => new();
 
     public void AddFont(ResourceStore<byte[]> store, string? assetName = null, FontStore? target = null)
         => addFont(target ?? Fonts, store, assetName);

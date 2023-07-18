@@ -1,6 +1,10 @@
-﻿using Azalea.Extentions.EnumExtentions;
+﻿using Azalea.Extentions;
+using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics.Containers;
 using Azalea.Graphics.Primitives;
+using Azalea.Inputs;
+using Azalea.Inputs.Events;
+using Azalea.Inputs.States;
 using Azalea.Numerics;
 using System;
 using System.Numerics;
@@ -13,6 +17,7 @@ public abstract class GameObject : IGameObject
 
     public virtual bool UpdateSubTree()
     {
+        UpdateInput();
         Update();
         OnUpdate?.Invoke(this);
         return true;
@@ -268,6 +273,9 @@ public abstract class GameObject : IGameObject
         }
     }
 
+    protected InputManager GetContainingInputManager() => this.FindClosestParent<InputManager>()
+        ?? throw new Exception("This drawable is not part of the scene graph");
+
     private CompositeGameObject? parent;
 
     public CompositeGameObject? Parent
@@ -331,6 +339,50 @@ public abstract class GameObject : IGameObject
     public Vector2 ToScreenSpace(Vector2 input) => Vector2Extentions.Transform(input, DrawInfo.Matrix);
 
     public Quad ToScreenSpace(Rectangle input) => Quad.FromRectangle(input) * DrawInfo.Matrix;
+
+    public Vector2 ToLocalSpace(Vector2 screenSpacePosition) => Vector2Extentions.Transform(screenSpacePosition, DrawInfo.MatrixInverse);
+
+    public Quad ToLocalSpace(Quad screenSpaceQuad) => screenSpaceQuad * DrawInfo.MatrixInverse;
+
+    #endregion
+
+    #region Input
+
+    private void UpdateInput()
+    {
+        if (ToScreenSpace(DrawRectangle).Contains(Input.MousePosition))
+        {
+            if (Input.GetMouseButton(MouseButton.Left).Down)
+                TriggerEvent(new MouseDownEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), MouseButton.Left));
+            else if (Input.GetMouseButton(MouseButton.Left).Up)
+            {
+                TriggerEvent(new MouseUpEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), MouseButton.Left));
+                TriggerClick();
+            }
+        }
+
+    }
+
+    protected virtual bool Handle(UIEvent e) => false;
+
+    public bool TriggerEvent(UIEvent e)
+    {
+        e.Target = this;
+
+        return e switch
+        {
+            ClickEvent click => OnClick(click),
+            MouseDownEvent mouseDown => OnMouseDown(mouseDown),
+            MouseUpEvent mouseUp => OnMouseUp(mouseUp),
+            _ => Handle(e),
+        };
+    }
+
+    public bool TriggerClick() => TriggerEvent(new ClickEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), MouseButton.Left));
+
+    protected virtual bool OnClick(ClickEvent e) => Handle(e);
+    protected virtual bool OnMouseDown(MouseDownEvent e) => Handle(e);
+    protected virtual bool OnMouseUp(MouseUpEvent e) => Handle(e);
 
     #endregion
 

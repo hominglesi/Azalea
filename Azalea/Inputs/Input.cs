@@ -14,5 +14,5 @@ public static class Input
 
     public static ButtonState GetKey(Keys key) => GetKey((int)key);
     public static ButtonState GetKey(int keycode) => KEYBOARD_KEYS[keycode];
-    public static ButtonState GetMouseButton(int index) => MOUSE_BUTTONS[index];
+    public static ButtonState GetMouseButton(MouseButton button) => MOUSE_BUTTONS[(int)button];
 }

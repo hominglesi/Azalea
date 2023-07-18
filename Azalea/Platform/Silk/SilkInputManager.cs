@@ -3,6 +3,8 @@ using Silk.NET.Input;
 using System;
 using System.Numerics;
 
+using SilkMouseButton = Silk.NET.Input.MouseButton;
+
 namespace Azalea.Platform.Silk;
 
 internal class SilkInputManager
@@ -47,7 +49,7 @@ internal class SilkInputManager
         Input.MOUSE_POSITION = position;
     }
 
-    private void ProcessMouseDown(IMouse mouse, MouseButton button)
+    private void ProcessMouseDown(IMouse mouse, SilkMouseButton button)
     {
         var buttonIndex = (int)button;
         if (buttonIndex > 4) return;
@@ -55,7 +57,7 @@ internal class SilkInputManager
         Input.MOUSE_BUTTONS[buttonIndex].SetDown();
     }
 
-    private void ProcessMouseUp(IMouse mouse, MouseButton button)
+    private void ProcessMouseUp(IMouse mouse, SilkMouseButton button)
     {
         var buttonIndex = (int)button;
         if (buttonIndex > 4) return;

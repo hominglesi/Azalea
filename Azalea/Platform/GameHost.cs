@@ -19,7 +19,7 @@ public abstract class GameHost
 
     public virtual void Run(AzaleaGame game)
     {
-        var root = new Container();
+        var root = game.CreateUserInputManager();
         root.Add(game);
 
         game.SetHost(this);

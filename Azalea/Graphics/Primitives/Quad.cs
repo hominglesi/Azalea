@@ -1,4 +1,5 @@
-﻿using Azalea.Numerics;
+﻿using Azalea.Extentions;
+using Azalea.Numerics;
 using System.Numerics;
 
 namespace Azalea.Graphics.Primitives;
@@ -42,4 +43,32 @@ public readonly struct Quad
             Vector2Extentions.Transform(r.BottomLeft, m),
             Vector2Extentions.Transform(r.BottomRight, m),
             Vector2Extentions.Transform(r.TopRight, m));
+
+    public float Width => Vector2Extentions.Distance(TopLeft, TopRight);
+    public float Height => Vector2Extentions.Distance(TopLeft, BottomLeft);
+
+    public bool Contains(Vector2 pos)
+    {
+        if (Width == 0 && Height == 0)
+            return pos == TopLeft;
+
+
+        float perpDot1 = Vector2Extentions.PerpDot(BottomLeft - TopLeft, pos - TopLeft);
+        if (float.IsNaN(perpDot1))
+            return false;
+
+        float perpDot2 = Vector2Extentions.PerpDot(BottomRight - BottomLeft, pos - BottomLeft);
+        if (float.IsNaN(perpDot2) || perpDot1 * perpDot2 < 0)
+            return false;
+
+        float perpDot3 = Vector2Extentions.PerpDot(TopRight - BottomRight, pos - BottomRight);
+        if (float.IsNaN(perpDot3) || perpDot1 * perpDot3 < 0 || perpDot2 * perpDot3 < 0)
+            return false;
+
+        float perpDot4 = Vector2Extentions.PerpDot(TopLeft - TopRight, pos - TopRight);
+        if (float.IsNaN(perpDot4) || perpDot1 * perpDot4 < 0 || perpDot2 * perpDot4 < 0 || perpDot3 * perpDot4 < 0)
+            return false;
+
+        return true;
+    }
 }

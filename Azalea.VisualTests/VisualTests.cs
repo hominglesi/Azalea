@@ -27,12 +27,12 @@ internal class VisualTests : AzaleaGame
                 Position = Vector2.Zero,
                 Size = Host.Window.ClientSize
             },
-            solid = new Sprite()
+            solid = new TestGameObject()
             {
                 Texture = Host.Renderer.WhitePixel,
                 Position = new Vector2(200, 200),
                 Size = new Vector2(300, 50),
-                Color = Color.Azalea
+                Color = Color.Lime
             },
             cursor = new Sprite()
             {
@@ -45,7 +45,7 @@ internal class VisualTests : AzaleaGame
             {
                 Text = "Ide Gas",
                 Font = FontUsage.Default.With(size: 48),
-                Position = new Vector2(200, 200)
+                Position = new Vector2(100, 100)
             }
         });
     }
@@ -54,8 +54,10 @@ internal class VisualTests : AzaleaGame
     {
         cursor.Position = Input.MousePosition;
 
-        if (Input.GetKey(Keys.ShiftLeft).Pressed || Input.GetMouseButton(0).Pressed)
+        if (Input.GetKey(Keys.ShiftLeft).Pressed || Input.GetMouseButton(MouseButton.Left).Pressed)
             hidden.Alpha = 1;
         else hidden.Alpha = 0;
+
+        if (Input.GetKey(Keys.Enter).Down) TriggerClick();
     }
 }
