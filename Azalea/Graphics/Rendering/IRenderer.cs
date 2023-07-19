@@ -7,6 +7,7 @@ public interface IRenderer
 {
     public const int VERTICES_PER_QUAD = 4;
     public const int INDICES_PER_QUAD = VERTICES_PER_QUAD + 2;
+    public const int MAX_MIPMAP_LEVELS = 3;
 
     public Color ClearColor { get; set; }
     public bool AutomaticallyClear { get; set; }

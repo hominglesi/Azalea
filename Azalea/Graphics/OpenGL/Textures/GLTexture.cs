@@ -31,15 +31,19 @@ internal class GLTexture : INativeTexture
         _gl.ActiveTexture(TextureUnit.Texture0);
         _gl.BindTexture(TextureTarget.Texture2D, _textureId);
 
+        _gl.TextureParameter(_textureId, TextureParameterName.TextureMinLod, 0);
+        _gl.TextureParameter(_textureId, TextureParameterName.TextureMaxLod, IRenderer.MAX_MIPMAP_LEVELS);
+
         _gl.TextureParameter(_textureId, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
         _gl.TextureParameter(_textureId, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
 
-        _gl.TextureParameter(_textureId, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
+        _gl.TextureParameter(_textureId, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
         _gl.TextureParameter(_textureId, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 
         fixed (Rgba32* ptr = upload.Data)
             _gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba, (uint)Width,
-                (uint)Height, 0, Silk.NET.OpenGL.PixelFormat.Rgba, Silk.NET.OpenGL.PixelType.UnsignedByte, ptr);
+                (uint)Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, ptr);
+
 
         _gl.GenerateMipmap(TextureTarget.Texture2D);
     }

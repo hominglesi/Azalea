@@ -38,14 +38,19 @@ internal class VisualTests : AzaleaGame
             {
                 Texture = Assets.GetTexture("Resources/wall.png"),
                 Position = Input.MousePosition,
-                Size = new Vector2(100, 200),
-                Color = Color.Red
+                Size = new Vector2(400, 400)
             },
             text = new SpriteText()
             {
                 Text = "Ide Gas",
                 Font = FontUsage.Default.With(size: 48),
                 Position = new Vector2(100, 100)
+            },
+            new SpriteText()
+            {
+                Text = "Ide Gas 2",
+                Font = FontUsage.Default,
+                Position = new Vector2(50, 50)
             }
         });
     }
