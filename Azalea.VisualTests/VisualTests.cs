@@ -1,5 +1,6 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
+using Azalea.Graphics.UserInterface;
 using Azalea.Inputs;
 using Azalea.IO.Assets;
 using Azalea.IO.Stores;
@@ -51,6 +52,11 @@ internal class VisualTests : AzaleaGame
                 Text = "Ide Gas 2",
                 Font = FontUsage.Default,
                 Position = new Vector2(50, 50)
+            },
+            new BasicButton()
+            {
+                Text = "Print Pog!",
+                Action = () => {Console.WriteLine("Pog!"); }
             }
         });
     }

@@ -1,0 +1,35 @@
+﻿using Azalea.Graphics.Shapes;
+using Azalea.Graphics.Sprites;
+using System.Numerics;
+
+namespace Azalea.Graphics.UserInterface;
+
+public class BasicButton : Button
+{
+    public string Text
+    {
+        get => SpriteText.Text;
+        set => SpriteText.Text = value;
+    }
+
+    protected Box Background;
+    protected SpriteText SpriteText;
+
+    public BasicButton()
+    {
+        Size = new Vector2(200, 70);
+        AddRange(new GameObject[]
+        {
+            Background = new Box()
+            {
+                Color = Color.Blue,
+                Size = Size
+            },
+            SpriteText = new SpriteText
+            {
+                Font = FrameworkFont.Regular,
+                Color = Color.Azalea
+            }
+        });
+    }
+}
