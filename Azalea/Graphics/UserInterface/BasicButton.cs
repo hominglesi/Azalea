@@ -12,6 +12,18 @@ public class BasicButton : Button
         set => SpriteText.Text = value;
     }
 
+    public Color TextColor
+    {
+        get => SpriteText.Color;
+        set => SpriteText.Color = value;
+    }
+
+    public Color BackgroundColor
+    {
+        get => Background.Color;
+        set => Background.Color = value;
+    }
+
     protected Box Background;
     protected SpriteText SpriteText;
 
@@ -28,7 +40,8 @@ public class BasicButton : Button
             SpriteText = new SpriteText
             {
                 Font = FrameworkFont.Regular,
-                Color = Color.Azalea
+                Color = Color.Azalea,
+                Anchor = Anchor.TopLeft
             }
         });
     }

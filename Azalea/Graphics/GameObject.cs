@@ -223,6 +223,42 @@ public abstract class GameObject : IGameObject
 
     protected virtual Vector2 DrawScale => Scale;
 
+    private Anchor _anchor = Anchor.TopLeft;
+
+    public Anchor Anchor
+    {
+        get => _anchor;
+        set
+        {
+            if (_anchor == value) return;
+
+            if (value == 0) throw new ArgumentException("Cannot set anchor to 0.", nameof(value));
+
+            _anchor = value;
+        }
+    }
+
+    public Vector2 RelativeAnchorPosition
+    {
+        get
+        {
+            Vector2 result = Vector2.Zero;
+            if (_anchor.HasFlagFast(Anchor.x1))
+                result.X = 0.5f;
+            else if (_anchor.HasFlagFast(Anchor.x2))
+                result.X = 1;
+
+            if (_anchor.HasFlagFast(Anchor.y1))
+                result.Y = 0.5f;
+            else if (_anchor.HasFlagFast(Anchor.y2))
+                result.Y = 1;
+
+            return result;
+        }
+    }
+
+    public Vector2 AnchorPosition => RelativeAnchorPosition * Parent?.Size ?? Vector2.Zero;
+
     #region Color & Alpha
 
     private Color color = Color.White;
@@ -326,7 +362,7 @@ public abstract class GameObject : IGameObject
     {
         DrawInfo di = Parent?.DrawInfo ?? new DrawInfo(null);
 
-        Vector2 pos = Position;
+        Vector2 pos = Position + AnchorPosition;
 
         di.ApplyTransformations(pos, Vector2.One, 0, Vector2.Zero, Vector2.Zero);
 
@@ -403,6 +439,30 @@ public abstract class GameObject : IGameObject
 
         return drawNode;
     }
+}
+
+[Flags]
+public enum Anchor
+{
+    TopLeft = y0 | x0,
+    TopCenter = y0 | x1,
+    TopRight = y0 | x2,
+
+    CenterLeft = y1 | x0,
+    Center = y1 | x1,
+    CenterRight = y1 | x2,
+
+    BottomLeft = y2 | x0,
+    BottomCenter = y2 | x1,
+    BottomRight = y2 | x2,
+
+
+    y0 = 1,
+    y1 = 1 << 1,
+    y2 = 1 << 2,
+    x0 = 1 << 3,
+    x1 = 1 << 4,
+    x2 = 1 << 5,
 }
 
 [Flags]

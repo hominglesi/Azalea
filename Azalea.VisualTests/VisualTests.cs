@@ -55,6 +55,7 @@ internal class VisualTests : AzaleaGame
             },
             new BasicButton()
             {
+                Position = new Vector2(200, 400),
                 Text = "Print Pog!",
                 Action = () => {Console.WriteLine("Pog!"); }
             }
