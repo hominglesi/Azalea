@@ -44,7 +44,8 @@ public struct DrawInfo
 
         if (origin != Vector2.Zero)
         {
-            throw new NotImplementedException();
+            MatrixExtentions.TranslateFromLeft(ref Matrix, -origin);
+            MatrixExtentions.TranslateFromRight(ref MatrixInverse, origin);
         }
     }
 }

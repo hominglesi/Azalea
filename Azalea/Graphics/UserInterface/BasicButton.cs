@@ -41,7 +41,13 @@ public class BasicButton : Button
             {
                 Font = FrameworkFont.Regular,
                 Color = Color.Azalea,
-                Anchor = Anchor.TopLeft
+                Anchor = Anchor.Center
+            },
+            new Box()
+            {
+                Size = new Vector2(40,20),
+                Anchor = Anchor.Center,
+                Origin = Anchor.Center
             }
         });
     }

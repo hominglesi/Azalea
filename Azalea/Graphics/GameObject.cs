@@ -223,6 +223,38 @@ public abstract class GameObject : IGameObject
 
     protected virtual Vector2 DrawScale => Scale;
 
+    private Anchor _origin = Anchor.TopLeft;
+
+    public Anchor Origin
+    {
+        get => _origin;
+        set
+        {
+            if (_origin == value) return;
+
+            if (value == 0)
+                throw new ArgumentException("Cannot set origin to 0.", nameof(value));
+
+            _origin = value;
+        }
+    }
+
+    public Vector2 RelativeOriginPosition => computeAnchorPosition(_origin);
+
+    public Vector2 OriginPosition
+    {
+        get
+        {
+            Vector2 result;
+            if (Origin == Anchor.TopLeft)
+                result = Vector2.Zero;
+            else
+                result = Size * computeAnchorPosition(Origin);
+
+            return result;
+        }
+    }
+
     private Anchor _anchor = Anchor.TopLeft;
 
     public Anchor Anchor
@@ -238,26 +270,25 @@ public abstract class GameObject : IGameObject
         }
     }
 
-    public Vector2 RelativeAnchorPosition
-    {
-        get
-        {
-            Vector2 result = Vector2.Zero;
-            if (_anchor.HasFlagFast(Anchor.x1))
-                result.X = 0.5f;
-            else if (_anchor.HasFlagFast(Anchor.x2))
-                result.X = 1;
-
-            if (_anchor.HasFlagFast(Anchor.y1))
-                result.Y = 0.5f;
-            else if (_anchor.HasFlagFast(Anchor.y2))
-                result.Y = 1;
-
-            return result;
-        }
-    }
+    public Vector2 RelativeAnchorPosition => computeAnchorPosition(_anchor);
 
     public Vector2 AnchorPosition => RelativeAnchorPosition * Parent?.Size ?? Vector2.Zero;
+
+    private static Vector2 computeAnchorPosition(Anchor anchor)
+    {
+        Vector2 result = Vector2.Zero;
+        if (anchor.HasFlagFast(Anchor.x1))
+            result.X = 0.5f;
+        else if (anchor.HasFlagFast(Anchor.x2))
+            result.X = 1;
+
+        if (anchor.HasFlagFast(Anchor.y1))
+            result.Y = 0.5f;
+        else if (anchor.HasFlagFast(Anchor.y2))
+            result.Y = 1;
+
+        return result;
+    }
 
     #region Color & Alpha
 
@@ -364,7 +395,7 @@ public abstract class GameObject : IGameObject
 
         Vector2 pos = Position + AnchorPosition;
 
-        di.ApplyTransformations(pos, Vector2.One, 0, Vector2.Zero, Vector2.Zero);
+        di.ApplyTransformations(pos, Vector2.One, 0, Vector2.Zero, OriginPosition);
 
         return di;
     }
