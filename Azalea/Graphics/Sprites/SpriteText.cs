@@ -191,6 +191,8 @@ public partial class SpriteText : GameObject
     {
         if (_store == null) return;
 
+        if (_characterBacking.Count > 0) return;
+
         _characterBacking.Clear();
 
         Vector2 textBounds = Vector2.Zero;

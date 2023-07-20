@@ -76,7 +76,7 @@ public abstract class GameObject : IGameObject
     private float width;
     private float height;
 
-    private Vector2 size
+    private Vector2 _size
     {
         get => new(width, height);
         set
@@ -88,12 +88,12 @@ public abstract class GameObject : IGameObject
 
     public virtual Vector2 Size
     {
-        get => size;
+        get => _size;
         set
         {
-            if (size == value) return;
+            if (_size == value) return;
 
-            size = value;
+            _size = value;
         }
     }
 
@@ -132,6 +132,8 @@ public abstract class GameObject : IGameObject
             _relativeSizeAxes = value;
         }
     }
+
+    public Vector2 DrawSize => Size;
 
     public Rectangle DrawRectangle => new(0, 0, Size.X, Size.Y);
 
@@ -249,7 +251,7 @@ public abstract class GameObject : IGameObject
             if (Origin == Anchor.TopLeft)
                 result = Vector2.Zero;
             else
-                result = Size * computeAnchorPosition(Origin);
+                result = DrawSize * RelativeOriginPosition;
 
             return result;
         }
@@ -286,7 +288,6 @@ public abstract class GameObject : IGameObject
             result.Y = 0.5f;
         else if (anchor.HasFlagFast(Anchor.y2))
             result.Y = 1;
-
         return result;
     }
 
