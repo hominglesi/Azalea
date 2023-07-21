@@ -9,6 +9,14 @@ public struct MarginPadding : IEquatable<MarginPadding>
     public float Bottom;
     public float Right;
 
+    public MarginPadding(float top, float right, float bottom, float left)
+    {
+        Top = top;
+        Right = right;
+        Bottom = bottom;
+        Left = left;
+    }
+
     public readonly bool Equals(MarginPadding other) => Top == other.Top && Left == other.Left && Bottom == other.Bottom && Right == other.Right;
     public override readonly string ToString() => $@"({Top}, {Left}, {Bottom}, {Right})";
 }
