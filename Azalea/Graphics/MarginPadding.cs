@@ -17,6 +17,9 @@ public struct MarginPadding : IEquatable<MarginPadding>
         Left = left;
     }
 
+    public readonly float Horizontal => Left + Right;
+    public readonly float Vertical => Top + Bottom;
+
     public readonly bool Equals(MarginPadding other) => Top == other.Top && Left == other.Left && Bottom == other.Bottom && Right == other.Right;
     public override readonly string ToString() => $@"({Top}, {Left}, {Bottom}, {Right})";
 }
