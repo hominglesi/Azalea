@@ -7,6 +7,10 @@ namespace Azalea.Extentions.ImageExtentions;
 
 public static class ImageExtentions
 {
+    internal static ReadOnlyPixelSpan<TPixel> CreateReadOnlyPixelSpan<TPixel>(this Image<TPixel> image)
+        where TPixel : unmanaged, IPixel<TPixel>
+        => new(image);
+
     internal static ReadOnlyPixelMemory<TPixel> CreateReadOnlyPixelMemory<TPixel>(this Image<TPixel> image)
         where TPixel : unmanaged, IPixel<TPixel>
         => new(image);

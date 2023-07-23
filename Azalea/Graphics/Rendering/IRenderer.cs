@@ -15,6 +15,8 @@ public interface IRenderer
     public Texture WhitePixel { get; }
 
     internal void Initialize();
+    internal void BeginFrame();
+    internal void FinishFrame();
     public void Clear();
     internal void FlushCurrentBatch();
 

@@ -54,6 +54,12 @@ internal abstract class Renderer : IRenderer
     internal Texture CreateTexture(INativeTexture nativeTexture)
         => new(nativeTexture);
 
+    internal virtual void BeginFrame() { }
+    internal virtual void FinishFrame()
+    {
+        FlushCurrentBatch();
+    }
+
     protected internal virtual void SetClearColor(Color value) { }
 
     public void Clear()
@@ -89,6 +95,8 @@ internal abstract class Renderer : IRenderer
     }
 
     void IRenderer.Initialize() => Initialize();
+    void IRenderer.BeginFrame() => BeginFrame();
+    void IRenderer.FinishFrame() => FinishFrame();
     IVertexBatch<TexturedVertex2D> IRenderer.DefaultQuadBatch => defaultQuadBatch ?? throw new Exception("Cannot call DefaultQuadBatch before Initialization");
     void IRenderer.FlushCurrentBatch() => FlushCurrentBatch();
     IVertexBatch IRenderer.CreateQuadBatch(int size) => CreateQuadBatch(size);

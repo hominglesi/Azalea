@@ -35,12 +35,13 @@ public abstract class GameHost
 
     public virtual void CallOnRender()
     {
+        Renderer.BeginFrame();
         if (Renderer.AutomaticallyClear) Renderer.Clear();
 
         var node = Root.GenerateDrawNodeSubtree();
         node?.Draw(Renderer);
 
-        Renderer.FlushCurrentBatch();
+        Renderer.FinishFrame();
     }
 
     public virtual void CallOnUpdate()

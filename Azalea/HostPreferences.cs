@@ -2,13 +2,14 @@
 
 public struct HostPreferences
 {
-    public HostType Type = HostType.Silk;
+    public HostType Type = HostType.Veldrid;
 
     public HostPreferences() { }
 }
 
 public enum HostType
 {
+    Silk,
+    Veldrid,
     XNA,
-    Silk
 }
