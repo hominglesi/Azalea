@@ -1,5 +1,6 @@
 ﻿using Azalea.Platform;
 using Azalea.Platform.Silk;
+using Azalea.Platform.Veldrid;
 using Azalea.Platform.XNA;
 using System;
 
@@ -13,6 +14,7 @@ public static class Host
         {
             HostType.XNA => new XNAGameHost(),
             HostType.Silk => new SilkGameHost(),
+            HostType.Veldrid => new VeldridGameHost(),
             _ => throw new Exception($"Host of type {preferences.Type} does not exist")
         };
     }
