@@ -18,14 +18,14 @@ public class VeldridWindow : IWindow
     public Action? OnUpdate;
     public Action? OnRender;
 
-    public VeldridWindow()
+    public VeldridWindow(Vector2Int preferedClientSize)
     {
         var windowCreateInfo = new WindowCreateInfo()
         {
             X = 100,
             Y = 100,
-            WindowHeight = 720,
-            WindowWidth = 1280,
+            WindowWidth = preferedClientSize.X,
+            WindowHeight = preferedClientSize.Y,
             WindowTitle = IWindow.DefaultTitle
         };
         Window = VeldridStartup.CreateWindow(windowCreateInfo);

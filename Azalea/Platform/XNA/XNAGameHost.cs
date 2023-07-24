@@ -11,7 +11,7 @@ internal class XNAGameHost : GameHost
 
     private readonly GameWrapper _gameWrapper;
 
-    public XNAGameHost()
+    public XNAGameHost(HostPreferences preferences)
     {
         _gameWrapper = new GameWrapper();
         _gameWrapper.OnInitialize += CallInitialized;

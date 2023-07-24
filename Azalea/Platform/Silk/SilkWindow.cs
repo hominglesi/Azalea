@@ -16,11 +16,11 @@ internal class SilkWindow : IWindow
 {
     public IWindowSilk Window;
 
-    public SilkWindow()
+    public SilkWindow(Vector2Int preferredClientSize)
     {
         var windowOptions = WindowOptions.Default with
         {
-            Size = new Vector2D<int>(1280, 720),
+            Size = new Vector2D<int>(preferredClientSize.X, preferredClientSize.Y),
             Title = IWindow.DefaultTitle,
             WindowBorder = WindowBorder.Fixed
         };

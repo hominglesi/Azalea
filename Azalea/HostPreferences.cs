@@ -4,6 +4,8 @@ public struct HostPreferences
 {
     public HostType Type = HostType.Veldrid;
 
+    public Vector2Int PreferredClientSize = new(1280, 720);
+
     public HostPreferences() { }
 }
 

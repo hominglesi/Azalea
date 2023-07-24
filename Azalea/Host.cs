@@ -12,9 +12,9 @@ public static class Host
     {
         return preferences.Type switch
         {
-            HostType.XNA => new XNAGameHost(),
-            HostType.Silk => new SilkGameHost(),
-            HostType.Veldrid => new VeldridGameHost(),
+            HostType.XNA => new XNAGameHost(preferences),
+            HostType.Silk => new SilkGameHost(preferences),
+            HostType.Veldrid => new VeldridGameHost(preferences),
             _ => throw new Exception($"Host of type {preferences.Type} does not exist")
         };
     }

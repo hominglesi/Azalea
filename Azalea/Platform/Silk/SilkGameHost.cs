@@ -19,9 +19,9 @@ internal class SilkGameHost : GameHost
 
     private SilkInputManager? _inputManager;
 
-    public SilkGameHost()
+    public SilkGameHost(HostPreferences preferences)
     {
-        _window = new SilkWindow();
+        _window = new SilkWindow(preferences.PreferredClientSize);
 
         _window.Window.Load += CallInitialized;
         _window.Window.Render += (_) => CallOnRender();
