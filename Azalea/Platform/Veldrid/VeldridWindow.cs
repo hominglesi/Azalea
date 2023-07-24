@@ -38,6 +38,8 @@ public class VeldridWindow : IWindow
             PreferDepthRangeZeroToOne = true,
         };
         GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, options);
+
+        Window.Resizable = false;
     }
 
     public void Run()
