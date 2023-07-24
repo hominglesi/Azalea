@@ -1,4 +1,5 @@
 ﻿using Azalea.Extentions.ImageExtentions;
+using Azalea.Graphics.Veldrid;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
@@ -18,15 +19,16 @@ public class VeldridWindow : IWindow
     public Action? OnUpdate;
     public Action? OnRender;
 
-    public VeldridWindow(Vector2Int preferedClientSize)
+    public VeldridWindow(Vector2Int preferredClientSize, WindowState preferredWindowState)
     {
         var windowCreateInfo = new WindowCreateInfo()
         {
             X = 100,
             Y = 100,
-            WindowWidth = preferedClientSize.X,
-            WindowHeight = preferedClientSize.Y,
-            WindowTitle = IWindow.DefaultTitle
+            WindowWidth = preferredClientSize.X,
+            WindowHeight = preferredClientSize.Y,
+            WindowTitle = IWindow.DefaultTitle,
+            WindowInitialState = preferredWindowState.ToVeldridWindowState()
         };
         Window = VeldridStartup.CreateWindow(windowCreateInfo);
 
@@ -55,6 +57,12 @@ public class VeldridWindow : IWindow
         set { Window.Width = value.X; Window.Height = value.Y; }
     }
     public string Title { get => Window.Title; set => Window.Title = value; }
+
+    public WindowState State
+    {
+        get => Window.WindowState.ToAzaleaWindowState();
+        set => Window.WindowState = value.ToVeldridWindowState();
+    }
 
     public unsafe void SetIconFromStream(Stream imageStream)
     {

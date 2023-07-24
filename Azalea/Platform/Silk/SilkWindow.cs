@@ -57,4 +57,10 @@ internal class SilkWindow : IWindow
         get => Window.Title;
         set => Window.Title = value;
     }
+
+    public WindowState State
+    {
+        get => Window.WindowState.ToAzaleaWindowState();
+        set => Window.WindowState = value.ToSilkWindowState();
+    }
 }

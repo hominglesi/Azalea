@@ -10,5 +10,7 @@ public interface IWindow
 
     string Title { get; set; }
 
+    WindowState State { get; set; }
+
     public void SetIconFromStream(Stream imageStream);
 }

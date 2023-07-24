@@ -16,7 +16,7 @@ public class VeldridGameHost : GameHost
 
     public VeldridGameHost(HostPreferences preferences)
     {
-        _window = new VeldridWindow(preferences.PreferredClientSize);
+        _window = new VeldridWindow(preferences.PreferredClientSize, preferences.PreferredWindowState);
         _window.OnInitialized += CallInitialized;
         _window.OnUpdate += CallOnUpdate;
         _window.OnRender += CallOnRender;
