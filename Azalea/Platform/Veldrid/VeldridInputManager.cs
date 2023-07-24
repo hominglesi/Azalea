@@ -1,4 +1,5 @@
-﻿using Azalea.Inputs;
+﻿using Azalea.Graphics.Veldrid;
+using Azalea.Inputs;
 using System;
 using Veldrid;
 using Veldrid.Sdl2;
@@ -34,6 +35,23 @@ internal class VeldridInputManager
         _window.MouseMove += processMouseMove;
         _window.MouseDown += processMouseDown;
         _window.MouseUp += processMouseUp;
+
+        _window.KeyDown += processKeyDown;
+        _window.KeyUp += processKeyUp;
+    }
+
+    private void processKeyUp(KeyEvent obj)
+    {
+        var pressedKey = (int)obj.Key.ToAzaleaKey();
+        if (Input.KEYBOARD_KEYS.ContainsKey(pressedKey) == false) return;
+        Input.KEYBOARD_KEYS[pressedKey].SetUp();
+    }
+
+    private void processKeyDown(KeyEvent obj)
+    {
+        var pressedKey = (int)obj.Key.ToAzaleaKey();
+        if (Input.KEYBOARD_KEYS.ContainsKey(pressedKey) == false) return;
+        Input.KEYBOARD_KEYS[pressedKey].SetDown();
     }
 
     private void processMouseDown(MouseEvent obj)

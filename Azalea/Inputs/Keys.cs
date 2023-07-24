@@ -478,6 +478,10 @@ public enum Keys
     SuperLeft = 343,
     //
     // Summary:
+    //     The left windows key
+    WinLeft = 347,
+    //
+    // Summary:
     //     The right shift key.
     ShiftRight = 344,
     //
@@ -493,6 +497,9 @@ public enum Keys
     //     The right super key.
     SuperRight = 347,
     //
+    // Summary:
+    //     The right windows key
+    WinRight = 347,
     // Summary:
     //     The menu key.
     Menu = 348

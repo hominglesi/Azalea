@@ -4,6 +4,7 @@ using Azalea.Graphics.UserInterface;
 using Azalea.Inputs;
 using Azalea.IO.Assets;
 using Azalea.IO.Stores;
+using Azalea.Platform;
 using System.Numerics;
 
 namespace Azalea.VisualTests;
@@ -70,6 +71,12 @@ internal class VisualTests : AzaleaGame
             hidden.Alpha = 1;
         else hidden.Alpha = 0;
 
-        if (Input.GetKey(Keys.Enter).Down) TriggerClick();
+        if (Input.GetKey(Keys.F9).Down)
+        {
+            if (Host.Window.State == WindowState.Normal)
+                Host.Window.State = WindowState.BorderlessFullscreen;
+            else
+                Host.Window.State = WindowState.Normal;
+        }
     }
 }
