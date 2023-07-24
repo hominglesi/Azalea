@@ -15,23 +15,40 @@ public class Container<T> : CompositeGameObject
 
     protected virtual Container<T> Content => this;
 
-    public virtual void Add(T drawable)
+    public virtual void Add(T gameObject)
     {
-        if (drawable == Content)
+        if (gameObject == Content)
             throw new InvalidOperationException("Content may not be added to itself.");
 
-        ArgumentNullException.ThrowIfNull(drawable);
+        ArgumentNullException.ThrowIfNull(gameObject);
 
         if (Content == this)
-            AddInternal(drawable);
+            AddInternal(gameObject);
         else
-            Content.Add(drawable);
+            Content.Add(gameObject);
     }
 
     public virtual void AddRange(IEnumerable<T> range)
     {
-        foreach (T drawable in range)
-            Add(drawable);
+        foreach (T gameObject in range)
+            Add(gameObject);
+    }
+
+    public virtual bool Remove(T gameObject)
+    {
+        if (Content != this)
+            Content.Remove(gameObject);
+
+        return RemoveInternal(gameObject);
+    }
+
+    public void RemoveRange(IEnumerable<T> range)
+    {
+        if (range == null)
+            return;
+
+        foreach (T obj in range)
+            Remove(obj);
     }
 
     protected override void AddInternal(GameObject gameObject)

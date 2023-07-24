@@ -44,7 +44,7 @@ internal class VisualTests : AzaleaGame
             },
             text = new SpriteText()
             {
-                Text = "Ide Gas",
+                Text = "Ovo ce nestati ako se stisne F1",
                 Font = FontUsage.Default.With(size: 48),
                 Position = new Vector2(100, 100)
             },
@@ -63,6 +63,8 @@ internal class VisualTests : AzaleaGame
         });
     }
 
+    private bool removed = false;
+
     protected override void Update()
     {
         cursor.Position = Input.MousePosition;
@@ -78,5 +80,12 @@ internal class VisualTests : AzaleaGame
             else
                 Host.Window.State = WindowState.Normal;
         }
+
+        if (Input.GetKey(Keys.F1).Down && removed == false)
+        {
+            RemoveRange(new GameObject[] { text });
+            removed = true;
+        }
+
     }
 }

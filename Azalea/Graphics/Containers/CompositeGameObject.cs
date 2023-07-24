@@ -37,6 +37,33 @@ public partial class CompositeGameObject : GameObject
         internalChildren.Add(gameObject);
     }
 
+    protected internal int IndexOfInternal(GameObject gameObject)
+    {
+        if (gameObject.Parent != null && gameObject.Parent != this)
+            throw new InvalidOperationException($@"Cannot call {nameof(IndexOfInternal)} for a drawable that already is a child of a different parent");
+
+        int index = internalChildren.IndexOf(gameObject);
+
+        if (index >= 0 && internalChildren[index].ChildID != gameObject.ChildID)
+            throw new InvalidOperationException(@$"A non-matching {nameof(GameObject)} was returned.");
+
+        return index;
+    }
+
+    protected virtual bool RemoveInternal(GameObject gameObject)
+    {
+        ArgumentNullException.ThrowIfNull(gameObject);
+
+        int index = IndexOfInternal(gameObject);
+        if (index < 0)
+            return false;
+
+        internalChildren.RemoveAt(index);
+
+        gameObject.Parent = null;
+        return true;
+    }
+
     #endregion
 
     public override bool UpdateSubTree()
