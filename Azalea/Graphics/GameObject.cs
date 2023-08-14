@@ -5,7 +5,9 @@ using Azalea.Graphics.Primitives;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.Inputs.States;
+using Azalea.Layout;
 using Azalea.Numerics;
+using Azalea.Utils;
 using System;
 using System.Numerics;
 
@@ -14,6 +16,7 @@ namespace Azalea.Graphics;
 public abstract class GameObject : IGameObject
 {
     public event Action<GameObject>? OnUpdate;
+    internal event Action<GameObject, Invalidation>? Invalidated;
 
     public virtual bool UpdateSubTree()
     {
@@ -93,7 +96,17 @@ public abstract class GameObject : IGameObject
         {
             if (_size == value) return;
 
+            Axes changedAxes = Axes.None;
+
+            if (_size.X != value.X)
+                changedAxes |= Axes.X;
+
+            if (_size.Y != value.Y)
+                changedAxes |= Axes.Y;
+
             _size = value;
+
+            InvalidateParentSizeDependencies(Invalidation.DrawSize | Invalidation.DrawInfo, changedAxes);
         }
     }
 
@@ -105,6 +118,8 @@ public abstract class GameObject : IGameObject
             if (width == value) return;
 
             width = value;
+
+            InvalidateParentSizeDependencies(Invalidation.DrawSize | Invalidation.DrawInfo, Axes.X);
         }
     }
 
@@ -116,6 +131,8 @@ public abstract class GameObject : IGameObject
             if (height == value) return;
 
             height = value;
+
+            InvalidateParentSizeDependencies(Invalidation.DrawSize | Invalidation.DrawInfo, Axes.Y);
         }
     }
 
@@ -128,14 +145,51 @@ public abstract class GameObject : IGameObject
         {
             if (_relativeSizeAxes == value) return;
 
+            if (_fillMode != FillMode.Stretch && (value == Axes.Both || _relativeSizeAxes == Axes.Both))
+                Invalidate(Invalidation.DrawSize);
+            else
+            {
+                Vector2 conversion = _relativeToAbsoluteFactor;
+                if ((value & Axes.X) > (_relativeSizeAxes & Axes.X))
+                    Width = Precision.AlmostEquals(conversion.X, 0) ? 0 : Width / conversion.X;
+                else if ((_relativeSizeAxes & Axes.X) > (value & Axes.X))
+                    Width *= conversion.X;
+
+                if ((value & Axes.Y) > (_relativeSizeAxes & Axes.Y))
+                    Height = Precision.AlmostEquals(conversion.Y, 0) ? 0 : Height / conversion.Y;
+                else if ((_relativeSizeAxes & Axes.Y) > (value & Axes.Y))
+                    Height *= conversion.Y;
+            }
 
             _relativeSizeAxes = value;
+
+            if (_relativeSizeAxes.HasFlagFast(Axes.X) && Width == 0) Width = 1;
+            if (_relativeSizeAxes.HasFlagFast(Axes.Y) && Height == 0) Height = 1;
         }
     }
 
-    public Vector2 DrawSize => Size;
+    public Vector2 DrawSize => ApplyRelativeAxes(RelativeSizeAxes, Size, FillMode);
 
-    public Rectangle DrawRectangle => new(0, 0, Size.X, Size.Y);
+    public float DrawWidth => DrawSize.X;
+    public float DrawHeight => DrawSize.Y;
+    private MarginPadding _margin;
+
+    public MarginPadding Margin
+    {
+        get => _margin;
+        set
+        {
+            if (_margin.Equals(value)) return;
+
+            _margin = value;
+        }
+    }
+
+    public Vector2 LayoutSize => DrawSize + new Vector2(Margin.Horizontal, Margin.Vertical);
+
+    public Rectangle DrawRectangle => new(0, 0, DrawSize.X, DrawSize.Y);
+
+    public Rectangle LayoutRectangle => new(-Margin.Left, -Margin.Top, LayoutSize.X, LayoutSize.Y);
 
     protected Vector2 ApplyRelativeAxes(Axes relativeAxes, Vector2 v, FillMode fillMode)
     {
@@ -162,7 +216,9 @@ public abstract class GameObject : IGameObject
         return v;
     }
 
-    private Vector2 _relativeToAbsoluteFactor => /*Parent?.RelativeToAbsoluteFactor ??*/ Vector2.One;
+    private Vector2 _relativeToAbsoluteFactor => Parent?.RelativeToAbsoluteFactor ?? Vector2.One;
+
+    public virtual Rectangle BoundingBox => ToParentSpace(LayoutRectangle).AABBFloat;
 
     private float _fillAspectRatio = 1;
 
@@ -401,15 +457,101 @@ public abstract class GameObject : IGameObject
         return di;
     }
 
+    private InvalidationList invalidationList = new(Invalidation.All);
+    private LayoutMember? layoutList;
+
+    protected void AddLayout(LayoutMember member)
+    {
+        if (layoutList == null)
+            layoutList = member;
+        else
+        {
+            member.Next = layoutList;
+            layoutList = member;
+        }
+
+        member.Parent = this;
+    }
+
+    internal void ValidateSuperTree(Invalidation validationType)
+    {
+        if (invalidationList.Validate(validationType))
+            Parent?.ValidateSuperTree(validationType);
+    }
+
+    public long InvalidationID { get; private set; } = 1;
+
+    public bool Invalidate(Invalidation invalidation = Invalidation.All, InvalidationSource source = InvalidationSource.Self)
+        => invalidate(invalidation, source);
+
+    private bool invalidate(Invalidation invalidation = Invalidation.All, InvalidationSource source = InvalidationSource.Self, bool propagateToParent = true)
+    {
+        if (source != InvalidationSource.Child && source != InvalidationSource.Parent && source != InvalidationSource.Self)
+            throw new InvalidOperationException($"A {nameof(GameObject)} can only be invalidated with a singular {nameof(source)} (child, parent, self).");
+
+        if (source == InvalidationSource.Child)
+            invalidation &= ~Invalidation.Color;
+
+        if (invalidation == Invalidation.None)
+            return false;
+
+        if (propagateToParent && source == InvalidationSource.Self)
+            Parent?.Invalidate(invalidation, InvalidationSource.Child);
+
+        if (invalidationList.Invalidate(source, invalidation) == false)
+            return false;
+
+        bool anyInvalidated = (invalidation & Invalidation.DrawNode) > 0;
+
+        LayoutMember? nextLayout = layoutList;
+
+        while (nextLayout is not null)
+        {
+            if ((nextLayout.Source & source) == 0)
+                goto NextLayoutIteration;
+
+            Invalidation memberInvalidation = invalidation & nextLayout.Invalidation;
+            if (memberInvalidation == 0)
+                goto NextLayoutIteration;
+
+            anyInvalidated |= nextLayout.Invalidate();
+
+        NextLayoutIteration:
+            nextLayout = nextLayout.Next;
+        }
+
+        anyInvalidated |= OnInvalidate(invalidation, source);
+
+        if (anyInvalidated)
+            InvalidationID++;
+
+        Invalidated?.Invoke(this, invalidation);
+
+        return anyInvalidated;
+    }
+
+    protected virtual bool OnInvalidate(Invalidation invalidation, InvalidationSource source) => false;
+
+    private void InvalidateParentSizeDependencies(Invalidation invalidation, Axes changedAxes)
+    {
+        invalidate(invalidation, InvalidationSource.Self, false);
+
+        Parent?.InvalidateChildrenSizeDependencies(invalidation, changedAxes, this);
+    }
 
     #region DrawInfo-based conversions
 
+    public Vector2 ToSpaceOfOtherDrawable(Vector2 input, IGameObject other) => other == this ? input
+        : Vector2Extentions.Transform(Vector2Extentions.Transform(input, DrawInfo.Matrix), other.DrawInfo.MatrixInverse);
+    public Quad ToSpaceOfOtherDrawable(Rectangle input, IGameObject other) => other == this ? input
+        : Quad.FromRectangle(input) * (DrawInfo.Matrix * other.DrawInfo.MatrixInverse);
+    public Vector2 ToParentSpace(Vector2 input) => ToSpaceOfOtherDrawable(input, Parent
+        ?? throw new Exception($"This {nameof(GameObject)} doesn't have a {nameof(Parent)}"));
+    public Quad ToParentSpace(Rectangle input) => ToSpaceOfOtherDrawable(input, Parent
+        ?? throw new Exception($"This {nameof(GameObject)} doesn't have a {nameof(Parent)}"));
     public Vector2 ToScreenSpace(Vector2 input) => Vector2Extentions.Transform(input, DrawInfo.Matrix);
-
     public Quad ToScreenSpace(Rectangle input) => Quad.FromRectangle(input) * DrawInfo.Matrix;
-
     public Vector2 ToLocalSpace(Vector2 screenSpacePosition) => Vector2Extentions.Transform(screenSpacePosition, DrawInfo.MatrixInverse);
-
     public Quad ToLocalSpace(Quad screenSpaceQuad) => screenSpaceQuad * DrawInfo.MatrixInverse;
 
     #endregion
@@ -471,6 +613,24 @@ public abstract class GameObject : IGameObject
 
         return drawNode;
     }
+}
+
+[Flags]
+public enum Invalidation
+{
+    DrawInfo = 1,
+    DrawSize = 1 << 1,
+    MiscGeometry = 1 << 2,
+    Color = 1 << 3,
+    DrawNode = 1 << 4,
+    Presence = 1 << 5,
+    Parent = 1 << 6,
+
+    RequiredParentSizeToFit = MiscGeometry | Parent,
+    All = DrawNode | RequiredParentSizeToFit | Color | DrawInfo | Presence,
+    Layout = All & ~(DrawNode | Parent),
+
+    None = 0
 }
 
 [Flags]

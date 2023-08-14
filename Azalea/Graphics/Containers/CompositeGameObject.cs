@@ -1,6 +1,8 @@
-﻿using Azalea.Lists;
+﻿using Azalea.Layout;
+using Azalea.Lists;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace Azalea.Graphics.Containers;
 
@@ -64,6 +66,18 @@ public partial class CompositeGameObject : GameObject
         return true;
     }
 
+    protected internal virtual void ClearInternal(bool disposeChildren = true)
+    {
+        if (internalChildren.Count == 0) return;
+
+        foreach (GameObject t in internalChildren)
+        {
+            t.Parent = null;
+        }
+
+        internalChildren.Clear();
+    }
+
     #endregion
 
     public override bool UpdateSubTree()
@@ -116,6 +130,43 @@ public partial class CompositeGameObject : GameObject
             j++;
         }
     }
+
+    private MarginPadding _padding;
+    public MarginPadding Padding
+    {
+        get => _padding;
+        protected set
+        {
+            if (_padding.Equals(value)) return;
+
+            _padding = value;
+        }
+    }
+
+    public Vector2 ChildSize => DrawSize - new Vector2(Padding.Horizontal, Padding.Vertical);
+
+    private Vector2 _relativeChildSize = Vector2.One;
+    public Vector2 RelativeChildSize => _relativeChildSize;
+
+    public Vector2 RelativeToAbsoluteFactor => Vector2.Divide(ChildSize, RelativeChildSize);
+
+    #region Invalidation
+
+    internal void InvalidateChildrenSizeDependencies(Invalidation invalidation, Axes axes, GameObject source)
+    {
+        //bool wasValid = childrenSizeDependencies.IsValid;
+
+        Invalidate(invalidation, InvalidationSource.Child);
+
+        //axes &= ~source.BypassAutoSizedAxes;
+
+        //axes &= AutoSizeAxes;
+
+        //if (wasValid && axes == Axes.None)
+        //childrenSizeDependencies.Validate();w
+    }
+
+    #endregion
 
     protected class ChildComparer : IComparer<GameObject>
     {

@@ -51,6 +51,16 @@ public class Container<T> : CompositeGameObject
             Remove(obj);
     }
 
+    public void Clear() => Clear(true);
+
+    public virtual void Clear(bool disposeChildren)
+    {
+        if (Content != null && Content != this)
+            Content.Clear(disposeChildren);
+        else
+            ClearInternal(disposeChildren);
+    }
+
     protected override void AddInternal(GameObject gameObject)
     {
         if (Content == this && gameObject != null && (gameObject is T) == false)

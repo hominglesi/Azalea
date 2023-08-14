@@ -1,5 +1,6 @@
 ﻿using Azalea.Extentions;
 using Azalea.Numerics;
+using System;
 using System.Numerics;
 
 namespace Azalea.Graphics.Primitives;
@@ -46,6 +47,19 @@ public readonly struct Quad
 
     public float Width => Vector2Extentions.Distance(TopLeft, TopRight);
     public float Height => Vector2Extentions.Distance(TopLeft, BottomLeft);
+
+    public Rectangle AABBFloat
+    {
+        get
+        {
+            float xMin = Math.Min(TopLeft.X, Math.Min(TopRight.X, Math.Min(BottomLeft.X, BottomRight.X)));
+            float yMin = Math.Min(TopLeft.Y, Math.Min(TopRight.Y, Math.Min(BottomLeft.Y, BottomRight.Y)));
+            float xMax = Math.Max(TopLeft.X, Math.Max(TopRight.X, Math.Max(BottomLeft.X, BottomRight.X)));
+            float yMax = Math.Max(TopLeft.Y, Math.Max(TopRight.Y, Math.Max(BottomLeft.Y, BottomRight.Y)));
+
+            return new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin);
+        }
+    }
 
     public bool Contains(Vector2 pos)
     {
