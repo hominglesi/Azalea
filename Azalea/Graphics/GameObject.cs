@@ -20,7 +20,7 @@ public abstract class GameObject : IGameObject
 
     public virtual bool UpdateSubTree()
     {
-        UpdateInput();
+        if (this is not InputManager) UpdateInput();
         Update();
         OnUpdate?.Invoke(this);
         return true;

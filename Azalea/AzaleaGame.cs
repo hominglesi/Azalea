@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.Containers;
+﻿using Azalea.Graphics;
+using Azalea.Graphics.Containers;
 using Azalea.Graphics.Textures;
 using Azalea.Inputs;
 using Azalea.IO.Assets;
@@ -35,22 +36,27 @@ public abstract class AzaleaGame : Container
         Host.Initialized += CallInitialize;
     }
 
+    public AzaleaGame()
+    {
+        RelativeSizeAxes = Axes.Both;
+    }
+
     internal void CallInitialize()
     {
         _resources = new ResourceStore<byte[]>();
-        _resources.AddStore(new NamespacedResourceStore<byte[]>(new DllResourceStore(typeof(AzaleaGame).Assembly), "Resources"));
+        _resources.AddStore(new NamespacedResourceStore<byte[]>(new DllResourceStore(typeof(AzaleaGame).Assembly), @"Resources"));
 
         _textures = new TextureStore(Host.Renderer,
-            Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, "Textures")));
+            Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
 
         _fonts = new FontStore(Host.Renderer);
         _fonts.AddStore(_localFonts = new FontStore(Host.Renderer));
 
-        addFont(_localFonts, Resources, @"Resources/Fonts/Roboto-Regular");
+        addFont(_localFonts, Resources, @"Fonts/Roboto-Regular");
 
         Assets.InitializeAssets(this);
 
-        Host.Window.SetIconFromStream(Textures.GetStream("Resources/azalea-icon.png")!);
+        Host.Window.SetIconFromStream(Textures.GetStream("azalea-icon.png")!);
 
         OnInitialize();
     }

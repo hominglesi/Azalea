@@ -22,7 +22,7 @@ internal class VisualTests : AzaleaGame
 
     protected override void OnInitialize()
     {
-        Resources.AddStore(new DllResourceStore(typeof(VisualTests).Assembly));
+        Resources.AddStore(new NamespacedResourceStore<byte[]>(new DllResourceStore(typeof(VisualTests).Assembly), "Resources"));
 
         Host.Renderer.ClearColor = Color.Azalea;
 
@@ -37,7 +37,7 @@ internal class VisualTests : AzaleaGame
             {
                 content[r, c] = new Sprite()
                 {
-                    Texture = count == 0 ? Assets.GetTexture("Resources/wall2.png") : Assets.GetTexture("Resources/wall.png"),
+                    Texture = count == 0 ? Assets.GetTexture("wall2.png") : Assets.GetTexture("wall.png"),
                     Size = new Vector2(1, 1),
                     RelativeSizeAxes = Axes.Both,
                 };
@@ -48,7 +48,7 @@ internal class VisualTests : AzaleaGame
         AddRange(new GameObject[]{
             hidden = new Sprite()
             {
-                Texture = Assets.GetTexture("Resources/wall2.png"),
+                Texture = Assets.GetTexture("wall2.png"),
                 Position = Vector2.Zero,
                 Size = Host.Window.ClientSize
             },
@@ -132,7 +132,7 @@ internal class VisualTests : AzaleaGame
             {
                 content[r, c] = new Sprite()
                 {
-                    Texture = Rng.Int(2) == 0 ? Assets.GetTexture("Resources/wall2.png") : Assets.GetTexture("Resources/wall.png"),
+                    Texture = Rng.Int(2) == 0 ? Assets.GetTexture("wall2.png") : Assets.GetTexture("wall.png"),
                     Size = new Vector2(1, 1),
                     RelativeSizeAxes = Axes.Both,
                 };

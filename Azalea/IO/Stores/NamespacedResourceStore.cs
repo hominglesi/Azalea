@@ -15,6 +15,8 @@ public class NamespacedResourceStore<T> : ResourceStore<T>
         Namespace = ns;
     }
 
+    protected override IEnumerable<string> GetFilenames(string name) => base.GetFilenames($@"{Namespace}/{name}");
+
     public override IEnumerable<string> GetAvalibleResources()
         => base.GetAvalibleResources()
         .Where(x => x.StartsWith($"{Namespace}/", StringComparison.Ordinal))

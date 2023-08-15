@@ -1,8 +1,10 @@
-﻿using Azalea.Graphics.Containers;
+﻿using Azalea.Extentions;
+using Azalea.Graphics.Containers;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Textures;
 using Azalea.IO.Stores;
 using System;
+using System.Numerics;
 
 namespace Azalea.Platform;
 
@@ -46,6 +48,9 @@ public abstract class GameHost
 
     public virtual void CallOnUpdate()
     {
+        Root.Size = new Vector2(Window.ClientSize.X, Window.ClientSize.Y);
+        Root.Size = Vector2Extentions.ComponentMax(Vector2.One, Root.Size);
+
         Root.UpdateSubTree();
     }
 

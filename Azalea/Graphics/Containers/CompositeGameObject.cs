@@ -91,6 +91,38 @@ public partial class CompositeGameObject : GameObject
         return true;
     }
 
+    protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+    {
+        bool anyInvalidated = base.OnInvalidate(invalidation, source);
+
+        if (source == InvalidationSource.Child)
+            return anyInvalidated;
+
+        invalidation &= ~Invalidation.DrawNode;
+        if (invalidation == Invalidation.None)
+            return anyInvalidated;
+
+        IReadOnlyList<GameObject> targetChildren = internalChildren;
+
+        for (int i = 0; i < targetChildren.Count; ++i)
+        {
+            GameObject c = targetChildren[i];
+
+            Invalidation childInvalidation = invalidation;
+            if ((invalidation & Invalidation.RequiredParentSizeToFit) > 0)
+                childInvalidation |= Invalidation.DrawInfo;
+
+            childInvalidation &= ~Invalidation.MiscGeometry;
+
+            if (c.RelativeSizeAxes == Axes.None)
+                childInvalidation &= ~Invalidation.DrawSize;
+
+            anyInvalidated |= c.Invalidate(childInvalidation, InvalidationSource.Parent);
+        }
+
+        return base.OnInvalidate(invalidation, source);
+    }
+
     protected override DrawNode CreateDrawNode() => new CompositeGameObjectDrawNode(this);
 
     public override DrawNode? GenerateDrawNodeSubtree()

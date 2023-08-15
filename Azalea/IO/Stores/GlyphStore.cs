@@ -31,6 +31,7 @@ public class GlyphStore : IResourceStore<TextureUpload>, IGlyphStore
         Store = new ResourceStore<byte[]>(store);
 
         Store.AddExtention("bin");
+        Store.AddExtention("fnt");
 
         AssetName = assetName;
         TextureLoader = textureLoader;

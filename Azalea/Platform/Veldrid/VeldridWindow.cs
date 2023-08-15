@@ -39,7 +39,7 @@ public class VeldridWindow : IWindow
         };
         GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, options);
 
-        Window.Resizable = false;
+        Window.Resizable = true;
     }
 
     public void Run()
