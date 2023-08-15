@@ -18,7 +18,6 @@ internal class VeldridRenderer : Renderer
     public readonly ResourceFactory Factory;
     public CommandList CommandList;
     public CommandList TextureUploadCommandList;
-    private bool beganTextureUploadCommands;
 
     private readonly IWindow _window;
     private readonly Dictionary<int, VeldridTextureResources> boundTextureUnits = new();
@@ -38,6 +37,7 @@ internal class VeldridRenderer : Renderer
     {
         CommandList.Begin();
         CommandList.SetFramebuffer(GraphicsDevice.SwapchainFramebuffer);
+        Console.WriteLine(GraphicsDevice.SwapchainFramebuffer.Width);
 
         base.BeginFrame();
     }

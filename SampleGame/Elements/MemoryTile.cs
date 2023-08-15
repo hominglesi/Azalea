@@ -38,8 +38,7 @@ public class MemoryTile : Button
             Origin = Anchor.Center,
             Position = new Vector2(70),
             Font = new FontUsage(family: "Roboto", size: 140, weight: "Medium"),
-            Color = new Color(201, 132, 146),
-            RelativeSizeAxes = Axes.Both
+            Color = new Color(201, 132, 146)
         }});
     }
 

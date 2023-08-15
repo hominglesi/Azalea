@@ -35,7 +35,7 @@ internal class VeldridTexture : INativeTexture
         {
             texture?.Dispose();
 
-            var textureDescription = TextureDescription.Texture2D((uint)Width, (uint)Height, 1, 1,
+            var textureDescription = TextureDescription.Texture2D((uint)Width, (uint)Height, 4, 1,
                 PixelFormat.R8_G8_B8_A8_UNorm, TextureUsage.Sampled | TextureUsage.RenderTarget);
             texture = Renderer.Factory.CreateTexture(textureDescription);
 

@@ -35,11 +35,18 @@ public class VeldridWindow : IWindow
         GraphicsDeviceOptions options = new()
         {
             PreferStandardClipSpaceYDirection = true,
-            PreferDepthRangeZeroToOne = true,
+            PreferDepthRangeZeroToOne = true
         };
         GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, options);
 
         Window.Resizable = true;
+
+        Window.Resized += onResized;
+    }
+
+    private void onResized()
+    {
+        GraphicsDevice.ResizeMainWindow((uint)ClientSize.X, (uint)ClientSize.Y);
     }
 
     public void Run()
