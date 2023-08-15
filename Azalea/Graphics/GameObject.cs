@@ -76,6 +76,50 @@ public abstract class GameObject : IGameObject
         }
     }
 
+    private Axes _relativePositionAxes;
+
+    public Axes RelativePositionAxes
+    {
+        get => _relativePositionAxes;
+        set
+        {
+            if (value == _relativePositionAxes) return;
+
+            Vector2 conversion = _relativeToAbsoluteFactor;
+            if ((value & Axes.X) > (_relativePositionAxes & Axes.X))
+                X = Precision.AlmostEquals(conversion.X, 0) ? 0 : X / conversion.X;
+            else if ((_relativePositionAxes & Axes.X) > (value & Axes.X))
+                X *= conversion.X;
+
+            if ((value & Axes.Y) > (_relativePositionAxes & Axes.Y))
+                Y = Precision.AlmostEquals(conversion.Y, 0) ? 0 : Y / conversion.Y;
+            else if ((_relativePositionAxes & Axes.Y) > (value & Axes.Y))
+                Y *= conversion.Y;
+
+            _relativePositionAxes = value;
+        }
+    }
+
+    public Vector2 DrawPosition
+    {
+        get
+        {
+            Vector2 offset = Vector2.Zero;
+
+            if (Parent != null && RelativePositionAxes != Axes.None)
+            {
+                offset = Parent.RelativeChildOffset;
+
+                if (RelativePositionAxes.HasFlagFast(Axes.X) == false)
+                    offset.X = 0;
+                if (RelativePositionAxes.HasFlagFast(Axes.Y) == false)
+                    offset.Y = 0;
+            }
+
+            return ApplyRelativeAxes(RelativePositionAxes, Position - offset, FillMode.Stretch);
+        }
+    }
+
     private float width;
     private float height;
 
@@ -309,7 +353,7 @@ public abstract class GameObject : IGameObject
             else
                 result = DrawSize * RelativeOriginPosition;
 
-            return result;
+            return result - new Vector2(Margin.Left, Margin.Top);
         }
     }
 
@@ -450,7 +494,10 @@ public abstract class GameObject : IGameObject
     {
         DrawInfo di = Parent?.DrawInfo ?? new DrawInfo(null);
 
-        Vector2 pos = Position + AnchorPosition;
+        Vector2 pos = DrawPosition + AnchorPosition;
+
+        if (Parent != null)
+            pos += Parent.ChildOffset;
 
         di.ApplyTransformations(pos, Vector2.One, 0, Vector2.Zero, OriginPosition);
 
@@ -531,6 +578,19 @@ public abstract class GameObject : IGameObject
     }
 
     protected virtual bool OnInvalidate(Invalidation invalidation, InvalidationSource source) => false;
+
+    public Invalidation InvalidationFromParentSize
+    {
+        get
+        {
+            Invalidation result = Invalidation.DrawInfo;
+            if (RelativeSizeAxes != Axes.None)
+                result |= Invalidation.DrawSize;
+            if (RelativePositionAxes != Axes.None)
+                result |= Invalidation.MiscGeometry;
+            return result;
+        }
+    }
 
     private void InvalidateParentSizeDependencies(Invalidation invalidation, Axes changedAxes)
     {

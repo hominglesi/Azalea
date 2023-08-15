@@ -1,8 +1,12 @@
-﻿namespace SampleGame.Elements;
+﻿using Timer = System.Timers.Timer;
+
+namespace SampleGame.Elements;
 
 public class MemoryLogic
 {
     private GameState _state = GameState.WaitingForFirstClick;
+
+    private readonly Timer _timer;
 
     private MemoryField _field;
     private MemoryTile[] _revealedTiles = new MemoryTile[2];
@@ -12,25 +16,24 @@ public class MemoryLogic
     public MemoryLogic(MemoryField field)
     {
         _field = field;
-
         _field.OnTileClicked += processTileClicked;
+
+        _timer = new Timer(500)
+        {
+            Enabled = false
+        };
+        _timer.Elapsed += timeoutElapsed;
+
         StartGame();
     }
 
     private void processTileClicked(int index)
     {
+        if (_state == GameState.TimingOut) return;
+
         if (_state == GameState.Finished)
         {
             StartGame();
-
-            _state = GameState.WaitingForFirstClick;
-            return;
-        }
-
-        if (_state == GameState.TimingOut)
-        {
-            _revealedTiles[0].Hide();
-            _revealedTiles[1].Hide();
 
             _state = GameState.WaitingForFirstClick;
             return;
@@ -53,6 +56,7 @@ public class MemoryLogic
             _revealedTiles[1] = _field.Tiles[index];
             if (_revealedTiles[0].TextureName != _revealedTiles[1].TextureName)
             {
+                _timer.Start();
                 _state = GameState.TimingOut;
                 return;
             }
@@ -67,6 +71,25 @@ public class MemoryLogic
 
             _state = GameState.Finished;
             return;
+        }
+    }
+
+    private void timeoutElapsed(object? sender, System.Timers.ElapsedEventArgs e)
+    {
+        _timer.Stop();
+
+        _revealedTiles[0].Hide();
+        _revealedTiles[1].Hide();
+
+        _state = GameState.WaitingForFirstClick;
+    }
+
+    public void Solve()
+    {
+        foreach (var tile in _field.Tiles)
+        {
+            tile.Show();
+            _state = GameState.Finished;
         }
     }
 

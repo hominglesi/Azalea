@@ -37,7 +37,6 @@ internal class VeldridRenderer : Renderer
     {
         CommandList.Begin();
         CommandList.SetFramebuffer(GraphicsDevice.SwapchainFramebuffer);
-        Console.WriteLine(GraphicsDevice.SwapchainFramebuffer.Width);
 
         base.BeginFrame();
     }

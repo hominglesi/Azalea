@@ -17,6 +17,9 @@ public struct MarginPadding : IEquatable<MarginPadding>
         Left = left;
     }
 
+    public MarginPadding(float padding)
+        : this(padding, padding, padding, padding) { }
+
     public readonly float Horizontal => Left + Right;
     public readonly float Vertical => Top + Bottom;
 

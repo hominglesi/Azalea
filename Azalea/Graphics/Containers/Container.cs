@@ -15,6 +15,20 @@ public class Container<T> : CompositeGameObject
 
     protected virtual Container<T> Content => this;
 
+    public IReadOnlyList<T> Children
+    {
+        set => ChildrenEnumerable = value;
+    }
+
+    public IEnumerable<T> ChildrenEnumerable
+    {
+        set
+        {
+            Clear();
+            AddRange(value);
+        }
+    }
+
     public virtual void Add(T gameObject)
     {
         if (gameObject == Content)

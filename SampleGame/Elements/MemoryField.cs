@@ -30,19 +30,20 @@ public class MemoryField : GridContainer
 
         var content = new GameObject[_gridSize.X, _gridSize.Y];
 
-        for (int i = 0; i < _gridSize.Y; i++)
+        for (int j = 0; j < _gridSize.Y; j++)
         {
-            for (int j = 0; j < _gridSize.X; j++)
+            for (int i = 0; i < _gridSize.X; i++)
             {
                 var texture = tiles.Random();
-                var index = j + (i * _gridSize.X);
+                var index = i + (j * _gridSize.X);
+
                 var tile = new MemoryTile(texture, index + 1)
                 {
                     Action = () => { OnTileClicked?.Invoke(index); }
                 };
                 tiles.Remove(texture);
 
-                content[i, j] = tile;
+                content[j, i] = tile;
                 Tiles.Add(tile);
             }
         }

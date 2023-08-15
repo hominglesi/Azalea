@@ -172,13 +172,20 @@ public partial class CompositeGameObject : GameObject
             if (_padding.Equals(value)) return;
 
             _padding = value;
+
+            foreach (GameObject c in internalChildren)
+                c.Invalidate(c.InvalidationFromParentSize | Invalidation.MiscGeometry);
         }
     }
 
     public Vector2 ChildSize => DrawSize - new Vector2(Padding.Horizontal, Padding.Vertical);
+    public Vector2 ChildOffset => new(Padding.Left, Padding.Top);
 
     private Vector2 _relativeChildSize = Vector2.One;
     public Vector2 RelativeChildSize => _relativeChildSize;
+
+    private Vector2 _relativeChildOffset = Vector2.Zero;
+    public Vector2 RelativeChildOffset => _relativeChildOffset;
 
     public Vector2 RelativeToAbsoluteFactor => Vector2.Divide(ChildSize, RelativeChildSize);
 
