@@ -1,5 +1,6 @@
 ﻿using Azalea.IO.Assets;
 using Azalea.IO.Stores;
+using Azalea.Layout;
 using Azalea.Text;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,8 @@ public partial class SpriteText : GameObject
     public SpriteText()
     {
         _store = Assets.Fonts;
+
+        AddLayout(_charactersCache);
     }
 
     private string _text = "";
@@ -29,6 +32,7 @@ public partial class SpriteText : GameObject
                 return;
 
             _text = value;
+            invalidate(true, true);
         }
     }
 
@@ -163,12 +167,17 @@ public partial class SpriteText : GameObject
         }
     }
 
+    private readonly LayoutValue _charactersCache = new(Invalidation.DrawSize | Invalidation.Presence, InvalidationSource.Parent);
+
     public override bool IsPresent => base.IsPresent && (AlwaysPresent || string.IsNullOrEmpty(_displayedText) == false);
 
     protected override DrawNode CreateDrawNode() => new SpriteTextDrawNode(this);
 
-    private void invalidate(bool chracter = false, bool textBuilder = false)
+    private void invalidate(bool characters = false, bool textBuilder = false)
     {
+        if (characters)
+            _charactersCache.Invalidate();
+
         if (textBuilder)
             _textBuilderCache = null;
     }
@@ -191,7 +200,7 @@ public partial class SpriteText : GameObject
     {
         if (_store == null) return;
 
-        if (_characterBacking.Count > 0) return;
+        if (_charactersCache.IsValid) return;
 
         _characterBacking.Clear();
 
@@ -217,7 +226,7 @@ public partial class SpriteText : GameObject
 
             base.Width = Math.Min(base.Width, MaxWidth);
 
-            //_charactersCache.Validate();
+            _charactersCache.Validate();
         }
     }
 
