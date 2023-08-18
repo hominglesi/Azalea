@@ -63,4 +63,16 @@ internal class SilkWindow : IWindow
         get => Window.WindowState.ToAzaleaWindowState();
         set => Window.WindowState = value.ToSilkWindowState();
     }
+
+    public bool Resizable
+    {
+        get => throw new NotImplementedException();
+        set => throw new NotImplementedException();
+    }
+
+    public bool CursorVisible
+    {
+        get => throw new NotImplementedException();
+        set => throw new NotImplementedException();
+    }
 }

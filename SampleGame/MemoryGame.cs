@@ -19,6 +19,7 @@ public class MemoryGame : AzaleaGame
     protected override void OnInitialize()
     {
         Host.Renderer.ClearColor = new Color(189, 223, 214);
+        Host.Window.Resizable = true;
 
         Resources.AddStore(new NamespacedResourceStore<byte[]>(new DllResourceStore(typeof(MemoryGame).Assembly), "Resources"));
         _tilesStore = new TextureStore(Host.Renderer,

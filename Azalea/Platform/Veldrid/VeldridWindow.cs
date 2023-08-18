@@ -39,8 +39,7 @@ public class VeldridWindow : IWindow
         };
         GraphicsDevice = VeldridStartup.CreateGraphicsDevice(Window, options);
 
-        Window.Resizable = true;
-
+        Window.Resizable = false;
         Window.Resized += onResized;
     }
 
@@ -71,6 +70,18 @@ public class VeldridWindow : IWindow
     {
         get => Window.WindowState.ToAzaleaWindowState();
         set => Window.WindowState = value.ToVeldridWindowState();
+    }
+
+    public bool Resizable
+    {
+        get => Window.Resizable;
+        set => Window.Resizable = value;
+    }
+
+    public bool CursorVisible
+    {
+        get => Window.CursorVisible;
+        set => Window.CursorVisible = value;
     }
 
     public unsafe void SetIconFromStream(Stream imageStream)
