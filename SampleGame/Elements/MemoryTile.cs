@@ -3,6 +3,7 @@ using Azalea.Graphics.Containers;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.Textures;
 using Azalea.IO.Assets;
+using System;
 using System.Numerics;
 
 namespace SampleGame.Elements;

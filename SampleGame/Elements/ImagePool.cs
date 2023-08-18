@@ -1,5 +1,7 @@
 ﻿using Azalea.Graphics.Textures;
 using Azalea.Utils;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace SampleGame.Elements;

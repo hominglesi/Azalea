@@ -5,23 +5,45 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Title>$(AssemblyName)</Title>
+    <Version>$(VersionPrefix)</Version>
+    <Authors>hominglesi</Authors>
+    <Company>Azalea</Company>
+    <Description>A 2D game engine.</Description>
+    <PackageIcon>azalea-icon.png</PackageIcon>
+    <PackageIconUrl>https://i.imgur.com/UPsEzXU.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/hominglesi/Azalea</RepositoryUrl>
+    <PackageReleaseNotes>https://github.com/hominglesi/Azalea/releases</PackageReleaseNotes>
+    <PackageId>$(AssemblyName)</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303">
-      <PrivateAssets></PrivateAssets>
+      <PrivateAssets>compile</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SharpFNT" Version="2.0.0" />
+    <PackageReference Include="SharpFNT" Version="2.0.0">
+      <PrivateAssets>compile</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Silk.NET" Version="2.17.1">
-      <PrivateAssets></PrivateAssets>
+      <PrivateAssets>compile</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
-    <PackageReference Include="Veldrid" Version="4.9.0" />
-    <PackageReference Include="Veldrid.SPIRV" Version="1.0.15" />
-    <PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1">
+      <PrivateAssets>compile</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Veldrid" Version="4.9.0">
+      <PrivateAssets>compile</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Veldrid.SPIRV" Version="1.0.15">
+      <PrivateAssets>compile</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0">
+      <PrivateAssets>compile</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 	
 	<ItemGroup>
-        <EmbeddedResource Include="Resources\**\*" />
+    <EmbeddedResource Include="Resources\**\*" />
+    <None Include="Resources\Textures\azalea-icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
+  
 </Project>
