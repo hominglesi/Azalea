@@ -1,6 +1,7 @@
 ﻿using Azalea.Extentions;
 using Azalea.Graphics;
 using Azalea.Graphics.Containers;
+using Azalea.Graphics.Shapes;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.IO.Assets;
@@ -52,7 +53,7 @@ internal class VisualTests : AzaleaGame
                 Position = Vector2.Zero,
                 Size = Host.Window.ClientSize
             },
-            container = new GridContainer()
+            new Outline(container = new GridContainer()
             {
                 Content = GenerateRandomContent(5, 5).ToJagged(),
                 Size = new Vector2(400, 200),
@@ -61,7 +62,7 @@ internal class VisualTests : AzaleaGame
                 Content = content.ToJagged(),
                 Size = new Vector2(400, 200),
                 Position = new Vector2(50, 500)*/
-            }/*,
+            })/*,
             solid = new TestGameObject()
             {
                 Texture = Host.Renderer.WhitePixel,
