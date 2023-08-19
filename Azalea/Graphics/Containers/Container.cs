@@ -13,10 +13,19 @@ public class Container<T> : CompositeGameObject
 {
     private int enumeratorVersion;
 
+    public Container()
+    {
+        if (typeof(T) == typeof(GameObject))
+            internalChildrenAsT = (IReadOnlyList<T>)InternalChildren;
+        else
+            throw new NotImplementedException("Other types are not currently supported");
+    }
+
     protected virtual Container<T> Content => this;
 
     public IReadOnlyList<T> Children
     {
+        get => internalChildrenAsT;
         set => ChildrenEnumerable = value;
     }
 
@@ -28,6 +37,8 @@ public class Container<T> : CompositeGameObject
             AddRange(value);
         }
     }
+
+    private readonly IReadOnlyList<T> internalChildrenAsT;
 
     public virtual void Add(T gameObject)
     {
