@@ -1,6 +1,7 @@
 ﻿using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Graphics.Textures;
+using System.Numerics;
 
 namespace Azalea.Graphics.Rendering;
 
@@ -41,5 +42,39 @@ public static class RendererExtentions
             Color = drawColorInfo.AlphaAdjustedColor,
             TexturePosition = new(0, 0)
         });
+    }
+
+    internal static void DrawRectangle(this IRenderer renderer, Quad quad, float width, DrawColorInfo color)
+    {
+        var texture = renderer.WhitePixel;
+
+        var topQuad = new Quad(
+            quad.TopLeft + new Vector2(-width, -width),
+            quad.TopLeft + new Vector2(-width, 0),
+            quad.TopRight + new Vector2(width, 0),
+            quad.TopRight + new Vector2(width, -width));
+
+        var rightQuad = new Quad(
+            quad.TopRight,
+            quad.BottomRight + new Vector2(0, width),
+            quad.BottomRight + new Vector2(width, width),
+            quad.TopRight + new Vector2(width, 0));
+
+        var bottomQuad = new Quad(
+            quad.BottomLeft,
+            quad.BottomLeft + new Vector2(0, width),
+            quad.BottomRight + new Vector2(0, width),
+            quad.BottomRight);
+
+        var leftQuad = new Quad(
+            quad.TopLeft + new Vector2(-width, 0),
+            quad.BottomLeft + new Vector2(-width, width),
+            quad.BottomLeft + new Vector2(0, width),
+            quad.TopLeft);
+
+        renderer.DrawQuad(texture, topQuad, color);
+        renderer.DrawQuad(texture, rightQuad, color);
+        renderer.DrawQuad(texture, bottomQuad, color);
+        renderer.DrawQuad(texture, leftQuad, color);
     }
 }

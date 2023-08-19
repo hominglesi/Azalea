@@ -1,12 +1,4 @@
-﻿using Azalea.Graphics;
-using Azalea.Graphics.Containers;
-using Azalea.Graphics.Sprites;
-using Azalea.IO.Assets;
-using Azalea.IO.Stores;
-using System;
-using System.Numerics;
-
-namespace Azalea.VisualTests;
+﻿namespace Azalea.VisualTests;
 
 internal class VisualTests : AzaleaGame
 {
@@ -36,10 +28,22 @@ internal class VisualTests : AzaleaGame
                 Texture = Assets.GetTexture("wall.png"),
                 Size = new Vector2(100, 100)
             },
-            new Sprite()
+            new Outline(container = new GridContainer()
             {
-                Texture = Assets.GetTexture("wall.png"),
-                Size = new Vector2(100, 100)
+                Content = GenerateRandomContent(5, 5).ToJagged(),
+                Size = new Vector2(400, 200),
+                Position = Vector2.Zero
+                /*
+                Content = content.ToJagged(),
+                Size = new Vector2(400, 200),
+                Position = new Vector2(50, 500)*/
+            })/*,
+            solid = new TestGameObject()
+            {
+                Texture = Host.Renderer.WhitePixel,
+                Position = new Vector2(200, 200),
+                Size = new Vector2(300, 50),
+                Color = Color.Lime
             },
             new Sprite()
             {
