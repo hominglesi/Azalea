@@ -264,6 +264,11 @@ public abstract class GameObject : IGameObject
 
     public virtual Rectangle BoundingBox => ToParentSpace(LayoutRectangle).AABBFloat;
 
+    protected virtual void OnSizingChanged()
+    {
+
+    }
+
     private float _fillAspectRatio = 1;
 
     public float FillAspectRatio

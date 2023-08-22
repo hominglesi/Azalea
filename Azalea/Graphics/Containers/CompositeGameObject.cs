@@ -80,6 +80,8 @@ public partial class CompositeGameObject : GameObject
 
     #endregion
 
+    protected virtual bool RequiresChildrenUpdate => true;
+
     public override bool UpdateSubTree()
     {
         if (base.UpdateSubTree() == false) return false;
@@ -88,8 +90,12 @@ public partial class CompositeGameObject : GameObject
         {
             internalChildren[i].UpdateSubTree();
         }
+
+        UpdateAfterChildren();
         return true;
     }
+
+    protected virtual void UpdateAfterChildren() { }
 
     protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
     {
@@ -188,6 +194,31 @@ public partial class CompositeGameObject : GameObject
     public Vector2 RelativeChildOffset => _relativeChildOffset;
 
     public Vector2 RelativeToAbsoluteFactor => Vector2.Divide(ChildSize, RelativeChildSize);
+
+    private Axes _autoSizeAxes;
+
+    public Axes AutoSizeAxes
+    {
+        get => _autoSizeAxes;
+        protected set
+        {
+            if (value == _autoSizeAxes) return;
+
+            if ((RelativeSizeAxes & value) != 0)
+                throw new InvalidOperationException("No axis can be relatively sized and automatically sized at the same time.");
+
+            _autoSizeAxes = value;
+
+            if (value == Axes.None)
+                _childrenSizeDependencies.Validate();
+            else
+                _childrenSizeDependencies.Invalidate();
+
+            OnSizingChanged();
+        }
+    }
+
+    private readonly LayoutValue _childrenSizeDependencies = new(Invalidation.RequiredParentSizeToFit | Invalidation.Presence, InvalidationSource.Child);
 
     #region Invalidation
 
