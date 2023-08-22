@@ -11,7 +11,7 @@ namespace Azalea.VisualTests;
 
 internal class VisualTests : AzaleaGame
 {
-    private FillFlowContainer _container;
+    private FlexContainer _container;
 
     protected override void OnInitialize()
     {
@@ -19,17 +19,24 @@ internal class VisualTests : AzaleaGame
 
         Host.Renderer.ClearColor = Color.Azalea;
 
-        Add(new Outline(_container = new FillFlowContainer()
+        Add(new Outline(_container = new FlexContainer()
         {
-            MaximumSize = new Vector2(500, 500)
-        })
-        {
-            Position = new Vector2(100, 100)
-        });
-        _container.Direction = FillDirection.Full;
+            Size = new Vector2(400, 400),
+            Direction = FlexDirection.Vertical
+        }));
 
         _container.Children = new GameObject[]
         {
+            new Sprite()
+            {
+                Texture = Assets.GetTexture("wall.png"),
+                Size = new Vector2(100, 100)
+            },
+            new Sprite()
+            {
+                Texture = Assets.GetTexture("wall.png"),
+                Size = new Vector2(100, 100)
+            },
             new Sprite()
             {
                 Texture = Assets.GetTexture("wall.png"),
@@ -65,8 +72,6 @@ internal class VisualTests : AzaleaGame
 
     protected override void Update()
     {
-        _container.Size = Input.MousePosition - new Vector2(100, 100);
-        _container.MaximumSize = _container.Size;
-
+        _container.Size = Input.MousePosition;
     }
 }

@@ -21,27 +21,14 @@ public abstract class FlowContainer<T> : Container<T>
         AddLayout(_childLayout);
     }
 
-    private readonly LayoutValue _layout = new LayoutValue(Invalidation.DrawSize);
-    private readonly LayoutValue _childLayout = new LayoutValue(Invalidation.RequiredParentSizeToFit | Invalidation.Presence, InvalidationSource.Child);
-
-    private Vector2 _maximumSize;
-    public Vector2 MaximumSize
-    {
-        get => _maximumSize;
-        set
-        {
-            if (_maximumSize == value) return;
-
-            _maximumSize = value;
-            Invalidate(Invalidation.DrawSize);
-        }
-    }
+    private readonly LayoutValue _layout = new(Invalidation.DrawSize);
+    private readonly LayoutValue _childLayout = new(Invalidation.RequiredParentSizeToFit | Invalidation.Presence, InvalidationSource.Child);
 
     protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate || !_layout.IsValid;
 
     protected virtual void InvalidateLayout() => _layout.Invalidate();
 
-    private readonly Dictionary<GameObject, float> _layoutChildren = new Dictionary<GameObject, float>();
+    private readonly Dictionary<GameObject, float> _layoutChildren = new();
 
     protected override void AddInternal(GameObject gameObject)
     {
