@@ -32,8 +32,9 @@ internal class SilkGameHost : GameHost
     {
         _gl = _window.Window.CreateOpenGL();
         _renderer = new GLRenderer(_gl, _window);
-
         _inputManager = new SilkInputManager(_window.Window.CreateInput());
+
+        _window.InitializeAfterStartup(_gl, _inputManager);
 
         base.CallInitialized();
     }
@@ -41,6 +42,8 @@ internal class SilkGameHost : GameHost
     public override void CallOnUpdate()
     {
         base.CallOnUpdate();
+
+        _gl.Viewport(0, 0, (uint)_window.ClientSize.X, (uint)_window.ClientSize.Y);
 
         _inputManager?.Update();
     }

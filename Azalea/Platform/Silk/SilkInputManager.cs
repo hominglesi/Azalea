@@ -11,6 +11,8 @@ internal class SilkInputManager
 {
     private readonly IInputContext _input;
 
+    public IMouse PrimaryMouse;
+
     public SilkInputManager(IInputContext input)
     {
         _input = input;
@@ -30,6 +32,9 @@ internal class SilkInputManager
 
             Input.KEYBOARD_KEYS.Add((int)key, new ButtonState());
         }
+
+        if (_input.Mice.Count >= 1)
+            PrimaryMouse = _input.Mice[0];
 
         foreach (var mouse in _input.Mice)
         {
