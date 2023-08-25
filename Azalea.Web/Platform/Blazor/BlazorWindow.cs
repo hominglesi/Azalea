@@ -35,7 +35,7 @@ internal class BlazorWindow : IWindow
 
 		_builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(_builder.HostEnvironment.BaseAddress) });
 
-		_clock = new Timer(1000 / 30)
+		_clock = new Timer(1000 / 60)
 		{
 			AutoReset = true,
 			Enabled = true

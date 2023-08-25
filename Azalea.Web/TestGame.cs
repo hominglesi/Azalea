@@ -1,6 +1,7 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.Shapes;
 using Azalea.Graphics.Sprites;
+using Azalea.Inputs;
 using Azalea.IO.Assets;
 using Azalea.Utils;
 using System.Numerics;
@@ -11,6 +12,7 @@ namespace Azalea.Web;
 public class TestGame : AzaleaGame
 {
 	private Timer _timer;
+	private Sprite _azalea;
 
 	protected override void OnInitialize()
 	{
@@ -28,6 +30,11 @@ public class TestGame : AzaleaGame
 
 		Add(new Box() { Size = new Vector2(200, 100), Color = Color.Aqua });
 		Add(new Box() { Position = new Vector2(100, 400), Size = new Vector2(50, 100), Color = Color.Black });
-		Add(new Sprite() { Texture = Assets.GetTexture("azalea-icon.png") });
+		Add(_azalea = new Sprite() { Texture = Assets.GetTexture("azalea-icon.png"), Origin = Anchor.Center });
+	}
+
+	protected override void Update()
+	{
+		_azalea.Position = Input.MousePosition;
 	}
 }
