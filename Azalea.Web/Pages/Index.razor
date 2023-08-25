@@ -1,0 +1,10 @@
+﻿@page "/"
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Index</PageTitle>
+
+<canvas Width="1280" Height="720" id="mainCanvas" 
+	@onmousemove="@HandleMouseMove" @onmousedown="@HandleMouseDown" @onmouseup="@HandleMouseUp"
+	tabindex="0" @onkeydown="@HandleKeyDown" @onkeyup="@HandleKeyUp" />
+
+
