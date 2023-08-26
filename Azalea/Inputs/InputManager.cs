@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.Containers;
+﻿using Azalea.Graphics;
+using Azalea.Graphics.Containers;
 using Azalea.Inputs.Handlers;
 using Azalea.Inputs.States;
 using Azalea.Platform;
@@ -10,46 +11,73 @@ namespace Azalea.Inputs;
 
 public abstract class InputManager : Container
 {
-    private readonly Dictionary<MouseButton, MouseButtonEventManager> mouseButtonEventManagers = new();
+	private readonly Dictionary<MouseButton, MouseButtonEventManager> mouseButtonEventManagers = new();
 
-    public readonly InputState CurrentState;
+	public readonly InputState CurrentState;
 
-    protected GameHost Host => AzaleaGame.Main.Host;
+	protected GameHost Host => AzaleaGame.Main.Host;
 
-    protected abstract ImmutableArray<InputHandler> InputHandlers { get; }
+	/// <summary>
+	/// The currently focused <see cref="GameObject"/>. Null if there is no current focus.
+	/// </summary>
+	public GameObject? FocusedObject { get; internal set; }
 
-    protected InputManager()
-    {
-        CurrentState = new InputState(null);
+	protected abstract ImmutableArray<InputHandler> InputHandlers { get; }
 
-        foreach (var button in Enum.GetValues<MouseButton>())
-        {
-            var manager = CreateButtonEventManagerFor(button);
-            mouseButtonEventManagers.Add(button, manager);
-        }
-    }
+	protected InputManager()
+	{
+		CurrentState = new InputState(null);
 
-    protected virtual MouseButtonEventManager CreateButtonEventManagerFor(MouseButton button)
-        => button switch
-        {
-            MouseButton.Left => new MouseLeftButtonEventManager(button),
-            _ => new MouseMinorButtonEventManager(button)
-        };
+		foreach (var button in Enum.GetValues<MouseButton>())
+		{
+			var manager = CreateButtonEventManagerFor(button);
+			mouseButtonEventManagers.Add(button, manager);
+		}
+	}
 
-    protected override void Update()
-    {
-        base.Update();
-    }
+	protected virtual MouseButtonEventManager CreateButtonEventManagerFor(MouseButton button)
+		=> button switch
+		{
+			MouseButton.Left => new MouseLeftButtonEventManager(button),
+			_ => new MouseMinorButtonEventManager(button)
+		};
 
-    private class MouseLeftButtonEventManager : MouseButtonEventManager
-    {
-        public MouseLeftButtonEventManager(MouseButton button)
-            : base(button) { }
-    }
+	protected override void Update()
+	{
+		base.Update();
+	}
 
-    private class MouseMinorButtonEventManager : MouseButtonEventManager
-    {
-        public MouseMinorButtonEventManager(MouseButton button)
-            : base(button) { }
-    }
+	public bool ChangeFocus(GameObject? newTarget) => ChangeFocus(newTarget, CurrentState);
+	protected bool ChangeFocus(GameObject? newTarget, InputState state)
+	{
+		if (newTarget == FocusedObject) return true;
+
+		if (newTarget is not null && newTarget.AcceptsFocus == false) return false;
+
+		if (FocusedObject is not null && FocusedObject.AcceptsFocus)
+		{
+			FocusedObject.HasFocus = false;
+		}
+
+		FocusedObject = newTarget;
+
+		if (FocusedObject is not null)
+		{
+			FocusedObject.HasFocus = true;
+		}
+
+		return true;
+	}
+
+	private class MouseLeftButtonEventManager : MouseButtonEventManager
+	{
+		public MouseLeftButtonEventManager(MouseButton button)
+			: base(button) { }
+	}
+
+	private class MouseMinorButtonEventManager : MouseButtonEventManager
+	{
+		public MouseMinorButtonEventManager(MouseButton button)
+			: base(button) { }
+	}
 }

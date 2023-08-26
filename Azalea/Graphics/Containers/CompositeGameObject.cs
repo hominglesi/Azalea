@@ -8,257 +8,274 @@ namespace Azalea.Graphics.Containers;
 
 public partial class CompositeGameObject : GameObject
 {
-    public CompositeGameObject()
-    {
-        var childComparer = new ChildComparer(this);
+	public CompositeGameObject()
+	{
+		var childComparer = new ChildComparer(this);
 
-        internalChildren = new SortedList<GameObject>(childComparer);
-    }
+		internalChildren = new SortedList<GameObject>(childComparer);
+	}
 
-    #region Parenting
+	#region Parenting
 
-    private readonly SortedList<GameObject> internalChildren;
-    protected internal IReadOnlyList<GameObject> InternalChildren => internalChildren;
+	private readonly SortedList<GameObject> internalChildren;
+	protected internal IReadOnlyList<GameObject> InternalChildren => internalChildren;
 
-    private ulong currentChildID;
+	private ulong currentChildID;
 
-    protected virtual void AddInternal(GameObject gameObject)
-    {
-        if (gameObject == null)
-            throw new ArgumentNullException(nameof(gameObject), $"Cannot add null {nameof(gameObject)} to {nameof(CompositeGameObject)}.");
+	protected virtual void AddInternal(GameObject gameObject)
+	{
+		if (gameObject == null)
+			throw new ArgumentNullException(nameof(gameObject), $"Cannot add null {nameof(gameObject)} to {nameof(CompositeGameObject)}.");
 
-        if (gameObject == this)
-            throw new InvalidOperationException($"{nameof(CompositeGameObject)} cannot be addet to itself.");
+		if (gameObject == this)
+			throw new InvalidOperationException($"{nameof(CompositeGameObject)} cannot be addet to itself.");
 
-        if (gameObject.ChildID != 0)
-            throw new InvalidOperationException($"Cannot add Game Object to multiple containers.");
+		if (gameObject.ChildID != 0)
+			throw new InvalidOperationException($"Cannot add Game Object to multiple containers.");
 
-        gameObject.ChildID = ++currentChildID;
-        gameObject.Parent = this;
+		gameObject.ChildID = ++currentChildID;
+		gameObject.Parent = this;
 
-        internalChildren.Add(gameObject);
-    }
+		internalChildren.Add(gameObject);
+	}
 
-    protected internal int IndexOfInternal(GameObject gameObject)
-    {
-        if (gameObject.Parent != null && gameObject.Parent != this)
-            throw new InvalidOperationException($@"Cannot call {nameof(IndexOfInternal)} for a drawable that already is a child of a different parent");
+	protected internal int IndexOfInternal(GameObject gameObject)
+	{
+		if (gameObject.Parent != null && gameObject.Parent != this)
+			throw new InvalidOperationException($@"Cannot call {nameof(IndexOfInternal)} for a drawable that already is a child of a different parent");
 
-        int index = internalChildren.IndexOf(gameObject);
+		int index = internalChildren.IndexOf(gameObject);
 
-        if (index >= 0 && internalChildren[index].ChildID != gameObject.ChildID)
-            throw new InvalidOperationException(@$"A non-matching {nameof(GameObject)} was returned.");
+		if (index >= 0 && internalChildren[index].ChildID != gameObject.ChildID)
+			throw new InvalidOperationException(@$"A non-matching {nameof(GameObject)} was returned.");
 
-        return index;
-    }
+		return index;
+	}
 
-    protected virtual bool RemoveInternal(GameObject gameObject)
-    {
-        ArgumentNullException.ThrowIfNull(gameObject);
+	protected virtual bool RemoveInternal(GameObject gameObject)
+	{
+		ArgumentNullException.ThrowIfNull(gameObject);
 
-        int index = IndexOfInternal(gameObject);
-        if (index < 0)
-            return false;
+		int index = IndexOfInternal(gameObject);
+		if (index < 0)
+			return false;
 
-        internalChildren.RemoveAt(index);
+		internalChildren.RemoveAt(index);
 
-        gameObject.Parent = null;
-        return true;
-    }
+		gameObject.Parent = null;
+		return true;
+	}
 
-    protected internal virtual void ClearInternal(bool disposeChildren = true)
-    {
-        if (internalChildren.Count == 0) return;
+	protected internal virtual void ClearInternal(bool disposeChildren = true)
+	{
+		if (internalChildren.Count == 0) return;
 
-        foreach (GameObject t in internalChildren)
-        {
-            t.Parent = null;
-        }
+		foreach (GameObject t in internalChildren)
+		{
+			t.Parent = null;
+		}
 
-        internalChildren.Clear();
-    }
+		internalChildren.Clear();
+	}
 
-    #endregion
+	protected internal void ChangeInternalChildDepth(GameObject child, float newDepth)
+	{
+		if (child.Depth == newDepth) return;
 
-    protected virtual bool RequiresChildrenUpdate => true;
+		int index = IndexOfInternal(child);
+		if (index < 0)
+			throw new InvalidOperationException($"Can not change depth of an object which is not contained within this {nameof(CompositeGameObject)}.");
 
-    public override bool UpdateSubTree()
-    {
-        if (base.UpdateSubTree() == false) return false;
+		internalChildren.RemoveAt(index);
+		ulong cId = child.ChildID;
+		child.ChildID = 0;
+		child.Depth = newDepth;
+		child.ChildID = cId;
 
-        for (int i = 0; i < internalChildren.Count; ++i)
-        {
-            internalChildren[i].UpdateSubTree();
-        }
+		internalChildren.Add(child);
+	}
 
-        UpdateAfterChildren();
-        return true;
-    }
+	#endregion
 
-    protected virtual void UpdateAfterChildren() { }
+	protected virtual bool RequiresChildrenUpdate => true;
 
-    protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
-    {
-        bool anyInvalidated = base.OnInvalidate(invalidation, source);
+	public override bool UpdateSubTree()
+	{
+		if (base.UpdateSubTree() == false) return false;
 
-        if (source == InvalidationSource.Child)
-            return anyInvalidated;
+		for (int i = 0; i < internalChildren.Count; ++i)
+		{
+			internalChildren[i].UpdateSubTree();
+		}
 
-        invalidation &= ~Invalidation.DrawNode;
-        if (invalidation == Invalidation.None)
-            return anyInvalidated;
+		UpdateAfterChildren();
+		return true;
+	}
 
-        IReadOnlyList<GameObject> targetChildren = internalChildren;
+	protected virtual void UpdateAfterChildren() { }
 
-        for (int i = 0; i < targetChildren.Count; ++i)
-        {
-            GameObject c = targetChildren[i];
+	protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+	{
+		bool anyInvalidated = base.OnInvalidate(invalidation, source);
 
-            Invalidation childInvalidation = invalidation;
-            if ((invalidation & Invalidation.RequiredParentSizeToFit) > 0)
-                childInvalidation |= Invalidation.DrawInfo;
+		if (source == InvalidationSource.Child)
+			return anyInvalidated;
 
-            childInvalidation &= ~Invalidation.MiscGeometry;
+		invalidation &= ~Invalidation.DrawNode;
+		if (invalidation == Invalidation.None)
+			return anyInvalidated;
 
-            if (c.RelativeSizeAxes == Axes.None)
-                childInvalidation &= ~Invalidation.DrawSize;
+		IReadOnlyList<GameObject> targetChildren = internalChildren;
 
-            anyInvalidated |= c.Invalidate(childInvalidation, InvalidationSource.Parent);
-        }
+		for (int i = 0; i < targetChildren.Count; ++i)
+		{
+			GameObject c = targetChildren[i];
 
-        return base.OnInvalidate(invalidation, source);
-    }
+			Invalidation childInvalidation = invalidation;
+			if ((invalidation & Invalidation.RequiredParentSizeToFit) > 0)
+				childInvalidation |= Invalidation.DrawInfo;
 
-    protected override DrawNode CreateDrawNode() => new CompositeGameObjectDrawNode(this);
+			childInvalidation &= ~Invalidation.MiscGeometry;
 
-    public override DrawNode? GenerateDrawNodeSubtree()
-    {
-        var drawNode = base.GenerateDrawNodeSubtree();
+			if (c.RelativeSizeAxes == Axes.None)
+				childInvalidation &= ~Invalidation.DrawSize;
 
-        if ((drawNode is ICompositeDrawNode compositeNode) == false)
-            return null;
+			anyInvalidated |= c.Invalidate(childInvalidation, InvalidationSource.Parent);
+		}
 
-        compositeNode.Children ??= new List<DrawNode>();
+		return base.OnInvalidate(invalidation, source);
+	}
 
-        int j = 0;
-        addFromComposite(ref j, this, compositeNode.Children);
+	protected override DrawNode CreateDrawNode() => new CompositeGameObjectDrawNode(this);
 
-        if (j < compositeNode.Children.Count)
-            compositeNode.Children.RemoveRange(j, compositeNode.Children.Count - j);
+	public override DrawNode? GenerateDrawNodeSubtree()
+	{
+		var drawNode = base.GenerateDrawNodeSubtree();
 
-        return drawNode;
-    }
+		if ((drawNode is ICompositeDrawNode compositeNode) == false)
+			return null;
 
-    private static void addFromComposite(ref int j, CompositeGameObject parentComposite, List<DrawNode> target)
-    {
-        var children = parentComposite.internalChildren;
+		compositeNode.Children ??= new List<DrawNode>();
 
-        for (int i = 0; i < children.Count; i++)
-        {
-            var drawable = children[i];
+		int j = 0;
+		addFromComposite(ref j, this, compositeNode.Children);
 
-            DrawNode? next = drawable.GenerateDrawNodeSubtree();
-            if (next == null) continue;
+		if (j < compositeNode.Children.Count)
+			compositeNode.Children.RemoveRange(j, compositeNode.Children.Count - j);
 
-            if (j < target.Count)
-                target[j] = next;
-            else
-                target.Add(next);
+		return drawNode;
+	}
 
-            j++;
-        }
-    }
+	private static void addFromComposite(ref int j, CompositeGameObject parentComposite, List<DrawNode> target)
+	{
+		var children = parentComposite.internalChildren;
 
-    private MarginPadding _padding;
-    public MarginPadding Padding
-    {
-        get => _padding;
-        protected set
-        {
-            if (_padding.Equals(value)) return;
+		for (int i = 0; i < children.Count; i++)
+		{
+			var drawable = children[i];
 
-            _padding = value;
+			DrawNode? next = drawable.GenerateDrawNodeSubtree();
+			if (next == null) continue;
 
-            foreach (GameObject c in internalChildren)
-                c.Invalidate(c.InvalidationFromParentSize | Invalidation.MiscGeometry);
-        }
-    }
+			if (j < target.Count)
+				target[j] = next;
+			else
+				target.Add(next);
 
-    public Vector2 ChildSize => DrawSize - new Vector2(Padding.Horizontal, Padding.Vertical);
-    public Vector2 ChildOffset => new(Padding.Left, Padding.Top);
+			j++;
+		}
+	}
 
-    private Vector2 _relativeChildSize = Vector2.One;
-    public Vector2 RelativeChildSize => _relativeChildSize;
+	private MarginPadding _padding;
+	public MarginPadding Padding
+	{
+		get => _padding;
+		protected set
+		{
+			if (_padding.Equals(value)) return;
 
-    private Vector2 _relativeChildOffset = Vector2.Zero;
-    public Vector2 RelativeChildOffset => _relativeChildOffset;
+			_padding = value;
 
-    public Vector2 RelativeToAbsoluteFactor => Vector2.Divide(ChildSize, RelativeChildSize);
+			foreach (GameObject c in internalChildren)
+				c.Invalidate(c.InvalidationFromParentSize | Invalidation.MiscGeometry);
+		}
+	}
 
-    private Axes _autoSizeAxes;
+	public Vector2 ChildSize => DrawSize - new Vector2(Padding.Horizontal, Padding.Vertical);
+	public Vector2 ChildOffset => new(Padding.Left, Padding.Top);
 
-    public Axes AutoSizeAxes
-    {
-        get => _autoSizeAxes;
-        protected set
-        {
-            if (value == _autoSizeAxes) return;
+	private Vector2 _relativeChildSize = Vector2.One;
+	public Vector2 RelativeChildSize => _relativeChildSize;
 
-            if ((RelativeSizeAxes & value) != 0)
-                throw new InvalidOperationException("No axis can be relatively sized and automatically sized at the same time.");
+	private Vector2 _relativeChildOffset = Vector2.Zero;
+	public Vector2 RelativeChildOffset => _relativeChildOffset;
 
-            _autoSizeAxes = value;
+	public Vector2 RelativeToAbsoluteFactor => Vector2.Divide(ChildSize, RelativeChildSize);
 
-            if (value == Axes.None)
-                _childrenSizeDependencies.Validate();
-            else
-                _childrenSizeDependencies.Invalidate();
+	private Axes _autoSizeAxes;
 
-            OnSizingChanged();
-        }
-    }
+	public Axes AutoSizeAxes
+	{
+		get => _autoSizeAxes;
+		protected set
+		{
+			if (value == _autoSizeAxes) return;
 
-    private readonly LayoutValue _childrenSizeDependencies = new(Invalidation.RequiredParentSizeToFit | Invalidation.Presence, InvalidationSource.Child);
+			if ((RelativeSizeAxes & value) != 0)
+				throw new InvalidOperationException("No axis can be relatively sized and automatically sized at the same time.");
 
-    #region Invalidation
+			_autoSizeAxes = value;
 
-    internal void InvalidateChildrenSizeDependencies(Invalidation invalidation, Axes axes, GameObject source)
-    {
-        //bool wasValid = childrenSizeDependencies.IsValid;
+			if (value == Axes.None)
+				_childrenSizeDependencies.Validate();
+			else
+				_childrenSizeDependencies.Invalidate();
 
-        Invalidate(invalidation, InvalidationSource.Child);
+			OnSizingChanged();
+		}
+	}
 
-        //axes &= ~source.BypassAutoSizedAxes;
+	private readonly LayoutValue _childrenSizeDependencies = new(Invalidation.RequiredParentSizeToFit | Invalidation.Presence, InvalidationSource.Child);
 
-        //axes &= AutoSizeAxes;
+	#region Invalidation
 
-        //if (wasValid && axes == Axes.None)
-        //childrenSizeDependencies.Validate();w
-    }
+	internal void InvalidateChildrenSizeDependencies(Invalidation invalidation, Axes axes, GameObject source)
+	{
+		//bool wasValid = childrenSizeDependencies.IsValid;
 
-    #endregion
+		Invalidate(invalidation, InvalidationSource.Child);
 
-    protected class ChildComparer : IComparer<GameObject>
-    {
-        private readonly CompositeGameObject _owner;
+		//axes &= ~source.BypassAutoSizedAxes;
 
-        public ChildComparer(CompositeGameObject owner)
-        {
-            _owner = owner;
-        }
+		//axes &= AutoSizeAxes;
 
-        public int Compare(GameObject? x, GameObject? y) => _owner.Compare(x ?? throw new Exception("Cannot compare null value"),
-                                                                            y ?? throw new Exception("Cannot compare null value"));
-    }
+		//if (wasValid && axes == Axes.None)
+		//childrenSizeDependencies.Validate();w
+	}
 
-    protected virtual int Compare(GameObject x, GameObject y)
-    {
-        ArgumentNullException.ThrowIfNull(x);
-        ArgumentNullException.ThrowIfNull(y);
+	#endregion
 
-        int i = y.Depth.CompareTo(x.Depth);
-        if (i != 0) return i;
+	protected class ChildComparer : IComparer<GameObject>
+	{
+		private readonly CompositeGameObject _owner;
 
-        return x.ChildID.CompareTo(y.ChildID);
-    }
+		public ChildComparer(CompositeGameObject owner)
+		{
+			_owner = owner;
+		}
+
+		public int Compare(GameObject? x, GameObject? y) => _owner.Compare(x ?? throw new Exception("Cannot compare null value"),
+																			y ?? throw new Exception("Cannot compare null value"));
+	}
+
+	protected virtual int Compare(GameObject x, GameObject y)
+	{
+		ArgumentNullException.ThrowIfNull(x);
+		ArgumentNullException.ThrowIfNull(y);
+
+		int i = y.Depth.CompareTo(x.Depth);
+		if (i != 0) return i;
+
+		return x.ChildID.CompareTo(y.ChildID);
+	}
 }
