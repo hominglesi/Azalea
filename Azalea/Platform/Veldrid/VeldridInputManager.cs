@@ -10,81 +10,93 @@ namespace Azalea.Platform.Veldrid;
 
 internal class VeldridInputManager
 {
-    private Sdl2Window _window;
+	private Sdl2Window _sdl;
 
-    public VeldridInputManager(Sdl2Window window)
-    {
-        _window = window;
+	public VeldridInputManager(VeldridWindow window)
+	{
+		_sdl = window.Window;
+		window.OnInput += handleInput;
 
-        Initialize();
-    }
+		Initialize();
+	}
 
-    private void Initialize()
-    {
-        for (int i = 0; i < Input.MOUSE_BUTTONS.Length; i++)
-        {
-            Input.MOUSE_BUTTONS[i] = new AzaleaButtonState();
-        }
-        foreach (Keys key in (Keys[])Enum.GetValues(typeof(Keys)))
-        {
-            if (Input.KEYBOARD_KEYS.ContainsKey((int)key)) continue;
+	private void Initialize()
+	{
+		for (int i = 0; i < Input.MOUSE_BUTTONS.Length; i++)
+		{
+			Input.MOUSE_BUTTONS[i] = new AzaleaButtonState();
+		}
+		foreach (Keys key in (Keys[])Enum.GetValues(typeof(Keys)))
+		{
+			if (Input.KEYBOARD_KEYS.ContainsKey((int)key)) continue;
 
-            Input.KEYBOARD_KEYS.Add((int)key, new AzaleaButtonState());
-        }
+			Input.KEYBOARD_KEYS.Add((int)key, new AzaleaButtonState());
+		}
 
-        _window.MouseMove += processMouseMove;
-        _window.MouseDown += processMouseDown;
-        _window.MouseUp += processMouseUp;
+		Input.TEXT_INPUT_SOURCE = new TextInputSource();
 
-        _window.KeyDown += processKeyDown;
-        _window.KeyUp += processKeyUp;
-    }
+		_sdl.MouseMove += processMouseMove;
+		_sdl.MouseDown += processMouseDown;
+		_sdl.MouseUp += processMouseUp;
 
-    private void processKeyUp(KeyEvent obj)
-    {
-        var pressedKey = (int)obj.Key.ToAzaleaKey();
-        if (Input.KEYBOARD_KEYS.ContainsKey(pressedKey) == false) return;
-        Input.KEYBOARD_KEYS[pressedKey].SetUp();
-    }
+		_sdl.KeyDown += processKeyDown;
+		_sdl.KeyUp += processKeyUp;
+	}
 
-    private void processKeyDown(KeyEvent obj)
-    {
-        var pressedKey = (int)obj.Key.ToAzaleaKey();
-        if (Input.KEYBOARD_KEYS.ContainsKey(pressedKey) == false) return;
-        Input.KEYBOARD_KEYS[pressedKey].SetDown();
-    }
+	private void handleInput()
+	{
+		var events = _sdl.PumpEvents();
+		foreach (var charPress in events.KeyCharPresses)
+		{
+			Input.TEXT_INPUT_SOURCE.TriggerTextInput(charPress.ToString());
+		}
+	}
 
-    private void processMouseDown(MouseEvent obj)
-    {
-        var buttonIndex = (int)VeldridExtentions.ToAzaleaMouseInput(obj.MouseButton);
-        if (buttonIndex > 4) return;
+	private void processKeyUp(KeyEvent obj)
+	{
+		var pressedKey = (int)obj.Key.ToAzaleaKey();
+		if (Input.KEYBOARD_KEYS.ContainsKey(pressedKey) == false) return;
+		Input.KEYBOARD_KEYS[pressedKey].SetUp();
+	}
 
-        Input.MOUSE_BUTTONS[buttonIndex].SetDown();
-    }
+	private void processKeyDown(KeyEvent obj)
+	{
+		var pressedKey = (int)obj.Key.ToAzaleaKey();
+		if (Input.KEYBOARD_KEYS.ContainsKey(pressedKey) == false) return;
+		Input.KEYBOARD_KEYS[pressedKey].SetDown();
+	}
 
-    private void processMouseUp(MouseEvent obj)
-    {
-        var buttonIndex = (int)VeldridExtentions.ToAzaleaMouseInput(obj.MouseButton);
-        if (buttonIndex > 4) return;
+	private void processMouseDown(MouseEvent obj)
+	{
+		var buttonIndex = (int)VeldridExtentions.ToAzaleaMouseInput(obj.MouseButton);
+		if (buttonIndex > 4) return;
 
-        Input.MOUSE_BUTTONS[buttonIndex].SetUp();
-    }
+		Input.MOUSE_BUTTONS[buttonIndex].SetDown();
+	}
 
-    private void processMouseMove(MouseMoveEventArgs obj)
-    {
-        Input.MOUSE_POSITION = obj.MousePosition;
-    }
+	private void processMouseUp(MouseEvent obj)
+	{
+		var buttonIndex = (int)VeldridExtentions.ToAzaleaMouseInput(obj.MouseButton);
+		if (buttonIndex > 4) return;
 
-    public void Update()
-    {
-        foreach (var key in Input.KEYBOARD_KEYS)
-        {
-            key.Value.Update();
-        }
+		Input.MOUSE_BUTTONS[buttonIndex].SetUp();
+	}
 
-        foreach (var mouseButton in Input.MOUSE_BUTTONS)
-        {
-            mouseButton.Update();
-        }
-    }
+	private void processMouseMove(MouseMoveEventArgs obj)
+	{
+		Input.MOUSE_POSITION = obj.MousePosition;
+	}
+
+	public void Update()
+	{
+		foreach (var key in Input.KEYBOARD_KEYS)
+		{
+			key.Value.Update();
+		}
+
+		foreach (var mouseButton in Input.MOUSE_BUTTONS)
+		{
+			mouseButton.Update();
+		}
+	}
 }

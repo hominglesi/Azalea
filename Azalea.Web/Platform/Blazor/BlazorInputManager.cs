@@ -22,5 +22,7 @@ public class BlazorInputManager
 
 			Input.KEYBOARD_KEYS.Add((int)key, new ButtonState());
 		}
+
+		Input.TEXT_INPUT_SOURCE = new TextInputSource();
 	}
 }

@@ -2,7 +2,6 @@
 using Azalea.Graphics.Containers;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
-using Azalea.Inputs.Events;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -59,6 +58,8 @@ public abstract class TextBox : TabbableContainer
 			}
 		};
 		HasFocus = true;
+
+		Input.GetTextInput().OnTextInput += handleTextInput;
 	}
 
 	private int _selectionStart;
@@ -256,39 +257,8 @@ public abstract class TextBox : TabbableContainer
 			manager.ChangeFocus(null);
 	}
 
-	protected override bool OnKeyDown(KeyDownEvent e)
-	{
-		if (AttemptAction(e.Key)) return true;
-
-		if (e.Key == Keys.ShiftLeft || e.Key == Keys.ShiftRight) return false;
-
-		var text = e.Key.ToString();
-		if (Input.GetKey(Keys.ShiftLeft).Released && Input.GetKey(Keys.ShiftRight).Released)
-		{
-			text = text.ToLower();
-		}
-		handleTextInput(text);
-
-		return true;
-	}
-
 	private void handleTextInput(string text)
 	{
 		InsertString(text);
-	}
-
-	protected bool AttemptAction(Keys key)
-	{
-		switch (key)
-		{
-			case Keys.Space:
-				handleTextInput(" ");
-				return true;
-			case Keys.Backspace:
-				DeleteBy(-1);
-				return true;
-		}
-
-		return false;
 	}
 }

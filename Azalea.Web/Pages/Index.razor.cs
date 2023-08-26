@@ -1,5 +1,6 @@
 using Azalea.Inputs;
 using Azalea.Web.Platform.Blazor;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using nkast.Wasm.Canvas;
@@ -38,7 +39,7 @@ public partial class Index
 
 	public void UpdateRender()
 	{
-		FocusCanvas();
+		FocusInput();
 		StateHasChanged();
 	}
 
@@ -72,6 +73,21 @@ public partial class Index
 		Input.KEYBOARD_KEYS[(int)button].SetUp();
 	}
 
+	private const string DefaultInputText = "a";
+
+	public void HandleTextInput(ChangeEventArgs e)
+	{
+		string? stringInput = (string?)e.Value;
+		if (stringInput is null) return;
+
+		if (stringInput.Length > DefaultInputText.Length)
+		{
+			Input.TEXT_INPUT_SOURCE.TriggerTextInput(stringInput[DefaultInputText.Length..]);
+		}
+
+		setInputText(DefaultInputText);
+	}
+
 	public async void SetTitle(string title)
 		=> await JSRuntime.InvokeVoidAsync("setTitle", title);
 
@@ -81,6 +97,9 @@ public partial class Index
 	public async void Log(object? text)
 		=> await JSRuntime.InvokeVoidAsync("console.log", text?.ToString());
 
-	private async void FocusCanvas()
-		=> await JSRuntime.InvokeVoidAsync("focusCanvas");
+	private async void FocusInput()
+		=> await JSRuntime.InvokeVoidAsync("focusInput");
+
+	private async void setInputText(string value)
+		=> await JSRuntime.InvokeVoidAsync("setInputText", value);
 }

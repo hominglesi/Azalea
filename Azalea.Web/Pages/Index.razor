@@ -4,8 +4,10 @@
 
 <PageTitle>Index</PageTitle>
 
+<input id="mainInput" value="a"
+	@onkeydown="@HandleKeyDown" @onkeyup="@HandleKeyUp" @oninput="@HandleTextInput"></input>
+
 <canvas Width="1280" Height="720" id="mainCanvas" 
-	@onmousemove="@HandleMouseMove" @onmousedown="@HandleMouseDown" @onmouseup="@HandleMouseUp"
-	tabindex="0" @onkeydown="@HandleKeyDown" @onkeyup="@HandleKeyUp" />
+	@onmousemove="@HandleMouseMove" @onmousedown="@HandleMouseDown" @onmouseup="@HandleMouseUp" />
 
 
