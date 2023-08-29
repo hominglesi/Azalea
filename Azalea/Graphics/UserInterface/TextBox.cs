@@ -2,6 +2,7 @@
 using Azalea.Graphics.Containers;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
+using Azalea.Inputs.Events;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -246,6 +247,29 @@ public abstract class TextBox : TabbableContainer
 		}
 
 		return 0;
+	}
+
+	protected override bool OnKeyDown(KeyDownEvent e)
+	{
+		return e.Key switch
+		{
+			Keys.Backspace => onAction(PlatformAction.DeleteBackwardChar),
+			_ => false,
+		};
+	}
+
+	private bool onAction(PlatformAction action)
+	{
+		if (HasFocus == false) return false;
+
+		switch (action)
+		{
+			case PlatformAction.DeleteBackwardChar:
+				DeleteBy(-1);
+				return true;
+		}
+
+		return false;
 	}
 
 	protected virtual void KillFocus() => killFocus();
