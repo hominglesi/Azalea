@@ -70,6 +70,8 @@ public abstract class TextBox : TabbableContainer
 	private int _selectionLeft => Math.Min(_selectionStart, _selectionEnd);
 	private int _selectionRight => Math.Max(_selectionStart, _selectionEnd);
 
+	public string SelectedText => _selectionLength > 0 ? Text.Substring(_selectionLeft, _selectionLength) : string.Empty;
+
 	private string _text = string.Empty;
 
 	public virtual string Text
@@ -111,7 +113,7 @@ public abstract class TextBox : TabbableContainer
 			_text = _text.Insert(_selectionLeft, c.ToString());
 			_selectionStart = _selectionEnd = _selectionLeft + 1;
 
-			cursorAndLayout.Invalidate();
+			_cursorAndLayout.Invalidate();
 		}
 	}
 
@@ -124,7 +126,40 @@ public abstract class TextBox : TabbableContainer
 
 		insertString(value);
 
-		cursorAndLayout.Invalidate();
+		_cursorAndLayout.Invalidate();
+	}
+
+	protected void MoveCursorBy(int amount)
+	{
+		_selectionStart = _selectionEnd;
+		_cursorAndLayout.Invalidate();
+		moveSelection(amount, false);
+	}
+
+	private void moveSelection(int offset, bool expand)
+	{
+		int oldStart = _selectionStart;
+		int oldEnd = _selectionEnd;
+
+		if (expand)
+			_selectionEnd = Math.Clamp(_selectionEnd + offset, 0, _text.Length);
+		else
+		{
+			if (_selectionLength > 0 && Math.Abs(offset) <= 1)
+			{
+				if (offset > 0)
+					_selectionEnd = _selectionStart = _selectionRight;
+				else
+					_selectionEnd = _selectionStart = _selectionLeft;
+			}
+			else
+				_selectionEnd = _selectionStart = Math.Clamp((offset > 0 ? _selectionRight : _selectionLeft) + offset, 0, _text.Length);
+		}
+
+		if (oldStart != _selectionStart || oldEnd != _selectionEnd)
+		{
+			_cursorAndLayout.Invalidate();
+		}
 	}
 
 	protected virtual GameObject GetGameObjectCharacter(char c) =>
@@ -182,7 +217,7 @@ public abstract class TextBox : TabbableContainer
 
 		_selectionStart = _selectionEnd = removeStart;
 
-		cursorAndLayout.Invalidate();
+		_cursorAndLayout.Invalidate();
 
 		return removedText;
 	}
@@ -200,16 +235,16 @@ public abstract class TextBox : TabbableContainer
 
 	#endregion
 
-	private readonly Cached cursorAndLayout = new();
+	private readonly Cached _cursorAndLayout = new();
 
 	protected override void UpdateAfterChildren()
 	{
 		base.UpdateAfterChildren();
 
-		if (cursorAndLayout.IsValid == false)
+		if (_cursorAndLayout.IsValid == false)
 		{
 			updateCursorAndLayout();
-			cursorAndLayout.Validate();
+			_cursorAndLayout.Validate();
 		}
 	}
 
@@ -251,11 +286,24 @@ public abstract class TextBox : TabbableContainer
 
 	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		return e.Key switch
+		switch (e.Key)
 		{
-			Keys.Backspace => onAction(PlatformAction.DeleteBackwardChar),
-			_ => false,
-		};
+			case Keys.Backspace: return onAction(PlatformAction.DeleteBackwardChar);
+			case Keys.Left: return onAction(PlatformAction.MoveBackwardChar);
+			case Keys.Right: return onAction(PlatformAction.MoveForwardChar);
+		}
+
+		if (Input.GetKey(Keys.ControlLeft).Pressed || Input.GetKey(Keys.ControlRight).Pressed)
+		{
+			switch (e.Key)
+			{
+				case Keys.C: return onAction(PlatformAction.Copy);
+				case Keys.V: return onAction(PlatformAction.Paste);
+				case Keys.A: return onAction(PlatformAction.SelectAll);
+			}
+		}
+
+		return false;
 	}
 
 	private bool onAction(PlatformAction action)
@@ -264,6 +312,37 @@ public abstract class TextBox : TabbableContainer
 
 		switch (action)
 		{
+			case PlatformAction.Cut:
+			case PlatformAction.Copy:
+				if (string.IsNullOrEmpty(SelectedText)) return true;
+
+				AzaleaGame.Main.Host.Clipboard.SetText(SelectedText);
+
+				if (action == PlatformAction.Cut)
+					DeleteBy(0);
+
+				return true;
+
+			case PlatformAction.Paste:
+				var clipboardText = AzaleaGame.Main.Host.Clipboard.GetText();
+				if (clipboardText is null) return false;
+				InsertString(clipboardText);
+				return true;
+
+			case PlatformAction.SelectAll:
+				_selectionStart = 0;
+				_selectionEnd = _text.Length;
+				_cursorAndLayout.Invalidate();
+				return true;
+
+			case PlatformAction.MoveForwardChar:
+				MoveCursorBy(1);
+				return true;
+
+			case PlatformAction.MoveBackwardChar:
+				MoveCursorBy(-1);
+				return true;
+
 			case PlatformAction.DeleteBackwardChar:
 				DeleteBy(-1);
 				return true;
