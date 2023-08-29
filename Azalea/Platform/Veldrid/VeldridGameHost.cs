@@ -1,4 +1,8 @@
-﻿namespace Azalea.Platform.Veldrid;
+﻿using Azalea.Graphics.Rendering;
+using Azalea.Graphics.Veldrid;
+using System;
+
+namespace Azalea.Platform.Veldrid;
 
 public class VeldridGameHost : GameHost
 {

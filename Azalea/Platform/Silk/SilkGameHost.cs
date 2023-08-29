@@ -4,6 +4,7 @@ using Silk.NET.Input;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 using System;
+using System.Diagnostics;
 
 namespace Azalea.Platform.Silk;
 
@@ -43,6 +44,8 @@ internal class SilkGameHost : GameHost
 	public override void CallOnUpdate()
 	{
 		base.CallOnUpdate();
+
+		Debug.Assert(_gl is not null);
 
 		_gl.Viewport(0, 0, (uint)_window.ClientSize.X, (uint)_window.ClientSize.Y);
 

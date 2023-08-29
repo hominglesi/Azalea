@@ -1,4 +1,8 @@
-﻿using SilkMouseButton = Silk.NET.Input.MouseButton;
+﻿using Azalea.Inputs;
+using Silk.NET.Input;
+using System;
+using System.Numerics;
+using SilkMouseButton = Silk.NET.Input.MouseButton;
 
 namespace Azalea.Platform.Silk;
 
@@ -48,6 +52,7 @@ internal class SilkInputManager
 		{
 			keyboard.KeyDown += ProcessKeyDown;
 			keyboard.KeyUp += ProcessKeyUp;
+			keyboard.KeyChar += ProcessTextInput;
 		}
 	}
 
