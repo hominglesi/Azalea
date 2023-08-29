@@ -9,50 +9,51 @@ namespace Azalea.Platform.Silk;
 
 internal class SilkGameHost : GameHost
 {
-    public override IWindow Window => _window ?? throw new Exception("Cannot use Window before it is initialized");
-    private SilkWindow _window;
+	public override IWindow Window => _window ?? throw new Exception("Cannot use Window before it is initialized");
+	private SilkWindow _window;
 
-    public override IRenderer Renderer => _renderer ?? throw new Exception("Cannot use Renderer before it is initialized");
-    private GLRenderer? _renderer;
+	public override IRenderer Renderer => _renderer ?? throw new Exception("Cannot use Renderer before it is initialized");
+	private GLRenderer? _renderer;
 
-    private GL? _gl;
+	private GL? _gl;
 
-    private SilkInputManager? _inputManager;
+	private SilkInputManager? _inputManager;
 
-    public SilkGameHost(HostPreferences preferences)
-    {
-        _window = new SilkWindow(preferences.PreferredClientSize);
+	public SilkGameHost(HostPreferences preferences)
+	{
+		_window = new SilkWindow(preferences.PreferredClientSize);
 
-        _window.Window.Load += CallInitialized;
-        _window.Window.Render += (_) => CallOnRender();
-        _window.Window.Update += (_) => CallOnUpdate();
-    }
+		_window.Window.Load += CallInitialized;
+		_window.Window.Render += (_) => CallOnRender();
+		_window.Window.Update += (_) => CallOnUpdate();
+	}
 
-    public override void CallInitialized()
-    {
-        _gl = _window.Window.CreateOpenGL();
-        _renderer = new GLRenderer(_gl, _window);
-        _inputManager = new SilkInputManager(_window.Window.CreateInput());
+	public override void CallInitialized()
+	{
+		_gl = _window.Window.CreateOpenGL();
+		_renderer = new GLRenderer(_gl, _window);
+		_inputManager = new SilkInputManager(_window.Window.CreateInput());
 
-        _window.InitializeAfterStartup(_gl, _inputManager);
+		_window.InitializeAfterStartup(_gl, _inputManager);
+		((SilkClipboard)Clipboard).SetInput(_inputManager);
 
-        base.CallInitialized();
-    }
+		base.CallInitialized();
+	}
 
-    public override void CallOnUpdate()
-    {
-        base.CallOnUpdate();
+	public override void CallOnUpdate()
+	{
+		base.CallOnUpdate();
 
-        _gl.Viewport(0, 0, (uint)_window.ClientSize.X, (uint)_window.ClientSize.Y);
+		_gl.Viewport(0, 0, (uint)_window.ClientSize.X, (uint)_window.ClientSize.Y);
 
-        _inputManager?.Update();
-    }
+		_inputManager?.Update();
+	}
 
-    public override void Run(AzaleaGame game)
-    {
-        base.Run(game);
-        _window.Window.Run();
-    }
+	public override void Run(AzaleaGame game)
+	{
+		base.Run(game);
+		_window.Window.Run();
+	}
 
-
+	protected override IClipboard? CreateClipboard() => new SilkClipboard();
 }

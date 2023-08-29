@@ -1,8 +1,4 @@
-﻿using Azalea.Graphics.Rendering;
-using Azalea.Graphics.Veldrid;
-using System;
-
-namespace Azalea.Platform.Veldrid;
+﻿namespace Azalea.Platform.Veldrid;
 
 public class VeldridGameHost : GameHost
 {
@@ -43,4 +39,6 @@ public class VeldridGameHost : GameHost
 		base.Run(game);
 		_window.Run();
 	}
+
+	protected override IClipboard? CreateClipboard() => new VeldridClipboard();
 }

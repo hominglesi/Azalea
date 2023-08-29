@@ -1,9 +1,4 @@
-﻿using Azalea.Inputs;
-using Silk.NET.Input;
-using System;
-using System.Numerics;
-
-using SilkMouseButton = Silk.NET.Input.MouseButton;
+﻿using SilkMouseButton = Silk.NET.Input.MouseButton;
 
 namespace Azalea.Platform.Silk;
 
@@ -12,6 +7,8 @@ internal class SilkInputManager
 	private readonly IInputContext _input;
 
 	public IMouse? PrimaryMouse;
+
+	public IKeyboard? PrimaryKeyboard;
 
 	public SilkInputManager(IInputContext input)
 	{
@@ -38,6 +35,9 @@ internal class SilkInputManager
 		if (_input.Mice.Count >= 1)
 			PrimaryMouse = _input.Mice[0];
 
+		if (_input.Keyboards.Count >= 1)
+			PrimaryKeyboard = _input.Keyboards[0];
+
 		foreach (var mouse in _input.Mice)
 		{
 			mouse.MouseMove += ProcessMouseMove;
@@ -48,7 +48,6 @@ internal class SilkInputManager
 		{
 			keyboard.KeyDown += ProcessKeyDown;
 			keyboard.KeyUp += ProcessKeyUp;
-			keyboard.KeyChar += ProcessTextInput;
 		}
 	}
 
