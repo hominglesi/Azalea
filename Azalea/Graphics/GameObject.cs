@@ -411,16 +411,16 @@ public abstract class GameObject : IGameObject
 		}
 	}
 
-	private float alpha = 1.0f;
-
 	public float Alpha
 	{
-		get => alpha;
+		get => Color.A;
 		set
 		{
-			if (alpha == value) return;
+			if (Color.A == value) return;
+			var alphaValue = Math.Clamp(value, 0, 1) * byte.MaxValue;
 
-			alpha = value;
+
+			Color = new Color(Color.R, Color.G, Color.B, (byte)alphaValue);
 		}
 	}
 
@@ -690,7 +690,7 @@ public abstract class GameObject : IGameObject
 
 	private DrawColorInfo computeDrawColorInfo()
 	{
-		return new DrawColorInfo(Color, Alpha);
+		return new DrawColorInfo(Color);
 	}
 
 	private DrawNode? drawNode;

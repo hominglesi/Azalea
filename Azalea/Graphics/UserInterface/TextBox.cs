@@ -33,6 +33,8 @@ public abstract class TextBox : TabbableContainer
 		}
 	}
 
+	private readonly Caret _caret;
+
 	public TextBox()
 	{
 		Children = new GameObject[]
@@ -42,10 +44,11 @@ public abstract class TextBox : TabbableContainer
 				Size = Vector2.One,
 				RelativeSizeAxes = Axes.Both,
 				Anchor = Anchor.CenterLeft,
-				Origin = Anchor.CenterLeft,
+				Origin = Anchor.TopLeft,
 				Position = new Vector2(0, 0),
 				Children = new GameObject[]
 				{
+					_caret = CreateCaret(),
 					TextFlow = new FlexContainer()
 					{
 						Anchor = Anchor.CenterLeft,
@@ -84,6 +87,27 @@ public abstract class TextBox : TabbableContainer
 			setText(value);
 		}
 	}
+
+	private bool _caretVisible;
+
+	private void updateCaretVisibility()
+	{
+		bool newVisibility = HasFocus;
+
+		if (_caretVisible != newVisibility)
+		{
+			_caretVisible = newVisibility;
+
+			if (_caretVisible)
+				_caret.Alpha = 1;
+			else
+				_caret.Alpha = 0;
+
+			_cursorAndLayout.Invalidate();
+		}
+	}
+
+	protected abstract Caret CreateCaret();
 
 	protected void InsertString(string value) => insertString(value);
 
@@ -134,6 +158,11 @@ public abstract class TextBox : TabbableContainer
 		_selectionStart = _selectionEnd;
 		_cursorAndLayout.Invalidate();
 		moveSelection(amount, false);
+	}
+
+	protected void ExpandSelectionBy(int amount)
+	{
+		moveSelection(amount, true);
 	}
 
 	private void moveSelection(int offset, bool expand)
@@ -243,6 +272,7 @@ public abstract class TextBox : TabbableContainer
 
 		if (_cursorAndLayout.IsValid == false)
 		{
+			updateCaretVisibility();
 			updateCursorAndLayout();
 			_cursorAndLayout.Validate();
 		}
@@ -268,6 +298,9 @@ public abstract class TextBox : TabbableContainer
 		float? selectionWidth = null;
 		if (_selectionLength > 0)
 			selectionWidth = getPositionAt(_selectionRight) - cursorPos;
+
+		if (_caretVisible)
+			_caret.DisplayAt(new Vector2(cursorPos, 0), selectionWidth);
 	}
 
 	private float getPositionAt(int index)
@@ -286,21 +319,27 @@ public abstract class TextBox : TabbableContainer
 
 	protected override bool OnKeyDown(KeyDownEvent e)
 	{
+		var controlPressed = Input.GetKey(Keys.ControlLeft).Pressed || Input.GetKey(Keys.ControlRight).Pressed;
+		var shiftPressed = Input.GetKey(Keys.ShiftLeft).Pressed || Input.GetKey(Keys.ShiftRight).Pressed;
+
 		switch (e.Key)
 		{
+			case Keys.A:
+				if (controlPressed) return onAction(PlatformAction.SelectAll);
+				return false;
+			case Keys.V:
+				if (controlPressed) return onAction(PlatformAction.Paste);
+				return false;
+			case Keys.C:
+				if (controlPressed) return onAction(PlatformAction.Copy);
+				return false;
 			case Keys.Backspace: return onAction(PlatformAction.DeleteBackwardChar);
-			case Keys.Left: return onAction(PlatformAction.MoveBackwardChar);
-			case Keys.Right: return onAction(PlatformAction.MoveForwardChar);
-		}
-
-		if (Input.GetKey(Keys.ControlLeft).Pressed || Input.GetKey(Keys.ControlRight).Pressed)
-		{
-			switch (e.Key)
-			{
-				case Keys.C: return onAction(PlatformAction.Copy);
-				case Keys.V: return onAction(PlatformAction.Paste);
-				case Keys.A: return onAction(PlatformAction.SelectAll);
-			}
+			case Keys.Left:
+				if (shiftPressed) return onAction(PlatformAction.SelectBackwardChar);
+				return onAction(PlatformAction.MoveBackwardChar);
+			case Keys.Right:
+				if (shiftPressed) return onAction(PlatformAction.SelectForwardChar);
+				return onAction(PlatformAction.MoveForwardChar);
 		}
 
 		return false;
@@ -345,6 +384,14 @@ public abstract class TextBox : TabbableContainer
 
 			case PlatformAction.DeleteBackwardChar:
 				DeleteBy(-1);
+				return true;
+
+			case PlatformAction.SelectBackwardChar:
+				ExpandSelectionBy(-1);
+				return true;
+
+			case PlatformAction.SelectForwardChar:
+				ExpandSelectionBy(1);
 				return true;
 		}
 

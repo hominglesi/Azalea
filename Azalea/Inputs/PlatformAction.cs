@@ -9,5 +9,7 @@ public enum PlatformAction
 
 	MoveBackwardChar,
 	MoveForwardChar,
-	DeleteBackwardChar
+	DeleteBackwardChar,
+	SelectBackwardChar,
+	SelectForwardChar,
 }
