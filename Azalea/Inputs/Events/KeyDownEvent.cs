@@ -4,6 +4,11 @@ namespace Azalea.Inputs.Events;
 
 public class KeyDownEvent : KeyEvent
 {
-	public KeyDownEvent(InputState state, Keys key)
-		: base(state, key) { }
+	public readonly bool IsRepeat;
+
+	public KeyDownEvent(InputState state, Keys key, bool isRepeat = false)
+		: base(state, key)
+	{
+		IsRepeat = isRepeat;
+	}
 }
