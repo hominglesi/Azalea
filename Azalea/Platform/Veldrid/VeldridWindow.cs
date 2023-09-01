@@ -3,6 +3,7 @@ using Azalea.Graphics.Veldrid;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
+using System.Diagnostics;
 using System.IO;
 using Veldrid;
 using Veldrid.Sdl2;
@@ -19,6 +20,8 @@ public class VeldridWindow : IWindow
 	public Action? OnInput;
 	public Action? OnUpdate;
 	public Action? OnRender;
+
+	private Stopwatch _stopwatch;
 
 	public VeldridWindow(Vector2Int preferredClientSize, WindowState preferredWindowState)
 	{
@@ -42,6 +45,8 @@ public class VeldridWindow : IWindow
 
 		Window.Resizable = false;
 		Window.Resized += onResized;
+
+		_stopwatch = new Stopwatch();
 	}
 
 	private void onResized()
@@ -54,8 +59,18 @@ public class VeldridWindow : IWindow
 		OnInitialized?.Invoke();
 		while (Window.Exists)
 		{
+			//Get all inputs first
 			OnInput?.Invoke();
+
+			//Invoke all updates and calculate delta time
+			if (_stopwatch.IsRunning == false) _stopwatch.Start();
+
+			Time._deltaTime = (float)_stopwatch.Elapsed.TotalSeconds;
+			_stopwatch.Restart();
+
 			OnUpdate?.Invoke();
+
+			//Render to screen
 			OnRender?.Invoke();
 		}
 	}

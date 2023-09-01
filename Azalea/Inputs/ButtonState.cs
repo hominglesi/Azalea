@@ -1,4 +1,6 @@
-﻿namespace Azalea.Inputs;
+﻿using Azalea.Platform;
+
+namespace Azalea.Inputs;
 
 public class ButtonState
 {
@@ -33,7 +35,7 @@ public class ButtonState
 
     internal void Update()
     {
-        if (_pressed) _heldTime += 1000 / 60;
+        if (_pressed) _heldTime += Time.DeltaTimeMs;
 
         if (_heldTime > RepeatDelay + RepeatRate)
         {

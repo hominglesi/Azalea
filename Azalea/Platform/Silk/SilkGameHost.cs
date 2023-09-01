@@ -26,7 +26,11 @@ internal class SilkGameHost : GameHost
 
 		_window.Window.Load += CallInitialized;
 		_window.Window.Render += (_) => CallOnRender();
-		_window.Window.Update += (_) => CallOnUpdate();
+		_window.Window.Update += (deltaTime) =>
+		{
+			Time._deltaTime = (float)deltaTime;
+			CallOnUpdate();
+		};
 	}
 
 	public override void CallInitialized()
