@@ -112,7 +112,7 @@ public class Container<T> : CompositeGameObject
 
 	public void ChangeChildDepth(T child, float newDepth)
 	{
-		ChangeInternalChildDepth(child, Depth);
+		ChangeInternalChildDepth(child, newDepth);
 	}
 }
 
