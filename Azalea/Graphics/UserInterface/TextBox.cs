@@ -333,6 +333,9 @@ public abstract class TextBox : TabbableContainer
 			case Keys.C:
 				if (controlPressed) return onAction(PlatformAction.Copy);
 				return false;
+			case Keys.X:
+				if (controlPressed) return onAction(PlatformAction.Cut);
+				return false;
 			case Keys.Backspace: return onAction(PlatformAction.DeleteBackwardChar);
 			case Keys.Left:
 				if (shiftPressed) return onAction(PlatformAction.SelectBackwardChar);

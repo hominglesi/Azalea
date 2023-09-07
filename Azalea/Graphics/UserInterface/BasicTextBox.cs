@@ -13,6 +13,9 @@ public class BasicTextBox : TextBox
 			Depth = 1,
 			Color = Color.Green
 		});
+
+		Width = 500;
+		Height = 30;
 	}
 
 	protected virtual float CaretWidth => 2;
