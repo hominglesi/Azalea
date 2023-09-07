@@ -4,16 +4,12 @@ namespace Azalea.Graphics;
 
 public struct DrawColorInfo : IEquatable<DrawColorInfo>
 {
-    public Color Color;
-    public float Alpha;
+	public Color Color;
 
-    public DrawColorInfo(Color color, float alpha)
-    {
-        Color = color;
-        Alpha = alpha;
-    }
+	public DrawColorInfo(Color color)
+	{
+		Color = color;
+	}
 
-    public readonly Color AlphaAdjustedColor => new(Color.R, Color.G, Color.B, (byte)(Color.A * Alpha));
-
-    public readonly bool Equals(DrawColorInfo other) => Alpha == other.Alpha && Color == other.Color;
+	public readonly bool Equals(DrawColorInfo other) => Color == other.Color;
 }

@@ -2,6 +2,7 @@
 using Azalea.Graphics.Containers;
 using Azalea.Graphics.Shapes;
 using Azalea.Graphics.Sprites;
+using Azalea.Graphics.UserInterface;
 using Azalea.Inputs;
 using Azalea.IO.Assets;
 using Azalea.IO.Stores;
@@ -12,6 +13,7 @@ namespace Azalea.VisualTests;
 public class VisualTests : AzaleaGame
 {
 	private FlexContainer _container;
+	private BasicTextBox _text;
 
 	protected override void OnInitialize()
 	{
@@ -24,6 +26,13 @@ public class VisualTests : AzaleaGame
 			Size = new Vector2(400, 400),
 			Direction = FlexDirection.Vertical
 		}));
+		Add(_text = new BasicTextBox()
+		{
+			Width = 500,
+			Height = 30,
+			Position = new Vector2(500, 500)
+		});
+		_text.Text = "Ide Gas";
 
 		_container.Children = new GameObject[]
 		{

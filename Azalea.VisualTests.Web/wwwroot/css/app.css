@@ -12,3 +12,9 @@ canvas:focus {
     outline: none;
     box-shadow: none;
 }
+
+#mainInput {
+    position: absolute;
+    left: -1000px;
+    top: -1000px;
+}

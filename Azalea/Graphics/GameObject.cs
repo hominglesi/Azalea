@@ -15,727 +15,750 @@ namespace Azalea.Graphics;
 
 public abstract class GameObject : IGameObject
 {
-    public event Action<GameObject>? OnUpdate;
-    internal event Action<GameObject, Invalidation>? Invalidated;
+	public event Action<GameObject>? OnUpdate;
+	internal event Action<GameObject, Invalidation>? Invalidated;
 
-    public virtual bool UpdateSubTree()
-    {
-        if (this is not InputManager) UpdateInput();
-        Update();
-        OnUpdate?.Invoke(this);
-        return true;
-    }
+	public virtual bool UpdateSubTree()
+	{
+		if (this is not InputManager) UpdateInput();
+		Update();
+		OnUpdate?.Invoke(this);
+		return true;
+	}
 
-    protected virtual void Update() { }
+	protected virtual void Update() { }
 
-    #region Position & Size
+	#region Position & Size
 
-    private float x;
-    private float y;
+	private float x;
+	private float y;
 
-    private Vector2 position
-    {
-        get => new(x, y);
-        set
-        {
-            x = value.X;
-            y = value.Y;
-        }
-    }
+	private Vector2 position
+	{
+		get => new(x, y);
+		set
+		{
+			x = value.X;
+			y = value.Y;
+		}
+	}
 
-    public Vector2 Position
-    {
-        get => position;
-        set
-        {
-            if (position == value) return;
+	public Vector2 Position
+	{
+		get => position;
+		set
+		{
+			if (position == value) return;
 
-            position = value;
-        }
-    }
+			position = value;
+		}
+	}
 
-    public float X
-    {
-        get => x;
-        set
-        {
-            if (x == value) return;
+	public float X
+	{
+		get => x;
+		set
+		{
+			if (x == value) return;
 
-            x = value;
-        }
-    }
+			x = value;
+		}
+	}
 
-    public float Y
-    {
-        get => y;
-        set
-        {
-            if (y == value) return;
+	public float Y
+	{
+		get => y;
+		set
+		{
+			if (y == value) return;
 
-            y = value;
-        }
-    }
+			y = value;
+		}
+	}
 
-    private Axes _relativePositionAxes;
+	private Axes _relativePositionAxes;
 
-    public Axes RelativePositionAxes
-    {
-        get => _relativePositionAxes;
-        set
-        {
-            if (value == _relativePositionAxes) return;
+	public Axes RelativePositionAxes
+	{
+		get => _relativePositionAxes;
+		set
+		{
+			if (value == _relativePositionAxes) return;
 
-            Vector2 conversion = _relativeToAbsoluteFactor;
-            if ((value & Axes.X) > (_relativePositionAxes & Axes.X))
-                X = Precision.AlmostEquals(conversion.X, 0) ? 0 : X / conversion.X;
-            else if ((_relativePositionAxes & Axes.X) > (value & Axes.X))
-                X *= conversion.X;
+			Vector2 conversion = _relativeToAbsoluteFactor;
+			if ((value & Axes.X) > (_relativePositionAxes & Axes.X))
+				X = Precision.AlmostEquals(conversion.X, 0) ? 0 : X / conversion.X;
+			else if ((_relativePositionAxes & Axes.X) > (value & Axes.X))
+				X *= conversion.X;
 
-            if ((value & Axes.Y) > (_relativePositionAxes & Axes.Y))
-                Y = Precision.AlmostEquals(conversion.Y, 0) ? 0 : Y / conversion.Y;
-            else if ((_relativePositionAxes & Axes.Y) > (value & Axes.Y))
-                Y *= conversion.Y;
+			if ((value & Axes.Y) > (_relativePositionAxes & Axes.Y))
+				Y = Precision.AlmostEquals(conversion.Y, 0) ? 0 : Y / conversion.Y;
+			else if ((_relativePositionAxes & Axes.Y) > (value & Axes.Y))
+				Y *= conversion.Y;
 
-            _relativePositionAxes = value;
-        }
-    }
+			_relativePositionAxes = value;
+		}
+	}
 
-    public Vector2 DrawPosition
-    {
-        get
-        {
-            Vector2 offset = Vector2.Zero;
+	public Vector2 DrawPosition
+	{
+		get
+		{
+			Vector2 offset = Vector2.Zero;
 
-            if (Parent != null && RelativePositionAxes != Axes.None)
-            {
-                offset = Parent.RelativeChildOffset;
+			if (Parent != null && RelativePositionAxes != Axes.None)
+			{
+				offset = Parent.RelativeChildOffset;
 
-                if (RelativePositionAxes.HasFlagFast(Axes.X) == false)
-                    offset.X = 0;
-                if (RelativePositionAxes.HasFlagFast(Axes.Y) == false)
-                    offset.Y = 0;
-            }
+				if (RelativePositionAxes.HasFlagFast(Axes.X) == false)
+					offset.X = 0;
+				if (RelativePositionAxes.HasFlagFast(Axes.Y) == false)
+					offset.Y = 0;
+			}
 
-            return ApplyRelativeAxes(RelativePositionAxes, Position - offset, FillMode.Stretch);
-        }
-    }
+			return ApplyRelativeAxes(RelativePositionAxes, Position - offset, FillMode.Stretch);
+		}
+	}
 
-    private float width;
-    private float height;
+	private float width;
+	private float height;
 
-    private Vector2 _size
-    {
-        get => new(width, height);
-        set
-        {
-            width = value.X;
-            height = value.Y;
-        }
-    }
+	private Vector2 _size
+	{
+		get => new(width, height);
+		set
+		{
+			width = value.X;
+			height = value.Y;
+		}
+	}
 
-    public virtual Vector2 Size
-    {
-        get => _size;
-        set
-        {
-            if (_size == value) return;
+	public virtual Vector2 Size
+	{
+		get => _size;
+		set
+		{
+			if (_size == value) return;
 
-            Axes changedAxes = Axes.None;
+			Axes changedAxes = Axes.None;
 
-            if (_size.X != value.X)
-                changedAxes |= Axes.X;
+			if (_size.X != value.X)
+				changedAxes |= Axes.X;
 
-            if (_size.Y != value.Y)
-                changedAxes |= Axes.Y;
+			if (_size.Y != value.Y)
+				changedAxes |= Axes.Y;
 
-            _size = value;
+			_size = value;
 
-            InvalidateParentSizeDependencies(Invalidation.DrawSize | Invalidation.DrawInfo, changedAxes);
-        }
-    }
+			InvalidateParentSizeDependencies(Invalidation.DrawSize | Invalidation.DrawInfo, changedAxes);
+		}
+	}
 
-    public virtual float Width
-    {
-        get => width;
-        set
-        {
-            if (width == value) return;
+	public virtual float Width
+	{
+		get => width;
+		set
+		{
+			if (width == value) return;
 
-            width = value;
+			width = value;
 
-            InvalidateParentSizeDependencies(Invalidation.DrawSize | Invalidation.DrawInfo, Axes.X);
-        }
-    }
+			InvalidateParentSizeDependencies(Invalidation.DrawSize | Invalidation.DrawInfo, Axes.X);
+		}
+	}
 
-    public virtual float Height
-    {
-        get => height;
-        set
-        {
-            if (height == value) return;
+	public virtual float Height
+	{
+		get => height;
+		set
+		{
+			if (height == value) return;
 
-            height = value;
+			height = value;
 
-            InvalidateParentSizeDependencies(Invalidation.DrawSize | Invalidation.DrawInfo, Axes.Y);
-        }
-    }
+			InvalidateParentSizeDependencies(Invalidation.DrawSize | Invalidation.DrawInfo, Axes.Y);
+		}
+	}
 
-    private Axes _relativeSizeAxes;
+	private Axes _relativeSizeAxes;
 
-    public virtual Axes RelativeSizeAxes
-    {
-        get => _relativeSizeAxes;
-        set
-        {
-            if (_relativeSizeAxes == value) return;
+	public virtual Axes RelativeSizeAxes
+	{
+		get => _relativeSizeAxes;
+		set
+		{
+			if (_relativeSizeAxes == value) return;
 
-            if (_fillMode != FillMode.Stretch && (value == Axes.Both || _relativeSizeAxes == Axes.Both))
-                Invalidate(Invalidation.DrawSize);
-            else
-            {
-                Vector2 conversion = _relativeToAbsoluteFactor;
-                if ((value & Axes.X) > (_relativeSizeAxes & Axes.X))
-                    Width = Precision.AlmostEquals(conversion.X, 0) ? 0 : Width / conversion.X;
-                else if ((_relativeSizeAxes & Axes.X) > (value & Axes.X))
-                    Width *= conversion.X;
+			if (_fillMode != FillMode.Stretch && (value == Axes.Both || _relativeSizeAxes == Axes.Both))
+				Invalidate(Invalidation.DrawSize);
+			else
+			{
+				Vector2 conversion = _relativeToAbsoluteFactor;
+				if ((value & Axes.X) > (_relativeSizeAxes & Axes.X))
+					Width = Precision.AlmostEquals(conversion.X, 0) ? 0 : Width / conversion.X;
+				else if ((_relativeSizeAxes & Axes.X) > (value & Axes.X))
+					Width *= conversion.X;
 
-                if ((value & Axes.Y) > (_relativeSizeAxes & Axes.Y))
-                    Height = Precision.AlmostEquals(conversion.Y, 0) ? 0 : Height / conversion.Y;
-                else if ((_relativeSizeAxes & Axes.Y) > (value & Axes.Y))
-                    Height *= conversion.Y;
-            }
+				if ((value & Axes.Y) > (_relativeSizeAxes & Axes.Y))
+					Height = Precision.AlmostEquals(conversion.Y, 0) ? 0 : Height / conversion.Y;
+				else if ((_relativeSizeAxes & Axes.Y) > (value & Axes.Y))
+					Height *= conversion.Y;
+			}
 
-            _relativeSizeAxes = value;
+			_relativeSizeAxes = value;
 
-            if (_relativeSizeAxes.HasFlagFast(Axes.X) && Width == 0) Width = 1;
-            if (_relativeSizeAxes.HasFlagFast(Axes.Y) && Height == 0) Height = 1;
-        }
-    }
+			if (_relativeSizeAxes.HasFlagFast(Axes.X) && Width == 0) Width = 1;
+			if (_relativeSizeAxes.HasFlagFast(Axes.Y) && Height == 0) Height = 1;
+		}
+	}
 
-    public Vector2 DrawSize => ApplyRelativeAxes(RelativeSizeAxes, Size, FillMode);
+	public Vector2 DrawSize => ApplyRelativeAxes(RelativeSizeAxes, Size, FillMode);
 
-    public float DrawWidth => DrawSize.X;
-    public float DrawHeight => DrawSize.Y;
-    private MarginPadding _margin;
+	public float DrawWidth => DrawSize.X;
+	public float DrawHeight => DrawSize.Y;
+	private MarginPadding _margin;
 
-    public MarginPadding Margin
-    {
-        get => _margin;
-        set
-        {
-            if (_margin.Equals(value)) return;
+	public MarginPadding Margin
+	{
+		get => _margin;
+		set
+		{
+			if (_margin.Equals(value)) return;
 
-            _margin = value;
-        }
-    }
+			_margin = value;
+		}
+	}
 
-    public Vector2 LayoutSize => DrawSize + new Vector2(Margin.Horizontal, Margin.Vertical);
+	public Vector2 LayoutSize => DrawSize + new Vector2(Margin.Horizontal, Margin.Vertical);
 
-    public Rectangle DrawRectangle => new(0, 0, DrawSize.X, DrawSize.Y);
+	public Rectangle DrawRectangle => new(0, 0, DrawSize.X, DrawSize.Y);
 
-    public Rectangle LayoutRectangle => new(-Margin.Left, -Margin.Top, LayoutSize.X, LayoutSize.Y);
+	public Rectangle LayoutRectangle => new(-Margin.Left, -Margin.Top, LayoutSize.X, LayoutSize.Y);
 
-    protected Vector2 ApplyRelativeAxes(Axes relativeAxes, Vector2 v, FillMode fillMode)
-    {
-        if (relativeAxes != Axes.None)
-        {
-            Vector2 conversion = _relativeToAbsoluteFactor;
+	protected Vector2 ApplyRelativeAxes(Axes relativeAxes, Vector2 v, FillMode fillMode)
+	{
+		if (relativeAxes != Axes.None)
+		{
+			Vector2 conversion = _relativeToAbsoluteFactor;
 
-            if (relativeAxes.HasFlagFast(Axes.X))
-                v.X *= conversion.X;
+			if (relativeAxes.HasFlagFast(Axes.X))
+				v.X *= conversion.X;
 
-            if (relativeAxes.HasFlagFast(Axes.Y))
-                v.Y *= conversion.Y;
+			if (relativeAxes.HasFlagFast(Axes.Y))
+				v.Y *= conversion.Y;
 
-            if (relativeAxes == Axes.Both && fillMode != FillMode.Stretch)
-            {
-                if (fillMode == FillMode.Fill)
-                    v = new Vector2(Math.Max(v.X, v.Y * _fillAspectRatio));
-                else if (fillMode == FillMode.Fit)
-                    v = new Vector2(Math.Min(v.X, v.Y * _fillAspectRatio));
-                v.Y /= _fillAspectRatio;
-            }
-        }
+			if (relativeAxes == Axes.Both && fillMode != FillMode.Stretch)
+			{
+				if (fillMode == FillMode.Fill)
+					v = new Vector2(Math.Max(v.X, v.Y * _fillAspectRatio));
+				else if (fillMode == FillMode.Fit)
+					v = new Vector2(Math.Min(v.X, v.Y * _fillAspectRatio));
+				v.Y /= _fillAspectRatio;
+			}
+		}
 
-        return v;
-    }
+		return v;
+	}
 
-    private Vector2 _relativeToAbsoluteFactor => Parent?.RelativeToAbsoluteFactor ?? Vector2.One;
+	private Vector2 _relativeToAbsoluteFactor => Parent?.RelativeToAbsoluteFactor ?? Vector2.One;
 
-    public virtual Rectangle BoundingBox => ToParentSpace(LayoutRectangle).AABBFloat;
+	public virtual Rectangle BoundingBox => ToParentSpace(LayoutRectangle).AABBFloat;
 
-    protected virtual void OnSizingChanged()
-    {
+	protected virtual void OnSizingChanged()
+	{
 
-    }
+	}
 
-    private float _fillAspectRatio = 1;
+	private float _fillAspectRatio = 1;
 
-    public float FillAspectRatio
-    {
-        get => _fillAspectRatio;
-        set
-        {
-            if (_fillAspectRatio == value) return;
+	public float FillAspectRatio
+	{
+		get => _fillAspectRatio;
+		set
+		{
+			if (_fillAspectRatio == value) return;
 
-            if (float.IsFinite(value) == false) throw new ArgumentException($"{nameof(FillAspectRatio)} must be finite, but is {value}.");
-            if (value == 0) throw new ArgumentException($@"{nameof(FillAspectRatio)} must be non-zero.");
+			if (float.IsFinite(value) == false) throw new ArgumentException($"{nameof(FillAspectRatio)} must be finite, but is {value}.");
+			if (value == 0) throw new ArgumentException($@"{nameof(FillAspectRatio)} must be non-zero.");
 
-            _fillAspectRatio = value;
-            /*
+			_fillAspectRatio = value;
+			/*
             if (_fillMode != FillMode.Stretch && RelativeSizeAxes == Axes.Both)
                 Invalidate(Invalidation.DrawSize);*/
-        }
-    }
+		}
+	}
 
-    #endregion
+	#endregion
 
-    private Vector2 _scale = Vector2.One;
+	private Vector2 _scale = Vector2.One;
 
-    public Vector2 Scale
-    {
-        get => _scale;
-        set
-        {
-            if (_scale == value) return;
+	public Vector2 Scale
+	{
+		get => _scale;
+		set
+		{
+			if (_scale == value) return;
 
-            //if(Validation.IsFinite(value) == false) throw new ArgumentException($@"{nameof(Scale)} must be finite, but is {value}.");
+			//if(Validation.IsFinite(value) == false) throw new ArgumentException($@"{nameof(Scale)} must be finite, but is {value}.");
 
-            bool wasPresent = IsPresent;
+			bool wasPresent = IsPresent;
 
-            _scale = value;
+			_scale = value;
 
-            /*
+			/*
             if (IsPresent != wasPresent)
                 Invalidate(Invalidation.MiscGeometry | Invalidation.Presence);
             else
                 Invalidate(Invalidation.MiscGeomerty);*/
-        }
-    }
+		}
+	}
 
-    private FillMode _fillMode;
+	private FillMode _fillMode;
 
-    public FillMode FillMode
-    {
-        get => _fillMode;
-        set
-        {
-            if (_fillMode == value) return;
+	public FillMode FillMode
+	{
+		get => _fillMode;
+		set
+		{
+			if (_fillMode == value) return;
 
-            _fillMode = value;
+			_fillMode = value;
 
-            //Invalidate(Invalidation.DrawSize);
-        }
-    }
+			//Invalidate(Invalidation.DrawSize);
+		}
+	}
 
-    protected virtual Vector2 DrawScale => Scale;
+	protected virtual Vector2 DrawScale => Scale;
 
-    private Anchor _origin = Anchor.TopLeft;
+	private Anchor _origin = Anchor.TopLeft;
 
-    public Anchor Origin
-    {
-        get => _origin;
-        set
-        {
-            if (_origin == value) return;
+	public Anchor Origin
+	{
+		get => _origin;
+		set
+		{
+			if (_origin == value) return;
 
-            if (value == 0)
-                throw new ArgumentException("Cannot set origin to 0.", nameof(value));
+			if (value == 0)
+				throw new ArgumentException("Cannot set origin to 0.", nameof(value));
 
-            _origin = value;
-        }
-    }
+			_origin = value;
+		}
+	}
 
-    public Vector2 RelativeOriginPosition => computeAnchorPosition(_origin);
+	public Vector2 RelativeOriginPosition => computeAnchorPosition(_origin);
 
-    public Vector2 OriginPosition
-    {
-        get
-        {
-            Vector2 result;
-            if (Origin == Anchor.TopLeft)
-                result = Vector2.Zero;
-            else
-                result = DrawSize * RelativeOriginPosition;
+	public Vector2 OriginPosition
+	{
+		get
+		{
+			Vector2 result;
+			if (Origin == Anchor.TopLeft)
+				result = Vector2.Zero;
+			else
+				result = DrawSize * RelativeOriginPosition;
 
-            return result - new Vector2(Margin.Left, Margin.Top);
-        }
-    }
+			return result - new Vector2(Margin.Left, Margin.Top);
+		}
+	}
 
-    private Anchor _anchor = Anchor.TopLeft;
+	private Anchor _anchor = Anchor.TopLeft;
 
-    public Anchor Anchor
-    {
-        get => _anchor;
-        set
-        {
-            if (_anchor == value) return;
+	public Anchor Anchor
+	{
+		get => _anchor;
+		set
+		{
+			if (_anchor == value) return;
 
-            if (value == 0) throw new ArgumentException("Cannot set anchor to 0.", nameof(value));
+			if (value == 0) throw new ArgumentException("Cannot set anchor to 0.", nameof(value));
 
-            _anchor = value;
-        }
-    }
+			_anchor = value;
+		}
+	}
 
-    public Vector2 RelativeAnchorPosition => computeAnchorPosition(_anchor);
+	public Vector2 RelativeAnchorPosition => computeAnchorPosition(_anchor);
 
-    public Vector2 AnchorPosition => RelativeAnchorPosition * Parent?.Size ?? Vector2.Zero;
+	public Vector2 AnchorPosition => RelativeAnchorPosition * Parent?.Size ?? Vector2.Zero;
 
-    private static Vector2 computeAnchorPosition(Anchor anchor)
-    {
-        Vector2 result = Vector2.Zero;
-        if (anchor.HasFlagFast(Anchor.x1))
-            result.X = 0.5f;
-        else if (anchor.HasFlagFast(Anchor.x2))
-            result.X = 1;
+	private static Vector2 computeAnchorPosition(Anchor anchor)
+	{
+		Vector2 result = Vector2.Zero;
+		if (anchor.HasFlagFast(Anchor.x1))
+			result.X = 0.5f;
+		else if (anchor.HasFlagFast(Anchor.x2))
+			result.X = 1;
 
-        if (anchor.HasFlagFast(Anchor.y1))
-            result.Y = 0.5f;
-        else if (anchor.HasFlagFast(Anchor.y2))
-            result.Y = 1;
-        return result;
-    }
+		if (anchor.HasFlagFast(Anchor.y1))
+			result.Y = 0.5f;
+		else if (anchor.HasFlagFast(Anchor.y2))
+			result.Y = 1;
+		return result;
+	}
 
-    #region Color & Alpha
+	#region Color & Alpha
 
-    private Color color = Color.White;
+	private Color color = Color.White;
 
-    public Color Color
-    {
-        get => color;
-        set
-        {
-            if (color == value) return;
+	public Color Color
+	{
+		get => color;
+		set
+		{
+			if (color == value) return;
 
-            color = value;
-        }
-    }
+			color = value;
+		}
+	}
 
-    private float alpha = 1.0f;
+	public float Alpha
+	{
+		get => Color.A;
+		set
+		{
+			if (Color.A == value) return;
+			var alphaValue = Math.Clamp(value, 0, 1) * byte.MaxValue;
 
-    public float Alpha
-    {
-        get => alpha;
-        set
-        {
-            if (alpha == value) return;
 
-            alpha = value;
-        }
-    }
+			Color = new Color(Color.R, Color.G, Color.B, (byte)alphaValue);
+		}
+	}
 
-    #endregion
+	#endregion
 
-    internal ulong ChildID { get; set; }
+	internal ulong ChildID { get; set; }
 
-    internal bool IsPartOfComposite => ChildID != 0;
+	internal bool IsPartOfComposite => ChildID != 0;
 
-    private float depth;
-    public float Depth
-    {
-        get => depth;
-        set
-        {
-            if (IsPartOfComposite)
-            {
-                throw new InvalidOperationException(
-                    $"May not change {nameof(Depth)} while inside a parent {nameof(CompositeGameObject)}.");
-            }
+	private float depth;
+	public float Depth
+	{
+		get => depth;
+		set
+		{
+			if (IsPartOfComposite)
+			{
+				throw new InvalidOperationException(
+					$"May not change {nameof(Depth)} while inside a parent {nameof(CompositeGameObject)}.");
+			}
 
-            depth = value;
-        }
-    }
+			depth = value;
+		}
+	}
 
-    protected InputManager GetContainingInputManager() => this.FindClosestParent<InputManager>()
-        ?? throw new Exception("This drawable is not part of the scene graph");
+	protected InputManager GetContainingInputManager() => this.FindClosestParent<InputManager>()
+		?? throw new Exception("This drawable is not part of the scene graph");
 
-    private CompositeGameObject? parent;
+	private CompositeGameObject? parent;
 
-    public CompositeGameObject? Parent
-    {
-        get => parent;
-        set
-        {
-            if (value == null)
-                ChildID = 0;
+	public CompositeGameObject? Parent
+	{
+		get => parent;
+		set
+		{
+			if (value == null)
+				ChildID = 0;
 
-            if (parent == value) return;
+			if (parent == value) return;
 
-            if (value != null && parent != null)
-                throw new Exception("Cannot add GameObject to multiple containers");
+			if (value != null && parent != null)
+				throw new Exception("Cannot add GameObject to multiple containers");
 
-            parent = value;
-        }
-    }
+			parent = value;
+		}
+	}
 
-    private const float visibility_cutoff = 0.0001f;
+	private const float visibility_cutoff = 0.0001f;
 
-    public virtual bool IsPresent => AlwaysPresent || (Alpha > visibility_cutoff && DrawScale.X != 0 && DrawScale.Y != 0);
+	public virtual bool IsPresent => AlwaysPresent || (Alpha > visibility_cutoff && DrawScale.X != 0 && DrawScale.Y != 0);
 
-    private bool _alwaysPresent;
+	private bool _alwaysPresent;
 
-    public bool AlwaysPresent
-    {
-        get => _alwaysPresent;
-        set
-        {
-            if (_alwaysPresent == value) return;
+	public bool AlwaysPresent
+	{
+		get => _alwaysPresent;
+		set
+		{
+			if (_alwaysPresent == value) return;
 
-            bool wasPresent = IsPresent;
+			bool wasPresent = IsPresent;
 
-            _alwaysPresent = value;
+			_alwaysPresent = value;
 
-            /*
+			/*
             if (IsPresent != wasPresent)
                 Invalidate(Invalidation.Presence)*/
-        }
-    }
+		}
+	}
 
-    protected virtual DrawNode CreateDrawNode() => new(this);
+	protected virtual DrawNode CreateDrawNode() => new(this);
 
-    private DrawInfo? drawInfo;
-    public DrawInfo DrawInfo => (DrawInfo)(drawInfo = computeDrawInfo());
-    private DrawInfo computeDrawInfo()
-    {
-        DrawInfo di = Parent?.DrawInfo ?? new DrawInfo(null);
+	private DrawInfo? drawInfo;
+	public DrawInfo DrawInfo => (DrawInfo)(drawInfo = computeDrawInfo());
+	private DrawInfo computeDrawInfo()
+	{
+		DrawInfo di = Parent?.DrawInfo ?? new DrawInfo(null);
 
-        Vector2 pos = DrawPosition + AnchorPosition;
+		Vector2 pos = DrawPosition + AnchorPosition;
 
-        if (Parent != null)
-            pos += Parent.ChildOffset;
+		if (Parent != null)
+			pos += Parent.ChildOffset;
 
-        di.ApplyTransformations(pos, Vector2.One, 0, Vector2.Zero, OriginPosition);
+		di.ApplyTransformations(pos, Vector2.One, 0, Vector2.Zero, OriginPosition);
 
-        return di;
-    }
+		return di;
+	}
 
-    private InvalidationList invalidationList = new(Invalidation.All);
-    private LayoutMember? layoutList;
+	private InvalidationList invalidationList = new(Invalidation.All);
+	private LayoutMember? layoutList;
 
-    protected void AddLayout(LayoutMember member)
-    {
-        if (layoutList == null)
-            layoutList = member;
-        else
-        {
-            member.Next = layoutList;
-            layoutList = member;
-        }
+	protected void AddLayout(LayoutMember member)
+	{
+		if (layoutList == null)
+			layoutList = member;
+		else
+		{
+			member.Next = layoutList;
+			layoutList = member;
+		}
 
-        member.Parent = this;
-    }
+		member.Parent = this;
+	}
 
-    internal void ValidateSuperTree(Invalidation validationType)
-    {
-        if (invalidationList.Validate(validationType))
-            Parent?.ValidateSuperTree(validationType);
-    }
+	internal void ValidateSuperTree(Invalidation validationType)
+	{
+		if (invalidationList.Validate(validationType))
+			Parent?.ValidateSuperTree(validationType);
+	}
 
-    public long InvalidationID { get; private set; } = 1;
+	public long InvalidationID { get; private set; } = 1;
 
-    public bool Invalidate(Invalidation invalidation = Invalidation.All, InvalidationSource source = InvalidationSource.Self)
-        => invalidate(invalidation, source);
+	public bool Invalidate(Invalidation invalidation = Invalidation.All, InvalidationSource source = InvalidationSource.Self)
+		=> invalidate(invalidation, source);
 
-    private bool invalidate(Invalidation invalidation = Invalidation.All, InvalidationSource source = InvalidationSource.Self, bool propagateToParent = true)
-    {
-        if (source != InvalidationSource.Child && source != InvalidationSource.Parent && source != InvalidationSource.Self)
-            throw new InvalidOperationException($"A {nameof(GameObject)} can only be invalidated with a singular {nameof(source)} (child, parent, self).");
+	private bool invalidate(Invalidation invalidation = Invalidation.All, InvalidationSource source = InvalidationSource.Self, bool propagateToParent = true)
+	{
+		if (source != InvalidationSource.Child && source != InvalidationSource.Parent && source != InvalidationSource.Self)
+			throw new InvalidOperationException($"A {nameof(GameObject)} can only be invalidated with a singular {nameof(source)} (child, parent, self).");
 
-        if (source == InvalidationSource.Child)
-            invalidation &= ~Invalidation.Color;
+		if (source == InvalidationSource.Child)
+			invalidation &= ~Invalidation.Color;
 
-        if (invalidation == Invalidation.None)
-            return false;
+		if (invalidation == Invalidation.None)
+			return false;
 
-        if (propagateToParent && source == InvalidationSource.Self)
-            Parent?.Invalidate(invalidation, InvalidationSource.Child);
+		if (propagateToParent && source == InvalidationSource.Self)
+			Parent?.Invalidate(invalidation, InvalidationSource.Child);
 
-        if (invalidationList.Invalidate(source, invalidation) == false)
-            return false;
+		if (invalidationList.Invalidate(source, invalidation) == false)
+			return false;
 
-        bool anyInvalidated = (invalidation & Invalidation.DrawNode) > 0;
+		bool anyInvalidated = (invalidation & Invalidation.DrawNode) > 0;
 
-        LayoutMember? nextLayout = layoutList;
+		LayoutMember? nextLayout = layoutList;
 
-        while (nextLayout is not null)
-        {
-            if ((nextLayout.Source & source) == 0)
-                goto NextLayoutIteration;
+		while (nextLayout is not null)
+		{
+			if ((nextLayout.Source & source) == 0)
+				goto NextLayoutIteration;
 
-            Invalidation memberInvalidation = invalidation & nextLayout.Invalidation;
-            if (memberInvalidation == 0)
-                goto NextLayoutIteration;
+			Invalidation memberInvalidation = invalidation & nextLayout.Invalidation;
+			if (memberInvalidation == 0)
+				goto NextLayoutIteration;
 
-            anyInvalidated |= nextLayout.Invalidate();
+			anyInvalidated |= nextLayout.Invalidate();
 
-        NextLayoutIteration:
-            nextLayout = nextLayout.Next;
-        }
+		NextLayoutIteration:
+			nextLayout = nextLayout.Next;
+		}
 
-        anyInvalidated |= OnInvalidate(invalidation, source);
+		anyInvalidated |= OnInvalidate(invalidation, source);
 
-        if (anyInvalidated)
-            InvalidationID++;
+		if (anyInvalidated)
+			InvalidationID++;
 
-        Invalidated?.Invoke(this, invalidation);
+		Invalidated?.Invoke(this, invalidation);
 
-        return anyInvalidated;
-    }
+		return anyInvalidated;
+	}
 
-    protected virtual bool OnInvalidate(Invalidation invalidation, InvalidationSource source) => false;
+	protected virtual bool OnInvalidate(Invalidation invalidation, InvalidationSource source) => false;
 
-    public Invalidation InvalidationFromParentSize
-    {
-        get
-        {
-            Invalidation result = Invalidation.DrawInfo;
-            if (RelativeSizeAxes != Axes.None)
-                result |= Invalidation.DrawSize;
-            if (RelativePositionAxes != Axes.None)
-                result |= Invalidation.MiscGeometry;
-            return result;
-        }
-    }
+	public Invalidation InvalidationFromParentSize
+	{
+		get
+		{
+			Invalidation result = Invalidation.DrawInfo;
+			if (RelativeSizeAxes != Axes.None)
+				result |= Invalidation.DrawSize;
+			if (RelativePositionAxes != Axes.None)
+				result |= Invalidation.MiscGeometry;
+			return result;
+		}
+	}
 
-    private void InvalidateParentSizeDependencies(Invalidation invalidation, Axes changedAxes)
-    {
-        invalidate(invalidation, InvalidationSource.Self, false);
+	private void InvalidateParentSizeDependencies(Invalidation invalidation, Axes changedAxes)
+	{
+		invalidate(invalidation, InvalidationSource.Self, false);
 
-        Parent?.InvalidateChildrenSizeDependencies(invalidation, changedAxes, this);
-    }
+		Parent?.InvalidateChildrenSizeDependencies(invalidation, changedAxes, this);
+	}
 
-    #region DrawInfo-based conversions
+	#region DrawInfo-based conversions
 
-    public Vector2 ToSpaceOfOtherDrawable(Vector2 input, IGameObject other) => other == this ? input
-        : Vector2Extentions.Transform(Vector2Extentions.Transform(input, DrawInfo.Matrix), other.DrawInfo.MatrixInverse);
-    public Quad ToSpaceOfOtherDrawable(Rectangle input, IGameObject other) => other == this ? input
-        : Quad.FromRectangle(input) * (DrawInfo.Matrix * other.DrawInfo.MatrixInverse);
-    public Vector2 ToParentSpace(Vector2 input) => ToSpaceOfOtherDrawable(input, Parent
-        ?? throw new Exception($"This {nameof(GameObject)} doesn't have a {nameof(Parent)}"));
-    public Quad ToParentSpace(Rectangle input) => ToSpaceOfOtherDrawable(input, Parent
-        ?? throw new Exception($"This {nameof(GameObject)} doesn't have a {nameof(Parent)}"));
-    public Vector2 ToScreenSpace(Vector2 input) => Vector2Extentions.Transform(input, DrawInfo.Matrix);
-    public Quad ToScreenSpace(Rectangle input) => Quad.FromRectangle(input) * DrawInfo.Matrix;
-    public Vector2 ToLocalSpace(Vector2 screenSpacePosition) => Vector2Extentions.Transform(screenSpacePosition, DrawInfo.MatrixInverse);
-    public Quad ToLocalSpace(Quad screenSpaceQuad) => screenSpaceQuad * DrawInfo.MatrixInverse;
+	public Vector2 ToSpaceOfOtherDrawable(Vector2 input, IGameObject other) => other == this ? input
+		: Vector2Extentions.Transform(Vector2Extentions.Transform(input, DrawInfo.Matrix), other.DrawInfo.MatrixInverse);
+	public Quad ToSpaceOfOtherDrawable(Rectangle input, IGameObject other) => other == this ? input
+		: Quad.FromRectangle(input) * (DrawInfo.Matrix * other.DrawInfo.MatrixInverse);
+	public Vector2 ToParentSpace(Vector2 input) => ToSpaceOfOtherDrawable(input, Parent
+		?? throw new Exception($"This {nameof(GameObject)} doesn't have a {nameof(Parent)}"));
+	public Quad ToParentSpace(Rectangle input) => ToSpaceOfOtherDrawable(input, Parent
+		?? throw new Exception($"This {nameof(GameObject)} doesn't have a {nameof(Parent)}"));
+	public Vector2 ToScreenSpace(Vector2 input) => Vector2Extentions.Transform(input, DrawInfo.Matrix);
+	public Quad ToScreenSpace(Rectangle input) => Quad.FromRectangle(input) * DrawInfo.Matrix;
+	public Vector2 ToLocalSpace(Vector2 screenSpacePosition) => Vector2Extentions.Transform(screenSpacePosition, DrawInfo.MatrixInverse);
+	public Quad ToLocalSpace(Quad screenSpaceQuad) => screenSpaceQuad * DrawInfo.MatrixInverse;
 
-    #endregion
+	#endregion
 
-    #region Input
+	#region Input
 
-    private void UpdateInput()
-    {
-        if (ToScreenSpace(DrawRectangle).Contains(Input.MousePosition))
-        {
-            if (Input.GetMouseButton(MouseButton.Left).Down)
-                TriggerEvent(new MouseDownEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), MouseButton.Left));
-            else if (Input.GetMouseButton(MouseButton.Left).Up)
-            {
-                TriggerEvent(new MouseUpEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), MouseButton.Left));
-                TriggerClick();
-            }
-        }
+	/// <summary>
+	/// Check if this <see cref="GameObject"/> has focus
+	/// </summary>
+	public bool HasFocus { get; internal set; }
 
-    }
+	/// <summary>
+	/// Controls if this <see cref="GameObject"/> should be able to be focused
+	/// </summary>
+	public virtual bool AcceptsFocus => false;
 
-    protected virtual bool Handle(UIEvent e) => false;
+	private void UpdateInput()
+	{
+		if (ToScreenSpace(DrawRectangle).Contains(Input.MousePosition))
+		{
+			if (Input.GetMouseButton(MouseButton.Left).Down)
+				TriggerEvent(new MouseDownEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), MouseButton.Left));
+			else if (Input.GetMouseButton(MouseButton.Left).Up)
+			{
+				TriggerEvent(new MouseUpEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), MouseButton.Left));
+				TriggerClick();
+			}
+		}
+		if (HasFocus)
+		{
+			foreach (var key in Input.KEYBOARD_KEYS)
+			{
+				if (key.Value.Down || key.Value.Repeat) TriggerEvent(
+					new KeyDownEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), (Keys)key.Key, key.Value.Repeat));
+				if (key.Value.Up) TriggerEvent(
+					new KeyUpEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), (Keys)key.Key));
+			}
+		}
+	}
 
-    public bool TriggerEvent(UIEvent e)
-    {
-        e.Target = this;
+	protected virtual bool Handle(UIEvent e) => false;
 
-        return e switch
-        {
-            ClickEvent click => OnClick(click),
-            MouseDownEvent mouseDown => OnMouseDown(mouseDown),
-            MouseUpEvent mouseUp => OnMouseUp(mouseUp),
-            _ => Handle(e),
-        };
-    }
+	public bool TriggerEvent(UIEvent e)
+	{
+		e.Target = this;
 
-    public bool TriggerClick() => TriggerEvent(new ClickEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), MouseButton.Left));
+		return e switch
+		{
+			ClickEvent click => OnClick(click),
+			MouseDownEvent mouseDown => OnMouseDown(mouseDown),
+			MouseUpEvent mouseUp => OnMouseUp(mouseUp),
+			KeyDownEvent keyDown => OnKeyDown(keyDown),
+			KeyUpEvent keyUp => OnKeyUp(keyUp),
+			_ => Handle(e),
+		};
+	}
 
-    protected virtual bool OnClick(ClickEvent e) => Handle(e);
-    protected virtual bool OnMouseDown(MouseDownEvent e) => Handle(e);
-    protected virtual bool OnMouseUp(MouseUpEvent e) => Handle(e);
+	public bool TriggerClick() => TriggerEvent(new ClickEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), MouseButton.Left));
 
-    #endregion
+	protected virtual bool OnClick(ClickEvent e) => Handle(e);
+	protected virtual bool OnMouseDown(MouseDownEvent e) => Handle(e);
+	protected virtual bool OnMouseUp(MouseUpEvent e) => Handle(e);
+	protected virtual bool OnKeyDown(KeyDownEvent e) => Handle(e);
+	protected virtual bool OnKeyUp(KeyUpEvent e) => Handle(e);
 
-    public virtual Quad ScreenSpaceDrawQuad => ToScreenSpace(DrawRectangle);
+	#endregion
 
-    public virtual DrawColorInfo DrawColorInfo => computeDrawColorInfo();
+	public virtual Quad ScreenSpaceDrawQuad => ToScreenSpace(DrawRectangle);
 
-    private DrawColorInfo computeDrawColorInfo()
-    {
-        return new DrawColorInfo(Color, Alpha);
-    }
+	public virtual DrawColorInfo DrawColorInfo => computeDrawColorInfo();
 
-    private DrawNode? drawNode;
+	private DrawColorInfo computeDrawColorInfo()
+	{
+		return new DrawColorInfo(Color);
+	}
 
-    public virtual DrawNode? GenerateDrawNodeSubtree()
-    {
-        drawNode ??= CreateDrawNode();
+	private DrawNode? drawNode;
 
-        return drawNode;
-    }
+	public virtual DrawNode? GenerateDrawNodeSubtree()
+	{
+		drawNode ??= CreateDrawNode();
+
+		return drawNode;
+	}
 }
 
 [Flags]
 public enum Invalidation
 {
-    DrawInfo = 1,
-    DrawSize = 1 << 1,
-    MiscGeometry = 1 << 2,
-    Color = 1 << 3,
-    DrawNode = 1 << 4,
-    Presence = 1 << 5,
-    Parent = 1 << 6,
+	DrawInfo = 1,
+	DrawSize = 1 << 1,
+	MiscGeometry = 1 << 2,
+	Color = 1 << 3,
+	DrawNode = 1 << 4,
+	Presence = 1 << 5,
+	Parent = 1 << 6,
 
-    RequiredParentSizeToFit = MiscGeometry | Parent,
-    All = DrawNode | RequiredParentSizeToFit | Color | DrawInfo | Presence,
-    Layout = All & ~(DrawNode | Parent),
+	RequiredParentSizeToFit = MiscGeometry | Parent,
+	All = DrawNode | RequiredParentSizeToFit | Color | DrawInfo | Presence,
+	Layout = All & ~(DrawNode | Parent),
 
-    None = 0
+	None = 0
 }
 
 [Flags]
 public enum Anchor
 {
-    TopLeft = y0 | x0,
-    TopCenter = y0 | x1,
-    TopRight = y0 | x2,
+	TopLeft = y0 | x0,
+	TopCenter = y0 | x1,
+	TopRight = y0 | x2,
 
-    CenterLeft = y1 | x0,
-    Center = y1 | x1,
-    CenterRight = y1 | x2,
+	CenterLeft = y1 | x0,
+	Center = y1 | x1,
+	CenterRight = y1 | x2,
 
-    BottomLeft = y2 | x0,
-    BottomCenter = y2 | x1,
-    BottomRight = y2 | x2,
+	BottomLeft = y2 | x0,
+	BottomCenter = y2 | x1,
+	BottomRight = y2 | x2,
 
 
-    y0 = 1,
-    y1 = 1 << 1,
-    y2 = 1 << 2,
-    x0 = 1 << 3,
-    x1 = 1 << 4,
-    x2 = 1 << 5,
+	y0 = 1,
+	y1 = 1 << 1,
+	y2 = 1 << 2,
+	x0 = 1 << 3,
+	x1 = 1 << 4,
+	x2 = 1 << 5,
 }
 
 [Flags]
 public enum Axes
 {
-    None = 0,
+	None = 0,
 
-    X = 1,
-    Y = 1 << 1,
+	X = 1,
+	Y = 1 << 1,
 
-    Both = X | Y
+	Both = X | Y
 }
 
 public enum FillMode
 {
-    Stretch,
-    Fill,
-    Fit
+	Stretch,
+	Fill,
+	Fit
 }

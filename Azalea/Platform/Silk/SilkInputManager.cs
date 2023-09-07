@@ -2,7 +2,6 @@
 using Silk.NET.Input;
 using System;
 using System.Numerics;
-
 using SilkMouseButton = Silk.NET.Input.MouseButton;
 
 namespace Azalea.Platform.Silk;
@@ -35,6 +34,8 @@ internal class SilkInputManager
 			Input.KEYBOARD_KEYS.Add((int)key, new ButtonState());
 		}
 
+		Input.TEXT_INPUT_SOURCE = new TextInputSource();
+
 		if (_input.Mice.Count >= 1)
 			PrimaryMouse = _input.Mice[0];
 
@@ -51,6 +52,7 @@ internal class SilkInputManager
 		{
 			keyboard.KeyDown += ProcessKeyDown;
 			keyboard.KeyUp += ProcessKeyUp;
+			keyboard.KeyChar += ProcessTextInput;
 		}
 	}
 
@@ -87,6 +89,11 @@ internal class SilkInputManager
 		var pressedKey = (int)key;
 		if (Input.KEYBOARD_KEYS.ContainsKey(pressedKey) == false) return;
 		Input.KEYBOARD_KEYS[pressedKey].SetUp();
+	}
+
+	private void ProcessTextInput(IKeyboard keyboard, char chr)
+	{
+		Input.TEXT_INPUT_SOURCE.TriggerTextInput(chr.ToString());
 	}
 
 	public void Update()

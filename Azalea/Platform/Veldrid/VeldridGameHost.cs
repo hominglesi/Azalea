@@ -26,7 +26,7 @@ public class VeldridGameHost : GameHost
 	{
 		_renderer = new VeldridRenderer(_window.GraphicsDevice, _window);
 
-		_inputManager = new VeldridInputManager(_window.Window);
+		_inputManager = new VeldridInputManager(_window);
 
 		base.CallInitialized();
 	}

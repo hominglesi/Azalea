@@ -1,5 +1,6 @@
 ﻿using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Textures;
+using Azalea.Utils;
 using nkast.Wasm.Canvas.WebGL;
 
 namespace Azalea.Web.Graphics.Blazor.Textures;
@@ -40,6 +41,7 @@ internal class BlazorTexture : INativeTexture
 		_gl.TexImage2D(WebGLTextureTarget.TEXTURE_2D, 0, WebGLInternalFormat.RGBA, Width, Height,
 			WebGLFormat.RGBA, WebGLTexelType.UNSIGNED_BYTE, upload.Data.ToArray());
 
-		_gl.GenerateMipmap(WebGLTextureTarget.TEXTURE_2D);
+		if (MathUtils.IsPowerOfTwo(Width) && MathUtils.IsPowerOfTwo(Height))
+			_gl.GenerateMipmap(WebGLTextureTarget.TEXTURE_2D);
 	}
 }

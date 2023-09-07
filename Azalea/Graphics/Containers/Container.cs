@@ -9,93 +9,110 @@ public class Container : Container<GameObject>
 }
 
 public class Container<T> : CompositeGameObject
-    where T : GameObject
+	where T : GameObject
 {
-    private int enumeratorVersion;
+	private int enumeratorVersion;
 
-    public Container()
-    {
-        if (typeof(T) == typeof(GameObject))
-            internalChildrenAsT = (IReadOnlyList<T>)InternalChildren;
-        else
-            throw new NotImplementedException("Other types are not currently supported");
-    }
+	public Container()
+	{
+		if (typeof(T) == typeof(GameObject))
+			internalChildrenAsT = (IReadOnlyList<T>)InternalChildren;
+		else
+			throw new NotImplementedException("Other types are not currently supported");
+	}
 
-    protected virtual Container<T> Content => this;
+	/// <summary>
+	/// Accesses the <paramref name="index"/>-th child.
+	/// </summary>
+	/// <param name="index">The index of the child to access.</param>
+	/// <returns>The <paramref name="index"/>-th child.</returns>
+	public T this[int index] => Children[index];
 
-    public IReadOnlyList<T> Children
-    {
-        get => internalChildrenAsT;
-        set => ChildrenEnumerable = value;
-    }
+	/// <summary>
+	/// The amount of elements in <see cref="Children"/>.
+	/// </summary>
+	public int Count => Children.Count;
 
-    public IEnumerable<T> ChildrenEnumerable
-    {
-        set
-        {
-            Clear();
-            AddRange(value);
-        }
-    }
+	protected virtual Container<T> Content => this;
 
-    private readonly IReadOnlyList<T> internalChildrenAsT;
+	public IReadOnlyList<T> Children
+	{
+		get => internalChildrenAsT;
+		set => ChildrenEnumerable = value;
+	}
 
-    public virtual void Add(T gameObject)
-    {
-        if (gameObject == Content)
-            throw new InvalidOperationException("Content may not be added to itself.");
+	public IEnumerable<T> ChildrenEnumerable
+	{
+		set
+		{
+			Clear();
+			AddRange(value);
+		}
+	}
 
-        ArgumentNullException.ThrowIfNull(gameObject);
+	private readonly IReadOnlyList<T> internalChildrenAsT;
 
-        if (Content == this)
-            AddInternal(gameObject);
-        else
-            Content.Add(gameObject);
-    }
+	public virtual void Add(T gameObject)
+	{
+		if (gameObject == Content)
+			throw new InvalidOperationException("Content may not be added to itself.");
 
-    public virtual void AddRange(IEnumerable<T> range)
-    {
-        foreach (T gameObject in range)
-            Add(gameObject);
-    }
+		ArgumentNullException.ThrowIfNull(gameObject);
 
-    public virtual bool Remove(T gameObject)
-    {
-        if (Content != this)
-            Content.Remove(gameObject);
+		if (Content == this)
+			AddInternal(gameObject);
+		else
+			Content.Add(gameObject);
+	}
 
-        return RemoveInternal(gameObject);
-    }
+	public virtual void AddRange(IEnumerable<T> range)
+	{
+		foreach (T gameObject in range)
+			Add(gameObject);
+	}
 
-    public void RemoveRange(IEnumerable<T> range)
-    {
-        if (range == null)
-            return;
+	public virtual bool Remove(T gameObject)
+	{
+		if (Content != this)
+			Content.Remove(gameObject);
 
-        foreach (T obj in range)
-            Remove(obj);
-    }
+		return RemoveInternal(gameObject);
+	}
 
-    public void Clear() => Clear(true);
+	public void RemoveRange(IEnumerable<T> range)
+	{
+		if (range == null)
+			return;
 
-    public virtual void Clear(bool disposeChildren)
-    {
-        if (Content != null && Content != this)
-            Content.Clear(disposeChildren);
-        else
-            ClearInternal(disposeChildren);
-    }
+		foreach (T obj in range)
+			Remove(obj);
+	}
 
-    protected override void AddInternal(GameObject gameObject)
-    {
-        if (Content == this && gameObject != null && (gameObject is T) == false)
-        {
-            throw new Exception("Cannot add Game Object");
-        }
+	public void Clear() => Clear(true);
 
-        enumeratorVersion++;
+	public virtual void Clear(bool disposeChildren)
+	{
+		if (Content != null && Content != this)
+			Content.Clear(disposeChildren);
+		else
+			ClearInternal(disposeChildren);
+	}
 
-        base.AddInternal(gameObject);
-    }
+	protected override void AddInternal(GameObject gameObject)
+	{
+		if (Content == this && gameObject != null && (gameObject is T) == false)
+		{
+			throw new Exception("Cannot add Game Object");
+		}
+
+		enumeratorVersion++;
+
+		base.AddInternal(gameObject);
+	}
+
+	public void ChangeChildDepth(T child, float newDepth)
+	{
+		ChangeInternalChildDepth(child, newDepth);
+	}
 }
 
