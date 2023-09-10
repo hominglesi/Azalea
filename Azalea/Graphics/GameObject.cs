@@ -633,16 +633,34 @@ public abstract class GameObject : IGameObject
 	/// </summary>
 	public virtual bool AcceptsFocus => false;
 
+	/// <summary>
+	/// Check if this <see cref="GameObject"/> is hovered
+	/// </summary>
+	public bool Hovered { get; internal set; }
+
 	private void UpdateInput()
 	{
 		if (ToScreenSpace(DrawRectangle).Contains(Input.MousePosition))
 		{
+			if (Hovered == false)
+			{
+				Hovered = true;
+				TriggerEvent(new HoverEvent(GetContainingInputManager()?.CurrentState ?? new InputState()));
+			}
 			if (Input.GetMouseButton(MouseButton.Left).Down)
 				TriggerEvent(new MouseDownEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), MouseButton.Left));
 			else if (Input.GetMouseButton(MouseButton.Left).Up)
 			{
 				TriggerEvent(new MouseUpEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), MouseButton.Left));
 				TriggerClick();
+			}
+		}
+		else
+		{
+			if (Hovered)
+			{
+				Hovered = false;
+				TriggerEvent(new HoverLostEvent(GetContainingInputManager()?.CurrentState ?? new InputState()));
 			}
 		}
 		if (HasFocus)
@@ -663,11 +681,18 @@ public abstract class GameObject : IGameObject
 	{
 		e.Target = this;
 
+		if (e is HoverLostEvent hoverLost)
+		{
+			OnHoverLost(hoverLost);
+			return false;
+		}
+
 		return e switch
 		{
 			ClickEvent click => OnClick(click),
 			MouseDownEvent mouseDown => OnMouseDown(mouseDown),
 			MouseUpEvent mouseUp => OnMouseUp(mouseUp),
+			HoverEvent hover => OnHover(hover),
 			KeyDownEvent keyDown => OnKeyDown(keyDown),
 			KeyUpEvent keyUp => OnKeyUp(keyUp),
 			_ => Handle(e),
@@ -679,6 +704,8 @@ public abstract class GameObject : IGameObject
 	protected virtual bool OnClick(ClickEvent e) => Handle(e);
 	protected virtual bool OnMouseDown(MouseDownEvent e) => Handle(e);
 	protected virtual bool OnMouseUp(MouseUpEvent e) => Handle(e);
+	protected virtual bool OnHover(HoverEvent e) => Handle(e);
+	protected virtual void OnHoverLost(HoverLostEvent e) => Handle(e);
 	protected virtual bool OnKeyDown(KeyDownEvent e) => Handle(e);
 	protected virtual bool OnKeyUp(KeyUpEvent e) => Handle(e);
 
