@@ -24,7 +24,8 @@ public class VisualTests : AzaleaGame
 		Add(new Outline(_container = new FlexContainer()
 		{
 			Size = new Vector2(400, 400),
-			Direction = FlexDirection.Vertical
+			Direction = FlexDirection.Horizontal,
+			Spacing = new Vector2(10, 5)
 		}));
 		Add(_text = new BasicTextBox()
 		{

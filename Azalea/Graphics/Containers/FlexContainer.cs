@@ -14,138 +14,151 @@ public class FlexContainer : FlexContainer<GameObject>
 }
 
 public class FlexContainer<T> : FlowContainer<T>
-    where T : GameObject
+	where T : GameObject
 {
-    private FlexDirection _direction = FlexDirection.Horizontal;
-    public FlexDirection Direction
-    {
-        get => _direction;
-        set
-        {
-            if (_direction == value) return;
-            _direction = value;
-            InvalidateLayout();
-        }
-    }
+	private FlexDirection _direction = FlexDirection.Horizontal;
+	public FlexDirection Direction
+	{
+		get => _direction;
+		set
+		{
+			if (_direction == value) return;
+			_direction = value;
+			InvalidateLayout();
+		}
+	}
 
-    private FlexWrapping _wrapping = FlexWrapping.Wrap;
-    public FlexWrapping Wrapping
-    {
-        get => _wrapping;
-        set
-        {
-            if (_wrapping == value) return;
-            _wrapping = value;
-            InvalidateLayout();
-        }
-    }
+	private FlexWrapping _wrapping = FlexWrapping.Wrap;
+	public FlexWrapping Wrapping
+	{
+		get => _wrapping;
+		set
+		{
+			if (_wrapping == value) return;
+			_wrapping = value;
+			InvalidateLayout();
+		}
+	}
 
-    protected override IEnumerable<Vector2> ComputeLayoutPositions()
-    {
-        var maxSize = ChildSize;
+	private Vector2 _spacing;
+	public Vector2 Spacing
+	{
+		get => _spacing;
+		set
+		{
+			if (_spacing == value) return;
+			_spacing = value;
+			InvalidateLayout();
+		}
+	}
 
-        var children = FlowingChildren.ToArray();
-        if (children.Length <= 0)
-            yield break;
+	protected override IEnumerable<Vector2> ComputeLayoutPositions()
+	{
+		var maxSize = ChildSize;
 
-        var layoutPositions = ArrayPool<Vector2>.Shared.Rent(children.Length);
-        float rowHeight = 0;
-        float rowWidth = 0;
-        Vector2 current = Vector2.Zero;
-        float rowStart = 0;
+		var children = FlowingChildren.ToArray();
+		if (children.Length <= 0)
+			yield break;
 
-        switch (Direction)
-        {
-            case FlexDirection.HorizontalReverse:
-                current = new Vector2(maxSize.X, 0);
-                rowStart = maxSize.X;
-                break;
-            case FlexDirection.VerticalReverse:
-                current = new Vector2(0, maxSize.Y);
-                rowStart = maxSize.Y;
-                break;
-        }
+		var layoutPositions = ArrayPool<Vector2>.Shared.Rent(children.Length);
+		float rowHeight = 0;
+		float rowWidth = 0;
+		Vector2 current = Vector2.Zero;
+		float rowStart = 0;
 
-        try
-        {
-            for (int i = 0; i < children.Length; i++)
-            {
-                GameObject c = children[i];
+		switch (Direction)
+		{
+			case FlexDirection.HorizontalReverse:
+				current = new Vector2(maxSize.X, 0);
+				rowStart = maxSize.X;
+				break;
+			case FlexDirection.VerticalReverse:
+				current = new Vector2(0, maxSize.Y);
+				rowStart = maxSize.Y;
+				break;
+		}
 
-                Vector2 stride = c.BoundingBox.Size;
+		try
+		{
+			for (int i = 0; i < children.Length; i++)
+			{
+				GameObject c = children[i];
 
-                if (Wrapping == FlexWrapping.Wrap)
-                {
-                    if ((Direction == FlexDirection.Horizontal || Direction == FlexDirection.HorizontalReverse)
-                        && rowWidth + stride.X > maxSize.X)
-                    {
-                        current.X = rowStart;
-                        current.Y += rowHeight;
+				Vector2 stride = c.BoundingBox.Size;
+				stride += Spacing;
 
-                        rowWidth = 0;
-                        rowHeight = 0;
-                    }
-                    else if ((Direction == FlexDirection.Vertical || Direction == FlexDirection.VerticalReverse)
-                        && rowWidth + stride.Y > maxSize.Y)
-                    {
-                        current.X += rowHeight;
-                        current.Y = rowStart;
+				if (Wrapping == FlexWrapping.Wrap)
+				{
+					if ((Direction == FlexDirection.Horizontal || Direction == FlexDirection.HorizontalReverse)
+						&& rowWidth + stride.X > maxSize.X)
+					{
+						current.X = rowStart;
+						current.Y += rowHeight;
 
-                        rowWidth = 0;
-                        rowHeight = 0;
-                    }
-                }
+						rowWidth = 0;
+						rowHeight = 0;
+					}
+					else if ((Direction == FlexDirection.Vertical || Direction == FlexDirection.VerticalReverse)
+						&& rowWidth + stride.Y > maxSize.Y)
+					{
+						current.X += rowHeight;
+						current.Y = rowStart;
 
-                switch (Direction)
-                {
-                    case FlexDirection.Horizontal:
-                        layoutPositions[i] = current;
-                        if (stride.Y > rowHeight)
-                            rowHeight = stride.Y;
-                        current.X += stride.X;
-                        rowWidth += stride.X;
-                        break;
-                    case FlexDirection.HorizontalReverse:
-                        if (stride.Y > rowHeight)
-                            rowHeight = stride.Y;
-                        current.X -= stride.X;
-                        rowWidth += stride.X;
-                        layoutPositions[i] = current;
-                        break;
-                    case FlexDirection.Vertical:
-                        layoutPositions[i] = current;
-                        if (stride.X > rowHeight)
-                            rowHeight = stride.X;
-                        current.Y += stride.Y;
-                        rowWidth += stride.Y;
-                        break;
-                    case FlexDirection.VerticalReverse:
-                        if (stride.X > rowHeight)
-                            rowHeight = stride.X;
-                        current.Y -= stride.Y;
-                        rowWidth += stride.Y;
-                        layoutPositions[i] = current;
-                        break;
-                }
+						rowWidth = 0;
+						rowHeight = 0;
+					}
+				}
 
-                yield return layoutPositions[i];
-            }
-        }
-        finally
-        {
-            ArrayPool<Vector2>.Shared.Return(layoutPositions);
-        }
-    }
+				switch (Direction)
+				{
+					case FlexDirection.Horizontal:
+						layoutPositions[i] = current;
+						if (stride.Y > rowHeight)
+							rowHeight = stride.Y;
+						current.X += stride.X;
+						rowWidth += stride.X;
+						break;
+					case FlexDirection.HorizontalReverse:
+						if (stride.Y > rowHeight)
+							rowHeight = stride.Y;
+						current.X -= stride.X;
+						rowWidth += stride.X;
+						layoutPositions[i] = current;
+						break;
+					case FlexDirection.Vertical:
+						layoutPositions[i] = current;
+						if (stride.X > rowHeight)
+							rowHeight = stride.X;
+						current.Y += stride.Y;
+						rowWidth += stride.Y;
+						break;
+					case FlexDirection.VerticalReverse:
+						if (stride.X > rowHeight)
+							rowHeight = stride.X;
+						current.Y -= stride.Y;
+						rowWidth += stride.Y;
+						layoutPositions[i] = current;
+						break;
+				}
+
+				yield return layoutPositions[i];
+			}
+		}
+		finally
+		{
+			ArrayPool<Vector2>.Shared.Return(layoutPositions);
+		}
+	}
 }
 /// <summary>
 /// Represents the direction children of a <see cref="FlexContainer{T}"/> should be filled in.
 /// </summary>
 public enum FlexDirection
 {
-    Horizontal,
-    HorizontalReverse,
-    Vertical,
-    VerticalReverse
+	Horizontal,
+	HorizontalReverse,
+	Vertical,
+	VerticalReverse
 }
 
 /// <summary>
@@ -153,6 +166,6 @@ public enum FlexDirection
 /// </summary>
 public enum FlexWrapping
 {
-    NoWrapping,
-    Wrap,
+	NoWrapping,
+	Wrap,
 }
