@@ -663,16 +663,15 @@ public abstract class GameObject : IGameObject
 				TriggerEvent(new HoverLostEvent(GetContainingInputManager()?.CurrentState ?? new InputState()));
 			}
 		}
-		if (HasFocus)
+
+		foreach (var key in Input.KEYBOARD_KEYS)
 		{
-			foreach (var key in Input.KEYBOARD_KEYS)
-			{
-				if (key.Value.Down || key.Value.Repeat) TriggerEvent(
-					new KeyDownEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), (Keys)key.Key, key.Value.Repeat));
-				if (key.Value.Up) TriggerEvent(
-					new KeyUpEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), (Keys)key.Key));
-			}
+			if (key.Value.Down || key.Value.Repeat) TriggerEvent(
+				new KeyDownEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), (Keys)key.Key, key.Value.Repeat));
+			if (key.Value.Up) TriggerEvent(
+				new KeyUpEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), (Keys)key.Key));
 		}
+
 	}
 
 	protected virtual bool Handle(UIEvent e) => false;
