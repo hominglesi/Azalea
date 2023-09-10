@@ -85,5 +85,7 @@ public class VisualTests : AzaleaGame
 		_container.Size = Input.MousePosition;
 
 		if (Input.GetKey(Keys.Escape).Down) Host.Window.Close();
+
+		if (Input.GetKey(Keys.P).Down && _container.Children.Count > 0) _container.Remove(_container.Children[0]);
 	}
 }

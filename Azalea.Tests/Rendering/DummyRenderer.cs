@@ -2,21 +2,22 @@
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Tests.Rendering.Batches;
+using System;
 
 namespace Azalea.Tests.Rendering;
 
 internal class DummyRenderer : Renderer
 {
-    protected override void ClearImplementation(Color color) { }
+	protected override void ClearImplementation(Color color) { }
 
-    protected override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
-        => new DummyVertexBatch<TexturedVertex2D>();
+	protected override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
+		=> new DummyVertexBatch<TexturedVertex2D>();
 
-    protected override INativeTexture CreateNativeTexture(int width, int height)
-        => new DummyTexture(this);
+	protected override INativeTexture CreateNativeTexture(int width, int height)
+		=> new DummyTexture(this);
 
-    protected override bool SetTextureImplementation(INativeTexture? texture, int unit)
-    {
-        throw new NotImplementedException();
-    }
+	protected override bool SetTextureImplementation(INativeTexture? texture, int unit)
+	{
+		throw new NotImplementedException();
+	}
 }
