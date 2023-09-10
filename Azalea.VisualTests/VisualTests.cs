@@ -82,5 +82,7 @@ public class VisualTests : AzaleaGame
 	protected override void Update()
 	{
 		_container.Size = Input.MousePosition;
+
+		if (Input.GetKey(Keys.Escape).Down) Host.Window.Close();
 	}
 }

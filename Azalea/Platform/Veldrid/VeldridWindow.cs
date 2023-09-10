@@ -115,4 +115,9 @@ public class VeldridWindow : IWindow
 			VeldridExtentions.SDL_FreeSurface(surface);
 		}
 	}
+
+	public void Close()
+	{
+		Window.Close();
+	}
 }

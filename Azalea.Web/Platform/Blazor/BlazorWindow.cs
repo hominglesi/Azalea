@@ -84,4 +84,9 @@ internal class BlazorWindow : IWindow
 	{
 		//throw new NotImplementedException();
 	}
+
+	public void Close()
+	{
+		//Blazor does not support closing the window
+	}
 }
