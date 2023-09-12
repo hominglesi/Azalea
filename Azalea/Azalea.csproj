@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Title>$(AssemblyName)</Title>
-    <Version>$(VersionPrefix)1.1.1</Version>
+    <Version>$(VersionPrefix)1.1.2</Version>
     <Authors>hominglesi</Authors>
     <Company>Azalea</Company>
     <Description>A 2D game engine.</Description>
