@@ -18,6 +18,7 @@ public class ButtonState
     public bool Repeat => _repeat;
     public bool Down => _down;
     public bool Up => _up;
+    public bool DownOrRepeat => _down || _repeat;
 
     internal void SetDown()
     {
