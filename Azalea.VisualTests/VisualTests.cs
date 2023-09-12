@@ -1,10 +1,8 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.Containers;
 using Azalea.Graphics.Shapes;
-using Azalea.Graphics.Sprites;
 using Azalea.Graphics.UserInterface;
 using Azalea.Inputs;
-using Azalea.IO.Assets;
 using Azalea.IO.Stores;
 using System.Numerics;
 
@@ -12,7 +10,7 @@ namespace Azalea.VisualTests;
 
 public class VisualTests : AzaleaGame
 {
-	private FlexContainer _container;
+	private TextContainer _container;
 	private BasicTextBox _text;
 
 	protected override void OnInitialize()
@@ -21,12 +19,16 @@ public class VisualTests : AzaleaGame
 
 		Host.Renderer.ClearColor = Color.Azalea;
 
-		Add(new Outline(_container = new FlexContainer()
+		Add(new Outline(_container = new TextContainer(t => { t.Font = t.Font.With(size: 40); })
 		{
 			Size = new Vector2(400, 400),
-			Direction = FlexDirection.Horizontal,
-			Spacing = new Vector2(10, 5)
+			LineSpacing = 1f,
+			Text = "Lorem ipsum dolor sit amet,\n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum"
 		}));
+
+		_container.AddText("Text3 ", t => { t.Color = Color.Black; });
+		_container.AddText("Text4 ");
+
 		Add(_text = new BasicTextBox()
 		{
 			Width = 500,
@@ -34,50 +36,6 @@ public class VisualTests : AzaleaGame
 			Position = new Vector2(500, 500)
 		});
 		_text.Text = "Ide Gas";
-
-		_container.Children = new GameObject[]
-		{
-			new Sprite()
-			{
-				Texture = Assets.GetTexture("wall.png"),
-				Size = new Vector2(100, 100)
-			},
-			new Sprite()
-			{
-				Texture = Assets.GetTexture("wall.png"),
-				Size = new Vector2(100, 100)
-			},
-			new Sprite()
-			{
-				Texture = Assets.GetTexture("wall.png"),
-				Size = new Vector2(100, 100)
-			},
-			new Sprite()
-			{
-				Texture = Assets.GetTexture("wall.png"),
-				Size = new Vector2(100, 100)
-			},
-			new Sprite()
-			{
-				Texture = Assets.GetTexture("wall.png"),
-				Size = new Vector2(100, 100)
-			},
-			new Sprite()
-			{
-				Texture = Assets.GetTexture("wall.png"),
-				Size = new Vector2(100, 100)
-			},
-			new Sprite()
-			{
-				Texture = Assets.GetTexture("wall.png"),
-				Size = new Vector2(100, 100)
-			},
-			new Sprite()
-			{
-				Texture = Assets.GetTexture("wall.png"),
-				Size = new Vector2(100, 100)
-			}
-		};
 	}
 
 	protected override void Update()
