@@ -9,6 +9,7 @@ namespace Azalea.VisualTests;
 public class DefaultUserInputTest : TestScene
 {
     private Container _buttonContainer;
+    private Container _childButtonContainer;
 
     public DefaultUserInputTest()
     {
@@ -46,13 +47,29 @@ public class DefaultUserInputTest : TestScene
                     Action = () => { Write("Button 3 clicked");},
                     Size = new(80, 200)
                 },
-                new BasicButton()
+                _childButtonContainer = new Container()
                 {
-                    Text = "Button 4",
                     Position = new(1f, 1f),
                     RelativePositionAxes = Axes.Both,
                     Origin = Anchor.BottomRight,
-                    Action = () => { Write("Button 4 clicked");}
+                    Size = new(150, 150),
+                    Children = new GameObject[]
+                    {
+                        new Box()
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Color = Color.White,
+                            Origin = Anchor.Center,
+                            Anchor = Anchor.Center
+                        },
+                        new BasicButton()
+                        {
+                            Text = "Button 4",
+                            Origin = Anchor.Center,
+                            Anchor = Anchor.Center,
+                            Action = () => { Write("Button 4 clicked");}
+                        },
+                    }
                 },
                 new BasicButton()
                 {

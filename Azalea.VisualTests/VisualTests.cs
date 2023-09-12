@@ -15,6 +15,7 @@ public class VisualTests : AzaleaGame
         Host.Renderer.ClearColor = Color.Azalea;
         Host.Window.Resizable = true;
 
+        //Add(new DefaultUserInputTest());
         Add(new TestingTestScene());
 
     }
