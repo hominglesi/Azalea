@@ -4,5 +4,5 @@ namespace Azalea.Lists;
 
 public interface INotifyArrayChanged
 {
-    event Action ArrayElementsChanged;
+	event Action ArrayElementsChanged;
 }

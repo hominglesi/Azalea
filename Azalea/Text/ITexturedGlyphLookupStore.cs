@@ -2,5 +2,5 @@
 
 public interface ITexturedGlyphLookupStore
 {
-    ITexturedCharacterGlyph? Get(string fontName, char character);
+	ITexturedCharacterGlyph? Get(string fontName, char character);
 }

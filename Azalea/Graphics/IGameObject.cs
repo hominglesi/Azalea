@@ -2,7 +2,7 @@
 
 public interface IGameObject
 {
-    DrawColorInfo DrawColorInfo { get; }
+	DrawColorInfo DrawColorInfo { get; }
 
-    DrawInfo DrawInfo { get; }
+	DrawInfo DrawInfo { get; }
 }

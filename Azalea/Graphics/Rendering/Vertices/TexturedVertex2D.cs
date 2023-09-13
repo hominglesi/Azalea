@@ -6,9 +6,9 @@ namespace Azalea.Graphics.Rendering.Vertices;
 [StructLayout(LayoutKind.Sequential)]
 internal struct TexturedVertex2D : IVertex
 {
-    public Vector2 Position;
+	public Vector2 Position;
 
-    public Color Color;
+	public Color Color;
 
-    public Vector2 TexturePosition;
+	public Vector2 TexturePosition;
 }

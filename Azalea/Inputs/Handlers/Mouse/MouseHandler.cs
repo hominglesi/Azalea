@@ -4,9 +4,9 @@ namespace Azalea.Inputs.Handlers.Mouse;
 
 public class MouseHandler : InputHandler
 {
-    private Vector2? lastPosition;
+	private Vector2? lastPosition;
 
-    /*
+	/*
     public override bool Initialize(GameHost host)
     {
         if (base.Initialize(host) == false)

@@ -13,72 +13,72 @@ namespace Azalea.Graphics.Veldrid;
 
 internal class VeldridRenderer : Renderer
 {
-    public readonly GraphicsDevice GraphicsDevice;
+	public readonly GraphicsDevice GraphicsDevice;
 
-    public readonly ResourceFactory Factory;
-    public CommandList CommandList;
-    public CommandList TextureUploadCommandList;
+	public readonly ResourceFactory Factory;
+	public CommandList CommandList;
+	public CommandList TextureUploadCommandList;
 
-    private readonly IWindow _window;
-    private readonly Dictionary<int, VeldridTextureResources> boundTextureUnits = new();
+	private readonly IWindow _window;
+	private readonly Dictionary<int, VeldridTextureResources> boundTextureUnits = new();
 
-    public VeldridRenderer(GraphicsDevice graphicsDevice, IWindow window)
-    {
-        GraphicsDevice = graphicsDevice;
-        _window = window;
+	public VeldridRenderer(GraphicsDevice graphicsDevice, IWindow window)
+	{
+		GraphicsDevice = graphicsDevice;
+		_window = window;
 
-        Factory = GraphicsDevice.ResourceFactory;
+		Factory = GraphicsDevice.ResourceFactory;
 
-        CommandList = Factory.CreateCommandList();
-        TextureUploadCommandList = Factory.CreateCommandList();
-    }
+		CommandList = Factory.CreateCommandList();
+		TextureUploadCommandList = Factory.CreateCommandList();
+	}
 
-    internal override void BeginFrame()
-    {
-        CommandList.Begin();
-        CommandList.SetFramebuffer(GraphicsDevice.SwapchainFramebuffer);
+	internal override void BeginFrame()
+	{
+		CommandList.Begin();
+		CommandList.SetFramebuffer(GraphicsDevice.SwapchainFramebuffer);
 
-        base.BeginFrame();
-    }
+		base.BeginFrame();
+	}
 
-    internal override void FinishFrame()
-    {
-        base.FinishFrame();
+	internal override void FinishFrame()
+	{
+		base.FinishFrame();
 
-        CommandList.End();
-        GraphicsDevice.SubmitCommands(CommandList);
-        GraphicsDevice.SwapBuffers();
-    }
+		CommandList.End();
+		GraphicsDevice.SubmitCommands(CommandList);
+		GraphicsDevice.SwapBuffers();
+	}
 
-    internal Dictionary<int, VeldridTextureResources> GetBoundTextureResources() => boundTextureUnits;
+	internal Dictionary<int, VeldridTextureResources> GetBoundTextureResources() => boundTextureUnits;
 
-    internal void UpdateTexture<T>(TextureVeldrid texture, uint x, uint y, int width, int height, ReadOnlySpan<T> data)
-        where T : unmanaged
-    {
-        GraphicsDevice.UpdateTexture(texture, data, x, y, 0, (uint)width, (uint)height, 1, 0, 0);
-    }
+	internal void UpdateTexture<T>(TextureVeldrid texture, uint x, uint y, int width, int height, ReadOnlySpan<T> data)
+		where T : unmanaged
+	{
+		GraphicsDevice.UpdateTexture(texture, data, x, y, 0, (uint)width, (uint)height, 1, 0, 0);
+	}
 
-    protected override void ClearImplementation(Color color)
-    {
-        CommandList.ClearColorTarget(0, ClearColor.ToRgbaFloat());
-    }
+	protected override void ClearImplementation(Color color)
+	{
+		CommandList.ClearColorTarget(0, ClearColor.ToRgbaFloat());
+	}
 
-    protected override INativeTexture CreateNativeTexture(int width, int height)
-        => new VeldridTexture(this, width, height);
+	protected override INativeTexture CreateNativeTexture(int width, int height)
+		=> new VeldridTexture(this, width, height);
 
-    protected override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
-        => new VeldridVertexBatch<TexturedVertex2D>(this, _window, size);
+	protected override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
+		=> new VeldridVertexBatch<TexturedVertex2D>(this, _window, size);
 
-    protected override bool SetTextureImplementation(INativeTexture? texture, int unit)
-    {
-        if (texture is not VeldridTexture vTexture)
-            return false;
+	protected override bool SetTextureImplementation(INativeTexture? texture, int unit)
+	{
+		if (texture is not VeldridTexture vTexture)
+			return false;
 
-        var resources = vTexture.GetResourceList();
+		var resources = vTexture.GetResourceList();
 
-        for (int i = 0; i < resources.Count; i++)
-            boundTextureUnits[unit++] = resources[i];
+		for (int i = 0; i < resources.Count; i++)
+			boundTextureUnits[unit++] = resources[i];
 
-        return true;
-    }
+		return true;
+	}
 }

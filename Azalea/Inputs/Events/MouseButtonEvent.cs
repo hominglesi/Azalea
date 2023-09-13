@@ -5,16 +5,16 @@ namespace Azalea.Inputs.Events;
 
 public class MouseButtonEvent : MouseEvent
 {
-    public readonly MouseButton Button;
+	public readonly MouseButton Button;
 
-    public readonly Vector2 ScreenSpaceMouseDownPosition;
+	public readonly Vector2 ScreenSpaceMouseDownPosition;
 
-    public Vector2 MouseDownPosition => ToLocalSpace(ScreenSpaceMouseDownPosition);
+	public Vector2 MouseDownPosition => ToLocalSpace(ScreenSpaceMouseDownPosition);
 
-    protected MouseButtonEvent(InputState state, MouseButton button, Vector2? screenSpaceMouseDownPosition)
-        : base(state)
-    {
-        Button = button;
-        ScreenSpaceMouseDownPosition = screenSpaceMouseDownPosition ?? ScreenSpaceMousePosition;
-    }
+	protected MouseButtonEvent(InputState state, MouseButton button, Vector2? screenSpaceMouseDownPosition)
+		: base(state)
+	{
+		Button = button;
+		ScreenSpaceMouseDownPosition = screenSpaceMouseDownPosition ?? ScreenSpaceMousePosition;
+	}
 }

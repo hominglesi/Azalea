@@ -2,6 +2,6 @@
 
 public class TexturedShaderDrawNode : DrawNode
 {
-    public TexturedShaderDrawNode(IGameObject source)
-        : base(source) { }
+	public TexturedShaderDrawNode(IGameObject source)
+		: base(source) { }
 }

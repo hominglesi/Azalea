@@ -7,63 +7,63 @@ namespace Azalea.Graphics.Shapes;
 
 public partial class Outline : CompositeGameObject
 {
-    private float _thickness = 3;
-    public float Thickness
-    {
-        get => _thickness;
-        set
-        {
-            if (_thickness == value) return;
+	private float _thickness = 3;
+	public float Thickness
+	{
+		get => _thickness;
+		set
+		{
+			if (_thickness == value) return;
 
-            _thickness = value;
-            _sizeValue.Invalidate();
-        }
-    }
+			_thickness = value;
+			_sizeValue.Invalidate();
+		}
+	}
 
-    private readonly GameObject _child;
-    private readonly OutlineWrapper _wrapper;
+	private readonly GameObject _child;
+	private readonly OutlineWrapper _wrapper;
 
-    public Outline(GameObject child)
-    {
-        AddLayout(_sizeValue);
+	public Outline(GameObject child)
+	{
+		AddLayout(_sizeValue);
 
-        Color = Color.Black;
+		Color = Color.Black;
 
-        AddInternal(_child = child);
-        AddInternal(_wrapper = new OutlineWrapper(_child));
-    }
+		AddInternal(_child = child);
+		AddInternal(_wrapper = new OutlineWrapper(_child));
+	}
 
-    private LayoutValue _sizeValue = new(Invalidation.DrawSize, InvalidationSource.Child);
+	private LayoutValue _sizeValue = new(Invalidation.DrawSize, InvalidationSource.Child);
 
-    protected override void Update()
-    {
-        base.Update();
+	protected override void Update()
+	{
+		base.Update();
 
-        if (_sizeValue.IsValid) return;
+		if (_sizeValue.IsValid) return;
 
-        base.Size = _child.Size + new Vector2(Thickness * 2, Thickness * 2);
-        _child.Position = new Vector2(Thickness, Thickness);
-        _wrapper.Thickness = Thickness;
-        _wrapper.Color = Color;
-    }
+		base.Size = _child.Size + new Vector2(Thickness * 2, Thickness * 2);
+		_child.Position = new Vector2(Thickness, Thickness);
+		_wrapper.Thickness = Thickness;
+		_wrapper.Color = Color;
+	}
 
-    public override Vector2 Size
-    {
-        get => base.Size;
-        set => throw new InvalidOperationException($"The size of {nameof(Outline)} cannot be directly edited," +
-            $"use thickness insead or directly change the size of the wrapped child.");
-    }
+	public override Vector2 Size
+	{
+		get => base.Size;
+		set => throw new InvalidOperationException($"The size of {nameof(Outline)} cannot be directly edited," +
+			$"use thickness insead or directly change the size of the wrapped child.");
+	}
 
-    internal class OutlineWrapper : GameObject
-    {
-        public float Thickness { get; set; }
-        public GameObject WrappedChild { get; set; }
+	internal class OutlineWrapper : GameObject
+	{
+		public float Thickness { get; set; }
+		public GameObject WrappedChild { get; set; }
 
-        public OutlineWrapper(GameObject child)
-        {
-            WrappedChild = child;
-        }
+		public OutlineWrapper(GameObject child)
+		{
+			WrappedChild = child;
+		}
 
-        protected override DrawNode CreateDrawNode() => new OutlineWrapperDrawNode(this);
-    }
+		protected override DrawNode CreateDrawNode() => new OutlineWrapperDrawNode(this);
+	}
 }

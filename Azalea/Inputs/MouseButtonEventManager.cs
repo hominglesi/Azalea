@@ -2,6 +2,6 @@
 
 public abstract class MouseButtonEventManager : ButtonEventManager<MouseButton>
 {
-    public MouseButtonEventManager(MouseButton button)
-        : base(button) { }
+	public MouseButtonEventManager(MouseButton button)
+		: base(button) { }
 }

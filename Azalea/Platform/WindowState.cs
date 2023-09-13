@@ -2,7 +2,7 @@
 
 public enum WindowState
 {
-    Normal,
-    Fullscreen,
-    BorderlessFullscreen
+	Normal,
+	Fullscreen,
+	BorderlessFullscreen
 }

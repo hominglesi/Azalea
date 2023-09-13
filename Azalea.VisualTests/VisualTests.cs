@@ -8,20 +8,20 @@ public class VisualTests : AzaleaGame
 {
 
 
-    protected override void OnInitialize()
-    {
-        Resources.AddStore(new NamespacedResourceStore<byte[]>(new DllResourceStore(typeof(VisualTests).Assembly), "Resources"));
+	protected override void OnInitialize()
+	{
+		Resources.AddStore(new NamespacedResourceStore<byte[]>(new DllResourceStore(typeof(VisualTests).Assembly), "Resources"));
 
-        Host.Renderer.ClearColor = Color.Azalea;
-        Host.Window.Resizable = true;
+		Host.Renderer.ClearColor = Color.Azalea;
+		Host.Window.Resizable = true;
 
-        //Add(new DefaultUserInputTest());
-        Add(new TestingTestScene());
+		//Add(new DefaultUserInputTest());
+		Add(new TestingTestScene());
 
-    }
+	}
 
-    protected override void Update()
-    {
-        if (Input.GetKey(Keys.Escape).Down) Host.Window.Close();
-    }
+	protected override void Update()
+	{
+		if (Input.GetKey(Keys.Escape).Down) Host.Window.Close();
+	}
 }

@@ -2,10 +2,10 @@
 
 public class InputState
 {
-    public readonly MouseState Mouse;
+	public readonly MouseState Mouse;
 
-    public InputState(MouseState? mouse = null)
-    {
-        Mouse = mouse ?? new MouseState();
-    }
+	public InputState(MouseState? mouse = null)
+	{
+		Mouse = mouse ?? new MouseState();
+	}
 }

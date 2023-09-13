@@ -5,6 +5,6 @@ namespace Azalea.Inputs.Events;
 
 public class MouseUpEvent : MouseButtonEvent
 {
-    public MouseUpEvent(InputState state, MouseButton button, Vector2? screenSpaceMouseDownPosition = null)
-        : base(state, button, screenSpaceMouseDownPosition) { }
+	public MouseUpEvent(InputState state, MouseButton button, Vector2? screenSpaceMouseDownPosition = null)
+		: base(state, button, screenSpaceMouseDownPosition) { }
 }

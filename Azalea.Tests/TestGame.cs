@@ -2,10 +2,10 @@
 
 internal class TestGame : AzaleaGame
 {
-    internal bool OnInitializeRan;
+	internal bool OnInitializeRan;
 
-    protected override void OnInitialize()
-    {
-        OnInitializeRan = true;
-    }
+	protected override void OnInitialize()
+	{
+		OnInitializeRan = true;
+	}
 }

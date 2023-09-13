@@ -2,8 +2,8 @@
 
 public static class Time
 {
-    internal static float _deltaTime;
+	internal static float _deltaTime;
 
-    public static float DeltaTime => _deltaTime;
-    public static float DeltaTimeMs => _deltaTime * 1000;
+	public static float DeltaTime => _deltaTime;
+	public static float DeltaTimeMs => _deltaTime * 1000;
 }

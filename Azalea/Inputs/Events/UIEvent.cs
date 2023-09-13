@@ -6,16 +6,16 @@ namespace Azalea.Inputs.Events;
 
 public abstract class UIEvent
 {
-    public InputState CurrentState;
+	public InputState CurrentState;
 
-    public GameObject? Target;
+	public GameObject? Target;
 
-    protected Vector2 ToLocalSpace(Vector2 screenSpacePosition) => Target?.Parent?.ToLocalSpace(screenSpacePosition) ?? screenSpacePosition;
+	protected Vector2 ToLocalSpace(Vector2 screenSpacePosition) => Target?.Parent?.ToLocalSpace(screenSpacePosition) ?? screenSpacePosition;
 
-    public Vector2 ScreenSpaceMousePosition => CurrentState.Mouse.Position;
+	public Vector2 ScreenSpaceMousePosition => CurrentState.Mouse.Position;
 
-    protected UIEvent(InputState state)
-    {
-        CurrentState = state;
-    }
+	protected UIEvent(InputState state)
+	{
+		CurrentState = state;
+	}
 }

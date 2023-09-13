@@ -4,11 +4,11 @@ namespace Azalea.IO.Stores;
 
 public interface IGlyphStore
 {
-    string? FontName { get; }
+	string? FontName { get; }
 
-    bool HasGlyph(char character);
+	bool HasGlyph(char character);
 
-    CharacterGlyph? Get(char character);
+	CharacterGlyph? Get(char character);
 
-    int GetKerning(char left, char right);
+	int GetKerning(char left, char right);
 }

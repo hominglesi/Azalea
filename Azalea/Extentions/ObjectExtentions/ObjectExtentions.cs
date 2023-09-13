@@ -2,5 +2,5 @@
 
 public static class ObjectExtentions
 {
-    public static T AsNotNull<T>(this T? obj) => obj!;
+	public static T AsNotNull<T>(this T? obj) => obj!;
 }

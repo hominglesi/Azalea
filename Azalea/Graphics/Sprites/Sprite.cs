@@ -5,21 +5,21 @@ namespace Azalea.Graphics.Sprites;
 
 public class Sprite : GameObject
 {
-    private Texture? texture;
+	private Texture? texture;
 
-    public virtual Texture? Texture
-    {
-        get => texture;
-        set
-        {
-            if (texture == value) return;
+	public virtual Texture? Texture
+	{
+		get => texture;
+		set
+		{
+			if (texture == value) return;
 
-            texture = value;
+			texture = value;
 
-            if (Size == Vector2.Zero)
-                Size = new Vector2(texture?.DisplayWidth ?? 0, texture?.DisplayHeight ?? 0);
-        }
-    }
+			if (Size == Vector2.Zero)
+				Size = new Vector2(texture?.DisplayWidth ?? 0, texture?.DisplayHeight ?? 0);
+		}
+	}
 
-    protected override DrawNode CreateDrawNode() => new SpriteDrawNode(this);
+	protected override DrawNode CreateDrawNode() => new SpriteDrawNode(this);
 }

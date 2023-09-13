@@ -2,10 +2,10 @@
 
 public abstract class ButtonEventManager<TButton>
 {
-    public readonly TButton Button;
+	public readonly TButton Button;
 
-    public ButtonEventManager(TButton button)
-    {
-        Button = button;
-    }
+	public ButtonEventManager(TButton button)
+	{
+		Button = button;
+	}
 }

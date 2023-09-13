@@ -5,13 +5,13 @@ namespace Azalea.Graphics.Rendering;
 
 internal interface IVertexBatch
 {
-    int Draw();
+	int Draw();
 }
 
 internal interface IVertexBatch<TVertex> : IVertexBatch
-    where TVertex : unmanaged, IVertex
+	where TVertex : unmanaged, IVertex
 {
 
-    Action<TVertex> AddAction { get; }
-    void Add(TVertex vertex);
+	Action<TVertex> AddAction { get; }
+	void Add(TVertex vertex);
 }

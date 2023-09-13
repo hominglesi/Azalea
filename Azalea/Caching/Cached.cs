@@ -2,18 +2,18 @@
 
 public class Cached
 {
-    public bool IsValid { get; private set; }
+	public bool IsValid { get; private set; }
 
-    public bool Invalidate()
-    {
-        if (IsValid == false) return false;
+	public bool Invalidate()
+	{
+		if (IsValid == false) return false;
 
-        IsValid = false;
-        return true;
-    }
+		IsValid = false;
+		return true;
+	}
 
-    public void Validate()
-    {
-        IsValid = true;
-    }
+	public void Validate()
+	{
+		IsValid = true;
+	}
 }

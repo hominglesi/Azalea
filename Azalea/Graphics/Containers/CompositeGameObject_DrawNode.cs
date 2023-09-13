@@ -5,22 +5,22 @@ namespace Azalea.Graphics.Containers;
 
 public partial class CompositeGameObject
 {
-    protected class CompositeGameObjectDrawNode : DrawNode, ICompositeDrawNode
-    {
-        public List<DrawNode>? Children { get; set; }
+	protected class CompositeGameObjectDrawNode : DrawNode, ICompositeDrawNode
+	{
+		public List<DrawNode>? Children { get; set; }
 
-        protected new CompositeGameObject Source => (CompositeGameObject)base.Source;
+		protected new CompositeGameObject Source => (CompositeGameObject)base.Source;
 
-        public CompositeGameObjectDrawNode(CompositeGameObject source)
-            : base(source) { }
+		public CompositeGameObjectDrawNode(CompositeGameObject source)
+			: base(source) { }
 
-        public override void Draw(IRenderer renderer)
-        {
-            base.Draw(renderer);
+		public override void Draw(IRenderer renderer)
+		{
+			base.Draw(renderer);
 
-            if (Children != null)
-                foreach (var child in Children)
-                    child.Draw(renderer);
-        }
-    }
+			if (Children != null)
+				foreach (var child in Children)
+					child.Draw(renderer);
+		}
+	}
 }
