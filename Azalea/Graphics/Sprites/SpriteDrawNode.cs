@@ -25,8 +25,14 @@ public class SpriteDrawNode : TexturedShaderDrawNode
 
 	protected virtual void Blit(IRenderer renderer)
 	{
+		if (Texture is null)
+		{
+			Console.WriteLine("Couldn't draw sprite because texture was null");
+			return;
+		}
+
 		renderer.DrawQuad(
-			Texture ?? throw new Exception("Texture must be applied before drawing"),
+			Texture,
 			ScreenSpaceDrawQuad,
 			DrawColorInfo);
 	}

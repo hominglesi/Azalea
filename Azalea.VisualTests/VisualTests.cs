@@ -6,8 +6,6 @@ namespace Azalea.VisualTests;
 
 public class VisualTests : AzaleaGame
 {
-
-
 	protected override void OnInitialize()
 	{
 		Resources.AddStore(new NamespacedResourceStore<byte[]>(new DllResourceStore(typeof(VisualTests).Assembly), "Resources"));

@@ -1,8 +1,10 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.Containers;
 using Azalea.Graphics.Shapes;
+using Azalea.Graphics.Sprites;
 using Azalea.Graphics.UserInterface;
 using Azalea.Inputs;
+using Azalea.IO.Assets;
 using System;
 using System.Numerics;
 
@@ -32,6 +34,14 @@ public class TestingTestScene : TestScene
 			Position = new Vector2(500, 500)
 		});
 		_text.Text = "Ide Gas";
+
+		Add(new Sprite()
+		{
+			Texture = Assets.GetTexture("Ovaj texture sigurno nema"),
+			Size = new(100, 100),
+			Origin = Anchor.BottomRight,
+			Anchor = Anchor.BottomRight
+		});
 	}
 
 	protected override void Update()
