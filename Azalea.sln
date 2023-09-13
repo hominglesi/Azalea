@@ -20,12 +20,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azalea.Web", "Azalea.Web\Az
 		{D13F3552-76B7-409D-B1B7-ADF2EA4029EB} = {D13F3552-76B7-409D-B1B7-ADF2EA4029EB}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azalea.VisualTests.Web", "Azalea.VisualTests.Web\Azalea.VisualTests.Web.csproj", "{023F46E8-0C14-4D6F-84F0-4B3A0D870D62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azalea.VisualTests.Web", "Azalea.VisualTests.Web\Azalea.VisualTests.Web.csproj", "{023F46E8-0C14-4D6F-84F0-4B3A0D870D62}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8AFADD60-5978-401B-B1E7-26C2B2CB2B88} = {8AFADD60-5978-401B-B1E7-26C2B2CB2B88}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azalea.VisualTests.Desktop", "Azalea.VisualTests.Desktop\Azalea.VisualTests.Desktop.csproj", "{81081890-063A-4D01-8F3D-15358B4AAF53}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azalea.VisualTests.Desktop", "Azalea.VisualTests.Desktop\Azalea.VisualTests.Desktop.csproj", "{81081890-063A-4D01-8F3D-15358B4AAF53}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{66518682-7463-49D6-B01C-ADE9989BC8DA}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

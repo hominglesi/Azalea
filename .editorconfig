@@ -1,0 +1,18 @@
+root = true
+
+[*.cs]
+end_of_line = crlf
+indent_style = tab
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+dotnet_naming_style.camelcase.capitalization = camel_case
+
+#camelCase for private methods
+dotnet_naming_symbols.private_method.applicable_kinds = method
+dotnet_naming_symbols.private_method.applicable_accessibilities = private
+dotnet_naming_rule.local_function_camelcase.severity = warning
+dotnet_naming_rule.local_function_camelcase.symbols = private_method
+dotnet_naming_rule.local_function_camelcase.style = camelcase
+
+csharp_style_namespace_declarations = file_scoped:warning
