@@ -1,6 +1,7 @@
 ﻿using Azalea.Graphics;
 using Azalea.Inputs;
 using Azalea.IO.Stores;
+using System;
 
 namespace Azalea.VisualTests;
 
@@ -16,6 +17,10 @@ public class VisualTests : AzaleaGame
 		//Add(new DefaultUserInputTest());
 		Add(new TestingTestScene());
 
+		var col = new Color(65, 71, 128);
+		Console.WriteLine(col.Saturation);
+		Console.WriteLine(col.Luminance);
+		Console.WriteLine(col.Hue);
 	}
 
 	protected override void Update()
