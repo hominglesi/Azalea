@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using Azalea.Utils;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -90,7 +91,7 @@ public class FlexContainer<T> : FlowContainer<T>
 				if (Wrapping == FlexWrapping.Wrap)
 				{
 					if ((Direction == FlexDirection.Horizontal || Direction == FlexDirection.HorizontalReverse)
-						&& rowWidth + stride.X > maxSize.X)
+						&& Precision.DefinitelyBigger(rowWidth + stride.X, maxSize.X))
 					{
 						current.X = rowStart;
 						current.Y += rowHeight;
@@ -99,7 +100,7 @@ public class FlexContainer<T> : FlowContainer<T>
 						rowHeight = 0;
 					}
 					else if ((Direction == FlexDirection.Vertical || Direction == FlexDirection.VerticalReverse)
-						&& rowWidth + stride.Y > maxSize.Y)
+						&& Precision.DefinitelyBigger(rowWidth + stride.Y, maxSize.Y))
 					{
 						current.X += rowHeight;
 						current.Y = rowStart;
