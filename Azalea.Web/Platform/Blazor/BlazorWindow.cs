@@ -70,14 +70,20 @@ internal class BlazorWindow : IWindow
 			_title = value;
 		}
 	}
-	public Vector2Int ClientSize { get => new(1280, 720); set => throw new NotImplementedException(); }
-	public WindowState State { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	public bool Resizable { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	public bool CursorVisible { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+	public Vector2Int ClientSize { get => new(1280, 720); set { } }
+	public Vector2Int Position { get => Vector2Int.Zero; set { } }
+	public WindowState State { get => WindowState.Normal; set { } }
+	public bool Resizable { get => false; set { } }
+	public bool CursorVisible { get => true; set { } }
 
 	public void Run()
 	{
 		_builder.Build().RunAsync();
+	}
+
+	public void Center()
+	{
+		//throw new NotImplementedException();
 	}
 
 	public void SetIconFromStream(Stream imageStream)

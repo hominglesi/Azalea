@@ -58,6 +58,8 @@ public abstract class AzaleaGame : Container
 
 		Host.Window.SetIconFromStream(Textures.GetStream("azalea-icon.png")!);
 
+		Host.Window.Center();
+
 		OnInitialize();
 	}
 

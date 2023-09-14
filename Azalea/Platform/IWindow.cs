@@ -6,6 +6,10 @@ public interface IWindow
 {
 	internal const string DefaultTitle = "Azalea Game";
 
+	//Aproximate window center for 1920x1080 resolution
+	internal static Vector2Int AproximateCenterWindowPosition(Vector2Int windowSize)
+		=> new Vector2Int(960, 540) - (windowSize / 2);
+
 	/// <summary>
 	/// The window title.
 	/// </summary>
@@ -31,6 +35,16 @@ public interface IWindow
 	/// Controls the visibility of the cursor. (Default: true)
 	/// </summary>
 	public bool CursorVisible { get; set; }
+
+	/// <summary>
+	/// The position of this window on the users desktop
+	/// </summary>
+	public Vector2Int Position { get; set; }
+
+	/// <summary>
+	/// Centers the window on the users screen
+	/// </summary>
+	public void Center();
 
 	/// <summary>
 	/// Sets the window icon.

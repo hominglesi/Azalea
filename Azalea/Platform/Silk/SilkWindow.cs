@@ -2,6 +2,7 @@
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
+using Silk.NET.SDL;
 using Silk.NET.Windowing;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Advanced;
@@ -21,17 +22,20 @@ internal class SilkWindow : IWindow
 	private GL? _gl;
 	private SilkInputManager? _input;
 
-	public SilkWindow(Vector2Int preferredClientSize)
+	public SilkWindow(Vector2Int preferredClientSize, WindowState preferredWindowState)
 	{
 		var windowOptions = WindowOptions.Default with
 		{
-			Size = new Vector2D<int>(preferredClientSize.X, preferredClientSize.Y),
+			Size = preferredClientSize,
 			Title = IWindow.DefaultTitle,
-			WindowBorder = WindowBorder.Fixed
+			WindowBorder = WindowBorder.Fixed,
+			Position = IWindow.AproximateCenterWindowPosition(preferredClientSize),
+			WindowState = preferredWindowState.ToSilkWindowState()
 		};
 
 		Window = WindowSilk.Create(windowOptions);
 		Window.Resize += onResize;
+
 	}
 
 	private void onResize(Vector2D<int> obj)
@@ -44,6 +48,16 @@ internal class SilkWindow : IWindow
 	{
 		_gl = gl;
 		_input = input;
+	}
+
+	public void Center()
+	{
+		var monitor = Window.Monitor;
+		var monitorBounds = monitor.Bounds;
+		Position = (Vector2Int)monitorBounds.Origin + new Vector2Int(
+			monitorBounds.Size.X / 2 - ClientSize.X / 2,
+			monitorBounds.Size.Y / 2 - ClientSize.Y / 2
+			);
 	}
 
 	public unsafe void SetIconFromStream(Stream imageStream)
@@ -68,6 +82,12 @@ internal class SilkWindow : IWindow
 	{
 		get => Window.Size;
 		set => Window.Size = value;
+	}
+
+	public Vector2Int Position
+	{
+		get => Window.Position;
+		set => Window.Position = value;
 	}
 
 	public string Title

@@ -22,7 +22,7 @@ internal class SilkGameHost : GameHost
 
 	public SilkGameHost(HostPreferences preferences)
 	{
-		_window = new SilkWindow(preferences.PreferredClientSize);
+		_window = new SilkWindow(preferences.PreferredClientSize, preferences.PreferredWindowState);
 
 		_window.Window.Load += CallInitialized;
 		_window.Window.Render += (_) => CallOnRender();

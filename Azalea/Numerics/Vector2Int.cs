@@ -24,8 +24,17 @@ public struct Vector2Int : IEquatable<Vector2Int>
 	public override readonly int GetHashCode() => HashCode.Combine(X, Y);
 	public override readonly string ToString() => $"{X}, {Y}";
 
+	public static Vector2Int Zero => new(0, 0);
+	public static Vector2Int One => new(1, 1);
+
 	public static bool operator ==(Vector2Int left, Vector2Int right) => left.Equals(right);
 	public static bool operator !=(Vector2Int left, Vector2Int right) => !left.Equals(right);
+
+	public static Vector2Int operator +(Vector2Int left, Vector2Int right) => new(left.X + right.X, left.Y + right.Y);
+	public static Vector2Int operator -(Vector2Int left, Vector2Int right) => new(left.X - right.X, left.Y - right.Y);
+	public static Vector2Int operator *(Vector2Int left, Vector2Int right) => new(left.X * right.X, left.Y * right.Y);
+	public static Vector2Int operator /(Vector2Int left, Vector2Int right) => new(left.X / right.X, left.Y / right.Y);
+	public static Vector2Int operator /(Vector2Int left, int right) => new(left.X / right, left.Y / right);
 
 	public static implicit operator Vector2Int(Vector2D<int> other) => new(other.X, other.Y);
 	public static implicit operator Vector2D<int>(Vector2Int other) => new(other.X, other.Y);
