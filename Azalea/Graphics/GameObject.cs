@@ -551,8 +551,6 @@ public abstract class GameObject : IGameObject
 		if (propagateToParent && source == InvalidationSource.Self)
 			Parent?.Invalidate(invalidation, InvalidationSource.Child);
 
-		Console.WriteLine($"Invalidated: {invalidation}, {source}");
-
 		if (invalidationList.Invalidate(source, invalidation) == false)
 			return false;
 

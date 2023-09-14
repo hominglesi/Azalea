@@ -122,6 +122,7 @@ public partial struct Color
 
 	//Sources for this implementation
 	//https://www.niwa.nu/2013/05/math-behind-colorspace-conversions-rgb-hsl/
+	//https://stackoverflow.com/a/9493060
 
 	private float maxValue() => new[] { RNormalized, BNormalized, GNormalized }.Max();
 	private float minValue() => new[] { RNormalized, BNormalized, GNormalized }.Min();
@@ -132,6 +133,15 @@ public partial struct Color
 	public float Luminance
 	{
 		get => (maxValue() + minValue()) / 2;
+		set
+		{
+			var clampedValue = Math.Clamp(value, 0, 1);
+
+			var newColor = FromHSL(Hue, Saturation, clampedValue);
+			R = newColor.R;
+			G = newColor.G;
+			B = newColor.B;
+		}
 	}
 
 	/// <summary>
@@ -142,6 +152,15 @@ public partial struct Color
 		get => Luminance <= 0.5f ?
 			(maxValue() - minValue()) / (maxValue() + minValue()) :
 			(maxValue() - minValue()) / (2f - maxValue() - minValue());
+		set
+		{
+			var clampedValue = Math.Clamp(value, 0, 1);
+
+			var newColor = FromHSL(Hue, clampedValue, Luminance);
+			R = newColor.R;
+			G = newColor.G;
+			B = newColor.B;
+		}
 	}
 
 	public float Hue
@@ -155,10 +174,53 @@ public partial struct Color
 
 			hueValue *= 60;
 
-			if (hueValue < 0) return hueValue + 360;
-			if (hueValue > 360) return hueValue - 360;
+			if (hueValue < 0) hueValue += 360;
+			if (hueValue > 360) hueValue -= 360;
+
 			return hueValue;
 		}
+		set
+		{
+			var clampedValue = Math.Clamp(value, 0, 360);
+
+			var newColor = FromHSL(clampedValue, Saturation, Luminance);
+			R = newColor.R;
+			G = newColor.G;
+			B = newColor.B;
+		}
+	}
+
+	public Color FromHSL(float hue, float saturation, float luminance)
+	{
+		float r, g, b;
+
+		hue /= 360;
+
+		if (saturation == 0)
+			r = g = b = luminance; //achromatic
+		else
+		{
+			var q = luminance < 0.5f ? luminance * (1 + saturation) : (luminance + saturation) - (luminance * saturation);
+			var p = (2 * luminance) - q;
+			r = hueToRgb(p, q, hue + (1 / 3f));
+			g = hueToRgb(p, q, hue);
+			b = hueToRgb(p, q, hue - (1 / 3f));
+		}
+
+		return new Color(
+			(byte)Math.Round(r * byte.MaxValue),
+			(byte)Math.Round(g * byte.MaxValue),
+			(byte)Math.Round(b * byte.MaxValue));
+	}
+
+	private float hueToRgb(float p, float q, float t)
+	{
+		if (t < 0) t += 1;
+		if (t > 1) t -= 1;
+		if (t < 1f / 6f) return p + (q - p) * 6 * t;
+		if (t < 1f / 2f) return q;
+		if (t < 2f / 3f) return p + (q - p) * (2f / 3f - t) * 6;
+		return p;
 	}
 
 	#endregion
@@ -173,4 +235,5 @@ public partial struct Color
 	public static bool operator !=(Color left, Color right) => !left.Equals(right);
 
 	public override readonly int GetHashCode() => (R, G, B, A).GetHashCode();
+	public override readonly string ToString() => $"({R}, {G}, {B})";
 }

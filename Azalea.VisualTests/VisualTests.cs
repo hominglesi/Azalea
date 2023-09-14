@@ -1,7 +1,6 @@
 ﻿using Azalea.Graphics;
 using Azalea.Inputs;
 using Azalea.IO.Stores;
-using System;
 
 namespace Azalea.VisualTests;
 
@@ -15,13 +14,8 @@ public class VisualTests : AzaleaGame
 		Host.Window.Resizable = true;
 
 		//Add(new DefaultUserInputTest());
-		//Add(new TestingTestScene());
-		Add(new FlexTest());
-
-		var col = new Color(65, 71, 128);
-		Console.WriteLine(col.Saturation);
-		Console.WriteLine(col.Luminance);
-		Console.WriteLine(col.Hue);
+		Add(new TestingTestScene());
+		//Add(new FlexTest());
 	}
 
 	protected override void Update()

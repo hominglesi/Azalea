@@ -1,10 +1,8 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.Containers;
 using Azalea.Graphics.Shapes;
-using Azalea.Graphics.Sprites;
 using Azalea.Graphics.UserInterface;
 using Azalea.Inputs;
-using Azalea.IO.Assets;
 using System;
 using System.Numerics;
 
@@ -35,12 +33,21 @@ public class TestingTestScene : TestScene
 		});
 		_text.Text = "Ide Gas";
 
-		Add(new Sprite()
+		Add(new Box()
 		{
-			Texture = Assets.GetTexture("Ovaj texture sigurno nema"),
 			Size = new(100, 100),
 			Origin = Anchor.BottomRight,
+			Color = Color.Blue,
 			Anchor = Anchor.BottomRight
+		});
+		var modifiedColor = Color.Blue;
+		modifiedColor.Luminance += 0.3f;
+		Add(new Box()
+		{
+			Size = new(100, 100),
+			Origin = Anchor.TopRight,
+			Color = modifiedColor,
+			Anchor = Anchor.TopRight
 		});
 	}
 
