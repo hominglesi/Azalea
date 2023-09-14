@@ -6,9 +6,11 @@ public interface IWindow
 {
 	internal const string DefaultTitle = "Azalea Game";
 
+	internal static Vector2Int CenterOffset = new(0, -10);
+
 	//Aproximate window center for 1920x1080 resolution
 	internal static Vector2Int AproximateCenterWindowPosition(Vector2Int windowSize)
-		=> new Vector2Int(960, 540) - (windowSize / 2);
+		=> new Vector2Int(960, 540) - (windowSize / 2) + CenterOffset;
 
 	/// <summary>
 	/// The window title.

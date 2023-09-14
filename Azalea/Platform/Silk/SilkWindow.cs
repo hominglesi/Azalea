@@ -57,7 +57,7 @@ internal class SilkWindow : IWindow
 		Position = (Vector2Int)monitorBounds.Origin + new Vector2Int(
 			monitorBounds.Size.X / 2 - ClientSize.X / 2,
 			monitorBounds.Size.Y / 2 - ClientSize.Y / 2
-			);
+			) + IWindow.CenterOffset;
 	}
 
 	public unsafe void SetIconFromStream(Stream imageStream)
