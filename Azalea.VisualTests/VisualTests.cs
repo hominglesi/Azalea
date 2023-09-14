@@ -15,7 +15,8 @@ public class VisualTests : AzaleaGame
 		Host.Window.Resizable = true;
 
 		//Add(new DefaultUserInputTest());
-		Add(new TestingTestScene());
+		//Add(new TestingTestScene());
+		Add(new FlexTest());
 
 		var col = new Color(65, 71, 128);
 		Console.WriteLine(col.Saturation);

@@ -150,7 +150,7 @@ public abstract class GameObject : IGameObject
 
 			_size = value;
 
-			InvalidateParentSizeDependencies(Invalidation.DrawSize | Invalidation.DrawInfo, changedAxes);
+			invalidateParentSizeDependencies(Invalidation.DrawSize, changedAxes);
 		}
 	}
 
@@ -163,7 +163,7 @@ public abstract class GameObject : IGameObject
 
 			width = value;
 
-			InvalidateParentSizeDependencies(Invalidation.DrawSize | Invalidation.DrawInfo, Axes.X);
+			invalidateParentSizeDependencies(Invalidation.DrawSize | Invalidation.DrawInfo, Axes.X);
 		}
 	}
 
@@ -176,7 +176,7 @@ public abstract class GameObject : IGameObject
 
 			height = value;
 
-			InvalidateParentSizeDependencies(Invalidation.DrawSize | Invalidation.DrawInfo, Axes.Y);
+			invalidateParentSizeDependencies(Invalidation.DrawSize | Invalidation.DrawInfo, Axes.Y);
 		}
 	}
 
@@ -551,6 +551,8 @@ public abstract class GameObject : IGameObject
 		if (propagateToParent && source == InvalidationSource.Self)
 			Parent?.Invalidate(invalidation, InvalidationSource.Child);
 
+		Console.WriteLine($"Invalidated: {invalidation}, {source}");
+
 		if (invalidationList.Invalidate(source, invalidation) == false)
 			return false;
 
@@ -598,7 +600,7 @@ public abstract class GameObject : IGameObject
 		}
 	}
 
-	private void InvalidateParentSizeDependencies(Invalidation invalidation, Axes changedAxes)
+	private void invalidateParentSizeDependencies(Invalidation invalidation, Axes changedAxes)
 	{
 		invalidate(invalidation, InvalidationSource.Self, false);
 
@@ -741,7 +743,7 @@ public enum Invalidation
 	Presence = 1 << 5,
 	Parent = 1 << 6,
 
-	RequiredParentSizeToFit = MiscGeometry | Parent,
+	RequiredParentSizeToFit = MiscGeometry | DrawSize,
 	All = DrawNode | RequiredParentSizeToFit | Color | DrawInfo | Presence,
 	Layout = All & ~(DrawNode | Parent),
 

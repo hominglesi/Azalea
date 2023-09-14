@@ -34,7 +34,7 @@ internal struct InvalidationList
 	{
 		return validate(selfInvalidation, validation, out selfInvalidation)
 			| validate(parentInvalidation, validation, out parentInvalidation)
-			| invalidate(childInvalidation, validation, out childInvalidation);
+			| validate(childInvalidation, validation, out childInvalidation);
 	}
 
 	private bool invalidate(Invalidation target, Invalidation flags, out Invalidation result)
