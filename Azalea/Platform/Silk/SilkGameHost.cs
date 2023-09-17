@@ -31,6 +31,8 @@ internal class SilkGameHost : GameHost
 			Time._deltaTime = (float)deltaTime;
 			CallOnUpdate();
 		};
+
+		_window.Window.Closing += close;
 	}
 
 	public override void CallInitialized()
@@ -41,6 +43,8 @@ internal class SilkGameHost : GameHost
 
 		_window.InitializeAfterStartup(_gl, _inputManager);
 		((SilkClipboard)Clipboard).SetInput(_inputManager);
+
+		SilkAudio.CreateInstance();
 
 		base.CallInitialized();
 	}
@@ -63,4 +67,9 @@ internal class SilkGameHost : GameHost
 	}
 
 	protected override IClipboard? CreateClipboard() => new SilkClipboard();
+
+	private void close()
+	{
+		SilkAudio.Instance?.Dispose();
+	}
 }
