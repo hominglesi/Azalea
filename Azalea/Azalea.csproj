@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Title>$(AssemblyName)</Title>
-    <Version>$(VersionPrefix)1.1.4</Version>
+    <Version>$(VersionPrefix)1.1.5-alpha.15</Version>
     <Authors>hominglesi</Authors>
     <Company>Azalea</Company>
     <Description>A 2D game engine.</Description>
@@ -41,6 +41,14 @@
 	<ItemGroup>
     <EmbeddedResource Include="Resources\**\*" />
     <None Include="Resources\Textures\azalea-icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup Label="FilesToCopy">
+    <Content Include="..\build\Azalea.targets" PackagePath="build\Azalea.targets" />
+    <Content Include="..\build\Native\soft_oal.dll" Pack="true" PackagePath="native">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+    </Content>
   </ItemGroup>
   
 </Project>

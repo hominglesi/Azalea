@@ -1,0 +1,8 @@
+<Project>
+  <ItemGroup>
+    <SoftAL Include="$(MSBuildThisFileDirectory)\..\native\soft_oal.dll" />
+  </ItemGroup>
+  <Target Name="CopySoftAL" BeforeTargets="Build">
+    <Copy SourceFiles="@(SoftAL)" DestinationFolder="$(TargetDir)" />
+  </Target>
+</Project>

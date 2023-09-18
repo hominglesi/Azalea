@@ -1,64 +1,55 @@
 ﻿using Silk.NET.OpenAL;
 using System;
 using System.Buffers.Binary;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Azalea.Platform.Silk;
 public unsafe class SilkAudio : IDisposable
 {
-	public static SilkAudio? Instance { get; private set; }
+	public static SilkAudio Instance { get; }
 
 	public bool IsPlaying;
 
-	private ALContext? _alc;
-	private AL? _al;
-	private Context* _context;
-	private Device* _device;
+	private readonly ALContext _alc;
+	private readonly AL _al;
+	private readonly Context* _context;
+	private readonly Device* _device;
 
-	private uint[] _sources;
+	private readonly uint[] _sources = new uint[32];
+	private readonly List<AudioInstance> _instances = new();
+
+	static SilkAudio()
+	{
+		Instance = new SilkAudio();
+	}
 
 	public SilkAudio()
 	{
-		initialize();
-	}
-
-	public static void CreateInstance()
-	{
-		Instance ??= new SilkAudio();
-	}
-
-	private bool isInitialized;
-
-	private unsafe void initialize()
-	{
-		_alc = ALContext.GetApi();
-		_al = AL.GetApi();
-		var device = _alc.OpenDevice("");
-		if (device == null)
+		_alc = ALContext.GetApi(true);
+		_al = AL.GetApi(true);
+		_device = _alc.OpenDevice("");
+		if (_device == null)
 		{
 			Console.WriteLine("Could not create device");
 			return;
 		}
 
-		_context = _alc.CreateContext(device, null);
+		_context = _alc.CreateContext(_device, null);
 		_alc.MakeContextCurrent(_context);
 
 		_al.GetError();
 
-		_sources = new uint[32];
-		for (int i = 0; i < 32; i++)
-		{
-			_sources[i] = _al.GenSource();
-		}
+		_sources = _al.GenSources(32);
 
 		isInitialized = true;
 	}
 
+	private bool isInitialized;
+
 	private int _sourceIndex;
 	public unsafe void PlaySound(AudioInstance audio)
 	{
-		if (isInitialized == false) initialize();
-
 		_al.SourceStop(_sources[_sourceIndex]);
 
 		_al.SetSourceProperty(_sources[_sourceIndex], SourceInteger.Buffer, audio.Buffer);
@@ -73,7 +64,11 @@ public unsafe class SilkAudio : IDisposable
 	}
 
 	public AudioInstance CreateInstance(string filePath)
-		=> new(filePath, _al);
+	{
+		var newInstance = new AudioInstance(filePath, _al);
+		_instances.Add(newInstance);
+		return newInstance;
+	}
 
 
 	protected bool Disposed;
@@ -88,17 +83,17 @@ public unsafe class SilkAudio : IDisposable
 	{
 		if (Disposed == false && isInitialized == true)
 		{
-			for (int i = 0; i < 32; i++)
+			foreach (var instance in _instances)
 			{
-				_al.DeleteSource(_sources[i]);
+				instance.Dispose();
 			}
 
+			_al.DeleteSources(_sources);
 			_alc.DestroyContext(_context);
 			_alc.CloseDevice(_device);
 			_al.Dispose();
 			_alc.Dispose();
 
-			Instance = null;
 			Disposed = true;
 		}
 	}
@@ -249,7 +244,6 @@ public unsafe class SilkAudio : IDisposable
 			if (Disposed == false)
 			{
 				_al.DeleteBuffer(Buffer);
-				Console.WriteLine("Buffer gone");
 				Disposed = true;
 			}
 		}

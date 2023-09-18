@@ -44,8 +44,6 @@ internal class SilkGameHost : GameHost
 		_window.InitializeAfterStartup(_gl, _inputManager);
 		((SilkClipboard)Clipboard).SetInput(_inputManager);
 
-		SilkAudio.CreateInstance();
-
 		base.CallInitialized();
 	}
 

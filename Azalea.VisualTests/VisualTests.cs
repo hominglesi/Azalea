@@ -21,6 +21,7 @@ public class VisualTests : AzaleaGame
 		//Add(new FlexTest());
 
 		_audio = SilkAudio.Instance.CreateInstance("Audio/audio.wav");
+		SilkAudio.Instance?.PlaySound(_audio);
 	}
 
 	protected override void Update()
