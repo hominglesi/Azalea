@@ -124,8 +124,8 @@ public partial struct Color
 	//https://www.niwa.nu/2013/05/math-behind-colorspace-conversions-rgb-hsl/
 	//https://stackoverflow.com/a/9493060
 
-	private float maxValue() => new[] { RNormalized, BNormalized, GNormalized }.Max();
-	private float minValue() => new[] { RNormalized, BNormalized, GNormalized }.Min();
+	private float maxValue() => new[] { RNormalized, GNormalized, BNormalized }.Max();
+	private float minValue() => new[] { RNormalized, GNormalized, BNormalized }.Min();
 
 	/// <summary>
 	/// The luminance of the color
@@ -149,9 +149,14 @@ public partial struct Color
 	/// </summary>
 	public float Saturation
 	{
-		get => Luminance <= 0.5f ?
-			(maxValue() - minValue()) / (maxValue() + minValue()) :
+		get
+		{
+			if (minValue() == maxValue()) return 0;
+
+			return Luminance <= 0.5f ? (maxValue() - minValue()) / (maxValue() + minValue()) :
 			(maxValue() - minValue()) / (2f - maxValue() - minValue());
+
+		}
 		set
 		{
 			var clampedValue = Math.Clamp(value, 0, 1);
@@ -167,6 +172,8 @@ public partial struct Color
 	{
 		get
 		{
+			if (minValue() == maxValue()) return 0;
+
 			float hueValue = 0;
 			if (maxValue() == RNormalized) hueValue = (GNormalized - BNormalized) / (maxValue() - minValue());
 			else if (maxValue() == GNormalized) hueValue = 2f + (BNormalized - GNormalized) / (maxValue() - minValue());
