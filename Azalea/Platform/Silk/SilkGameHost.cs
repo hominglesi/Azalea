@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.OpenGL;
+﻿using Azalea.Audios;
+using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.Rendering;
 using Silk.NET.Input;
 using Silk.NET.OpenGL;
@@ -68,6 +69,6 @@ internal class SilkGameHost : GameHost
 
 	private void close()
 	{
-		SilkAudio.Instance?.Dispose();
+		Audio.Dispose();
 	}
 }

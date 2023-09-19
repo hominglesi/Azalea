@@ -1,4 +1,5 @@
-﻿using Azalea.Extentions;
+﻿using Azalea.Audios;
+using Azalea.Extentions;
 using Azalea.Graphics.Containers;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Textures;
@@ -36,6 +37,7 @@ public abstract class GameHost
 	public virtual void CallInitialized()
 	{
 		Renderer.Initialize();
+		Audio.Initialize();
 		Initialized?.Invoke();
 	}
 

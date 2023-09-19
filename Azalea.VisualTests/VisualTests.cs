@@ -1,13 +1,17 @@
-﻿using Azalea.Graphics;
+﻿using Azalea.Audios;
+using Azalea.Graphics;
 using Azalea.Inputs;
+using Azalea.IO.Assets;
 using Azalea.IO.Stores;
-using Azalea.Platform.Silk;
+using System;
 
 namespace Azalea.VisualTests;
 
 public class VisualTests : AzaleaGame
 {
-	private SilkAudio.AudioInstance _audio;
+	private Sound _sound;
+	private Sound _sound2;
+	private AudioInstance? _instance;
 
 	protected override void OnInitialize()
 	{
@@ -20,14 +24,30 @@ public class VisualTests : AzaleaGame
 		Add(new TestingTestScene());
 		//Add(new FlexTest());
 
-		_audio = SilkAudio.Instance.CreateInstance("Audio/audio.wav");
-		SilkAudio.Instance?.PlaySound(_audio);
+		_sound = Assets.GetSound("Audio/paramore.wav");
+		_sound2 = Assets.GetSound("Audio/audio.wav");
+		_instance = Audio.Play(_sound);
+
+		Console.WriteLine(_sound.Length);
 	}
 
 	protected override void Update()
 	{
 		if (Input.GetKey(Keys.Escape).Down) Host.Window.Close();
 
-		if (Input.GetKey(Keys.K).Down) SilkAudio.Instance?.PlaySound(_audio);
+		if (Input.GetKey(Keys.K).Down)
+		{
+			if (_instance is not null)
+			{
+				_instance.Stop();
+				_instance = null;
+			}
+			else
+			{
+				_instance = Audio.Play(_sound);
+			}
+		}
+
+		if (Input.GetKey(Keys.L).Down) Audio.Play(_sound2);
 	}
 }
