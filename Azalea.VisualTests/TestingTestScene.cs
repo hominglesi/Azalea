@@ -23,7 +23,7 @@ public class TestingTestScene : TestScene
 			Text = "Lorem ipsum dolor sit amet,\n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum"
 		}));
 
-		_container.AddText("Text3 ", t => { t.Color = Color.Black; });
+		_container.AddText("Text3 ", t => { t.Color = Palette.Black; });
 		_container.AddText("Text4 ");
 
 		Add(_text = new BasicTextBox()
@@ -45,10 +45,10 @@ public class TestingTestScene : TestScene
 		{
 			Size = new(100, 100),
 			Origin = Anchor.BottomRight,
-			Color = Color.Blue,
+			Color = Palette.Blue,
 			Anchor = Anchor.BottomRight
 		});
-		var modifiedColor = Color.Blue;
+		var modifiedColor = Palette.Blue;
 		modifiedColor.Luminance += 0.3f;
 		Add(new Box()
 		{
@@ -56,6 +56,21 @@ public class TestingTestScene : TestScene
 			Origin = Anchor.TopRight,
 			Color = modifiedColor,
 			Anchor = Anchor.TopRight
+		});
+
+		Add(new Container()
+		{
+			Size = new(200, 200),
+			Position = new(500, 50),
+			Alpha = 0.5f,
+			Children = new GameObject[]
+			{
+				new Box()
+				{
+					RelativeSizeAxes = Axes.Both,
+					ColorInfo = ColorInfo.GradientHorizontal(Palette.Blue, Palette.Green)
+				}
+			}
 		});
 	}
 

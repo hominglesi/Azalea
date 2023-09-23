@@ -17,13 +17,13 @@ public class VisualTests : AzaleaGame
 	{
 		Resources.AddStore(new NamespacedResourceStore<byte[]>(new DllResourceStore(typeof(VisualTests).Assembly), "Resources"));
 
-		Host.Renderer.ClearColor = Color.Azalea;
+		Host.Renderer.ClearColor = Palette.Flowers.Azalea;
 		Host.Window.Resizable = true;
 
 		//Add(new DefaultUserInputTest());
-		Add(new TestingTestScene());
+		//Add(new TestingTestScene());
 		//Add(new FlexTest());
-		//Add(new InputTest());
+		Add(new InputTest());
 
 		_sound = Assets.GetSound("Audio/paramore.wav");
 		_sound2 = Assets.GetSound("Audio/audio.wav");

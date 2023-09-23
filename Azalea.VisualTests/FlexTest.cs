@@ -23,7 +23,7 @@ public class FlexTest : TestScene
 					new Box()
 					{
 						RelativeSizeAxes = Axes.Both,
-						Color = Color.White,
+						Color = Palette.White,
 					},
 					_flex = createFirstFlex()
 				}
@@ -41,25 +41,25 @@ public class FlexTest : TestScene
 			{
 				_firstChild = new Box()
 				{
-					Color = Color.Azalea,
+					Color = Palette.Flowers.Azalea,
 					RelativeSizeAxes = Axes.Both,
 					Size = new(0.2f, 0.5f)
 				},
 				new Box()
 				{
-					Color = Color.Aqua,
+					Color = Palette.Aqua,
 					RelativeSizeAxes = Axes.Both,
 					Size = new(0.2f, 0.5f)
 				},
 				new Box()
 				{
-					Color = Color.Black,
+					Color = Palette.Black,
 					RelativeSizeAxes = Axes.Both,
 					Size = new(0.6f, 0.5f),
 				},
 				new Box()
 				{
-					Color = Color.Black,
+					Color = Palette.Black,
 					RelativeSizeAxes = Axes.Both,
 					Size = new(0.2f, 0.5f),
 				}

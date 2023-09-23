@@ -22,7 +22,7 @@ public class DefaultUserInputTest : TestScene
 			{
 				new Box()
 				{
-					Color = Color.Green,
+					Color = Palette.Green,
 					RelativeSizeAxes = Axes.Both
 				},
 				new BasicButton()
@@ -59,7 +59,7 @@ public class DefaultUserInputTest : TestScene
 						new Box()
 						{
 							RelativeSizeAxes = Axes.Both,
-							Color = Color.White,
+							Color = Palette.White,
 							Origin = Anchor.Center,
 							Anchor = Anchor.Center
 						},

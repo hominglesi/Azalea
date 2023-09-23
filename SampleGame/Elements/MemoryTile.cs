@@ -50,7 +50,7 @@ public class MemoryTile : Container
 						Position = new Vector2(0.5f, 0.5f),
 						RelativePositionAxes = Axes.Both,
 						Font = new FontUsage(family: "Roboto", size: 140, weight: "Medium"),
-						Color = new Color(201, 132, 146)
+						ColorInfo = new Color(201, 132, 146)
 					}
 				}
 			} });

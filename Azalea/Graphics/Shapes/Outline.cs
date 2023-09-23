@@ -28,7 +28,7 @@ public partial class Outline : CompositeGameObject
 	{
 		AddLayout(_sizeValue);
 
-		Color = Color.Black;
+		Color = Palette.Black;
 
 		AddInternal(_child = child);
 		AddInternal(_wrapper = new OutlineWrapper(_child));
@@ -45,7 +45,6 @@ public partial class Outline : CompositeGameObject
 		base.Size = _child.Size + new Vector2(Thickness * 2, Thickness * 2);
 		_child.Position = new Vector2(Thickness, Thickness);
 		_wrapper.Thickness = Thickness;
-		_wrapper.Color = Color;
 	}
 
 	public override Vector2 Size

@@ -51,6 +51,57 @@ public partial struct Color
 	/// <param name="b">The blue component of the new Color</param>
 	public Color(byte r, byte g, byte b) : this(r, g, b, byte.MaxValue) { }
 
+	public Color(float r, float g, float b, float a)
+		: this((byte)(r * byte.MaxValue),
+			(byte)(g * byte.MaxValue),
+			(byte)(b * byte.MaxValue),
+			(byte)(a * byte.MaxValue))
+	{
+
+	}
+
+	public void MultiplyAlpha(float alpha)
+	{
+		if (alpha >= 1f) return;
+
+		A = (byte)(A * alpha);
+	}
+
+	#region Linear
+
+	private float toLinear(float srgb)
+	{
+		if (srgb == 1.0f) return 1.0f;
+
+		return srgb <= 0.04045f ? srgb / 12.92f : MathF.Pow((srgb + 0.055f) / 1.055f, 2.4f);
+	}
+
+	public Color ToLinear() => new(toLinear(RNormalized), toLinear(GNormalized), toLinear(BNormalized), ANormalized);
+
+	private float toSRBG(float linear)
+	{
+		if (linear == 1.0f) return 1.0f;
+
+		return linear < 0.0031308f ? 12.92f * linear : 1.055f * MathF.Pow(linear, 1.0f / 2.4f) - 0.055f;
+	}
+
+	public Color ToSRBG() => new(toSRBG(RNormalized), toSRBG(GNormalized), toSRBG(BNormalized), ANormalized);
+
+	public static Color operator *(Color first, Color second)
+	{
+		var firstLinear = first.ToLinear();
+		var secondLinear = second.ToLinear();
+
+		return new Color(
+			firstLinear.RNormalized * secondLinear.RNormalized,
+			firstLinear.GNormalized * secondLinear.GNormalized,
+			firstLinear.BNormalized * secondLinear.BNormalized,
+			firstLinear.ANormalized * secondLinear.ANormalized
+			).ToSRBG();
+	}
+
+	#endregion
+
 	#region Normalized
 
 	/// <summary>

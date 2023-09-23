@@ -4,11 +4,11 @@ namespace Azalea.Graphics.Colors;
 
 public struct DrawColorInfo : IEquatable<DrawColorInfo>
 {
-	public Color Color;
+	public ColorInfo Color;
 
-	public DrawColorInfo(Color color)
+	public DrawColorInfo(ColorInfo? color = null)
 	{
-		Color = color;
+		Color = color ?? ColorInfo.SolidColor(Palette.White);
 	}
 
 	public readonly bool Equals(DrawColorInfo other) => Color == other.Color;

@@ -14,22 +14,22 @@ public class BasicButton : Button
 		set => SpriteText.Text = value;
 	}
 
-	public Color TextColor
+	public ColorInfo TextColor
 	{
-		get => SpriteText.Color;
-		set => SpriteText.Color = value;
+		get => SpriteText.ColorInfo;
+		set => SpriteText.ColorInfo = value;
 	}
 
-	public Color BackgroundColor
+	public ColorInfo BackgroundColor
 	{
-		get => Background.Color;
-		set => Background.Color = value;
+		get => Background.ColorInfo;
+		set => Background.ColorInfo = value;
 	}
 
-	public Color HoveredColor
+	public ColorInfo HoveredColor
 	{
-		get => HoveredBackground.Color;
-		set => HoveredBackground.Color = value;
+		get => HoveredBackground.ColorInfo;
+		set => HoveredBackground.ColorInfo = value;
 	}
 
 	protected Box Background;
@@ -44,18 +44,18 @@ public class BasicButton : Button
 			Background = new Box()
 			{
 				RelativeSizeAxes = Axes.Both,
-				Color = Color.Blue
+				Color = Palette.Blue
 			},
 			HoveredBackground = new Box()
 			{
 				RelativeSizeAxes = Axes.Both,
-				Color = Color.Cornflower,
+				Color = Palette.Flowers.Cornflower,
 				Alpha = 0,
 			},
 			SpriteText = new SpriteText
 			{
 				Font = FrameworkFont.Regular,
-				Color = Color.Azalea,
+				Color = Palette.Flowers.Azalea,
 				Anchor = Anchor.Center,
 				Origin = Anchor.Center
 			}

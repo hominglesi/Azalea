@@ -1,15 +1,6 @@
 ﻿namespace Azalea.Graphics.Colors;
-
-public partial struct Color
+public static class Palette
 {
-	#region Flowers
-	public static Color Azalea => new(201, 98, 143);
-	public static Color Cornflower => new(100, 149, 237);
-	public static Color Lavender => new(230, 230, 250);
-	public static Color Orchid => new(218, 112, 214);
-	#endregion
-
-	#region Colors
 	public static Color Aqua => new(0, 255, 255);
 	public static Color Beige => new(245, 245, 220);
 	public static Color Black => new(0, 0, 0);
@@ -36,5 +27,12 @@ public partial struct Color
 	public static Color Violet => new(238, 130, 238);
 	public static Color Yellow => new(255, 255, 0);
 	public static Color White => new(255, 255, 255);
-	#endregion
+
+	public static class Flowers
+	{
+		public static Color Azalea => new(201, 98, 143);
+		public static Color Cornflower => new(100, 149, 237);
+		public static Color Lavender => new(230, 230, 250);
+		public static Color Orchid => new(218, 112, 214);
+	}
 }

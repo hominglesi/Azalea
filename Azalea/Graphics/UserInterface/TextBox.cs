@@ -403,6 +403,7 @@ public abstract class TextBox : TabbableContainer
 	protected override void OnFocus(FocusEvent e)
 	{
 		Input.OnTextInput += handleTextInput;
+		updateCaretVisibility();
 
 		base.OnFocus(e);
 	}
@@ -410,6 +411,7 @@ public abstract class TextBox : TabbableContainer
 	protected override void OnFocusLost(FocusLostEvent e)
 	{
 		Input.OnTextInput -= handleTextInput;
+		updateCaretVisibility();
 
 		base.OnFocusLost(e);
 	}

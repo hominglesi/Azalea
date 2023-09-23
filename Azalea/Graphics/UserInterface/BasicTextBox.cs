@@ -12,7 +12,7 @@ public class BasicTextBox : TextBox
 		{
 			RelativeSizeAxes = Axes.Both,
 			Depth = 1,
-			Color = Color.Green
+			Color = Palette.Green
 		});
 
 		Width = 500;
@@ -33,7 +33,7 @@ public class BasicTextBox : TextBox
 		public BasicCaret()
 		{
 			RelativeSizeAxes = Axes.Y;
-			Size = new Vector2(1, 0.9f);
+			Size = new Vector2(0, 0.9f);
 
 			Anchor = Anchor.CenterLeft;
 			Origin = Anchor.CenterLeft;
@@ -41,7 +41,7 @@ public class BasicTextBox : TextBox
 			AddInternal(_box = new Box()
 			{
 				RelativeSizeAxes = Axes.Both,
-				Color = Color.White
+				Color = Palette.White
 			});
 		}
 

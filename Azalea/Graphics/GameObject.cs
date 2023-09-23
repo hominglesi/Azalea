@@ -398,29 +398,37 @@ public abstract class GameObject : IGameObject
 
 	#region Color & Alpha
 
-	private Color color = Color.White;
+	private ColorInfo _colorInfo = ColorInfo.SolidColor(Palette.White);
 
-	public Color Color
+	public ColorInfo ColorInfo
 	{
-		get => color;
+		get => _colorInfo;
 		set
 		{
-			if (color == value) return;
+			if (_colorInfo == value) return;
 
-			color = value;
+			_colorInfo = value;
 		}
 	}
 
+	//Helper property for easily setting the color
+	public Color Color
+	{
+		set { ColorInfo = ColorInfo.SolidColor(value); }
+	}
+
+	private float _alpha = 1;
+
 	public float Alpha
 	{
-		get => Color.A;
+		get => _alpha;
 		set
 		{
-			if (Color.A == value) return;
-			var alphaValue = Math.Clamp(value, 0, 1) * byte.MaxValue;
+			if (_alpha == value) return;
 
+			_alpha = value;
 
-			Color = new Color(Color.R, Color.G, Color.B, (byte)alphaValue);
+			Invalidate(Invalidation.Color);
 		}
 	}
 
@@ -658,35 +666,40 @@ public abstract class GameObject : IGameObject
 
 		switch (e)
 		{
+			case MouseDownEvent mouseDown:
+				return OnMouseDown(mouseDown);
+			case MouseUpEvent mouseUp:
+				OnMouseUp(mouseUp);
+				return false;
+			case ClickEvent click:
+				return OnClick(click);
+			case HoverEvent hover:
+				return OnHover(hover);
 			case HoverLostEvent hoverLost:
 				OnHoverLost(hoverLost);
+				return false;
+			case KeyDownEvent keyDown:
+				return OnKeyDown(keyDown);
+			case KeyUpEvent keyUp:
+				OnKeyUp(keyUp);
 				return false;
 			case FocusEvent focus:
 				OnFocus(focus);
 				return false;
 			case FocusLostEvent focusLost:
 				OnFocusLost(focusLost);
-				return true;
+				return false;
+			default:
+				return Handle(e);
 		}
-
-		return e switch
-		{
-			MouseDownEvent mouseDown => OnMouseDown(mouseDown),
-			MouseUpEvent mouseUp => OnMouseUp(mouseUp),
-			ClickEvent click => OnClick(click),
-			HoverEvent hover => OnHover(hover),
-			KeyDownEvent keyDown => OnKeyDown(keyDown),
-			KeyUpEvent keyUp => OnKeyUp(keyUp),
-			_ => Handle(e),
-		};
 	}
 	protected virtual bool OnMouseDown(MouseDownEvent e) => Handle(e);
-	protected virtual bool OnMouseUp(MouseUpEvent e) => Handle(e);
+	protected virtual void OnMouseUp(MouseUpEvent e) => Handle(e);
 	protected virtual bool OnClick(ClickEvent e) => Handle(e);
 	protected virtual bool OnHover(HoverEvent e) => Handle(e);
 	protected virtual void OnHoverLost(HoverLostEvent e) => Handle(e);
 	protected virtual bool OnKeyDown(KeyDownEvent e) => Handle(e);
-	protected virtual bool OnKeyUp(KeyUpEvent e) => Handle(e);
+	protected virtual void OnKeyUp(KeyUpEvent e) => Handle(e);
 	protected virtual void OnFocus(FocusEvent e) => Handle(e);
 	protected virtual void OnFocusLost(FocusLostEvent e) => Handle(e);
 
@@ -698,10 +711,16 @@ public abstract class GameObject : IGameObject
 
 	private DrawColorInfo computeDrawColorInfo()
 	{
-		var info = Parent?.DrawColorInfo ?? new DrawColorInfo();
+		var info = Parent?.DrawColorInfo ?? new DrawColorInfo(null);
 
+		var colorInfo = _colorInfo;
 
-		return new DrawColorInfo(Color);
+		if (Alpha != 1)
+			colorInfo = colorInfo.MultiplyAlpha(Alpha);
+
+		info.Color.ApplyChild(colorInfo);
+
+		return info;
 	}
 
 	private DrawNode? drawNode;

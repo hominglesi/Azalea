@@ -11,14 +11,14 @@ public class InputTest : TestScene
 	{
 		Add(new InputLoggingObject("Orange")
 		{
-			Color = Color.Orange,
+			Color = Palette.Orange,
 			Position = new(300, 200),
 			Size = new(200, 300)
 		});
 
 		Add(new InputLoggingObject("Purple")
 		{
-			Color = Color.Purple,
+			Color = Palette.Purple,
 			Position = new(400, 300),
 			Size = new(200, 300)
 		});
@@ -41,18 +41,14 @@ public class InputTest : TestScene
 		protected override bool OnHover(HoverEvent e)
 		{
 			Console.WriteLine($"{_name} Object hovered");
-			var newColor = Color;
-			newColor.Luminance -= 0.05f;
-			Color = newColor;
+			ColorInfo.ModifyLuminance(-0.05f);
 			return true;
 		}
 
 		protected override void OnHoverLost(HoverLostEvent e)
 		{
 			Console.WriteLine($"{_name} Object hover lost");
-			var newColor = Color;
-			newColor.Luminance += 0.05f;
-			Color = newColor;
+			ColorInfo.ModifyLuminance(0.05f);
 			base.OnHoverLost(e);
 		}
 
@@ -62,10 +58,9 @@ public class InputTest : TestScene
 			return base.OnKeyDown(e);
 		}
 
-		protected override bool OnKeyUp(KeyUpEvent e)
+		protected override void OnKeyUp(KeyUpEvent e)
 		{
 			Console.WriteLine($"{_name} Key up: {e.Key}");
-			return base.OnKeyUp(e);
 		}
 		protected override bool OnMouseDown(MouseDownEvent e)
 		{
@@ -73,10 +68,9 @@ public class InputTest : TestScene
 			return false;
 		}
 
-		protected override bool OnMouseUp(MouseUpEvent e)
+		protected override void OnMouseUp(MouseUpEvent e)
 		{
 			Console.WriteLine($"{_name} Mouse up: {e.Button}");
-			return false;
 		}
 		protected override bool OnClick(ClickEvent e)
 		{
