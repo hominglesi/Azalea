@@ -2,7 +2,7 @@
 using System.Diagnostics;
 
 namespace Azalea.Graphics.Colors;
-public partial class ColorInfo : IEquatable<ColorInfo>
+public partial struct ColorInfo : IEquatable<ColorInfo>
 {
 	public Color TopLeft;
 	public Color BottomLeft;
@@ -40,7 +40,7 @@ public partial class ColorInfo : IEquatable<ColorInfo>
 
 	internal Color SingleColor
 	{
-		get
+		readonly get
 		{
 			Debug.Assert(HasSingleColor);
 			return TopLeft;
@@ -52,7 +52,7 @@ public partial class ColorInfo : IEquatable<ColorInfo>
 		}
 	}
 
-	public bool TryGetSingleColor(out Color color)
+	public readonly bool TryGetSingleColor(out Color color)
 	{
 		color = TopLeft;
 		return HasSingleColor;
@@ -74,7 +74,7 @@ public partial class ColorInfo : IEquatable<ColorInfo>
 		}
 	}
 
-	public ColorInfo MultiplyAlpha(float alpha)
+	public readonly ColorInfo MultiplyAlpha(float alpha)
 	{
 		if (alpha == 1f) return this;
 
@@ -106,5 +106,5 @@ public partial class ColorInfo : IEquatable<ColorInfo>
 	public static bool operator ==(ColorInfo left, ColorInfo right) => left.Equals(right);
 	public static bool operator !=(ColorInfo left, ColorInfo right) => left.Equals(right) == false;
 
-	public override int GetHashCode() => HashCode.Combine(TopLeft, BottomLeft, BottomRight, TopRight, HasSingleColor);
+	public override readonly int GetHashCode() => HashCode.Combine(TopLeft, BottomLeft, BottomRight, TopRight, HasSingleColor);
 }

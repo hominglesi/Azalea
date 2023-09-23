@@ -41,14 +41,14 @@ public class InputTest : TestScene
 		protected override bool OnHover(HoverEvent e)
 		{
 			Console.WriteLine($"{_name} Object hovered");
-			ColorInfo.ModifyLuminance(-0.05f);
+			ColorInfo = ColorInfo.ModifyLuminance(-0.05f);
 			return true;
 		}
 
 		protected override void OnHoverLost(HoverLostEvent e)
 		{
 			Console.WriteLine($"{_name} Object hover lost");
-			ColorInfo.ModifyLuminance(0.05f);
+			ColorInfo = ColorInfo.ModifyLuminance(0.05f);
 			base.OnHoverLost(e);
 		}
 
