@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Numerics;
 
 namespace Azalea.Graphics.Colors;
 
@@ -171,27 +171,109 @@ public partial struct Color
 
 	#region HSL
 
-	//Sources for this implementation
-	//https://www.niwa.nu/2013/05/math-behind-colorspace-conversions-rgb-hsl/
-	//https://stackoverflow.com/a/9493060
 
-	private float maxValue() => new[] { RNormalized, GNormalized, BNormalized }.Max();
-	private float minValue() => new[] { RNormalized, GNormalized, BNormalized }.Min();
+	private Vector4 toHSL()
+	{
+		var max = Math.Max(RNormalized, Math.Max(GNormalized, BNormalized));
+		var min = Math.Min(RNormalized, Math.Min(GNormalized, BNormalized));
+		var diff = max - min;
+
+		var h = 0.0f;
+		if (max == RNormalized) h = ((GNormalized - BNormalized) / diff) % 6;
+		else if (max == GNormalized) h = ((BNormalized - RNormalized) / diff) + 2f;
+		else if (max == BNormalized) h = ((RNormalized - GNormalized) / diff) + 4f;
+
+		if (h < 0) h += 6;
+		else if (h > 6) h -= 6;
+
+		var hue = h * 60f;
+
+		var luminance = (max + min) / 2f;
+
+		var saturation = 0.0f;
+		if ((1.0f - Math.Abs((2.0f * luminance) - 1.0f)) != 0)
+			saturation = diff / (1.0f - Math.Abs((2.0f * luminance) - 1.0f));
+
+		return new Vector4(hue, saturation, luminance, ANormalized);
+
+	}
+
+	private void fromHSL(Vector4 hsl)
+	{
+		var hue = hsl.X;
+		var saturation = hsl.Y;
+		var luminance = hsl.Z;
+		var alpha = hsl.W;
+
+		var c = (1.0f - Math.Abs((2.0f * luminance) - 1.0f)) * saturation;
+
+		var h = hue / 60f;
+		var x = c * (1.0f - Math.Abs((h % 2.0f) - 1.0f));
+
+		float r = 0.0f, g = 0.0f, b = 0.0f;
+
+		if (h >= 0.0f && h < 1.0f)
+		{
+			r = c;
+			g = x;
+			b = 0.0f;
+		}
+		else if (h >= 1.0f && h < 2.0f)
+		{
+			r = x;
+			g = c;
+			b = 0.0f;
+		}
+		else if (h >= 2.0f && h < 3.0f)
+		{
+			r = 0.0f;
+			g = c;
+			b = x;
+		}
+		else if (h >= 3.0f && h < 4.0f)
+		{
+			r = 0.0f;
+			g = x;
+			b = c;
+		}
+		else if (h >= 4.0f && h < 5.0f)
+		{
+			r = x;
+			g = 0.0f;
+			b = c;
+		}
+		else if (h >= 5.0f && h < 6.0f)
+		{
+			r = c;
+			g = 0.0f;
+			b = x;
+		}
+
+		var m = luminance - (c / 2.0f);
+		if (m < 0)
+		{
+			m = 0;
+		}
+
+		R = (byte)((r + m) * byte.MaxValue);
+		G = (byte)((g + m) * byte.MaxValue);
+		B = (byte)((b + m) * byte.MaxValue);
+		A = (byte)(alpha * byte.MaxValue);
+	}
 
 	/// <summary>
 	/// The luminance of the color
 	/// </summary>
 	public float Luminance
 	{
-		get => (maxValue() + minValue()) / 2;
+		get => toHSL().Z;
 		set
 		{
-			var clampedValue = Math.Clamp(value, 0, 1);
+			var clamped = Math.Clamp(value, 0, 1);
 
-			var newColor = FromHSL(Hue, Saturation, clampedValue);
-			R = newColor.R;
-			G = newColor.G;
-			B = newColor.B;
+			var hsl = toHSL();
+			hsl.Z = clamped;
+			fromHSL(hsl);
 		}
 	}
 
@@ -200,90 +282,33 @@ public partial struct Color
 	/// </summary>
 	public float Saturation
 	{
-		get
-		{
-			if (minValue() == maxValue()) return 0;
-
-			return Luminance <= 0.5f ? (maxValue() - minValue()) / (maxValue() + minValue()) :
-			(maxValue() - minValue()) / (2f - maxValue() - minValue());
-
-		}
+		get => toHSL().Y;
 		set
 		{
-			var clampedValue = Math.Clamp(value, 0, 1);
+			var clamped = Math.Clamp(value, 0, 1);
 
-			var newColor = FromHSL(Hue, clampedValue, Luminance);
-			R = newColor.R;
-			G = newColor.G;
-			B = newColor.B;
+			var hsl = toHSL();
+			hsl.Y = clamped;
+			fromHSL(hsl);
 		}
 	}
 
 	public float Hue
 	{
-		get
-		{
-			if (minValue() == maxValue()) return 0;
-
-			float hueValue = 0;
-			if (maxValue() == RNormalized) hueValue = (GNormalized - BNormalized) / (maxValue() - minValue());
-			else if (maxValue() == GNormalized) hueValue = 2f + (BNormalized - GNormalized) / (maxValue() - minValue());
-			else hueValue = 4 + (RNormalized - GNormalized) / (maxValue() - minValue());
-
-			hueValue *= 60;
-
-			if (hueValue < 0) hueValue += 360;
-			if (hueValue > 360) hueValue -= 360;
-
-			return hueValue;
-		}
+		get => toHSL().X;
 		set
 		{
-			var clampedValue = Math.Clamp(value, 0, 360);
+			var clamped = Math.Clamp(value, 0, 360);
 
-			var newColor = FromHSL(clampedValue, Saturation, Luminance);
-			R = newColor.R;
-			G = newColor.G;
-			B = newColor.B;
+			var hsl = toHSL();
+			hsl.X = clamped;
+			fromHSL(hsl);
 		}
-	}
-
-	public Color FromHSL(float hue, float saturation, float luminance)
-	{
-		float r, g, b;
-
-		hue /= 360;
-
-		if (saturation == 0)
-			r = g = b = luminance; //achromatic
-		else
-		{
-			var q = luminance < 0.5f ? luminance * (1 + saturation) : (luminance + saturation) - (luminance * saturation);
-			var p = (2 * luminance) - q;
-			r = hueToRgb(p, q, hue + (1 / 3f));
-			g = hueToRgb(p, q, hue);
-			b = hueToRgb(p, q, hue - (1 / 3f));
-		}
-
-		return new Color(
-			(byte)Math.Round(r * byte.MaxValue),
-			(byte)Math.Round(g * byte.MaxValue),
-			(byte)Math.Round(b * byte.MaxValue));
-	}
-
-	private float hueToRgb(float p, float q, float t)
-	{
-		if (t < 0) t += 1;
-		if (t > 1) t -= 1;
-		if (t < 1f / 6f) return p + (q - p) * 6 * t;
-		if (t < 1f / 2f) return q;
-		if (t < 2f / 3f) return p + (q - p) * (2f / 3f - t) * 6;
-		return p;
 	}
 
 	#endregion
 
-	public override bool Equals(object? obj)
+	public override readonly bool Equals(object? obj)
 	{
 		if (obj is not Color color) return false;
 

@@ -28,7 +28,9 @@ public class VisualTests : AzaleaGame
 		_sound = Assets.GetSound("Audio/paramore.wav");
 		_sound2 = Assets.GetSound("Audio/audio.wav");
 
-		Console.WriteLine(_sound.Length);
+		var color = Palette.Lime;
+		color.Luminance -= 0.45f;
+		Console.WriteLine(color);
 	}
 
 	protected override void Update()
