@@ -136,31 +136,29 @@ public static class Input
 		if (pressed)
 		{
 			_clickDownGameObjects.Clear();
+
 			foreach (var obj in PositionalInputQueue)
 			{
 				_clickDownGameObjects.Add(obj);
 				if (obj.TriggerEvent(new MouseDownEvent(button, _mousePosition)) == true) return;
+
+				if (button == MouseButton.Left && obj.AcceptsFocus)
+					ChangeFocus(obj);
 			}
+
+			if (FocusedObject is not null && _clickDownGameObjects.Contains(FocusedObject) == false)
+				ChangeFocus(null);
 		}
 		else
 		{
 			propagatePositionalInputEvent(new MouseUpEvent(button, _mousePosition));
 			var clickUpGameObjects = PositionalInputQueue;
 
-			if (FocusedObject is not null &&
-				clickUpGameObjects.Contains(FocusedObject) == false && _clickDownGameObjects.Contains(FocusedObject) == false)
-				ChangeFocus(null);
-
 			foreach (var obj in clickUpGameObjects)
 			{
 				if (_clickDownGameObjects.Contains(obj))
 				{
-					var handled = obj.TriggerEvent(new ClickEvent(button, _mousePosition));
-
-					if (button == MouseButton.Left && obj.AcceptsFocus)
-						ChangeFocus(obj);
-
-					if (handled) break;
+					if (obj.TriggerEvent(new ClickEvent(button, _mousePosition))) break;
 				}
 			}
 		}
