@@ -3,8 +3,10 @@ using Azalea.Extentions;
 using Azalea.Graphics.Containers;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Textures;
+using Azalea.Inputs;
 using Azalea.IO.Stores;
 using System;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace Azalea.Platform;
@@ -24,7 +26,7 @@ public abstract class GameHost
 
 	public virtual void Run(AzaleaGame game)
 	{
-		var root = game.CreateUserInputManager();
+		var root = new Container();
 		root.Add(game);
 
 		game.SetHost(this);
@@ -36,6 +38,9 @@ public abstract class GameHost
 
 	public virtual void CallInitialized()
 	{
+		Debug.Assert(_root is not null);
+
+		Input.Initialize(_root);
 		Renderer.Initialize();
 		Audio.Initialize();
 		Initialized?.Invoke();
@@ -58,6 +63,8 @@ public abstract class GameHost
 		Root.Size = Vector2Extentions.ComponentMax(Vector2.One, Root.Size);
 
 		Root.UpdateSubTree();
+
+		Input.LateUpdate();
 	}
 
 	public virtual IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore)

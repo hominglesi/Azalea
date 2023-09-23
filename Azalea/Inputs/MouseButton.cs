@@ -7,4 +7,5 @@ public enum MouseButton
 	Middle = 2,
 	Button1 = 3,
 	Button2 = 4,
+	LastButton = 5
 }

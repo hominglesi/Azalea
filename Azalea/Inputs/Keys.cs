@@ -1,7 +1,6 @@
-﻿//Originaly part of Silk.NET.Input
-//but copied here to make input keys independent
+﻿namespace Azalea.Inputs;
 
-namespace Azalea.Inputs;
+//Loosely based on the Veldrid key layout
 
 //
 // Summary:
@@ -10,84 +9,264 @@ public enum Keys
 {
 	//
 	// Summary:
-	//     An unknown key.
-	Unknown = -1,
+	//     A key outside the known keys.
+	Unknown = 0,
 	//
 	// Summary:
-	//     The spacebar key.
-	Space = 0x20,
+	//     The left shift key.
+	ShiftLeft = 1,
 	//
 	// Summary:
-	//     The apostrophe key.
-	Apostrophe = 39,
+	//     The right shift key.
+	ShiftRight = 2,
 	//
 	// Summary:
-	//     The comma key.
-	Comma = 44,
+	//     The left control key.
+	ControlLeft = 3,
 	//
 	// Summary:
-	//     The minus key.
-	Minus = 45,
+	//     The right control key.
+	ControlRight = 4,
 	//
 	// Summary:
-	//     The period key.
-	Period = 46,
+	//     The left alt key.
+	AltLeft = 5,
 	//
 	// Summary:
-	//     The slash key.
-	Slash = 47,
+	//     The right alt key.
+	AltRight = 6,
 	//
 	// Summary:
-	//     The 0 key.
-	Number0 = 48,
+	//     The left win key.
+	WinLeft = 7,
 	//
 	// Summary:
-	//     The 0 key; alias for Silk.NET.Input.Key.Number0
-	D0 = 48,
+	//     The right win key.
+	WinRight = 8,
 	//
 	// Summary:
-	//     The 1 key.
-	Number1 = 49,
+	//     The menu key.
+	Menu = 9,
 	//
 	// Summary:
-	//     The 2 key.
-	Number2 = 50,
+	//     The F1 key.
+	F1 = 10,
 	//
 	// Summary:
-	//     The 3 key.
-	Number3 = 51,
+	//     The F2 key.
+	F2 = 11,
 	//
 	// Summary:
-	//     The 4 key.
-	Number4 = 52,
+	//     The F3 key.
+	F3 = 12,
 	//
 	// Summary:
-	//     The 5 key.
-	Number5 = 53,
+	//     The F4 key.
+	F4 = 13,
 	//
 	// Summary:
-	//     The 6 key.
-	Number6 = 54,
+	//     The F5 key.
+	F5 = 14,
 	//
 	// Summary:
-	//     The 7 key.
-	Number7 = 55,
+	//     The F6 key.
+	F6 = 15,
 	//
 	// Summary:
-	//     The 8 key.
-	Number8 = 56,
+	//     The F7 key.
+	F7 = 16,
 	//
 	// Summary:
-	//     The 9 key.
-	Number9 = 57,
+	//     The F8 key.
+	F8 = 17,
 	//
 	// Summary:
-	//     The semicolon key.
-	Semicolon = 59,
+	//     The F9 key.
+	F9 = 18,
 	//
 	// Summary:
-	//     The equal key.
-	Equal = 61,
+	//     The F10 key.
+	F10 = 19,
+	//
+	// Summary:
+	//     The F11 key.
+	F11 = 20,
+	//
+	// Summary:
+	//     The F12 key.
+	F12 = 21,
+	//
+	// Summary:
+	//		The F13 key
+	F13 = 22,
+	//
+	// Summary:
+	//		The F14 key
+	F14 = 23,
+	//
+	// Summary:
+	//		The F15 key
+	F15 = 24,
+	//
+	// Summary:
+	//		The F16 key
+	F16 = 25,
+	//
+	// Summary:
+	//		The F17 key
+	F17 = 26,
+	//
+	// Summary:
+	//     The up arrow key.
+	Up = 27,
+	//
+	// Summary:
+	//     The down arrow key.
+	Down = 28,
+	//
+	// Summary:
+	//     The left arrow key.
+	Left = 29,
+	//
+	// Summary:
+	//     The right arrow key.
+	Right = 30,
+	//
+	// Summary:
+	//     The enter key.
+	Enter = 31,
+	//
+	// Summary:
+	//     The escape key.
+	Escape = 32,
+	//
+	// Summary:
+	//     The space key.
+	Space = 33,
+	//
+	// Summary:
+	//     The tab key.
+	Tab = 34,
+	//
+	// Summary:
+	//     The backspace key.
+	Backspace = 35,
+	//
+	// Summary:
+	//     The insert key.
+	Insert = 36,
+	//
+	// Summary:
+	//     The delete key.
+	Delete = 37,
+	//
+	// Summary:
+	//     The page up key.
+	PageUp = 38,
+	//
+	// Summary:
+	//     The page down key.
+	PageDown = 39,
+	//
+	// Summary:
+	//     The home key.
+	Home = 40,
+	//
+	// Summary:
+	//     The end key.
+	End = 41,
+	//
+	// Summary:
+	//     The caps lock key.
+	CapsLock = 42,
+	//
+	// Summary:
+	//     The scroll lock key.
+	ScrollLock = 43,
+	//
+	// Summary:
+	//     The print screen key.
+	PrintScreen = 44,
+	//
+	// Summary:
+	//     The pause key.
+	Pause = 45,
+	//
+	// Summary:
+	//     The num lock key.
+	NumLock = 46,
+	//
+	// Summary:
+	//     The clear key
+	Clear = 47,
+	//
+	// Summary:
+	//     The sleep key.
+	Sleep = 48,
+	//
+	// Summary:
+	//     The keypad 0 key.
+	Keypad0 = 49,
+	//
+	// Summary:
+	//     The keypad 1 key.
+	Keypad1 = 50,
+	//
+	// Summary:
+	//     The keypad 2 key.
+	Keypad2 = 51,
+	//
+	// Summary:
+	//     The keypad 3 key.
+	Keypad3 = 52,
+	//
+	// Summary:
+	//     The keypad 4 key.
+	Keypad4 = 53,
+	//
+	// Summary:
+	//     The keypad 5 key.
+	Keypad5 = 54,
+	//
+	// Summary:
+	//     The keypad 6 key.
+	Keypad6 = 55,
+	//
+	// Summary:
+	//     The keypad 7 key.
+	Keypad7 = 56,
+	//
+	// Summary:
+	//     The keypad 8 key.
+	Keypad8 = 57,
+	//
+	// Summary:
+	//     The keypad 9 key.
+	Keypad9 = 58,
+	//
+	// Summary:
+	//     The keypad divide key.
+	KeypadDivide = 59,
+	//
+	// Summary:
+	//     The keypad multiply key.
+	KeypadMultiply = 60,
+	//
+	// Summary:
+	//     The keypad minus key.
+	KeypadMinus = 61,
+	//
+	// Summary:
+	//     The keypad plus key.
+	KeypadPlus = 62,
+	//
+	// Summary:
+	//     The keypad period key.
+	KeypadPeriod = 63,
+	//
+	// Summary:
+	//     The keypad enter key.
+	KeypadEnter = 64,
 	//
 	// Summary:
 	//     The A key.
@@ -194,313 +373,90 @@ public enum Keys
 	Z = 90,
 	//
 	// Summary:
-	//     The left bracket(opening bracket) key.
-	LeftBracket = 91,
+	//     The number 0 key.
+	Number0 = 91,
 	//
 	// Summary:
-	//     The backslash.
-	BackSlash = 92,
+	//     The number 1 key.
+	Number1 = 92,
 	//
 	// Summary:
-	//     The right bracket(closing bracket) key.
-	RightBracket = 93,
+	//     The number 2 key.
+	Number2 = 93,
 	//
 	// Summary:
-	//     The grave accent key.
-	GraveAccent = 96,
+	//     The number 3 key.
+	Number3 = 94,
 	//
 	// Summary:
-	//     Non US keyboard layout key 1.
-	World1 = 161,
+	//     The number 4 key.
+	Number4 = 95,
 	//
 	// Summary:
-	//     Non US keyboard layout key 2.
-	World2 = 162,
+	//     The number 5 key.
+	Number5 = 96,
 	//
 	// Summary:
-	//     The escape key.
-	Escape = 0x100,
+	//     The number 6 key.
+	Number6 = 97,
 	//
 	// Summary:
-	//     The enter key.
-	Enter = 257,
+	//     The number 7 key.
+	Number7 = 98,
 	//
 	// Summary:
-	//     The tab key.
-	Tab = 258,
+	//     The number 8 key.
+	Number8 = 99,
 	//
 	// Summary:
-	//     The backspace key.
-	Backspace = 259,
+	//     The number 9 key.
+	Number9 = 100,
 	//
 	// Summary:
-	//     The insert key.
-	Insert = 260,
+	//     The tilde key.
+	Tilde = 101,
 	//
 	// Summary:
-	//     The delete key.
-	Delete = 261,
+	//     The minus key.
+	Minus = 102,
 	//
 	// Summary:
-	//     The right arrow key.
-	Right = 262,
+	//     The plus key.
+	Plus = 103,
 	//
 	// Summary:
-	//     The left arrow key.
-	Left = 263,
+	//     The left bracket key.
+	BracketLeft = 104,
 	//
 	// Summary:
-	//     The down arrow key.
-	Down = 264,
+	//     The right bracket key.
+	BracketRight = 105,
 	//
 	// Summary:
-	//     The up arrow key.
-	Up = 265,
+	//     The semicolon key.
+	Semicolon = 106,
 	//
 	// Summary:
-	//     The page up key.
-	PageUp = 266,
+	//     The quote key.
+	Quote = 107,
 	//
 	// Summary:
-	//     The page down key.
-	PageDown = 267,
+	//     The comma key.
+	Comma = 108,
 	//
 	// Summary:
-	//     The home key.
-	Home = 268,
+	//     The period key.
+	Period = 109,
 	//
 	// Summary:
-	//     The end key.
-	End = 269,
+	//     The slash key.
+	Slash = 110,
 	//
 	// Summary:
-	//     The caps lock key.
-	CapsLock = 280,
+	//     The backslash key.
+	BackSlash = 111,
 	//
 	// Summary:
-	//     The scroll lock key.
-	ScrollLock = 281,
-	//
-	// Summary:
-	//     The num lock key.
-	NumLock = 282,
-	//
-	// Summary:
-	//     The print screen key.
-	PrintScreen = 283,
-	//
-	// Summary:
-	//     The pause key.
-	Pause = 284,
-	//
-	// Summary:
-	//     The F1 key.
-	F1 = 290,
-	//
-	// Summary:
-	//     The F2 key.
-	F2 = 291,
-	//
-	// Summary:
-	//     The F3 key.
-	F3 = 292,
-	//
-	// Summary:
-	//     The F4 key.
-	F4 = 293,
-	//
-	// Summary:
-	//     The F5 key.
-	F5 = 294,
-	//
-	// Summary:
-	//     The F6 key.
-	F6 = 295,
-	//
-	// Summary:
-	//     The F7 key.
-	F7 = 296,
-	//
-	// Summary:
-	//     The F8 key.
-	F8 = 297,
-	//
-	// Summary:
-	//     The F9 key.
-	F9 = 298,
-	//
-	// Summary:
-	//     The F10 key.
-	F10 = 299,
-	//
-	// Summary:
-	//     The F11 key.
-	F11 = 300,
-	//
-	// Summary:
-	//     The F12 key.
-	F12 = 301,
-	//
-	// Summary:
-	//     The F13 key.
-	F13 = 302,
-	//
-	// Summary:
-	//     The F14 key.
-	F14 = 303,
-	//
-	// Summary:
-	//     The F15 key.
-	F15 = 304,
-	//
-	// Summary:
-	//     The F16 key.
-	F16 = 305,
-	//
-	// Summary:
-	//     The F17 key.
-	F17 = 306,
-	//
-	// Summary:
-	//     The F18 key.
-	F18 = 307,
-	//
-	// Summary:
-	//     The F19 key.
-	F19 = 308,
-	//
-	// Summary:
-	//     The F20 key.
-	F20 = 309,
-	//
-	// Summary:
-	//     The F21 key.
-	F21 = 310,
-	//
-	// Summary:
-	//     The F22 key.
-	F22 = 311,
-	//
-	// Summary:
-	//     The F23 key.
-	F23 = 312,
-	//
-	// Summary:
-	//     The F24 key.
-	F24 = 313,
-	//
-	// Summary:
-	//     The F25 key.
-	F25 = 314,
-	//
-	// Summary:
-	//     The 0 key on the key pad.
-	Keypad0 = 320,
-	//
-	// Summary:
-	//     The 1 key on the key pad.
-	Keypad1 = 321,
-	//
-	// Summary:
-	//     The 2 key on the key pad.
-	Keypad2 = 322,
-	//
-	// Summary:
-	//     The 3 key on the key pad.
-	Keypad3 = 323,
-	//
-	// Summary:
-	//     The 4 key on the key pad.
-	Keypad4 = 324,
-	//
-	// Summary:
-	//     The 5 key on the key pad.
-	Keypad5 = 325,
-	//
-	// Summary:
-	//     The 6 key on the key pad.
-	Keypad6 = 326,
-	//
-	// Summary:
-	//     The 7 key on the key pad.
-	Keypad7 = 327,
-	//
-	// Summary:
-	//     The 8 key on the key pad.
-	Keypad8 = 328,
-	//
-	// Summary:
-	//     The 9 key on the key pad.
-	Keypad9 = 329,
-	//
-	// Summary:
-	//     The decimal key on the key pad.
-	KeypadDecimal = 330,
-	//
-	// Summary:
-	//     The divide key on the key pad.
-	KeypadDivide = 331,
-	//
-	// Summary:
-	//     The multiply key on the key pad.
-	KeypadMultiply = 332,
-	//
-	// Summary:
-	//     The subtract key on the key pad.
-	KeypadSubtract = 333,
-	//
-	// Summary:
-	//     The add key on the key pad.
-	KeypadAdd = 334,
-	//
-	// Summary:
-	//     The enter key on the key pad.
-	KeypadEnter = 335,
-	//
-	// Summary:
-	//     The equal key on the key pad.
-	KeypadEqual = 336,
-	//
-	// Summary:
-	//     The left shift key.
-	ShiftLeft = 340,
-	//
-	// Summary:
-	//     The left control key.
-	ControlLeft = 341,
-	//
-	// Summary:
-	//     The left alt key.
-	AltLeft = 342,
-	//
-	// Summary:
-	//     The left super key.
-	SuperLeft = 343,
-	//
-	// Summary:
-	//     The left windows key
-	WinLeft = 347,
-	//
-	// Summary:
-	//     The right shift key.
-	ShiftRight = 344,
-	//
-	// Summary:
-	//     The right control key.
-	ControlRight = 345,
-	//
-	// Summary:
-	//     The right alt key.
-	AltRight = 346,
-	//
-	// Summary:
-	//     The right super key.
-	SuperRight = 347,
-	//
-	// Summary:
-	//     The right windows key
-	WinRight = 347,
-	// Summary:
-	//     The menu key.
-	Menu = 348
+	//     Indicates the last available keyboard key.
+	LastKey = 112
 }

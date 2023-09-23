@@ -1,13 +1,10 @@
-﻿using Azalea.Inputs.States;
+﻿namespace Azalea.Inputs.Events;
 
-namespace Azalea.Inputs.Events;
-
-public abstract class KeyEvent : UIEvent
+public abstract class KeyEvent : InputEvent
 {
 	public readonly Keys Key;
 
-	protected KeyEvent(InputState state, Keys key)
-		: base(state)
+	public KeyEvent(Keys key)
 	{
 		Key = key;
 	}

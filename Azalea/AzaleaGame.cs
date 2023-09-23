@@ -1,7 +1,6 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.Containers;
 using Azalea.Graphics.Textures;
-using Azalea.Inputs;
 using Azalea.IO.Assets;
 using Azalea.IO.Stores;
 using Azalea.Platform;
@@ -62,8 +61,6 @@ public abstract class AzaleaGame : Container
 
 		OnInitialize();
 	}
-
-	protected internal virtual UserInputManager CreateUserInputManager() => new();
 
 	public void AddFont(ResourceStore<byte[]> store, string? assetName = null, FontStore? target = null)
 		=> addFont(target ?? Fonts, store, assetName);

@@ -1,10 +1,7 @@
 ﻿using Azalea.Graphics.Veldrid;
 using Azalea.Inputs;
-using System;
 using Veldrid;
 using Veldrid.Sdl2;
-
-using AzaleaButtonState = Azalea.Inputs.ButtonState;
 
 namespace Azalea.Platform.Veldrid;
 
@@ -16,24 +13,6 @@ internal class VeldridInputManager
 	{
 		_sdl = window.Window;
 		window.OnInput += handleInput;
-
-		Initialize();
-	}
-
-	private void Initialize()
-	{
-		for (int i = 0; i < Input.MOUSE_BUTTONS.Length; i++)
-		{
-			Input.MOUSE_BUTTONS[i] = new AzaleaButtonState();
-		}
-		foreach (Keys key in (Keys[])Enum.GetValues(typeof(Keys)))
-		{
-			if (Input.KEYBOARD_KEYS.ContainsKey((int)key)) continue;
-
-			Input.KEYBOARD_KEYS.Add((int)key, new AzaleaButtonState());
-		}
-
-		Input.TEXT_INPUT_SOURCE = new TextInputSource();
 
 		_sdl.MouseMove += processMouseMove;
 		_sdl.MouseDown += processMouseDown;
@@ -48,24 +27,21 @@ internal class VeldridInputManager
 		var events = _sdl.PumpEvents();
 		foreach (var charPress in events.KeyCharPresses)
 		{
-			Input.TEXT_INPUT_SOURCE.TriggerTextInput(charPress.ToString());
+			Input.HandleTextInput(charPress);
 		}
-	}
-
-	private void processKeyUp(KeyEvent obj)
-	{
-		var pressedKey = (int)obj.Key.ToAzaleaKey();
-		if (Input.KEYBOARD_KEYS.ContainsKey(pressedKey) == false) return;
-		Input.KEYBOARD_KEYS[pressedKey].SetUp();
 	}
 
 	private void processKeyDown(KeyEvent obj)
 	{
 		if (obj.Repeat) return;
 
-		var pressedKey = (int)obj.Key.ToAzaleaKey();
-		if (Input.KEYBOARD_KEYS.ContainsKey(pressedKey) == false) return;
-		Input.KEYBOARD_KEYS[pressedKey].SetDown();
+		var pressedKey = obj.Key.ToAzaleaKey();
+		Input.HandleKeyboardKeyStateChange(pressedKey, true);
+	}
+	private void processKeyUp(KeyEvent obj)
+	{
+		var pressedKey = obj.Key.ToAzaleaKey();
+		Input.HandleKeyboardKeyStateChange(pressedKey, false);
 	}
 
 	private void processMouseDown(MouseEvent obj)
@@ -73,7 +49,7 @@ internal class VeldridInputManager
 		var buttonIndex = (int)VeldridExtentions.ToAzaleaMouseInput(obj.MouseButton);
 		if (buttonIndex > 4) return;
 
-		Input.MOUSE_BUTTONS[buttonIndex].SetDown();
+		Input.HandleMouseButtonStateChange((Inputs.MouseButton)buttonIndex, true);
 	}
 
 	private void processMouseUp(MouseEvent obj)
@@ -81,24 +57,11 @@ internal class VeldridInputManager
 		var buttonIndex = (int)VeldridExtentions.ToAzaleaMouseInput(obj.MouseButton);
 		if (buttonIndex > 4) return;
 
-		Input.MOUSE_BUTTONS[buttonIndex].SetUp();
+		Input.HandleMouseButtonStateChange((Inputs.MouseButton)buttonIndex, false);
 	}
 
 	private void processMouseMove(MouseMoveEventArgs obj)
 	{
-		Input.MOUSE_POSITION = obj.MousePosition;
-	}
-
-	public void Update()
-	{
-		foreach (var key in Input.KEYBOARD_KEYS)
-		{
-			key.Value.Update();
-		}
-
-		foreach (var mouseButton in Input.MOUSE_BUTTONS)
-		{
-			mouseButton.Update();
-		}
+		Input.HandleMousePositionChange(obj.MousePosition);
 	}
 }

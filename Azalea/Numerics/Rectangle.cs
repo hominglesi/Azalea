@@ -39,6 +39,9 @@ public struct Rectangle : IEquatable<Rectangle>
 	public readonly Rectangle Offset(Vector2 pos) => Offset(pos.X, pos.Y);
 	public readonly Rectangle Offset(float x, float y) => new Rectangle(X + x, Y + y, Width, Height);
 
+	public readonly bool Contains(Vector2 point)
+		=> X <= point.X && point.X < X + Width && Y <= point.Y && point.Y < Y + Height;
+
 	public readonly bool Equals(Rectangle other)
 		=> X.Equals(other.X) && Y.Equals(other.Y) && Width.Equals(other.Width) && Height.Equals(other.Height);
 	public override readonly bool Equals(object? obj)

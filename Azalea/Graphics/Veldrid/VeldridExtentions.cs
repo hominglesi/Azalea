@@ -32,22 +32,14 @@ internal static class VeldridExtentions
 
 	public static AzaleaKeys ToAzaleaKey(this Key key)
 	{
+		if (key <= Key.F17) return (AzaleaKeys)key;
+
 		if (key >= Key.A && key <= Key.Z) return (AzaleaKeys)(((int)key) - 18);
-		if (key >= Key.F1 && key <= Key.F25) return (AzaleaKeys)(((int)key) + 280);
-		if (key >= Key.Keypad0 && key <= Key.Keypad9) return (AzaleaKeys)(((int)key) + 253);
-		if (key >= Key.Number0 && key <= Key.Number9) return (AzaleaKeys)(((int)key) - 61);
+		if (key >= Key.Keypad0 && key <= Key.Keypad9) return (AzaleaKeys)(((int)key) - 18);
+		if (key >= Key.Number0 && key <= Key.Number9) return (AzaleaKeys)(((int)key) - 18);
 
 		return key switch
 		{
-			Key.ShiftLeft => AzaleaKeys.ShiftLeft,
-			Key.ShiftRight => AzaleaKeys.ShiftRight,
-			Key.ControlLeft => AzaleaKeys.ControlLeft,
-			Key.ControlRight => AzaleaKeys.ControlRight,
-			Key.AltLeft => AzaleaKeys.AltLeft,
-			Key.AltRight => AzaleaKeys.AltRight,
-			Key.WinLeft => AzaleaKeys.WinLeft,
-			Key.WinRight => AzaleaKeys.WinRight,
-			Key.Menu => AzaleaKeys.Menu,
 			Key.Up => AzaleaKeys.Up,
 			Key.Down => AzaleaKeys.Down,
 			Key.Left => AzaleaKeys.Left,
@@ -68,17 +60,21 @@ internal static class VeldridExtentions
 			Key.PrintScreen => AzaleaKeys.PrintScreen,
 			Key.Pause => AzaleaKeys.Pause,
 			Key.NumLock => AzaleaKeys.NumLock,
+			Key.Clear => AzaleaKeys.Clear,
+			Key.Sleep => AzaleaKeys.Sleep,
 			Key.KeypadDivide => AzaleaKeys.KeypadDivide,
 			Key.KeypadMultiply => AzaleaKeys.KeypadMultiply,
-			Key.KeypadSubtract => AzaleaKeys.KeypadSubtract,
-			Key.KeypadAdd => AzaleaKeys.KeypadAdd,
-			Key.KeypadDecimal => AzaleaKeys.KeypadDecimal,
+			Key.KeypadMinus => AzaleaKeys.KeypadMinus,
+			Key.KeypadPlus => AzaleaKeys.KeypadPlus,
+			Key.KeypadPeriod => AzaleaKeys.KeypadPeriod,
 			Key.KeypadEnter => AzaleaKeys.KeypadEnter,
-			Key.Grave => AzaleaKeys.GraveAccent,
+			Key.Tilde => AzaleaKeys.Tilde,
 			Key.Minus => AzaleaKeys.Minus,
-			Key.BracketLeft => AzaleaKeys.LeftBracket,
-			Key.BracketRight => AzaleaKeys.RightBracket,
+			Key.Plus => AzaleaKeys.Plus,
+			Key.BracketLeft => AzaleaKeys.BracketLeft,
+			Key.BracketRight => AzaleaKeys.BracketRight,
 			Key.Semicolon => AzaleaKeys.Semicolon,
+			Key.Quote => AzaleaKeys.Quote,
 			Key.Comma => AzaleaKeys.Comma,
 			Key.Period => AzaleaKeys.Period,
 			Key.Slash => AzaleaKeys.Slash,

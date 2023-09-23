@@ -1,6 +1,5 @@
 ﻿using Azalea.Inputs;
 using Silk.NET.Input;
-using System;
 using System.Numerics;
 using SilkMouseButton = Silk.NET.Input.MouseButton;
 
@@ -18,24 +17,6 @@ internal class SilkInputManager
 	{
 		_input = input;
 
-		Initialize();
-	}
-
-	private void Initialize()
-	{
-		for (int i = 0; i < Input.MOUSE_BUTTONS.Length; i++)
-		{
-			Input.MOUSE_BUTTONS[i] = new ButtonState();
-		}
-		foreach (Keys key in (Keys[])Enum.GetValues(typeof(Keys)))
-		{
-			if (Input.KEYBOARD_KEYS.ContainsKey((int)key)) continue;
-
-			Input.KEYBOARD_KEYS.Add((int)key, new ButtonState());
-		}
-
-		Input.TEXT_INPUT_SOURCE = new TextInputSource();
-
 		if (_input.Mice.Count >= 1)
 			PrimaryMouse = _input.Mice[0];
 
@@ -44,68 +25,53 @@ internal class SilkInputManager
 
 		foreach (var mouse in _input.Mice)
 		{
-			mouse.MouseMove += ProcessMouseMove;
-			mouse.MouseDown += ProcessMouseDown;
-			mouse.MouseUp += ProcessMouseUp;
+			mouse.MouseMove += processMouseMove;
+			mouse.MouseDown += processMouseDown;
+			mouse.MouseUp += processMouseUp;
 		}
 		foreach (var keyboard in _input.Keyboards)
 		{
-			keyboard.KeyDown += ProcessKeyDown;
-			keyboard.KeyUp += ProcessKeyUp;
-			keyboard.KeyChar += ProcessTextInput;
+			keyboard.KeyDown += processKeyDown;
+			keyboard.KeyUp += processKeyUp;
+			keyboard.KeyChar += processTextInput;
 		}
 	}
 
-	private void ProcessMouseMove(IMouse mouse, Vector2 position)
+	private void processMouseMove(IMouse mouse, Vector2 position)
 	{
-		Input.MOUSE_POSITION = position;
+		Input.HandleMousePositionChange(position);
 	}
 
-	private void ProcessMouseDown(IMouse mouse, SilkMouseButton button)
+	private void processMouseDown(IMouse mouse, SilkMouseButton button)
 	{
 		var buttonIndex = (int)button;
 		if (buttonIndex > 4) return;
 
-		Input.MOUSE_BUTTONS[buttonIndex].SetDown();
+		Input.HandleMouseButtonStateChange((Inputs.MouseButton)buttonIndex, true);
 	}
 
-	private void ProcessMouseUp(IMouse mouse, SilkMouseButton button)
+	private void processMouseUp(IMouse mouse, SilkMouseButton button)
 	{
 		var buttonIndex = (int)button;
 		if (buttonIndex > 4) return;
 
-		Input.MOUSE_BUTTONS[buttonIndex].SetUp();
+		Input.HandleMouseButtonStateChange((Inputs.MouseButton)buttonIndex, false);
 	}
 
-	private void ProcessKeyDown(IKeyboard keyboard, Key key, int _)
+	private void processKeyDown(IKeyboard keyboard, Key key, int _)
 	{
-		var pressedKey = (int)key;
-		if (Input.KEYBOARD_KEYS.ContainsKey(pressedKey) == false) return;
-		Input.KEYBOARD_KEYS[pressedKey].SetDown();
+		var pressedKey = key.ToAzaleaKey();
+		Input.HandleKeyboardKeyStateChange(pressedKey, true);
 	}
 
-	private void ProcessKeyUp(IKeyboard keyboard, Key key, int _)
+	private void processKeyUp(IKeyboard keyboard, Key key, int _)
 	{
-		var pressedKey = (int)key;
-		if (Input.KEYBOARD_KEYS.ContainsKey(pressedKey) == false) return;
-		Input.KEYBOARD_KEYS[pressedKey].SetUp();
+		var pressedKey = key.ToAzaleaKey();
+		Input.HandleKeyboardKeyStateChange(pressedKey, false);
 	}
 
-	private void ProcessTextInput(IKeyboard keyboard, char chr)
+	private void processTextInput(IKeyboard keyboard, char chr)
 	{
-		Input.TEXT_INPUT_SOURCE.TriggerTextInput(chr.ToString());
-	}
-
-	public void Update()
-	{
-		foreach (var key in Input.KEYBOARD_KEYS)
-		{
-			key.Value.Update();
-		}
-
-		foreach (var mouseButton in Input.MOUSE_BUTTONS)
-		{
-			mouseButton.Update();
-		}
+		Input.HandleTextInput(chr);
 	}
 }

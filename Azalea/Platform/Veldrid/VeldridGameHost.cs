@@ -34,8 +34,6 @@ public class VeldridGameHost : GameHost
 	public override void CallOnUpdate()
 	{
 		base.CallOnUpdate();
-
-		_inputManager?.Update();
 	}
 
 	public override void Run(AzaleaGame game)

@@ -55,8 +55,6 @@ internal class SilkGameHost : GameHost
 		Debug.Assert(_gl is not null);
 
 		_gl.Viewport(0, 0, (uint)_window.ClientSize.X, (uint)_window.ClientSize.Y);
-
-		_inputManager?.Update();
 	}
 
 	public override void Run(AzaleaGame game)

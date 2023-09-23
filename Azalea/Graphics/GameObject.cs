@@ -2,13 +2,12 @@
 using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics.Containers;
 using Azalea.Graphics.Primitives;
-using Azalea.Inputs;
 using Azalea.Inputs.Events;
-using Azalea.Inputs.States;
 using Azalea.Layout;
 using Azalea.Numerics;
 using Azalea.Utils;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Graphics;
@@ -20,7 +19,6 @@ public abstract class GameObject : IGameObject
 
 	public virtual bool UpdateSubTree()
 	{
-		if (this is not InputManager) UpdateInput();
 		Update();
 		OnUpdate?.Invoke(this);
 		return true;
@@ -447,9 +445,6 @@ public abstract class GameObject : IGameObject
 		}
 	}
 
-	protected InputManager GetContainingInputManager() => this.FindClosestParent<InputManager>()
-		?? throw new Exception("This drawable is not part of the scene graph");
-
 	private CompositeGameObject? parent;
 
 	public CompositeGameObject? Parent
@@ -624,6 +619,21 @@ public abstract class GameObject : IGameObject
 
 	#region Input
 
+	internal virtual bool BuildPositionalInputQueue(Vector2 screenSpacePos, List<GameObject> queue)
+	{
+		if (DrawRectangle.Contains(ToLocalSpace(screenSpacePos)))
+			queue.Add(this);
+
+		return true;
+	}
+
+	internal virtual bool BuildNonPositionalInputQueue(List<GameObject> queue)
+	{
+		queue.Add(this);
+
+		return true;
+	}
+
 	/// <summary>
 	/// Check if this <see cref="GameObject"/> has focus
 	/// </summary>
@@ -639,45 +649,9 @@ public abstract class GameObject : IGameObject
 	/// </summary>
 	public bool Hovered { get; internal set; }
 
-	private void UpdateInput()
-	{
-		if (ToScreenSpace(DrawRectangle).Contains(Input.MousePosition))
-		{
-			if (Hovered == false)
-			{
-				Hovered = true;
-				TriggerEvent(new HoverEvent(GetContainingInputManager()?.CurrentState ?? new InputState()));
-			}
-			if (Input.GetMouseButton(MouseButton.Left).Down)
-				TriggerEvent(new MouseDownEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), MouseButton.Left));
-			else if (Input.GetMouseButton(MouseButton.Left).Up)
-			{
-				TriggerEvent(new MouseUpEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), MouseButton.Left));
-				TriggerClick();
-			}
-		}
-		else
-		{
-			if (Hovered)
-			{
-				Hovered = false;
-				TriggerEvent(new HoverLostEvent(GetContainingInputManager()?.CurrentState ?? new InputState()));
-			}
-		}
+	protected virtual bool Handle(InputEvent e) => false;
 
-		foreach (var key in Input.KEYBOARD_KEYS)
-		{
-			if (key.Value.Down || key.Value.Repeat) TriggerEvent(
-				new KeyDownEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), (Keys)key.Key, key.Value.Repeat));
-			if (key.Value.Up) TriggerEvent(
-				new KeyUpEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), (Keys)key.Key));
-		}
-
-	}
-
-	protected virtual bool Handle(UIEvent e) => false;
-
-	public bool TriggerEvent(UIEvent e)
+	public virtual bool TriggerEvent(InputEvent e)
 	{
 		e.Target = this;
 
@@ -689,7 +663,6 @@ public abstract class GameObject : IGameObject
 
 		return e switch
 		{
-			ClickEvent click => OnClick(click),
 			MouseDownEvent mouseDown => OnMouseDown(mouseDown),
 			MouseUpEvent mouseUp => OnMouseUp(mouseUp),
 			HoverEvent hover => OnHover(hover),
@@ -698,10 +671,6 @@ public abstract class GameObject : IGameObject
 			_ => Handle(e),
 		};
 	}
-
-	public bool TriggerClick() => TriggerEvent(new ClickEvent(GetContainingInputManager()?.CurrentState ?? new InputState(), MouseButton.Left));
-
-	protected virtual bool OnClick(ClickEvent e) => Handle(e);
 	protected virtual bool OnMouseDown(MouseDownEvent e) => Handle(e);
 	protected virtual bool OnMouseUp(MouseUpEvent e) => Handle(e);
 	protected virtual bool OnHover(HoverEvent e) => Handle(e);

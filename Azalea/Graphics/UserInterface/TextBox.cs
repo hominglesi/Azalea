@@ -63,7 +63,7 @@ public abstract class TextBox : TabbableContainer
 		};
 		HasFocus = true;
 
-		Input.GetTextInput().OnTextInput += handleTextInput;
+		Input.OnTextInput += handleTextInput;
 	}
 
 	private int _selectionStart;
@@ -405,13 +405,14 @@ public abstract class TextBox : TabbableContainer
 
 	private void killFocus()
 	{
+		/*
 		var manager = GetContainingInputManager();
 		if (manager?.FocusedObject == this)
-			manager.ChangeFocus(null);
+			manager.ChangeFocus(null);*/
 	}
 
-	private void handleTextInput(string text)
+	private void handleTextInput(char text)
 	{
-		InsertString(text);
+		InsertString(text.ToString());
 	}
 }

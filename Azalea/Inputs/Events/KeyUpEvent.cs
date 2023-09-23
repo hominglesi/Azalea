@@ -1,9 +1,10 @@
-﻿using Azalea.Inputs.States;
-
-namespace Azalea.Inputs.Events;
+﻿namespace Azalea.Inputs.Events;
 
 public class KeyUpEvent : KeyEvent
 {
-	public KeyUpEvent(InputState state, Keys key)
-		: base(state, key) { }
+	public KeyUpEvent(Keys key)
+		: base(key)
+	{
+
+	}
 }

@@ -16,7 +16,7 @@ public class ClickableContainer : Container
 		}
 	}
 
-	protected override bool OnClick(ClickEvent e)
+	protected override bool OnMouseDown(MouseDownEvent e)
 	{
 		if (_action is not null)
 			Action?.Invoke();

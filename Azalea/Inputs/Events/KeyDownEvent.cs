@@ -1,13 +1,11 @@
-﻿using Azalea.Inputs.States;
-
-namespace Azalea.Inputs.Events;
+﻿namespace Azalea.Inputs.Events;
 
 public class KeyDownEvent : KeyEvent
 {
 	public readonly bool IsRepeat;
 
-	public KeyDownEvent(InputState state, Keys key, bool isRepeat = false)
-		: base(state, key)
+	public KeyDownEvent(Keys key, bool isRepeat = false)
+		: base(key)
 	{
 		IsRepeat = isRepeat;
 	}

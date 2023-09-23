@@ -1,10 +1,9 @@
-﻿using Azalea.Inputs.States;
+﻿namespace Azalea.Inputs.Events;
 
-namespace Azalea.Inputs.Events;
-
-public class HoverLostEvent : MouseEvent
+public class HoverLostEvent : InputEvent
 {
-	public HoverLostEvent(InputState state)
-		: base(state) { }
+	public HoverLostEvent()
+	{
 
+	}
 }

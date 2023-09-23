@@ -237,6 +237,32 @@ public partial class CompositeGameObject : GameObject
 
 	private readonly LayoutValue _childrenSizeDependencies = new(Invalidation.RequiredParentSizeToFit | Invalidation.Presence, InvalidationSource.Child);
 
+	internal override bool BuildNonPositionalInputQueue(List<GameObject> queue)
+	{
+		if (base.BuildNonPositionalInputQueue(queue) == false)
+			return false;
+
+		foreach (var child in internalChildren)
+		{
+			child.BuildNonPositionalInputQueue(queue);
+		}
+
+		return true;
+	}
+
+	internal override bool BuildPositionalInputQueue(Vector2 screenSpacePos, List<GameObject> queue)
+	{
+		if (base.BuildPositionalInputQueue(screenSpacePos, queue) == false)
+			return false;
+
+		foreach (var child in internalChildren)
+		{
+			child.BuildPositionalInputQueue(screenSpacePos, queue);
+		}
+
+		return true;
+	}
+
 	#region Invalidation
 
 	internal void InvalidateChildrenSizeDependencies(Invalidation invalidation, Axes axes, GameObject source)
