@@ -665,6 +665,7 @@ public abstract class GameObject : IGameObject
 		{
 			MouseDownEvent mouseDown => OnMouseDown(mouseDown),
 			MouseUpEvent mouseUp => OnMouseUp(mouseUp),
+			ClickEvent click => OnClick(click),
 			HoverEvent hover => OnHover(hover),
 			KeyDownEvent keyDown => OnKeyDown(keyDown),
 			KeyUpEvent keyUp => OnKeyUp(keyUp),
@@ -673,6 +674,7 @@ public abstract class GameObject : IGameObject
 	}
 	protected virtual bool OnMouseDown(MouseDownEvent e) => Handle(e);
 	protected virtual bool OnMouseUp(MouseUpEvent e) => Handle(e);
+	protected virtual bool OnClick(ClickEvent e) => Handle(e);
 	protected virtual bool OnHover(HoverEvent e) => Handle(e);
 	protected virtual void OnHoverLost(HoverLostEvent e) => Handle(e);
 	protected virtual bool OnKeyDown(KeyDownEvent e) => Handle(e);

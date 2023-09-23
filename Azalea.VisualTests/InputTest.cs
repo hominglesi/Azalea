@@ -28,9 +28,6 @@ public class InputTest : TestScene
 	{
 		if (Input.GetKey(Keys.P).Down)
 			Console.WriteLine("P recieved directly");
-
-		var hoveredObjects = Input.GetHoveredObjects();
-		Console.WriteLine(hoveredObjects.Count);
 	}
 
 	private class InputLoggingObject : Box
@@ -44,12 +41,18 @@ public class InputTest : TestScene
 		protected override bool OnHover(HoverEvent e)
 		{
 			Console.WriteLine($"{_name} Object hovered");
-			return base.OnHover(e);
+			var newColor = Color;
+			newColor.Luminance -= 0.05f;
+			Color = newColor;
+			return true;
 		}
 
 		protected override void OnHoverLost(HoverLostEvent e)
 		{
 			Console.WriteLine($"{_name} Object hover lost");
+			var newColor = Color;
+			newColor.Luminance += 0.05f;
+			Color = newColor;
 			base.OnHoverLost(e);
 		}
 
@@ -73,6 +76,11 @@ public class InputTest : TestScene
 		protected override bool OnMouseUp(MouseUpEvent e)
 		{
 			Console.WriteLine($"{_name} Mouse up: {e.Button}");
+			return true;
+		}
+		protected override bool OnClick(ClickEvent e)
+		{
+			Console.WriteLine($"{_name} Clicked: {e.Button}");
 			return true;
 		}
 	}

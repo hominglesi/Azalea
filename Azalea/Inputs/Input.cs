@@ -84,8 +84,13 @@ public static class Input
 
 	private static readonly List<GameObject> _lastHoveredObjects = new();
 	private static readonly List<GameObject> _hoveredObjects = new();
+
+	private static GameObject? _hoverHandledObject;
 	private static void updateHoverEvents()
 	{
+		GameObject? lastHoverHandledObject = _hoverHandledObject;
+		_hoverHandledObject = null;
+
 		_lastHoveredObjects.Clear();
 		_lastHoveredObjects.AddRange(_hoveredObjects);
 
@@ -98,11 +103,22 @@ public static class Input
 
 			if (obj.Hovered)
 			{
+				if (obj == lastHoverHandledObject)
+				{
+					_hoverHandledObject = lastHoverHandledObject;
+					break;
+				}
+
 				continue;
 			}
 
 			obj.Hovered = true;
-			obj.TriggerEvent(new HoverEvent());
+
+			if (obj.TriggerEvent(new HoverEvent()))
+			{
+				_hoverHandledObject = obj;
+				break;
+			}
 		}
 
 		foreach (var obj in _lastHoveredObjects)
@@ -112,14 +128,30 @@ public static class Input
 		}
 	}
 
+	private static readonly List<GameObject> _clickDownGameObjects = new();
 	internal static void HandleMouseButtonStateChange(MouseButton button, bool pressed)
 	{
 		_mouseButtons[(int)button].SetState(pressed);
 
 		if (pressed)
-			propagatePositionalInputEvent(new MouseDownEvent(button, _mousePosition));
+		{
+			_clickDownGameObjects.Clear();
+			foreach (var obj in PositionalInputQueue)
+			{
+				_clickDownGameObjects.Add(obj);
+				if (obj.TriggerEvent(new MouseDownEvent(button, _mousePosition)) == true) return;
+			}
+		}
 		else
+		{
 			propagatePositionalInputEvent(new MouseUpEvent(button, _mousePosition));
+			var clickUpGameObjects = PositionalInputQueue;
+			foreach (var obj in clickUpGameObjects)
+			{
+				if (_clickDownGameObjects.Contains(obj))
+					obj.TriggerEvent(new ClickEvent(button, _mousePosition));
+			}
+		}
 	}
 
 	internal static void HandleKeyboardKeyStateChange(Keys key, bool pressed)
