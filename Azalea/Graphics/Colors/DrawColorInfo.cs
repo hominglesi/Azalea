@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Azalea.Graphics;
+namespace Azalea.Graphics.Colors;
 
 public struct DrawColorInfo : IEquatable<DrawColorInfo>
 {

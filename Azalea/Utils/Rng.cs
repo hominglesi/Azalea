@@ -1,4 +1,4 @@
-﻿using Azalea.Graphics;
+﻿using Azalea.Graphics.Colors;
 using System;
 using System.Collections.Generic;
 using System.Numerics;

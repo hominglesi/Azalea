@@ -1,5 +1,6 @@
 ﻿using Azalea.Extentions;
 using Azalea.Extentions.EnumExtentions;
+using Azalea.Graphics.Colors;
 using Azalea.Graphics.Containers;
 using Azalea.Graphics.Primitives;
 using Azalea.Inputs.Events;
@@ -697,6 +698,9 @@ public abstract class GameObject : IGameObject
 
 	private DrawColorInfo computeDrawColorInfo()
 	{
+		var info = Parent?.DrawColorInfo ?? new DrawColorInfo();
+
+
 		return new DrawColorInfo(Color);
 	}
 

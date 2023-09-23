@@ -1,5 +1,5 @@
 ﻿using Azalea.Audios;
-using Azalea.Graphics;
+using Azalea.Graphics.Colors;
 using Azalea.Inputs;
 using Azalea.IO.Assets;
 using Azalea.IO.Stores;

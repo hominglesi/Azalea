@@ -4,6 +4,8 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
 
+using AzaleaColor = Azalea.Graphics.Colors.Color;
+
 namespace Azalea.Graphics.Rendering;
 
 internal abstract class Renderer : IRenderer
@@ -14,8 +16,8 @@ internal abstract class Renderer : IRenderer
 	private readonly INativeTexture[] lastBoundTexture = new INativeTexture[16];
 	private int lastActiveTextureUnit = -1;
 
-	private Color _clearColor;
-	public Color ClearColor
+	private AzaleaColor _clearColor;
+	public AzaleaColor ClearColor
 	{
 		get => _clearColor;
 		set
@@ -60,14 +62,14 @@ internal abstract class Renderer : IRenderer
 		FlushCurrentBatch();
 	}
 
-	protected internal virtual void SetClearColor(Color value) { }
+	protected internal virtual void SetClearColor(AzaleaColor value) { }
 
 	public void Clear()
 	{
 		ClearImplementation(ClearColor);
 	}
 
-	protected abstract void ClearImplementation(Color color);
+	protected abstract void ClearImplementation(AzaleaColor color);
 
 	protected internal void FlushCurrentBatch()
 	{

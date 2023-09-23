@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.Shapes;
+﻿using Azalea.Graphics.Colors;
+using Azalea.Graphics.Shapes;
 using System.Numerics;
 
 namespace Azalea.Graphics.UserInterface;

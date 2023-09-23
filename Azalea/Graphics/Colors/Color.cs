@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Azalea.Graphics;
+namespace Azalea.Graphics.Colors;
 
 /// <summary>
 /// Represents a color with 4 byte components (Red, Green, Blue, Alpha)

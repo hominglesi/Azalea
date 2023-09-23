@@ -1,4 +1,6 @@
-﻿namespace Azalea.Graphics;
+﻿using Azalea.Graphics.Colors;
+
+namespace Azalea.Graphics;
 
 public interface IGameObject
 {

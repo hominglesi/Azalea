@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.Rendering;
+﻿using Azalea.Graphics.Colors;
+using Azalea.Graphics.Rendering;
 
 namespace Azalea.Graphics;
 

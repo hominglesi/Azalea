@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace Azalea.Graphics;
+namespace Azalea.Graphics.Colors;
 
 public static class ColorExtentions
 {

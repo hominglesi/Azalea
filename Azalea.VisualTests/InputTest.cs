@@ -1,4 +1,4 @@
-﻿using Azalea.Graphics;
+﻿using Azalea.Graphics.Colors;
 using Azalea.Graphics.Shapes;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
