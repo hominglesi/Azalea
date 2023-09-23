@@ -61,9 +61,6 @@ public abstract class TextBox : TabbableContainer
 				}
 			}
 		};
-		HasFocus = true;
-
-		Input.OnTextInput += handleTextInput;
 	}
 
 	private int _selectionStart;
@@ -401,14 +398,27 @@ public abstract class TextBox : TabbableContainer
 		return false;
 	}
 
+	public override bool AcceptsFocus => true;
+
+	protected override void OnFocus(FocusEvent e)
+	{
+		Input.OnTextInput += handleTextInput;
+
+		base.OnFocus(e);
+	}
+
+	protected override void OnFocusLost(FocusLostEvent e)
+	{
+		Input.OnTextInput -= handleTextInput;
+
+		base.OnFocusLost(e);
+	}
+
 	protected virtual void KillFocus() => killFocus();
 
 	private void killFocus()
 	{
-		/*
-		var manager = GetContainingInputManager();
-		if (manager?.FocusedObject == this)
-			manager.ChangeFocus(null);*/
+		Input.ChangeFocus(null);
 	}
 
 	private void handleTextInput(char text)

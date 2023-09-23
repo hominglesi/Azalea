@@ -70,13 +70,13 @@ public class InputTest : TestScene
 		protected override bool OnMouseDown(MouseDownEvent e)
 		{
 			Console.WriteLine($"{_name} Mouse down: {e.Button}");
-			return true;
+			return false;
 		}
 
 		protected override bool OnMouseUp(MouseUpEvent e)
 		{
 			Console.WriteLine($"{_name} Mouse up: {e.Button}");
-			return true;
+			return false;
 		}
 		protected override bool OnClick(ClickEvent e)
 		{

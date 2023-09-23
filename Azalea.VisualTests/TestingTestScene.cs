@@ -33,6 +33,13 @@ public class TestingTestScene : TestScene
 		});
 		_text.Text = "Ide Gas";
 
+		Add(new BasicTextBox()
+		{
+			Width = 500,
+			Height = 30,
+			Position = new Vector2(550, 300)
+		});
+
 		Add(new Box()
 		{
 			Size = new(100, 100),

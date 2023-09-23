@@ -146,12 +146,49 @@ public static class Input
 		{
 			propagatePositionalInputEvent(new MouseUpEvent(button, _mousePosition));
 			var clickUpGameObjects = PositionalInputQueue;
+
+			if (FocusedObject is not null &&
+				clickUpGameObjects.Contains(FocusedObject) == false && _clickDownGameObjects.Contains(FocusedObject) == false)
+				ChangeFocus(null);
+
 			foreach (var obj in clickUpGameObjects)
 			{
 				if (_clickDownGameObjects.Contains(obj))
-					obj.TriggerEvent(new ClickEvent(button, _mousePosition));
+				{
+					var handled = obj.TriggerEvent(new ClickEvent(button, _mousePosition));
+
+					if (button == MouseButton.Left && obj.AcceptsFocus)
+						ChangeFocus(obj);
+
+					if (handled) break;
+				}
 			}
 		}
+	}
+
+	public static GameObject? FocusedObject;
+
+	public static bool ChangeFocus(GameObject? potentialFocusTarget)
+	{
+		if (FocusedObject == potentialFocusTarget)
+			return true;
+
+		var previousFocus = FocusedObject;
+		FocusedObject = potentialFocusTarget;
+
+		if (previousFocus is not null)
+		{
+			previousFocus.HasFocus = false;
+			previousFocus.TriggerEvent(new FocusLostEvent(potentialFocusTarget));
+		}
+
+		if (FocusedObject is not null)
+		{
+			FocusedObject.HasFocus = true;
+			FocusedObject.TriggerEvent(new FocusEvent(previousFocus));
+		}
+
+		return true;
 	}
 
 	internal static void HandleKeyboardKeyStateChange(Keys key, bool pressed)

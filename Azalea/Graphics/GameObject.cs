@@ -655,10 +655,17 @@ public abstract class GameObject : IGameObject
 	{
 		e.Target = this;
 
-		if (e is HoverLostEvent hoverLost)
+		switch (e)
 		{
-			OnHoverLost(hoverLost);
-			return false;
+			case HoverLostEvent hoverLost:
+				OnHoverLost(hoverLost);
+				return false;
+			case FocusEvent focus:
+				OnFocus(focus);
+				return false;
+			case FocusLostEvent focusLost:
+				OnFocusLost(focusLost);
+				return true;
 		}
 
 		return e switch
@@ -679,6 +686,8 @@ public abstract class GameObject : IGameObject
 	protected virtual void OnHoverLost(HoverLostEvent e) => Handle(e);
 	protected virtual bool OnKeyDown(KeyDownEvent e) => Handle(e);
 	protected virtual bool OnKeyUp(KeyUpEvent e) => Handle(e);
+	protected virtual void OnFocus(FocusEvent e) => Handle(e);
+	protected virtual void OnFocusLost(FocusLostEvent e) => Handle(e);
 
 	#endregion
 
