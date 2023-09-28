@@ -22,7 +22,7 @@ public partial class CompositeGameObject : GameObject
 
 	private ulong currentChildID;
 
-	protected virtual void AddInternal(GameObject gameObject)
+	internal virtual void AddInternal(GameObject gameObject)
 	{
 		if (gameObject == null)
 			throw new ArgumentNullException(nameof(gameObject), $"Cannot add null {nameof(gameObject)} to {nameof(CompositeGameObject)}.");
@@ -58,7 +58,7 @@ public partial class CompositeGameObject : GameObject
 		return index;
 	}
 
-	protected virtual bool RemoveInternal(GameObject gameObject)
+	internal virtual bool RemoveInternal(GameObject gameObject)
 	{
 		ArgumentNullException.ThrowIfNull(gameObject);
 

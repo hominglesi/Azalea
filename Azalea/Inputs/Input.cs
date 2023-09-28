@@ -1,5 +1,5 @@
-﻿using Azalea.Graphics;
-using Azalea.Graphics.Containers;
+﻿using Azalea.Design.Compositions;
+using Azalea.Graphics;
 using Azalea.Inputs.Events;
 using System;
 using System.Collections.Generic;
@@ -30,12 +30,12 @@ public static class Input
 	private static Vector2 _lastMousePosition = Vector2.Zero;
 	private static Vector2 _mousePosition = Vector2.Zero;
 
-	private static Container? _rootObject;
+	private static Composition? _rootObject;
 
 	internal static List<GameObject> PositionalInputQueue => buildPositionalInputQueue(_mousePosition);
 	internal static List<GameObject> NonPositionalInputQueue => buildNonPositionalInputQueue();
 
-	internal static void Initialize(Container rootObject)
+	internal static void Initialize(Composition rootObject)
 	{
 		_rootObject = rootObject;
 

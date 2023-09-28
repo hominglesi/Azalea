@@ -1,6 +1,6 @@
 ﻿using Azalea.Audios;
+using Azalea.Design.Compositions;
 using Azalea.Extentions;
-using Azalea.Graphics.Containers;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Textures;
 using Azalea.Inputs;
@@ -20,13 +20,13 @@ public abstract class GameHost
 
 	public event Action? Initialized;
 
-	public Container Root => _root ?? throw new Exception("Cannot use root before the game has started.");
+	public Composition Root => _root ?? throw new Exception("Cannot use root before the game has started.");
 
-	private Container? _root;
+	private Composition? _root;
 
 	public virtual void Run(AzaleaGame game)
 	{
-		var root = new Container();
+		var root = new Composition();
 		root.Add(game);
 
 		game.SetHost(this);

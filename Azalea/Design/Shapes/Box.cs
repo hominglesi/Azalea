@@ -2,7 +2,7 @@
 using Azalea.Graphics.Textures;
 using System;
 
-namespace Azalea.Graphics.Shapes;
+namespace Azalea.Design.Shapes;
 
 public class Box : Sprite
 {

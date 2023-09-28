@@ -1,7 +1,7 @@
-﻿using Azalea.Graphics;
+﻿using Azalea.Design.Compositions;
+using Azalea.Design.Shapes;
+using Azalea.Graphics;
 using Azalea.Graphics.Colors;
-using Azalea.Graphics.Containers;
-using Azalea.Graphics.Shapes;
 using Azalea.Graphics.UserInterface;
 using System;
 
@@ -9,14 +9,14 @@ namespace Azalea.VisualTests;
 
 public class DefaultUserInputTest : TestScene
 {
-	private Container _buttonContainer;
-	private Container _childButtonContainer;
+	private Composition _buttonContainer;
+	private Composition _childButtonContainer;
 
 	public DefaultUserInputTest()
 	{
-		Add(_buttonContainer = new Container()
+		Add(_buttonContainer = new Composition()
 		{
-			RelativeSizeAxes = Graphics.Axes.Both,
+			RelativeSizeAxes = Axes.Both,
 			Size = new(0.48f, 0.48f),
 			Children = new GameObject[]
 			{
@@ -48,7 +48,7 @@ public class DefaultUserInputTest : TestScene
 					Action = () => { Write("Button 3 clicked");},
 					Size = new(80, 200)
 				},
-				_childButtonContainer = new Container()
+				_childButtonContainer = new Composition()
 				{
 					Position = new(1f, 1f),
 					RelativePositionAxes = Axes.Both,

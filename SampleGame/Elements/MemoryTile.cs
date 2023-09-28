@@ -1,6 +1,6 @@
-﻿using Azalea.Graphics;
+﻿using Azalea.Design.Compositions;
+using Azalea.Graphics;
 using Azalea.Graphics.Colors;
-using Azalea.Graphics.Containers;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.Textures;
 using Azalea.Graphics.UserInterface;
@@ -10,7 +10,7 @@ using System.Numerics;
 
 namespace SampleGame.Elements;
 
-public class MemoryTile : Container
+public class MemoryTile : Composition
 {
 	public const string DefaultTexturePath = @"blank.png";
 

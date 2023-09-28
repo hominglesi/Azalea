@@ -48,28 +48,28 @@ public static class RendererExtentions
 		var texture = renderer.WhitePixel;
 
 		var topQuad = new Quad(
-			quad.TopLeft + new Vector2(-width, -width),
-			quad.TopLeft + new Vector2(-width, 0),
-			quad.TopRight + new Vector2(width, 0),
-			quad.TopRight + new Vector2(width, -width));
+			quad.TopLeft,
+			quad.TopLeft + new Vector2(0, width),
+			quad.TopRight + new Vector2(width, width),
+			quad.TopRight + new Vector2(-width, width));
 
 		var rightQuad = new Quad(
-			quad.TopRight,
-			quad.BottomRight + new Vector2(0, width),
-			quad.BottomRight + new Vector2(width, width),
-			quad.TopRight + new Vector2(width, 0));
+			quad.TopRight + new Vector2(-width, 0),
+			quad.BottomRight + new Vector2(-width, -width),
+			quad.BottomRight + new Vector2(0, -width),
+			quad.TopRight);
 
 		var bottomQuad = new Quad(
-			quad.BottomLeft,
-			quad.BottomLeft + new Vector2(0, width),
-			quad.BottomRight + new Vector2(0, width),
-			quad.BottomRight);
+			quad.BottomLeft + new Vector2(width, -width),
+			quad.BottomLeft + new Vector2(width, 0),
+			quad.BottomRight,
+			quad.BottomRight + new Vector2(0, -width));
 
 		var leftQuad = new Quad(
-			quad.TopLeft + new Vector2(-width, 0),
-			quad.BottomLeft + new Vector2(-width, width),
-			quad.BottomLeft + new Vector2(0, width),
-			quad.TopLeft);
+			quad.TopLeft + new Vector2(0, -width),
+			quad.BottomLeft,
+			quad.BottomLeft + new Vector2(width, 0),
+			quad.TopLeft + new Vector2(width, width));
 
 		renderer.DrawQuad(texture, topQuad, color);
 		renderer.DrawQuad(texture, rightQuad, color);

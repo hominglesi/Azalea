@@ -1,20 +1,21 @@
-﻿using Azalea.Layout;
+﻿using Azalea.Graphics;
+using Azalea.Layout;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
-namespace Azalea.Graphics.Containers;
+namespace Azalea.Design.Compositions;
 
 /// <summary>
 /// A container that can be used to fluently arrange its children.
 /// </summary>
-public abstract class FlowContainer : Container
+public abstract class FlowComposition : Composition
 {
 	internal event Action? OnLayout;
 
-	protected FlowContainer()
+	protected FlowComposition()
 	{
 		AddLayout(_layout);
 		AddLayout(_childLayout);
@@ -29,15 +30,15 @@ public abstract class FlowContainer : Container
 
 	private readonly Dictionary<GameObject, float> _layoutChildren = new();
 
-	protected override void AddInternal(GameObject gameObject)
+	public override void Add(GameObject gameObject)
 	{
 		_layoutChildren.Add(gameObject, 0f);
 
 		InvalidateLayout();
-		base.AddInternal(gameObject);
+		base.Add(gameObject);
 	}
 
-	protected override bool RemoveInternal(GameObject gameObject)
+	public override bool Remove(GameObject gameObject)
 	{
 		_layoutChildren.Remove(gameObject);
 
@@ -45,18 +46,18 @@ public abstract class FlowContainer : Container
 		return base.RemoveInternal(gameObject);
 	}
 
-	protected internal override void ClearInternal(bool disposeChildren = true)
+	public override void Clear()
 	{
 		_layoutChildren.Clear();
 
 		InvalidateLayout();
-		base.ClearInternal(disposeChildren);
+		base.Clear();
 	}
 
 	public void SetLayoutPosition(GameObject gameObject, float newPosition)
 	{
 		if (!_layoutChildren.ContainsKey(gameObject))
-			throw new InvalidOperationException($"Cannot change layout position of game object which is not contained within this {nameof(FlowContainer)}.");
+			throw new InvalidOperationException($"Cannot change layout position of game object which is not contained within this {nameof(FlowComposition)}.");
 
 		_layoutChildren[gameObject] = newPosition;
 		InvalidateLayout();
@@ -71,12 +72,12 @@ public abstract class FlowContainer : Container
 	public float GetLayoutPosition(GameObject gameObject)
 	{
 		if (!_layoutChildren.ContainsKey(gameObject))
-			throw new InvalidOperationException($"Cannot get layout position of game object which is not contained within this {nameof(FlowContainer)}.");
+			throw new InvalidOperationException($"Cannot get layout position of game object which is not contained within this {nameof(FlowComposition)}.");
 
 		return _layoutChildren[gameObject];
 	}
 
-	public virtual IEnumerable<GameObject> FlowingChildren => InternalChildren.Where(d => d.IsPresent).OrderBy(d => _layoutChildren[d]).ThenBy(d => d.ChildID);
+	public virtual IEnumerable<GameObject> FlowingChildren => Children.Where(d => d.IsPresent).OrderBy(d => _layoutChildren[d]).ThenBy(d => d.ChildID);
 
 	protected abstract IEnumerable<Vector2> ComputeLayoutPositions();
 

@@ -1,20 +1,21 @@
-﻿using Azalea.Graphics.Colors;
+﻿using Azalea.Graphics;
+using Azalea.Graphics.Colors;
 using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering;
 
-namespace Azalea.Graphics.Shapes;
+namespace Azalea.Design.Shapes;
 
-public partial class Outline
+public partial class HollowBox : GameObject
 {
-	internal class OutlineWrapperDrawNode : DrawNode
+	public class HollowBoxDrawNode : DrawNode
 	{
-		protected new OutlineWrapper Source => (OutlineWrapper)base.Source;
+		protected new HollowBox Source => (HollowBox)base.Source;
 
 		protected float Thickness { get; set; }
 		protected Quad ScreenSpaceDrawQuad { get; set; }
 		protected DrawColorInfo ColorInfo { get; set; }
 
-		public OutlineWrapperDrawNode(OutlineWrapper source)
+		public HollowBoxDrawNode(HollowBox source)
 			: base(source) { }
 
 		public override void ApplyState()
@@ -22,7 +23,7 @@ public partial class Outline
 			base.ApplyState();
 
 			Thickness = Source.Thickness;
-			ScreenSpaceDrawQuad = Source.WrappedChild.ScreenSpaceDrawQuad;
+			ScreenSpaceDrawQuad = Source.ScreenSpaceDrawQuad;
 			ColorInfo = Source.DrawColorInfo;
 		}
 
@@ -34,3 +35,4 @@ public partial class Outline
 		}
 	}
 }
+

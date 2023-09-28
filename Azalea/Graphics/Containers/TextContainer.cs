@@ -1,4 +1,5 @@
 ﻿using Azalea.Caching;
+using Azalea.Design.Compositions;
 using Azalea.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
@@ -141,7 +142,7 @@ public class TextContainer : FlexContainer
 		foreach (var manualPart in _parts.OfType<TextPartManual>())
 			RemoveRange(manualPart.GameObjects);
 
-		base.Clear(true);
+		base.Clear();
 
 		foreach (var part in _parts)
 			recreatePart(part);
@@ -156,9 +157,9 @@ public class TextContainer : FlexContainer
 			base.Add(go);
 	}
 
-	public override void Clear(bool disposeChildren)
+	public override void Clear()
 	{
-		base.Clear(disposeChildren);
+		base.Clear();
 		_parts.Clear();
 	}
 
@@ -239,7 +240,7 @@ public class TextContainer : FlexContainer
 		}
 	}
 
-	public class NewLineContainer : Container
+	public class NewLineContainer : Composition
 	{
 		public readonly bool IndicatesNewParagraph = true;
 		public NewLineContainer() { }

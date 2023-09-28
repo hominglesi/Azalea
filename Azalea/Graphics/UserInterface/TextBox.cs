@@ -1,4 +1,5 @@
 ﻿using Azalea.Caching;
+using Azalea.Design.Compositions;
 using Azalea.Graphics.Containers;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
@@ -11,10 +12,10 @@ using System.Numerics;
 
 namespace Azalea.Graphics.UserInterface;
 
-public abstract class TextBox : Container
+public abstract class TextBox : Composition
 {
 	protected FlexContainer TextFlow { get; private set; }
-	protected Container TextContainer { get; private set; }
+	protected Composition TextContainer { get; private set; }
 
 	private bool canAddCharacter(char character) => char.IsControl(character) == false;
 
@@ -39,7 +40,7 @@ public abstract class TextBox : Container
 	{
 		Children = new GameObject[]
 		{
-			TextContainer = new Container()
+			TextContainer = new Composition()
 			{
 				Size = Vector2.One,
 				RelativeSizeAxes = Axes.Both,

@@ -1,5 +1,5 @@
-﻿using Azalea.Graphics;
-using Azalea.Graphics.Containers;
+﻿using Azalea.Design.Compositions;
+using Azalea.Graphics;
 using Azalea.Graphics.Textures;
 using Azalea.IO.Assets;
 using Azalea.IO.Stores;
@@ -8,7 +8,7 @@ using System;
 
 namespace Azalea;
 
-public abstract class AzaleaGame : Container
+public abstract class AzaleaGame : Composition
 {
 	public static AzaleaGame Main => _main ?? throw new Exception("No game has been initialized");
 	private static AzaleaGame? _main;

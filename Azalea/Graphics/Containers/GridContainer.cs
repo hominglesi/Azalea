@@ -1,4 +1,5 @@
 ﻿using Azalea.Caching;
+using Azalea.Design.Compositions;
 using Azalea.Extentions.EnumExtentions;
 using Azalea.Layout;
 using System;
@@ -102,7 +103,7 @@ public class GridContainer : CompositeGameObject
 		int requiredColumns = requiredRows == 0 ? 0 : Content?.Max(c => c?.Count ?? 0) ?? 0;
 
 		foreach (var cell in _cells)
-			cell.Clear(false);
+			cell.Clear();
 
 		ClearInternal();
 		cellLayout.Invalidate();
@@ -266,7 +267,7 @@ public class GridContainer : CompositeGameObject
 		}
 	}
 
-	private class CellContainer : Container
+	private class CellContainer : Composition
 	{
 		protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
 		{

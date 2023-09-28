@@ -1,8 +1,8 @@
 ﻿using Azalea.Design.Compositions;
+using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Containers;
-using Azalea.Graphics.Shapes;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.UserInterface;
 using Azalea.Inputs;
@@ -18,12 +18,14 @@ public class TestingTestScene : TestScene
 
 	public TestingTestScene()
 	{
-		Add(new Outline(_container = new TextContainer(t => { t.Font = t.Font.With(size: 40); })
+		Add(_container = new TextContainer(t => { t.Font = t.Font.With(size: 40); })
 		{
 			Size = new Vector2(400, 400),
 			LineSpacing = 1f,
-			Text = "Lorem ipsum dolor sit amet,\n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum"
-		}));
+			Text = "Lorem ipsum dolor sit amet,\n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
+			//BackgroundColor = ColorInfo.SolidColor(Palette.Black),
+			BorderColor = ColorInfo.SolidColor(Palette.Black),
+		});
 
 		_container.AddText("Text3 ", t => { t.Color = Palette.Black; });
 		_container.AddText("Text4 ");
@@ -60,23 +62,19 @@ public class TestingTestScene : TestScene
 			Anchor = Anchor.TopRight
 		});
 
-		Add(new Container()
+		Add(new Composition()
 		{
 			Size = new(200, 200),
 			Position = new(500, 50),
 			Alpha = 0.5f,
-			Children = new GameObject[]
-			{
-				new Box()
-				{
-					RelativeSizeAxes = Axes.Both,
-					ColorInfo = ColorInfo.GradientHorizontal(Palette.Blue, Palette.Green)
-				}
-			}
+			BackgroundColor = ColorInfo.GradientHorizontal(Palette.Blue, Palette.Green)
 		});
 
 		BasicWindow window;
-		Add(window = new BasicWindow());
+		Add(window = new BasicWindow()
+		{
+			Position = new(300, 300)
+		});
 
 		window.Add(new SpriteText()
 		{

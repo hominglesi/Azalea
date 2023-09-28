@@ -1,5 +1,5 @@
-﻿using Azalea.Graphics.Colors;
-using Azalea.Graphics.Shapes;
+﻿using Azalea.Design.Shapes;
+using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs.Events;
 using System.Numerics;

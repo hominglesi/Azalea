@@ -1,12 +1,11 @@
 ﻿using Azalea.Graphics;
-using Azalea.Graphics.Containers;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Design.Compositions;
-public abstract class Window : Container
+public abstract class Window : Composition
 {
 	#region Dragging
 
@@ -39,9 +38,6 @@ public abstract class Window : Container
 	}
 
 	#endregion
-
-	protected abstract Container ContentContainer { get; }
-	protected override sealed Container Content => ContentContainer;
 
 	protected override void Update()
 	{

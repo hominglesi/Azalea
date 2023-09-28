@@ -1,8 +1,8 @@
-﻿using Azalea.Graphics.Containers;
+﻿using Azalea.Design.Compositions;
 
 namespace Azalea.VisualTests;
 
-public class TestScene : Container
+public class TestScene : Composition
 {
 	public TestScene()
 	{

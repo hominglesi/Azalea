@@ -1,7 +1,8 @@
-﻿using Azalea.Graphics;
+﻿using Azalea.Design.Compositions;
+using Azalea.Design.Shapes;
+using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Containers;
-using Azalea.Graphics.Shapes;
 using Azalea.Inputs;
 
 namespace Azalea.VisualTests;
@@ -14,7 +15,7 @@ public class FlexTest : TestScene
 	{
 		AddRange(new GameObject[]
 		{
-			new Container()
+			new Composition()
 			{
 				RelativeSizeAxes = Axes.Both,
 				Size = new(1, 0.25f),
