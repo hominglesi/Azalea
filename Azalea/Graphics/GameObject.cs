@@ -1,7 +1,7 @@
-﻿using Azalea.Extentions;
+﻿using Azalea.Design.Compositions;
+using Azalea.Extentions;
 using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics.Colors;
-using Azalea.Graphics.Containers;
 using Azalea.Graphics.Primitives;
 using Azalea.Inputs.Events;
 using Azalea.Layout;
@@ -467,7 +467,7 @@ public abstract class GameObject : IGameObject
 			if (parent == value) return;
 
 			if (value != null && parent != null)
-				throw new Exception("Cannot add GameObject to multiple containers");
+				throw new Exception("Cannot add GameObject to multiple compositions.");
 
 			parent = value;
 		}

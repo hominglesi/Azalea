@@ -9,7 +9,7 @@ using System.Numerics;
 namespace Azalea.Design.Compositions;
 
 /// <summary>
-/// A container that can be used to fluently arrange its children.
+/// A composition that can be used to fluently arrange its children.
 /// </summary>
 public abstract class FlowComposition : Composition
 {
@@ -115,7 +115,7 @@ public abstract class FlowComposition : Composition
 				Debug.Assert(drawable is not null);
 
 				if (drawable.RelativePositionAxes != Axes.None)
-					throw new InvalidOperationException($"A flow container cannot contain a child with relative positioning (it is {drawable.RelativePositionAxes}).");
+					throw new InvalidOperationException($"A flow composition cannot contain a child with relative positioning (it is {drawable.RelativePositionAxes}).");
 
 				Vector2 currentTargetPos = drawable.Position;
 

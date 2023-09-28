@@ -1,9 +1,10 @@
-﻿using Azalea.Graphics.Sprites;
+﻿using Azalea.Graphics;
+using Azalea.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Azalea.Graphics.Containers;
+namespace Azalea.Design.Compositions.Text;
 
 public class TextChunk<TSpriteText> : TextPart
 	where TSpriteText : SpriteText, new()
@@ -18,15 +19,15 @@ public class TextChunk<TSpriteText> : TextPart
 		_creationParameters = creationParameters;
 	}
 
-	public override IEnumerable<GameObject> CreateGameObjectsFor(TextContainer textContainer)
+	public override IEnumerable<GameObject> CreateGameObjectsFor(TextComposition textComposition)
 	{
 		var gameObjects = new List<GameObject>();
 
-		gameObjects.AddRange(CreateGameObjectsFor(_text, textContainer));
+		gameObjects.AddRange(CreateGameObjectsFor(_text, textComposition));
 		return gameObjects;
 	}
 
-	protected virtual IEnumerable<GameObject> CreateGameObjectsFor(string text, TextContainer textContainer)
+	protected virtual IEnumerable<GameObject> CreateGameObjectsFor(string text, TextComposition textComposition)
 	{
 		bool first = true;
 		var sprites = new List<GameObject>();
@@ -36,11 +37,11 @@ public class TextChunk<TSpriteText> : TextPart
 			/*
 			if (!first)
 			{
-				GameObject? lastChild = sprites.LastOrDefault() ?? textContainer.Children.LastOrDefault();
+				GameObject? lastChild = sprites.LastOrDefault() ?? textComposition.Children.LastOrDefault();
 
 				if (lastChild is not null)
 				{
-					var newLine = new TextContainer.NewLineContainer();
+					var newLine = new TextComposition.NewLineComposition();
 					sprites.Add(newLine);
 				}
 			}*/
@@ -49,7 +50,7 @@ public class TextChunk<TSpriteText> : TextPart
 			{
 				if (string.IsNullOrEmpty(word)) continue;
 
-				var textSprite = CreateSpriteText(textContainer);
+				var textSprite = CreateSpriteText(textComposition);
 				textSprite.Text = word;
 				sprites.Add(textSprite);
 			}
@@ -82,10 +83,10 @@ public class TextChunk<TSpriteText> : TextPart
 		return words.ToArray();
 	}
 
-	protected virtual TSpriteText CreateSpriteText(TextContainer textContainer)
+	protected virtual TSpriteText CreateSpriteText(TextComposition textComposition)
 	{
 		var spriteText = _creationFunc.Invoke();
-		textContainer.ApplyDefaultCreationParameters(spriteText);
+		textComposition.ApplyDefaultCreationParameters(spriteText);
 		_creationParameters?.Invoke(spriteText);
 		return spriteText;
 	}

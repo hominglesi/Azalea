@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Azalea.Graphics;
+using System;
 using System.Collections.Generic;
 
-namespace Azalea.Graphics.Containers;
+namespace Azalea.Design.Compositions.Text;
 
 public abstract class TextPart : ITextPart
 {
@@ -15,12 +16,12 @@ public abstract class TextPart : ITextPart
 		GameObjects = _gameObjects.AsReadOnly();
 	}
 
-	public void RecreateGameObjectsFor(TextContainer textContainer)
+	public void RecreateGameObjectsFor(TextComposition textComposition)
 	{
 		_gameObjects.Clear();
-		_gameObjects.AddRange(CreateGameObjectsFor(textContainer));
+		_gameObjects.AddRange(CreateGameObjectsFor(textComposition));
 		GameObjectPartsRecreated?.Invoke(_gameObjects);
 	}
 
-	public abstract IEnumerable<GameObject> CreateGameObjectsFor(TextContainer textContainer);
+	public abstract IEnumerable<GameObject> CreateGameObjectsFor(TextComposition textComposition);
 }

@@ -1,6 +1,6 @@
 ﻿using Azalea.Caching;
-using Azalea.Design.Compositions;
 using Azalea.Extentions.EnumExtentions;
+using Azalea.Graphics;
 using Azalea.Layout;
 using System;
 using System.Collections.Generic;
@@ -8,11 +8,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
-namespace Azalea.Graphics.Containers;
+namespace Azalea.Design.Compositions;
 
-public class GridContainer : CompositeGameObject
+public class GridComposition : CompositeGameObject
 {
-	public GridContainer()
+	public GridComposition()
 	{
 		AddLayout(cellLayout);
 		AddLayout(cellChildLayout);
@@ -20,8 +20,8 @@ public class GridContainer : CompositeGameObject
 		layoutContent();
 	}
 
-	private GridContainerContent? _content;
-	public GridContainerContent? Content
+	private GridCompositionContent? _content;
+	public GridCompositionContent? Content
 	{
 		get => _content;
 		set
@@ -91,7 +91,7 @@ public class GridContainer : CompositeGameObject
 	private readonly LayoutValue cellLayout = new(Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit);
 	private readonly LayoutValue cellChildLayout = new(Invalidation.RequiredParentSizeToFit | Invalidation.Presence, InvalidationSource.Child);
 
-	private CellContainer[,] _cells = new CellContainer[0, 0];
+	private CellComposition[,] _cells = new CellComposition[0, 0];
 	private int _cellRows => _cells.GetLength(0);
 	private int _cellColumns => _cells.GetLength(1);
 
@@ -108,7 +108,7 @@ public class GridContainer : CompositeGameObject
 		ClearInternal();
 		cellLayout.Invalidate();
 
-		_cells = new CellContainer[requiredRows, requiredColumns];
+		_cells = new CellComposition[requiredRows, requiredColumns];
 
 		for (int r = 0; r < _cellRows; r++)
 		{
@@ -116,7 +116,7 @@ public class GridContainer : CompositeGameObject
 			{
 				Debug.Assert(Content != null);
 
-				_cells[r, c] = new CellContainer();
+				_cells[r, c] = new CellComposition();
 
 				if (Content[r] is null)
 					continue;
@@ -267,7 +267,7 @@ public class GridContainer : CompositeGameObject
 		}
 	}
 
-	private class CellContainer : Composition
+	private class CellComposition : Composition
 	{
 		protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
 		{

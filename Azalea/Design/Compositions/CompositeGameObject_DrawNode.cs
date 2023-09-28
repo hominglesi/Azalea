@@ -1,7 +1,8 @@
-﻿using Azalea.Graphics.Rendering;
+﻿using Azalea.Graphics;
+using Azalea.Graphics.Rendering;
 using System.Collections.Generic;
 
-namespace Azalea.Graphics.Containers;
+namespace Azalea.Design.Compositions;
 
 public partial class CompositeGameObject
 {

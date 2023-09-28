@@ -1,8 +1,8 @@
 ﻿using Azalea.Design.Compositions;
+using Azalea.Design.Compositions.Text;
 using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
-using Azalea.Graphics.Containers;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.UserInterface;
 using Azalea.Inputs;
@@ -13,12 +13,12 @@ namespace Azalea.VisualTests;
 
 public class TestingTestScene : TestScene
 {
-	private TextContainer _container;
+	private TextComposition _composition;
 	private BasicTextBox _text;
 
 	public TestingTestScene()
 	{
-		Add(_container = new TextContainer(t => { t.Font = t.Font.With(size: 40); })
+		Add(_composition = new TextComposition(t => { t.Font = t.Font.With(size: 40); })
 		{
 			Size = new Vector2(400, 400),
 			LineSpacing = 1f,
@@ -27,8 +27,8 @@ public class TestingTestScene : TestScene
 			BorderColor = ColorInfo.SolidColor(Palette.Black),
 		});
 
-		_container.AddText("Text3 ", t => { t.Color = Palette.Black; });
-		_container.AddText("Text4 ");
+		_composition.AddText("Text3 ", t => { t.Color = Palette.Black; });
+		_composition.AddText("Text4 ");
 
 		Add(_text = new BasicTextBox()
 		{
@@ -85,9 +85,9 @@ public class TestingTestScene : TestScene
 
 	protected override void Update()
 	{
-		_container.Size = Input.MousePosition;
+		_composition.Size = Input.MousePosition;
 
-		if (Input.GetKey(Keys.P).Down && _container.Children.Count > 0) _container.Remove(_container.Children[0]);
+		if (Input.GetKey(Keys.P).Down && _composition.Children.Count > 0) _composition.Remove(_composition.Children[0]);
 
 		if (Input.GetKey(Keys.Space).DownOrRepeat) Console.WriteLine("Pressed space");
 	}

@@ -1,0 +1,1 @@
+Represents a collection of objects just like a [[CompositeGameObject]] but it can also have internal children which are not considered for methods like `Clear()` or `Children.Count`.

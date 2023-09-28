@@ -1,4 +1,4 @@
-﻿using Azalea.Graphics.Containers;
+﻿using Azalea.Design.Compositions.Text;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -20,7 +20,7 @@ public class TextPartManual : ITextPart
 		GameObjects = gameObjects.ToImmutableArray();
 	}
 
-	public void RecreateGameObjectsFor(TextContainer textContainer)
+	public void RecreateGameObjectsFor(TextComposition textComposition)
 	{
 
 	}

@@ -1,13 +1,13 @@
-﻿using Azalea.Design.Compositions;
+﻿using Azalea.Graphics;
 using Azalea.Utils;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
-namespace Azalea.Graphics.Containers;
+namespace Azalea.Design.Compositions;
 
-public class FlexContainer : FlowComposition
+public class FlexComposition : FlowComposition
 {
 	private FlexDirection _direction = FlexDirection.Horizontal;
 	public FlexDirection Direction
@@ -144,7 +144,7 @@ public class FlexContainer : FlowComposition
 	}
 }
 /// <summary>
-/// Represents the direction children of a <see cref="FlexContainer{T}"/> should be filled in.
+/// Represents the direction children of a <see cref="FlexComposition{T}"/> should be filled in.
 /// </summary>
 public enum FlexDirection
 {
@@ -155,7 +155,7 @@ public enum FlexDirection
 }
 
 /// <summary>
-/// Represents if and how the children of a <see cref="FlexContainer{T}"/> should be filled in.
+/// Represents if and how the children of a <see cref="FlexComposition{T}"/> should be filled in.
 /// </summary>
 public enum FlexWrapping
 {

@@ -9,12 +9,12 @@ namespace Azalea.VisualTests;
 
 public class DefaultUserInputTest : TestScene
 {
-	private Composition _buttonContainer;
-	private Composition _childButtonContainer;
+	private Composition _buttonComposition;
+	private Composition _childButtonComposition;
 
 	public DefaultUserInputTest()
 	{
-		Add(_buttonContainer = new Composition()
+		Add(_buttonComposition = new Composition()
 		{
 			RelativeSizeAxes = Axes.Both,
 			Size = new(0.48f, 0.48f),
@@ -48,7 +48,7 @@ public class DefaultUserInputTest : TestScene
 					Action = () => { Write("Button 3 clicked");},
 					Size = new(80, 200)
 				},
-				_childButtonContainer = new Composition()
+				_childButtonComposition = new Composition()
 				{
 					Position = new(1f, 1f),
 					RelativePositionAxes = Axes.Both,

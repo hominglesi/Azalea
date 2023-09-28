@@ -1,7 +1,6 @@
 ﻿using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
-using Azalea.Graphics.Containers;
 using Azalea.Layout;
 using System.Collections.Generic;
 using System.Numerics;

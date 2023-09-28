@@ -1,10 +1,11 @@
-﻿using Azalea.Layout;
+﻿using Azalea.Graphics;
+using Azalea.Layout;
 using Azalea.Lists;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace Azalea.Graphics.Containers;
+namespace Azalea.Design.Compositions;
 
 public partial class CompositeGameObject : GameObject
 {
@@ -31,7 +32,7 @@ public partial class CompositeGameObject : GameObject
 			throw new InvalidOperationException($"{nameof(CompositeGameObject)} cannot be addet to itself.");
 
 		if (gameObject.ChildID != 0)
-			throw new InvalidOperationException($"Cannot add Game Object to multiple containers.");
+			throw new InvalidOperationException($"Cannot add Game Object to multiple compositions.");
 
 		gameObject.ChildID = ++currentChildID;
 		gameObject.Parent = this;

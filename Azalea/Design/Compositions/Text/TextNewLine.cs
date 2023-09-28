@@ -1,7 +1,8 @@
 ﻿using Azalea.Extentions.IEnumerableExtentions;
+using Azalea.Graphics;
 using System.Collections.Generic;
 
-namespace Azalea.Graphics.Containers;
+namespace Azalea.Design.Compositions.Text;
 
 public class TextNewLine : TextPart
 {
@@ -12,9 +13,9 @@ public class TextNewLine : TextPart
 		_indicatesNewParagraph = indicatesNewParagraph;
 	}
 
-	public override IEnumerable<GameObject> CreateGameObjectsFor(TextContainer textContainer)
+	public override IEnumerable<GameObject> CreateGameObjectsFor(TextComposition textComposition)
 	{
-		var newLineContainer = new TextContainer.NewLineContainer();
-		return newLineContainer.Yield();
+		var newLineComposition = new TextComposition.NewLineComposition();
+		return newLineComposition.Yield();
 	}
 }

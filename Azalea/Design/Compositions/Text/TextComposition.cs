@@ -1,13 +1,13 @@
 ﻿using Azalea.Caching;
-using Azalea.Design.Compositions;
+using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Azalea.Graphics.Containers;
+namespace Azalea.Design.Compositions.Text;
 
-public class TextContainer : FlexContainer
+public class TextComposition : FlexComposition
 {
 	private readonly Action<SpriteText> _defaultCreationParameters;
 
@@ -83,7 +83,7 @@ public class TextContainer : FlexContainer
 		}
 	}
 
-	public TextContainer(Action<SpriteText> defaultCreationParameters = null)
+	public TextComposition(Action<SpriteText> defaultCreationParameters = null)
 	{
 		_defaultCreationParameters = defaultCreationParameters;
 	}
@@ -172,7 +172,7 @@ public class TextContainer : FlexContainer
 
 		foreach (var c in Children)
 		{
-			if (c is NewLineContainer nlc)
+			if (c is NewLineComposition nlc)
 			{
 				currentLine.Add(nlc);
 				childrenByLine.Add(currentLine);
@@ -208,7 +208,7 @@ public class TextContainer : FlexContainer
 
 			foreach (GameObject c in line)
 			{
-				if (c is NewLineContainer nlc)
+				if (c is NewLineComposition nlc)
 				{
 					nlc.Height = nlc.IndicatesNewParagraph ? (currentLineHeight == 0 ? lastLineHeight : currentLineHeight) * ParagraphSpacing : 0;
 					continue;
@@ -240,9 +240,9 @@ public class TextContainer : FlexContainer
 		}
 	}
 
-	public class NewLineContainer : Composition
+	public class NewLineComposition : Composition
 	{
 		public readonly bool IndicatesNewParagraph = true;
-		public NewLineContainer() { }
+		public NewLineComposition() { }
 	}
 }
