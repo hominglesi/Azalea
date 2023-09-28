@@ -10,8 +10,7 @@ namespace Azalea.Graphics.Containers;
 /// <summary>
 /// A container that can be used to fluently arrange its children.
 /// </summary>
-public abstract class FlowContainer<T> : Container<T>
-	where T : GameObject
+public abstract class FlowContainer : Container
 {
 	internal event Action? OnLayout;
 
@@ -57,22 +56,22 @@ public abstract class FlowContainer<T> : Container<T>
 	public void SetLayoutPosition(GameObject gameObject, float newPosition)
 	{
 		if (!_layoutChildren.ContainsKey(gameObject))
-			throw new InvalidOperationException($"Cannot change layout position of game object which is not contained within this {nameof(FlowContainer<T>)}.");
+			throw new InvalidOperationException($"Cannot change layout position of game object which is not contained within this {nameof(FlowContainer)}.");
 
 		_layoutChildren[gameObject] = newPosition;
 		InvalidateLayout();
 	}
 
-	public void Insert(int position, T drawable)
+	public void Insert(int position, GameObject obj)
 	{
-		Add(drawable);
-		SetLayoutPosition(drawable, position);
+		Add(obj);
+		SetLayoutPosition(obj, position);
 	}
 
 	public float GetLayoutPosition(GameObject gameObject)
 	{
 		if (!_layoutChildren.ContainsKey(gameObject))
-			throw new InvalidOperationException($"Cannot get layout position of game object which is not contained within this {nameof(FlowContainer<T>)}.");
+			throw new InvalidOperationException($"Cannot get layout position of game object which is not contained within this {nameof(FlowContainer)}.");
 
 		return _layoutChildren[gameObject];
 	}

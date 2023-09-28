@@ -39,6 +39,12 @@ public partial class CompositeGameObject : GameObject
 		internalChildren.Add(gameObject);
 	}
 
+	protected void AddRangeInternal(IEnumerable<GameObject> objects)
+	{
+		foreach (GameObject gameObject in objects)
+			AddInternal(gameObject);
+	}
+
 	protected internal int IndexOfInternal(GameObject gameObject)
 	{
 		if (gameObject.Parent != null && gameObject.Parent != this)

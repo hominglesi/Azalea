@@ -1,0 +1,1 @@
+-"Containers" are now called "Compositions". This was done to prevent visual studio from automatically including the wrong one causing unexpected behavior.

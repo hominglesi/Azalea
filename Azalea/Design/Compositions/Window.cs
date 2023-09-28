@@ -41,7 +41,7 @@ public abstract class Window : Container
 	#endregion
 
 	protected abstract Container ContentContainer { get; }
-	protected override sealed Container<GameObject> Content => ContentContainer;
+	protected override sealed Container Content => ContentContainer;
 
 	protected override void Update()
 	{

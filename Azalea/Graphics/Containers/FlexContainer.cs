@@ -6,16 +6,7 @@ using System.Numerics;
 
 namespace Azalea.Graphics.Containers;
 
-/// <summary>
-/// A container that fills space by arranging its children next to each other
-/// </summary>
-public class FlexContainer : FlexContainer<GameObject>
-{
-
-}
-
-public class FlexContainer<T> : FlowContainer<T>
-	where T : GameObject
+public class FlexContainer : FlowContainer
 {
 	private FlexDirection _direction = FlexDirection.Horizontal;
 	public FlexDirection Direction
