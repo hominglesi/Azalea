@@ -1,0 +1,1 @@
+A base building block for all [[Azalea]] games.

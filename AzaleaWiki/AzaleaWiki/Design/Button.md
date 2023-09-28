@@ -1,0 +1,1 @@
+A [[GameObject]] with an `Action` property that gets called on click, which also [[Consuming Input|consumes input]].
