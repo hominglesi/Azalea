@@ -1,7 +1,9 @@
-﻿using Azalea.Graphics;
+﻿using Azalea.Design.Compositions;
+using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Containers;
 using Azalea.Graphics.Shapes;
+using Azalea.Graphics.Sprites;
 using Azalea.Graphics.UserInterface;
 using Azalea.Inputs;
 using System;
@@ -71,6 +73,15 @@ public class TestingTestScene : TestScene
 					ColorInfo = ColorInfo.GradientHorizontal(Palette.Blue, Palette.Green)
 				}
 			}
+		});
+
+		BasicWindow window;
+		Add(window = new BasicWindow());
+
+		window.Add(new SpriteText()
+		{
+			Color = Palette.Black,
+			Text = "JA sam U windowu"
 		});
 	}
 

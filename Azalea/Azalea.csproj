@@ -48,6 +48,7 @@
     <Content Include="..\build\Native\soft_oal.dll" Pack="true" PackagePath="native">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <PackageCopyToOutput>true</PackageCopyToOutput>
+      <Visible>false</Visible>
     </Content>
   </ItemGroup>
   

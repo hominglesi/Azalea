@@ -41,6 +41,15 @@ public class Container<T> : CompositeGameObject
 		set => ChildrenEnumerable = value;
 	}
 
+	public T Child
+	{
+		set
+		{
+			Clear();
+			Add(value);
+		}
+	}
+
 	public IEnumerable<T> ChildrenEnumerable
 	{
 		set
@@ -108,6 +117,12 @@ public class Container<T> : CompositeGameObject
 		enumeratorVersion++;
 
 		base.AddInternal(gameObject);
+	}
+
+	protected void AddRangeInternal(IEnumerable<GameObject> objects)
+	{
+		foreach (T gameObject in objects)
+			AddInternal(gameObject);
 	}
 
 	public void ChangeChildDepth(T child, float newDepth)

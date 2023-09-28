@@ -667,41 +667,64 @@ public abstract class GameObject : IGameObject
 		switch (e)
 		{
 			case MouseDownEvent mouseDown:
-				return OnMouseDown(mouseDown);
+				var mdResult = OnMouseDown(mouseDown);
+				MouseDown?.Invoke(mouseDown);
+				return mdResult;
 			case MouseUpEvent mouseUp:
 				OnMouseUp(mouseUp);
+				MouseUp?.Invoke(mouseUp);
 				return false;
 			case ClickEvent click:
-				return OnClick(click);
+				var cResult = OnClick(click);
+				Click?.Invoke(click);
+				return cResult;
 			case HoverEvent hover:
-				return OnHover(hover);
+				var hResult = OnHover(hover);
+				Hover?.Invoke(hover);
+				return hResult;
 			case HoverLostEvent hoverLost:
 				OnHoverLost(hoverLost);
+				HoverLost?.Invoke(hoverLost);
 				return false;
 			case KeyDownEvent keyDown:
-				return OnKeyDown(keyDown);
+				var kdResult = OnKeyDown(keyDown);
+				return kdResult;
 			case KeyUpEvent keyUp:
 				OnKeyUp(keyUp);
+				KeyUp?.Invoke(keyUp);
 				return false;
 			case FocusEvent focus:
 				OnFocus(focus);
+				Focus?.Invoke(focus);
 				return false;
 			case FocusLostEvent focusLost:
 				OnFocusLost(focusLost);
+				FocusLost?.Invoke(focusLost);
 				return false;
 			default:
 				return Handle(e);
 		}
 	}
+
 	protected virtual bool OnMouseDown(MouseDownEvent e) => Handle(e);
+	public event Action<MouseDownEvent>? MouseDown;
 	protected virtual void OnMouseUp(MouseUpEvent e) => Handle(e);
+	public event Action<MouseUpEvent>? MouseUp;
 	protected virtual bool OnClick(ClickEvent e) => Handle(e);
+	public Action<ClickEvent> ClickAction { set { Click += value; } }
+	public event Action<ClickEvent>? Click;
 	protected virtual bool OnHover(HoverEvent e) => Handle(e);
+	public event Action<HoverEvent>? Hover;
 	protected virtual void OnHoverLost(HoverLostEvent e) => Handle(e);
+	public event Action<HoverLostEvent>? HoverLost;
 	protected virtual bool OnKeyDown(KeyDownEvent e) => Handle(e);
+	public event Action<KeyDownEvent>? KeyDown;
 	protected virtual void OnKeyUp(KeyUpEvent e) => Handle(e);
+	public event Action<KeyUpEvent>? KeyUp;
 	protected virtual void OnFocus(FocusEvent e) => Handle(e);
+	public event Action<FocusEvent>? Focus;
 	protected virtual void OnFocusLost(FocusLostEvent e) => Handle(e);
+	public event Action<FocusLostEvent>? FocusLost;
 
 	#endregion
 

@@ -3,6 +3,7 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Containers;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.Textures;
+using Azalea.Graphics.UserInterface;
 using Azalea.IO.Assets;
 using System;
 using System.Numerics;
@@ -16,7 +17,7 @@ public class MemoryTile : Container
 	public bool IsShown = false;
 	public string TextureName;
 
-	private readonly ClickableContainer _button;
+	private readonly Button _button;
 	private readonly Sprite _sprite;
 	private readonly Texture _texture;
 	private readonly SpriteText _number;
@@ -32,7 +33,7 @@ public class MemoryTile : Container
 		RelativeSizeAxes = Axes.Both;
 
 		AddRange(new GameObject[]{
-			_button = new ClickableContainer()
+			_button = new Button()
 			{
 				Action = () => Action?.Invoke(),
 				RelativeSizeAxes = Axes.Both,
