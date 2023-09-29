@@ -50,7 +50,7 @@ public class Composition : CompositeGameObject
 			if (BackgroundObject == null)
 				AddInternal(BackgroundObject = createSolidBackground());
 
-			BackgroundObject.ColorInfo = value;
+			BackgroundObject.Color = value;
 		}
 	}
 
@@ -70,7 +70,7 @@ public class Composition : CompositeGameObject
 			if (BorderObject is null)
 				AddInternal(BorderObject = createBorder());
 
-			BorderObject.ColorInfo = value;
+			BorderObject.Color = value;
 		}
 	}
 
@@ -89,7 +89,7 @@ public class Composition : CompositeGameObject
 	{
 		RelativeSizeAxes = Axes.Both,
 		Depth = 900,
-		ColorInfo = ColorInfo.SolidColor(Palette.Black)
+		Color = ColorInfo.SolidColor(Palette.Black)
 	};
 
 	#region Children

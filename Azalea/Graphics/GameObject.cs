@@ -398,23 +398,17 @@ public abstract class GameObject : IGameObject
 
 	#region Color & Alpha
 
-	private ColorInfo _colorInfo = ColorInfo.SolidColor(Palette.White);
+	private ColorInfo _color = ColorInfo.SolidColor(Palette.White);
 
-	public ColorInfo ColorInfo
+	public ColorInfo Color
 	{
-		get => _colorInfo;
+		get => _color;
 		set
 		{
-			if (_colorInfo == value) return;
+			if (_color == value) return;
 
-			_colorInfo = value;
+			_color = value;
 		}
-	}
-
-	//Helper property for easily setting the color
-	public Color Color
-	{
-		set { ColorInfo = ColorInfo.SolidColor(value); }
 	}
 
 	private float _alpha = 1;
@@ -736,7 +730,7 @@ public abstract class GameObject : IGameObject
 	{
 		var info = Parent?.DrawColorInfo ?? new DrawColorInfo(null);
 
-		var colorInfo = _colorInfo;
+		var colorInfo = _color;
 
 		if (Alpha != 1)
 			colorInfo = colorInfo.MultiplyAlpha(Alpha);

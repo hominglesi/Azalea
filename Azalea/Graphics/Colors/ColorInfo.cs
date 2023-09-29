@@ -106,5 +106,7 @@ public partial struct ColorInfo : IEquatable<ColorInfo>
 	public static bool operator ==(ColorInfo left, ColorInfo right) => left.Equals(right);
 	public static bool operator !=(ColorInfo left, ColorInfo right) => left.Equals(right) == false;
 
+	public static implicit operator ColorInfo(Color color) => SolidColor(color);
+
 	public override readonly int GetHashCode() => HashCode.Combine(TopLeft, BottomLeft, BottomRight, TopRight, HasSingleColor);
 }

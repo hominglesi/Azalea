@@ -16,20 +16,20 @@ public class BasicButton : Button
 
 	public ColorInfo TextColor
 	{
-		get => SpriteText.ColorInfo;
-		set => SpriteText.ColorInfo = value;
+		get => SpriteText.Color;
+		set => SpriteText.Color = value;
 	}
 
 	public ColorInfo BackgroundColor
 	{
-		get => Background.ColorInfo;
-		set => Background.ColorInfo = value;
+		get => Background.Color;
+		set => Background.Color = value;
 	}
 
 	public ColorInfo HoveredColor
 	{
-		get => HoveredBackground.ColorInfo;
-		set => HoveredBackground.ColorInfo = value;
+		get => HoveredBackground.Color;
+		set => HoveredBackground.Color = value;
 	}
 
 	protected Box Background;

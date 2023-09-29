@@ -19,7 +19,7 @@ public class TestGame : AzaleaGame
 		Host.Window.Title = "Ide gas";
 		Host.Window.Title += " a ide i plin";
 
-		Host.Renderer.ClearColor = ColorInfo.Red;
+		Host.Renderer.ClearColor = Color.Red;
 
 		_timer = new Timer(1000 / 2)
 		{
@@ -28,8 +28,8 @@ public class TestGame : AzaleaGame
 		};
 		_timer.Elapsed += (_, _) => { Host.Renderer.ClearColor = Rng.Color(); };
 
-		Add(new Box() { Size = new Vector2(200, 100), ColorInfo = ColorInfo.Aqua });
-		Add(new Box() { Position = new Vector2(100, 400), Size = new Vector2(50, 100), ColorInfo = ColorInfo.Black });
+		Add(new Box() { Size = new Vector2(200, 100), ColorInfo = Color.Aqua });
+		Add(new Box() { Position = new Vector2(100, 400), Size = new Vector2(50, 100), ColorInfo = Color.Black });
 		Add(_azalea = new Sprite() { Texture = Assets.GetTexture("azalea-icon.png"), Origin = Anchor.Center });
 	}
 
