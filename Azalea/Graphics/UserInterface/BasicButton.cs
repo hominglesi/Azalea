@@ -14,19 +14,19 @@ public class BasicButton : Button
 		set => SpriteText.Text = value;
 	}
 
-	public ColorInfo TextColor
+	public ColorQuad TextColor
 	{
 		get => SpriteText.Color;
 		set => SpriteText.Color = value;
 	}
 
-	public ColorInfo BackgroundColor
+	public ColorQuad BackgroundColor
 	{
 		get => Background.Color;
 		set => Background.Color = value;
 	}
 
-	public ColorInfo HoveredColor
+	public ColorQuad HoveredColor
 	{
 		get => HoveredBackground.Color;
 		set => HoveredBackground.Color = value;

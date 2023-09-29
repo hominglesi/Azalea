@@ -1,7 +1,7 @@
 ﻿namespace Azalea.Graphics.Colors;
-public partial struct ColorInfo
+public partial struct ColorQuad
 {
-	public readonly ColorInfo ModifyHue(float value)
+	public readonly ColorQuad ModifyHue(float value)
 	{
 		if (HasSingleColor)
 		{
@@ -20,10 +20,10 @@ public partial struct ColorInfo
 			var topRight = TopRight;
 			topRight.Hue += value;
 
-			return new ColorInfo(topLeft, bottomLeft, bottomRight, topRight);
+			return new ColorQuad(topLeft, bottomLeft, bottomRight, topRight);
 		}
 	}
-	public readonly ColorInfo ModifySaturation(float value)
+	public readonly ColorQuad ModifySaturation(float value)
 	{
 		if (HasSingleColor)
 		{
@@ -42,11 +42,11 @@ public partial struct ColorInfo
 			var topRight = TopRight;
 			topRight.Saturation += value;
 
-			return new ColorInfo(topLeft, bottomLeft, bottomRight, topRight);
+			return new ColorQuad(topLeft, bottomLeft, bottomRight, topRight);
 		}
 	}
 
-	public readonly ColorInfo ModifyLuminance(float value)
+	public readonly ColorQuad ModifyLuminance(float value)
 	{
 		if (HasSingleColor)
 		{
@@ -65,7 +65,7 @@ public partial struct ColorInfo
 			var topRight = TopRight;
 			topRight.Luminance += value;
 
-			return new ColorInfo(topLeft, bottomLeft, bottomRight, topRight);
+			return new ColorQuad(topLeft, bottomLeft, bottomRight, topRight);
 		}
 	}
 }

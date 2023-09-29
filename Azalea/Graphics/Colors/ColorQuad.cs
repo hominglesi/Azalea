@@ -2,7 +2,7 @@
 using System.Diagnostics;
 
 namespace Azalea.Graphics.Colors;
-public partial struct ColorInfo : IEquatable<ColorInfo>
+public partial struct ColorQuad : IEquatable<ColorQuad>
 {
 	public Color TopLeft;
 	public Color BottomLeft;
@@ -10,7 +10,7 @@ public partial struct ColorInfo : IEquatable<ColorInfo>
 	public Color TopRight;
 	public bool HasSingleColor;
 
-	public ColorInfo(Color topLeft, Color bottomLeft, Color bottomRight, Color topRight)
+	public ColorQuad(Color topLeft, Color bottomLeft, Color bottomRight, Color topRight)
 	{
 		TopLeft = topLeft;
 		BottomLeft = bottomLeft;
@@ -20,7 +20,7 @@ public partial struct ColorInfo : IEquatable<ColorInfo>
 		HasSingleColor = topLeft == bottomLeft && topLeft == bottomRight && topLeft == topRight;
 	}
 
-	public ColorInfo(Color color)
+	public ColorQuad(Color color)
 	{
 		TopLeft = color;
 		BottomLeft = color;
@@ -30,12 +30,12 @@ public partial struct ColorInfo : IEquatable<ColorInfo>
 		HasSingleColor = true;
 	}
 
-	public static ColorInfo SolidColor(Color color) => new(color);
+	public static ColorQuad SolidColor(Color color) => new(color);
 
-	public static ColorInfo GradientHorizontal(Color leftColor, Color rightColor)
+	public static ColorQuad GradientHorizontal(Color leftColor, Color rightColor)
 		=> new(leftColor, leftColor, rightColor, rightColor);
 
-	public static ColorInfo GradientVertical(Color topColor, Color bottomColor)
+	public static ColorQuad GradientVertical(Color topColor, Color bottomColor)
 		=> new(topColor, bottomColor, bottomColor, topColor);
 
 	internal Color SingleColor
@@ -58,7 +58,7 @@ public partial struct ColorInfo : IEquatable<ColorInfo>
 		return HasSingleColor;
 	}
 
-	public void ApplyChild(ColorInfo child)
+	public void ApplyChild(ColorQuad child)
 	{
 		if (child.HasSingleColor && HasSingleColor)
 		{
@@ -74,7 +74,7 @@ public partial struct ColorInfo : IEquatable<ColorInfo>
 		}
 	}
 
-	public readonly ColorInfo MultiplyAlpha(float alpha)
+	public readonly ColorQuad MultiplyAlpha(float alpha)
 	{
 		if (alpha == 1f) return this;
 
@@ -87,7 +87,7 @@ public partial struct ColorInfo : IEquatable<ColorInfo>
 		return result;
 	}
 
-	public bool Equals(ColorInfo other)
+	public bool Equals(ColorQuad other)
 	{
 		if (HasSingleColor == false)
 		{
@@ -102,11 +102,11 @@ public partial struct ColorInfo : IEquatable<ColorInfo>
 		return other.HasSingleColor && SingleColor.Equals(other.SingleColor);
 	}
 
-	public override bool Equals(object? obj) => obj is ColorInfo other && Equals(other);
-	public static bool operator ==(ColorInfo left, ColorInfo right) => left.Equals(right);
-	public static bool operator !=(ColorInfo left, ColorInfo right) => left.Equals(right) == false;
+	public override bool Equals(object? obj) => obj is ColorQuad other && Equals(other);
+	public static bool operator ==(ColorQuad left, ColorQuad right) => left.Equals(right);
+	public static bool operator !=(ColorQuad left, ColorQuad right) => left.Equals(right) == false;
 
-	public static implicit operator ColorInfo(Color color) => SolidColor(color);
+	public static implicit operator ColorQuad(Color color) => SolidColor(color);
 
 	public override readonly int GetHashCode() => HashCode.Combine(TopLeft, BottomLeft, BottomRight, TopRight, HasSingleColor);
 }

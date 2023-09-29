@@ -398,9 +398,9 @@ public abstract class GameObject : IGameObject
 
 	#region Color & Alpha
 
-	private ColorInfo _color = ColorInfo.SolidColor(Palette.White);
+	private ColorQuad _color = ColorQuad.SolidColor(Palette.White);
 
-	public ColorInfo Color
+	public ColorQuad Color
 	{
 		get => _color;
 		set

@@ -43,7 +43,7 @@ public class Composition : CompositeGameObject
 
 	public GameObject? BackgroundObject { get; set; }
 
-	public ColorInfo BackgroundColor
+	public ColorQuad BackgroundColor
 	{
 		set
 		{
@@ -63,7 +63,7 @@ public class Composition : CompositeGameObject
 	#endregion
 
 	public HollowBox? BorderObject { get; set; }
-	public ColorInfo BorderColor
+	public ColorQuad BorderColor
 	{
 		set
 		{
@@ -89,7 +89,7 @@ public class Composition : CompositeGameObject
 	{
 		RelativeSizeAxes = Axes.Both,
 		Depth = 900,
-		Color = ColorInfo.SolidColor(Palette.Black)
+		Color = ColorQuad.SolidColor(Palette.Black)
 	};
 
 	#region Children
