@@ -1,11 +1,11 @@
 ﻿using Azalea.Graphics;
 using Azalea.Lists;
 
-namespace Azalea.Design.Compositions;
+namespace Azalea.Design.Containers;
 
-public class GridCompositionContent : ObservableArray<ObservableArray<GameObject>>
+public class GridContainerContent : ObservableArray<ObservableArray<GameObject>>
 {
-	public GridCompositionContent(GameObject[][] objects)
+	public GridContainerContent(GameObject[][] objects)
 		: base(new ObservableArray<GameObject>[objects.Length])
 	{
 		for (int i = 0; i < objects.Length; i++)
@@ -18,11 +18,11 @@ public class GridCompositionContent : ObservableArray<ObservableArray<GameObject
 		}
 	}
 
-	public static implicit operator GridCompositionContent?(GameObject[][] objects)
+	public static implicit operator GridContainerContent?(GameObject[][] objects)
 	{
 		if (objects == null)
 			return null;
 
-		return new GridCompositionContent(objects);
+		return new GridContainerContent(objects);
 	}
 }

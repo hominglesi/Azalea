@@ -6,16 +6,16 @@ using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
-namespace Azalea.Design.Compositions;
+namespace Azalea.Design.Containers;
 
 /// <summary>
 /// A composition that can be used to fluently arrange its children.
 /// </summary>
-public abstract class FlowComposition : Composition
+public abstract class FlowContainer : Composition
 {
 	internal event Action? OnLayout;
 
-	protected FlowComposition()
+	protected FlowContainer()
 	{
 		AddLayout(_layout);
 		AddLayout(_childLayout);
@@ -57,7 +57,7 @@ public abstract class FlowComposition : Composition
 	public void SetLayoutPosition(GameObject gameObject, float newPosition)
 	{
 		if (!_layoutChildren.ContainsKey(gameObject))
-			throw new InvalidOperationException($"Cannot change layout position of game object which is not contained within this {nameof(FlowComposition)}.");
+			throw new InvalidOperationException($"Cannot change layout position of game object which is not contained within this {nameof(FlowContainer)}.");
 
 		_layoutChildren[gameObject] = newPosition;
 		InvalidateLayout();
@@ -72,7 +72,7 @@ public abstract class FlowComposition : Composition
 	public float GetLayoutPosition(GameObject gameObject)
 	{
 		if (!_layoutChildren.ContainsKey(gameObject))
-			throw new InvalidOperationException($"Cannot get layout position of game object which is not contained within this {nameof(FlowComposition)}.");
+			throw new InvalidOperationException($"Cannot get layout position of game object which is not contained within this {nameof(FlowContainer)}.");
 
 		return _layoutChildren[gameObject];
 	}

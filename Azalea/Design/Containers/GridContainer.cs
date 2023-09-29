@@ -8,11 +8,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
-namespace Azalea.Design.Compositions;
+namespace Azalea.Design.Containers;
 
-public class GridComposition : CompositeGameObject
+public class GridContainer : CompositeGameObject
 {
-	public GridComposition()
+	public GridContainer()
 	{
 		AddLayout(cellLayout);
 		AddLayout(cellChildLayout);
@@ -20,8 +20,8 @@ public class GridComposition : CompositeGameObject
 		layoutContent();
 	}
 
-	private GridCompositionContent? _content;
-	public GridCompositionContent? Content
+	private GridContainerContent? _content;
+	public GridContainerContent? Content
 	{
 		get => _content;
 		set

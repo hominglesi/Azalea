@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Azalea.Design.Compositions.Text;
+namespace Azalea.Design.Containers.Text;
 
 public class TextChunk<TSpriteText> : TextPart
 	where TSpriteText : SpriteText, new()
@@ -19,7 +19,7 @@ public class TextChunk<TSpriteText> : TextPart
 		_creationParameters = creationParameters;
 	}
 
-	public override IEnumerable<GameObject> CreateGameObjectsFor(TextComposition textComposition)
+	public override IEnumerable<GameObject> CreateGameObjectsFor(TextContainer textComposition)
 	{
 		var gameObjects = new List<GameObject>();
 
@@ -27,7 +27,7 @@ public class TextChunk<TSpriteText> : TextPart
 		return gameObjects;
 	}
 
-	protected virtual IEnumerable<GameObject> CreateGameObjectsFor(string text, TextComposition textComposition)
+	protected virtual IEnumerable<GameObject> CreateGameObjectsFor(string text, TextContainer textComposition)
 	{
 		bool first = true;
 		var sprites = new List<GameObject>();
@@ -83,7 +83,7 @@ public class TextChunk<TSpriteText> : TextPart
 		return words.ToArray();
 	}
 
-	protected virtual TSpriteText CreateSpriteText(TextComposition textComposition)
+	protected virtual TSpriteText CreateSpriteText(TextContainer textComposition)
 	{
 		var spriteText = _creationFunc.Invoke();
 		textComposition.ApplyDefaultCreationParameters(spriteText);

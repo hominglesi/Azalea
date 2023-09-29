@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace Azalea.Design.Compositions;
+namespace Azalea.Design.Containers;
 
 public partial class CompositeGameObject : GameObject
 {

@@ -2,7 +2,7 @@
 using Azalea.Graphics;
 using System.Collections.Generic;
 
-namespace Azalea.Design.Compositions.Text;
+namespace Azalea.Design.Containers.Text;
 
 public class TextNewLine : TextPart
 {
@@ -13,9 +13,9 @@ public class TextNewLine : TextPart
 		_indicatesNewParagraph = indicatesNewParagraph;
 	}
 
-	public override IEnumerable<GameObject> CreateGameObjectsFor(TextComposition textComposition)
+	public override IEnumerable<GameObject> CreateGameObjectsFor(TextContainer textComposition)
 	{
-		var newLineComposition = new TextComposition.NewLineComposition();
+		var newLineComposition = new TextContainer.NewLineComposition();
 		return newLineComposition.Yield();
 	}
 }

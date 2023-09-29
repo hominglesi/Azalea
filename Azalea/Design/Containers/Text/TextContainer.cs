@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Azalea.Design.Compositions.Text;
+namespace Azalea.Design.Containers.Text;
 
-public class TextComposition : FlexComposition
+public class TextContainer : FlexContainer
 {
 	private readonly Action<SpriteText> _defaultCreationParameters;
 
@@ -83,7 +83,7 @@ public class TextComposition : FlexComposition
 		}
 	}
 
-	public TextComposition(Action<SpriteText> defaultCreationParameters = null)
+	public TextContainer(Action<SpriteText> defaultCreationParameters = null)
 	{
 		_defaultCreationParameters = defaultCreationParameters;
 	}

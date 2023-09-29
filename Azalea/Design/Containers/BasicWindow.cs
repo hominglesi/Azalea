@@ -2,7 +2,7 @@
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 
-namespace Azalea.Design.Compositions;
+namespace Azalea.Design.Containers;
 public class BasicWindow : Window
 {
 	public BasicWindow()

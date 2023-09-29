@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Azalea.Design.Compositions.Text;
+namespace Azalea.Design.Containers.Text;
 
 public interface ITextPart
 {
@@ -10,5 +10,5 @@ public interface ITextPart
 
 	event Action<IEnumerable<GameObject>> GameObjectPartsRecreated;
 
-	void RecreateGameObjectsFor(TextComposition textComposition);
+	void RecreateGameObjectsFor(TextContainer textComposition);
 }

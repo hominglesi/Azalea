@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Azalea.Design.Compositions.Text;
+namespace Azalea.Design.Containers.Text;
 
 public abstract class TextPart : ITextPart
 {
@@ -16,12 +16,12 @@ public abstract class TextPart : ITextPart
 		GameObjects = _gameObjects.AsReadOnly();
 	}
 
-	public void RecreateGameObjectsFor(TextComposition textComposition)
+	public void RecreateGameObjectsFor(TextContainer textComposition)
 	{
 		_gameObjects.Clear();
 		_gameObjects.AddRange(CreateGameObjectsFor(textComposition));
 		GameObjectPartsRecreated?.Invoke(_gameObjects);
 	}
 
-	public abstract IEnumerable<GameObject> CreateGameObjectsFor(TextComposition textComposition);
+	public abstract IEnumerable<GameObject> CreateGameObjectsFor(TextContainer textComposition);
 }

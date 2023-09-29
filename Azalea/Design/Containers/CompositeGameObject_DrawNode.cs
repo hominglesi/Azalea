@@ -2,7 +2,7 @@
 using Azalea.Graphics.Rendering;
 using System.Collections.Generic;
 
-namespace Azalea.Design.Compositions;
+namespace Azalea.Design.Containers;
 
 public partial class CompositeGameObject
 {

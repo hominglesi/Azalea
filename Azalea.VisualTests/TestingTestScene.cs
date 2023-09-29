@@ -1,5 +1,5 @@
-﻿using Azalea.Design.Compositions;
-using Azalea.Design.Compositions.Text;
+﻿using Azalea.Design.Containers;
+using Azalea.Design.Containers.Text;
 using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
@@ -13,12 +13,12 @@ namespace Azalea.VisualTests;
 
 public class TestingTestScene : TestScene
 {
-	private TextComposition _composition;
+	private TextContainer _composition;
 	private BasicTextBox _text;
 
 	public TestingTestScene()
 	{
-		Add(_composition = new TextComposition(t => { t.Font = t.Font.With(size: 40); })
+		Add(_composition = new TextContainer(t => { t.Font = t.Font.With(size: 40); })
 		{
 			Size = new Vector2(400, 400),
 			LineSpacing = 1f,

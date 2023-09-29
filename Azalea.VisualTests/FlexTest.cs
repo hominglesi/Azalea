@@ -1,4 +1,4 @@
-﻿using Azalea.Design.Compositions;
+﻿using Azalea.Design.Containers;
 using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
@@ -7,7 +7,7 @@ using Azalea.Inputs;
 namespace Azalea.VisualTests;
 public class FlexTest : TestScene
 {
-	private FlexComposition _flex;
+	private FlexContainer _flex;
 	private Box _firstChild;
 
 	public FlexTest()
@@ -31,9 +31,9 @@ public class FlexTest : TestScene
 		});
 	}
 
-	private FlexComposition createFirstFlex()
+	private FlexContainer createFirstFlex()
 	{
-		return new FlexComposition()
+		return new FlexContainer()
 		{
 			RelativeSizeAxes = Axes.Both,
 			Wrapping = FlexWrapping.Wrap,

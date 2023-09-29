@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
-namespace Azalea.Design.Compositions;
+namespace Azalea.Design.Containers;
 
-public class FlexComposition : FlowComposition
+public class FlexContainer : FlowContainer
 {
 	private FlexDirection _direction = FlexDirection.Horizontal;
 	public FlexDirection Direction
