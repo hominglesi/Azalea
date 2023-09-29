@@ -13,6 +13,7 @@ public static class Input
 	#region Public facing
 
 	public static Vector2 MousePosition => _mousePosition;
+	public static float MouseWheelDelta => _mouseWheelDelta;
 
 	public static ButtonState GetKey(Keys key) => GetKey((int)key);
 	public static ButtonState GetKey(int keycode) => _keyboardKeys[keycode];
@@ -29,6 +30,7 @@ public static class Input
 
 	private static Vector2 _lastMousePosition = Vector2.Zero;
 	private static Vector2 _mousePosition = Vector2.Zero;
+	private static float _mouseWheelDelta = 0;
 
 	private static Composition? _rootObject;
 
@@ -69,6 +71,8 @@ public static class Input
 		{
 			mouseButton.Update();
 		}
+
+		_mouseWheelDelta = 0;
 	}
 
 	internal static void HandleMousePositionChange(Vector2 newPosition)
@@ -80,6 +84,11 @@ public static class Input
 		_mousePosition = newPosition;
 
 		updateHoverEvents();
+	}
+
+	internal static void HandleScroll(float delta)
+	{
+		_mouseWheelDelta += delta;
 	}
 
 	private static readonly List<GameObject> _lastHoveredObjects = new();

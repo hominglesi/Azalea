@@ -5,6 +5,7 @@ using Azalea.Graphics.Colors;
 namespace Azalea.Design.Containers;
 public class BasicWindow : Window
 {
+	private Composition _contentContainer;
 	public BasicWindow()
 	{
 		GameObject draggableBar;
@@ -17,14 +18,16 @@ public class BasicWindow : Window
 			Size = new(1, 40),
 			Depth = -100
 		});
-		InternalComposition.Position = new(0, 40);
-		InternalComposition.RelativeSizeAxes = Axes.None;
-		InternalComposition.Size = new(500, 400);
-		Add(new Box()
+
+		AddInternal(_contentContainer = new Composition()
 		{
-			Color = Palette.White,
-			RelativeSizeAxes = Axes.Both
+			Position = new(0, 40),
+			Size = new(500, 400),
+			BackgroundColor = Palette.White,
 		});
+
+		RemoveInternal(InternalComposition);
+		_contentContainer.AddInternal(InternalComposition);
 
 		AddDragableSurface(draggableBar);
 	}

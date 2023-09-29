@@ -17,6 +17,7 @@ internal class VeldridInputManager
 		_sdl.MouseMove += processMouseMove;
 		_sdl.MouseDown += processMouseDown;
 		_sdl.MouseUp += processMouseUp;
+		_sdl.MouseWheel += processMouseWheel;
 
 		_sdl.KeyDown += processKeyDown;
 		_sdl.KeyUp += processKeyUp;
@@ -63,5 +64,10 @@ internal class VeldridInputManager
 	private void processMouseMove(MouseMoveEventArgs obj)
 	{
 		Input.HandleMousePositionChange(obj.MousePosition);
+	}
+
+	private void processMouseWheel(MouseWheelEventArgs args)
+	{
+		Input.HandleScroll(args.WheelDelta);
 	}
 }

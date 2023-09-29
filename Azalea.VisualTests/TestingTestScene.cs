@@ -16,6 +16,8 @@ public class TestingTestScene : TestScene
 	private TextContainer _composition;
 	private BasicTextBox _text;
 
+	private SpriteText _scrollDisplay;
+
 	public TestingTestScene()
 	{
 		Add(_composition = new TextContainer(t => { t.Font = t.Font.With(size: 40); })
@@ -73,19 +75,26 @@ public class TestingTestScene : TestScene
 		BasicWindow window;
 		Add(window = new BasicWindow()
 		{
-			Position = new(300, 300)
+			Position = new(300, 300),
+			Child = new SpriteText()
+			{
+				Color = Palette.Black,
+				Text = "JA sam U windowu"
+			}
 		});
 
-		window.Add(new SpriteText()
+		Add(_scrollDisplay = new SpriteText()
 		{
-			Color = Palette.Black,
-			Text = "JA sam U windowu"
+			Position = new(700, 100),
+			Text = "0"
 		});
+
 	}
 
 	protected override void Update()
 	{
 		_composition.Size = Input.MousePosition;
+		_scrollDisplay.Text = (float.Parse(_scrollDisplay.Text) + Input.MouseWheelDelta).ToString();
 
 		if (Input.GetKey(Keys.P).Down && _composition.Children.Count > 0) _composition.Remove(_composition.Children[0]);
 

@@ -680,6 +680,10 @@ public abstract class GameObject : IGameObject
 				OnHoverLost(hoverLost);
 				HoverLost?.Invoke(hoverLost);
 				return false;
+			case ScrollEvent scroll:
+				OnScroll(scroll);
+				Scroll?.Invoke(scroll);
+				return false;
 			case KeyDownEvent keyDown:
 				var kdResult = OnKeyDown(keyDown);
 				return kdResult;
@@ -711,6 +715,8 @@ public abstract class GameObject : IGameObject
 	public event Action<HoverEvent>? Hover;
 	protected virtual void OnHoverLost(HoverLostEvent e) => Handle(e);
 	public event Action<HoverLostEvent>? HoverLost;
+	protected virtual void OnScroll(ScrollEvent e) => Handle(e);
+	public event Action<ScrollEvent>? Scroll;
 	protected virtual bool OnKeyDown(KeyDownEvent e) => Handle(e);
 	public event Action<KeyDownEvent>? KeyDown;
 	protected virtual void OnKeyUp(KeyUpEvent e) => Handle(e);
