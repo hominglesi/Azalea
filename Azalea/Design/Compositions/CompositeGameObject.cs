@@ -193,11 +193,11 @@ public partial class CompositeGameObject : GameObject
 		}
 	}
 
-	private MarginPadding _padding;
-	public MarginPadding Padding
+	private Boundary _padding;
+	public Boundary Padding
 	{
 		get => _padding;
-		protected set
+		set
 		{
 			if (_padding.Equals(value)) return;
 

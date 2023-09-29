@@ -121,9 +121,9 @@ public partial class SpriteText : GameObject
 		}
 	}
 
-	private MarginPadding _padding;
+	private Boundary _padding;
 
-	public MarginPadding Padding
+	public Boundary Padding
 	{
 		get => _padding;
 		set

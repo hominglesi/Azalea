@@ -215,7 +215,7 @@ public class TextComposition : FlexComposition
 				}
 
 				float childLineBaseHeight = (c as IHasLineBaseHeight)?.LineBaseHeight ?? 0f;
-				MarginPadding margin = new()
+				Boundary margin = new()
 				{
 					Top = (childLineBaseHeight != 0f ? lineBaseHeight - childLineBaseHeight : 0f) + lineSpacingValue
 				};

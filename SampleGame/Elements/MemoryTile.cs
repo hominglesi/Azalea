@@ -28,7 +28,7 @@ public class MemoryTile : Composition
 	{
 		_texture = texture;
 		TextureName = _texture.AssetName;
-		Padding = new MarginPadding(3);
+		Padding = new Boundary(3);
 
 		RelativeSizeAxes = Axes.Both;
 

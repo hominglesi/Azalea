@@ -215,9 +215,9 @@ public abstract class GameObject : IGameObject
 
 	public float DrawWidth => DrawSize.X;
 	public float DrawHeight => DrawSize.Y;
-	private MarginPadding _margin;
+	private Boundary _margin;
 
-	public MarginPadding Margin
+	public Boundary Margin
 	{
 		get => _margin;
 		set
