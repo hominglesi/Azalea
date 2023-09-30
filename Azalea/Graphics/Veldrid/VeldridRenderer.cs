@@ -3,6 +3,7 @@ using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Graphics.Veldrid.Batches;
 using Azalea.Graphics.Veldrid.Textures;
+using Azalea.Numerics;
 using Azalea.Platform;
 using System;
 using System.Collections.Generic;
@@ -81,5 +82,19 @@ internal class VeldridRenderer : Renderer
 			boundTextureUnits[unit++] = resources[i];
 
 		return true;
+	}
+
+	protected override void SetScissorTestState(bool enabled)
+	{
+		//Scissor state is always enabled
+
+		if (enabled == false)
+			SetScissorTestRectangle(new RectangleInt(0, 0, 9999, 9999));
+	}
+
+	protected override void SetScissorTestRectangle(RectangleInt scissorRectangle)
+	{
+		CommandList.SetScissorRect(0, (uint)scissorRectangle.X, (uint)scissorRectangle.Y,
+			(uint)scissorRectangle.Width, (uint)scissorRectangle.Height);
 	}
 }

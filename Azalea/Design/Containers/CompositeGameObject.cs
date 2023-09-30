@@ -16,6 +16,18 @@ public partial class CompositeGameObject : GameObject
 		internalChildren = new SortedList<GameObject>(childComparer);
 	}
 
+	private bool _masking;
+	public bool Masking
+	{
+		get => _masking;
+		set
+		{
+			if (_masking == value) return;
+
+			_masking = value;
+		}
+	}
+
 	#region Parenting
 
 	private readonly SortedList<GameObject> internalChildren;

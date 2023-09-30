@@ -1,9 +1,10 @@
 ﻿using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Graphics.Textures;
+using Azalea.Numerics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
-
+using System.Collections.Generic;
 using AzaleaColor = Azalea.Graphics.Colors.Color;
 
 namespace Azalea.Graphics.Rendering;
@@ -56,7 +57,10 @@ internal abstract class Renderer : IRenderer
 	internal Texture CreateTexture(INativeTexture nativeTexture)
 		=> new(nativeTexture);
 
-	internal virtual void BeginFrame() { }
+	internal virtual void BeginFrame()
+	{
+
+	}
 	internal virtual void FinishFrame()
 	{
 		FlushCurrentBatch();
@@ -95,6 +99,52 @@ internal abstract class Renderer : IRenderer
 
 		return true;
 	}
+
+	#region Scissor test
+
+	private Stack<RectangleInt> _scissorRectangles = new();
+
+	public void PushScissor(RectangleInt scissorRect)
+	{
+		var stackEmpty = _scissorRectangles.Count == 0;
+		var rectSameAsLast = stackEmpty == false && _scissorRectangles.Peek() == scissorRect;
+
+		if (rectSameAsLast == false)
+			FlushCurrentBatch();
+
+		if (stackEmpty)
+			SetScissorTestState(enabled: true);
+
+		_scissorRectangles.Push(scissorRect);
+
+		if (rectSameAsLast == false)
+			SetScissorTestRectangle(scissorRect);
+	}
+
+	public void PopScissor()
+	{
+		if (_scissorRectangles.Count <= 0) throw new InvalidOperationException("There are not scissor rectangles to be popped");
+
+		var lastRect = _scissorRectangles.Peek();
+		_scissorRectangles.Pop();
+
+		var stackEmpty = _scissorRectangles.Count == 0;
+		var rectSameAsLast = stackEmpty == false && _scissorRectangles.Peek() == lastRect;
+
+		if (rectSameAsLast == false)
+			FlushCurrentBatch();
+
+		if (stackEmpty == false && rectSameAsLast == false)
+			SetScissorTestRectangle(_scissorRectangles.Peek());
+
+		if (stackEmpty)
+			SetScissorTestState(enabled: false);
+	}
+
+	protected abstract void SetScissorTestState(bool enabled);
+	protected abstract void SetScissorTestRectangle(RectangleInt scissorRectangle);
+
+	#endregion
 
 	void IRenderer.Initialize() => Initialize();
 	void IRenderer.BeginFrame() => BeginFrame();

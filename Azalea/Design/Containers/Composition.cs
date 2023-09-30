@@ -88,7 +88,7 @@ public class Composition : CompositeGameObject
 	private HollowBox createBorder() => new()
 	{
 		RelativeSizeAxes = Axes.Both,
-		Depth = 900,
+		Depth = -1000,
 		Color = ColorQuad.SolidColor(Palette.Black)
 	};
 

@@ -137,7 +137,7 @@ internal class VeldridVertexBatch<TVertex> : IVertexBatch<TVertex>
 				fillMode: PolygonFillMode.Solid,
 				frontFace: FrontFace.CounterClockwise,
 				depthClipEnabled: false,
-				scissorTestEnabled: false),
+				scissorTestEnabled: true),
 			PrimitiveTopology = PrimitiveTopology.TriangleList,
 			ResourceLayouts = new[] { _projectionLayout, _textureLayout },
 			ShaderSet = new ShaderSetDescription(

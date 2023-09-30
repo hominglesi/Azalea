@@ -1,6 +1,7 @@
 ﻿using Azalea.Graphics.Colors;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Graphics.Textures;
+using Azalea.Numerics;
 
 namespace Azalea.Graphics.Rendering;
 
@@ -24,4 +25,7 @@ public interface IRenderer
 	internal IVertexBatch CreateQuadBatch(int size);
 	internal Texture CreateTexture(int width, int height);
 	internal bool BindTexture(Texture texture, int unit = 0);
+
+	internal void PushScissor(RectangleInt scissorRect);
+	internal void PopScissor();
 }

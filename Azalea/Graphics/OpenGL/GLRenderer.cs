@@ -3,6 +3,7 @@ using Azalea.Graphics.OpenGL.Batches;
 using Azalea.Graphics.OpenGL.Textures;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
+using Azalea.Numerics;
 using Azalea.Platform;
 using Silk.NET.OpenGL;
 
@@ -56,5 +57,15 @@ internal class GLRenderer : Renderer
 		}
 
 		return true;
+	}
+
+	protected override void SetScissorTestRectangle(RectangleInt scissorRectangle)
+	{
+		throw new System.NotImplementedException();
+	}
+
+	protected override void SetScissorTestState(bool enabled)
+	{
+		throw new System.NotImplementedException();
 	}
 }
