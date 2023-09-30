@@ -22,6 +22,7 @@ public class TestingTestScene : TestScene
 	{
 		Add(_composition = new TextContainer(t => { t.Font = t.Font.With(size: 40); })
 		{
+			Position = new Vector2(100, 150),
 			Size = new Vector2(400, 400),
 			LineSpacing = 1f,
 			Text = "Lorem ipsum dolor sit amet,\n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
@@ -73,22 +74,28 @@ public class TestingTestScene : TestScene
 			BackgroundColor = ColorQuad.GradientHorizontal(Palette.Blue, Palette.Green)
 		});
 
-		BasicWindow window;
-		Add(window = new BasicWindow()
-		{
-			Position = new(300, 300),
-			Child = new SpriteText()
-			{
-				Color = Palette.Black,
-				Text = "JA sam U windowu"
-			}
-		});
-
 		Add(_scrollDisplay = new SpriteText()
 		{
 			Position = new(700, 100),
 			Text = "0"
 		});
+
+		BasicWindow window;
+		Add(window = new BasicWindow()
+		{
+			Position = new(300, 300),
+			Child = new ScrollableContainer()
+			{
+				RelativeSizeAxes = Axes.Both,
+				Child = new SpriteText()
+				{
+					Color = Palette.Black,
+					Text = "JA sam U windowu"
+				}
+			}
+		});
+
+
 
 	}
 

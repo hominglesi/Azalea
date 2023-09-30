@@ -30,7 +30,8 @@ public partial class CompositeGameObject
 
 			if (Masking)
 			{
-				renderer.PushScissor((RectangleInt)Source.DrawRectangle);
+				var newScissor = (RectangleInt)Source.ScreenSpaceDrawQuad;
+				renderer.PushScissor(newScissor);
 			}
 
 			if (Children != null)
