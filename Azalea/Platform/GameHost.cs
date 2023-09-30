@@ -1,4 +1,5 @@
 ﻿using Azalea.Audios;
+using Azalea.Debugging;
 using Azalea.Design.Containers;
 using Azalea.Extentions;
 using Azalea.Graphics.Rendering;
@@ -26,7 +27,11 @@ public abstract class GameHost
 
 	public virtual void Run(AzaleaGame game)
 	{
+#if DEBUG
+		var root = new DebuggingOverlay();
+#else
 		var root = new Composition();
+#endif
 		root.Add(game);
 
 		game.SetHost(this);

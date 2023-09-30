@@ -22,7 +22,7 @@ public class TestingTestScene : TestScene
 	{
 		Add(_composition = new TextContainer(t => { t.Font = t.Font.With(size: 40); })
 		{
-			Position = new Vector2(100, 150),
+			//Position = new Vector2(100, 150),
 			Size = new Vector2(400, 400),
 			LineSpacing = 1f,
 			Text = "Lorem ipsum dolor sit amet,\n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
@@ -101,7 +101,7 @@ public class TestingTestScene : TestScene
 
 	protected override void Update()
 	{
-		_composition.Size = Input.MousePosition;
+		_composition.Size = Input.MousePosition - _composition.ToScreenSpace(_composition.Position);
 		_scrollDisplay.Text = (float.Parse(_scrollDisplay.Text) + Input.MouseWheelDelta).ToString();
 
 		if (Input.GetKey(Keys.P).Down && _composition.Children.Count > 0) _composition.Remove(_composition.Children[0]);
