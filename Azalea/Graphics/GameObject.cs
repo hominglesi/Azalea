@@ -50,6 +50,8 @@ public abstract class GameObject : IGameObject
 			if (position == value) return;
 
 			position = value;
+
+			Invalidate(Invalidation.MiscGeometry);
 		}
 	}
 
@@ -61,6 +63,8 @@ public abstract class GameObject : IGameObject
 			if (x == value) return;
 
 			x = value;
+
+			Invalidate(Invalidation.MiscGeometry);
 		}
 	}
 
@@ -72,6 +76,8 @@ public abstract class GameObject : IGameObject
 			if (y == value) return;
 
 			y = value;
+
+			Invalidate(Invalidation.MiscGeometry);
 		}
 	}
 
@@ -162,7 +168,7 @@ public abstract class GameObject : IGameObject
 
 			width = value;
 
-			invalidateParentSizeDependencies(Invalidation.DrawSize | Invalidation.DrawInfo, Axes.X);
+			invalidateParentSizeDependencies(Invalidation.DrawSize, Axes.X);
 		}
 	}
 
@@ -175,7 +181,7 @@ public abstract class GameObject : IGameObject
 
 			height = value;
 
-			invalidateParentSizeDependencies(Invalidation.DrawSize | Invalidation.DrawInfo, Axes.Y);
+			invalidateParentSizeDependencies(Invalidation.DrawSize, Axes.Y);
 		}
 	}
 
@@ -267,6 +273,36 @@ public abstract class GameObject : IGameObject
 	{
 
 	}
+
+	private Vector2 computeRequiredParentSizeToFit()
+	{
+		var ap = AnchorPosition;
+		var rap = RelativeAnchorPosition;
+
+		var ratio1 = new Vector2(
+			rap.X <= 0 ? 0 : 1 / rap.X,
+			rap.Y <= 0 ? 0 : 1 / rap.Y);
+
+		var ratio2 = new Vector2(
+			rap.X >= 1 ? 0 : 1 / (1 - rap.X),
+			rap.Y >= 1 ? 0 : 1 / (1 - rap.Y));
+
+		Rectangle bBox = BoundingBox;
+
+		var topLeftOffset = ap - bBox.TopLeft;
+		var topLeftSize1 = topLeftOffset * ratio1;
+		var topLeftSize2 = -topLeftOffset * ratio2;
+
+		var bottomRightOffset = ap - bBox.BottomRight;
+		var bottomRightSize1 = bottomRightOffset * ratio1;
+		var bottomRightSize2 = -bottomRightOffset * ratio2;
+
+		return Vector2Extentions.ComponentMax(
+			Vector2Extentions.ComponentMax(topLeftSize1, topLeftSize2),
+			Vector2Extentions.ComponentMax(bottomRightSize1, bottomRightSize2));
+	}
+
+	internal Vector2 RequiredParentSizeToFit => computeRequiredParentSizeToFit();
 
 	private float _fillAspectRatio = 1;
 
@@ -464,6 +500,22 @@ public abstract class GameObject : IGameObject
 				throw new Exception("Cannot add GameObject to multiple compositions.");
 
 			parent = value;
+
+			//Invalidate(Invalidation.Presence);
+		}
+	}
+
+	private Axes _ignoredForAutoSizeAxes;
+	public Axes IgnoredForAutoSizeAxes
+	{
+		get { return _ignoredForAutoSizeAxes; }
+		set
+		{
+			if (value == _ignoredForAutoSizeAxes) return;
+
+			_ignoredForAutoSizeAxes = value;
+
+			Invalidate(Invalidation.RequiredParentSizeToFit);
 		}
 	}
 
@@ -546,7 +598,7 @@ public abstract class GameObject : IGameObject
 		if (invalidation == Invalidation.None)
 			return false;
 
-		if (propagateToParent && source == InvalidationSource.Self)
+		if (propagateToParent && (source == InvalidationSource.Self || GetType() == typeof(CompositeGameObject)))
 			Parent?.Invalidate(invalidation, InvalidationSource.Child);
 
 		if (invalidationList.Invalidate(source, invalidation) == false)

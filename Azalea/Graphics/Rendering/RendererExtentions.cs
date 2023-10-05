@@ -66,7 +66,7 @@ public static class RendererExtentions
 			quad.BottomRight + new Vector2(0, -width));
 
 		var leftQuad = new Quad(
-			quad.TopLeft + new Vector2(0, -width),
+			quad.TopLeft + new Vector2(0, width),
 			quad.BottomLeft,
 			quad.BottomLeft + new Vector2(width, 0),
 			quad.TopLeft + new Vector2(width, width));

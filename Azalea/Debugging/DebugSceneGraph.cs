@@ -1,52 +1,76 @@
 ﻿using Azalea.Design.Containers;
+using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.UserInterface;
+using Azalea.Layout;
 
 namespace Azalea.Debugging;
 public class DebugSceneGraph : FlexContainer
 {
 	private Checkbox _checkbox;
-	private Composition _content;
+	private FlexContainer _content;
 
 	private GameObject _rootObject;
+	private int _childCount;
 
 	public DebugSceneGraph(GameObject rootObject)
 	{
 		_rootObject = rootObject;
 		Wrapping = FlexWrapping.NoWrapping;
+		AutoSizeAxes = Axes.Y;
 
-		if (_rootObject is Composition)
+		//if (_rootObject is Composition)
+		//{
+		Add(_checkbox = new Checkbox()
 		{
-			Add(_checkbox = new Checkbox()
-			{
-				Size = new(25, 25)
-			});
-			_checkbox.Toggled += toggleChildren;
-		}
+			Size = new(25, 25)
+		});
+		_checkbox.Toggled += toggleChildren;
+		//}
 
-		Add(new Composition()
+		Add(_content = new FlexContainer()
 		{
-			Child = _content = new FlexContainer()
-			{
-				Direction = FlexDirection.Vertical,
-				Wrapping = FlexWrapping.NoWrapping,
-				Child = createLabel()
-			}
+			Direction = FlexDirection.Vertical,
+			Wrapping = FlexWrapping.NoWrapping,
+			AutoSizeAxes = Axes.Y
 		});
 
-		if (_rootObject is not Composition)
+		_content.OnLayout += () =>
 		{
-			_content.Margin = new(0, 0, 0, 25);
+			CompositeGameObject? parent = _content;
+			while (parent != null)
+			{
+				parent.Invalidate(Invalidation.RequiredParentSizeToFit, InvalidationSource.Child);
+
+				parent = parent.Parent;
+			}
+		};
+
+		if (rootObject is Composition comp)
+		{
+			rootObject.Invalidated += (_, invalidation) =>
+			{
+				if (invalidation.HasFlagFast(Invalidation.Presence))
+				{
+					if (_childCount != comp.Children.Count)
+						toggleChildren(_checkbox.Checked);
+				}
+			};
 		}
+
+		toggleChildren(false);
+
+		//if (_rootObject is not Composition)
+		//{
+		//_content.Margin = new(0, 0, 0, 25);
+		//}
 	}
 
 	private void toggleChildren(bool shown)
 	{
 		_content.Clear();
-		var label = createLabel();
-		_content.Add(label);
-		_content.Height += label.Height;
+		_content.Add(createLabel(_rootObject));
 
 		if (shown)
 		{
@@ -56,16 +80,30 @@ public class DebugSceneGraph : FlexContainer
 				{
 					var childGraph = new DebugSceneGraph(child);
 					_content.Add(childGraph);
-					_content.Height += childGraph.Height;
 				}
 			}
 		}
 
-		Height = _content.Height;
+		if (_rootObject is Composition composition)
+		{
+			_childCount = composition.Children.Count;
+		}
 	}
 
-	private SpriteText createLabel() => new()
+	private SpriteText createLabel(GameObject rootObject)
 	{
-		Text = _rootObject.GetType().Name
-	};
+		var label = new SpriteText()
+		{
+			Text = _rootObject.GetType().Name,
+		};
+		label.Click += (_) =>
+		{
+			AzaleaGame.Main.Host.Root.AddInternal(new DebugRectHighlight()
+			{
+				Position = rootObject.ScreenSpaceDrawQuad.TopLeft,
+				Size = rootObject.ScreenSpaceDrawQuad.BottomRight - rootObject.ScreenSpaceDrawQuad.TopLeft,
+			});
+		};
+		return label;
+	}
 }

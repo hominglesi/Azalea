@@ -6,6 +6,7 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.UserInterface;
 using Azalea.Inputs;
+using Azalea.Layout;
 using System;
 using System.Numerics;
 
@@ -13,6 +14,8 @@ namespace Azalea.VisualTests;
 
 public class TestingTestScene : TestScene
 {
+	private Composition _wrapper;
+	private Composition _comp;
 	private TextContainer _composition;
 	private BasicTextBox _text;
 
@@ -20,15 +23,18 @@ public class TestingTestScene : TestScene
 
 	public TestingTestScene()
 	{
-		Add(_composition = new TextContainer(t => { t.Font = t.Font.With(size: 40); })
+		Add(_wrapper = new Composition()
 		{
-			//Position = new Vector2(100, 150),
-			Size = new Vector2(400, 400),
-			LineSpacing = 1f,
-			Text = "Lorem ipsum dolor sit amet,\n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
-			//BackgroundColor = Palette.Black,
-			BorderColor = Palette.Black,
-			Masking = true,
+			Child = _composition = new TextContainer(t => { t.Font = t.Font.With(size: 40); })
+			{
+				//Position = new Vector2(100, 150),
+				Size = new Vector2(400, 400),
+				LineSpacing = 1f,
+				Text = "Lorem ipsum dolor sit amet,\n consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
+				//BackgroundColor = Palette.Black,
+				BorderColor = Palette.Black,
+				Masking = true,
+			}
 		});
 
 		_composition.AddText("Text3 ", t => { t.Color = Palette.Black; });
@@ -48,6 +54,30 @@ public class TestingTestScene : TestScene
 			Height = 30,
 			Position = new Vector2(550, 300)
 		});
+
+		Add(_comp = new FlexContainer()
+		{
+			Direction = FlexDirection.Vertical,
+			Wrapping = FlexWrapping.NoWrapping,
+			BackgroundColor = Palette.Red,
+			AutoSizeAxes = Axes.Both,
+			Children = new GameObject[] {
+				new Box()
+				{
+					Color = new Color(10, 10, 10, 10),
+					Size = new(50, 50),
+					Position = new(30, 30)
+				},
+				/*
+				new Box()
+				{
+					Color = new Color(10, 10, 10, 10),
+					Size = new(50, 50)
+				},*/
+			}
+		});
+
+
 
 		Add(new Box()
 		{
@@ -101,11 +131,17 @@ public class TestingTestScene : TestScene
 
 	protected override void Update()
 	{
-		_composition.Size = Input.MousePosition - _composition.ToScreenSpace(_composition.Position);
-		_scrollDisplay.Text = (float.Parse(_scrollDisplay.Text) + Input.MouseWheelDelta).ToString();
+		//_composition.Size = Input.MousePosition - _composition.ToScreenSpace(_composition.Position);
+		//_scrollDisplay.Text = (float.Parse(_scrollDisplay.Text) + Input.MouseWheelDelta).ToString();
 
 		if (Input.GetKey(Keys.P).Down && _composition.Children.Count > 0) _composition.Remove(_composition.Children[0]);
 
 		if (Input.GetKey(Keys.Space).DownOrRepeat) Console.WriteLine("Pressed space");
+
+		if (Input.GetKey(Keys.M).Down)
+		{
+			//_comp.Invalidate(Invalidation.RequiredParentSizeToFit, InvalidationSource.Child);
+			_comp.InternalComposition.Invalidate(Invalidation.RequiredParentSizeToFit, InvalidationSource.Child);
+		}
 	}
 }

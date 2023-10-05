@@ -43,7 +43,7 @@ public abstract class FlowContainer : Composition
 		_layoutChildren.Remove(gameObject);
 
 		InvalidateLayout();
-		return base.RemoveInternal(gameObject);
+		return base.Remove(gameObject);
 	}
 
 	public override void Clear()

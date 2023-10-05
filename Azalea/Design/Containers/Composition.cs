@@ -18,7 +18,7 @@ public class Composition : CompositeGameObject
 		});
 	}
 
-	protected CompositeGameObject InternalComposition;
+	public CompositeGameObject InternalComposition;
 
 	private LayoutValue _sizeLayout = new(Invalidation.DrawSize);
 
@@ -28,7 +28,7 @@ public class Composition : CompositeGameObject
 
 		if (_sizeLayout.IsValid == false)
 		{
-			if (BorderObject is not null)
+			if (BorderObject is not null && AutoSizeAxes == Axes.None)
 			{
 				var thickness = BorderObject.Thickness;
 				InternalComposition.Position = new(thickness, thickness);
@@ -37,6 +37,23 @@ public class Composition : CompositeGameObject
 			}
 			_sizeLayout.Validate();
 		}
+	}
+
+	public override Axes AutoSizeAxes
+	{
+		get => base.AutoSizeAxes;
+		set
+		{
+			InternalComposition.RelativeSizeAxes = Axes.None;
+			InternalComposition.AutoSizeAxes = value;
+			base.AutoSizeAxes = value;
+		}
+	}
+
+	protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+	{
+		InternalComposition.Invalidate(invalidation, source);
+		return base.OnInvalidate(invalidation, source);
 	}
 
 	#region Background
@@ -57,11 +74,13 @@ public class Composition : CompositeGameObject
 	private Box createSolidBackground() => new()
 	{
 		RelativeSizeAxes = Axes.Both,
+		IgnoredForAutoSizeAxes = Axes.Both,
 		Depth = 1000
 	};
 
 	#endregion
 
+	#region Border
 	public HollowBox? BorderObject { get; set; }
 	public ColorQuad BorderColor
 	{
@@ -88,9 +107,11 @@ public class Composition : CompositeGameObject
 	private HollowBox createBorder() => new()
 	{
 		RelativeSizeAxes = Axes.Both,
+		IgnoredForAutoSizeAxes = Axes.Both,
 		Depth = -1000,
 		Color = ColorQuad.SolidColor(Palette.Black)
 	};
+	#endregion
 
 	#region Children
 

@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics;
+﻿using Azalea.Extentions.EnumExtentions;
+using Azalea.Graphics;
 using Azalea.Layout;
 using Azalea.Lists;
 using System;
@@ -14,6 +15,8 @@ public partial class CompositeGameObject : GameObject
 		var childComparer = new ChildComparer(this);
 
 		internalChildren = new SortedList<GameObject>(childComparer);
+
+		AddLayout(_childrenSizeDependencies);
 	}
 
 	private bool _masking;
@@ -50,6 +53,11 @@ public partial class CompositeGameObject : GameObject
 		gameObject.Parent = this;
 
 		internalChildren.Add(gameObject);
+
+		Invalidate(Invalidation.Presence, InvalidationSource.Child);
+
+		if (AutoSizeAxes != Axes.None)
+			Invalidate(Invalidation.RequiredParentSizeToFit, InvalidationSource.Child);
 	}
 
 	protected void AddRangeInternal(IEnumerable<GameObject> objects)
@@ -82,6 +90,11 @@ public partial class CompositeGameObject : GameObject
 		internalChildren.RemoveAt(index);
 
 		gameObject.Parent = null;
+
+		Invalidate(Invalidation.Presence, InvalidationSource.Child);
+
+		if (AutoSizeAxes != Axes.None)
+			Invalidate(Invalidation.RequiredParentSizeToFit, InvalidationSource.Child);
 		return true;
 	}
 
@@ -95,6 +108,9 @@ public partial class CompositeGameObject : GameObject
 		}
 
 		internalChildren.Clear();
+
+		if (AutoSizeAxes != Axes.None)
+			Invalidate(Invalidation.RequiredParentSizeToFit, InvalidationSource.Child);
 	}
 
 	protected internal void ChangeInternalChildDepth(GameObject child, float newDepth)
@@ -231,12 +247,14 @@ public partial class CompositeGameObject : GameObject
 
 	public Vector2 RelativeToAbsoluteFactor => Vector2.Divide(ChildSize, RelativeChildSize);
 
+	#region AutoSizeAxes
+
 	private Axes _autoSizeAxes;
 
-	public Axes AutoSizeAxes
+	public virtual Axes AutoSizeAxes
 	{
 		get => _autoSizeAxes;
-		protected set
+		set
 		{
 			if (value == _autoSizeAxes) return;
 
@@ -254,7 +272,131 @@ public partial class CompositeGameObject : GameObject
 		}
 	}
 
+	public override float Width
+	{
+		get
+		{
+			if (_isComputingChildrenSizeDependencies == false && AutoSizeAxes.HasFlagFast(Axes.X))
+				updateChildrenSizeDependencies();
+			return base.Width;
+		}
+		set
+		{
+			if (AutoSizeAxes.HasFlagFast(Axes.X))
+				throw new InvalidOperationException("Width of composite cannot be manually set");
+
+			base.Width = value;
+		}
+	}
+
+	public override float Height
+	{
+		get
+		{
+			if (_isComputingChildrenSizeDependencies == false && AutoSizeAxes.HasFlagFast(Axes.Y))
+				updateChildrenSizeDependencies();
+			return base.Height;
+		}
+		set
+		{
+			if (AutoSizeAxes.HasFlagFast(Axes.Y))
+				throw new InvalidOperationException("Height of composite cannot be manually set");
+
+			base.Height = value;
+		}
+	}
+
+	public override Vector2 Size
+	{
+		get
+		{
+			if (_isComputingChildrenSizeDependencies == false && AutoSizeAxes != Axes.None)
+				updateChildrenSizeDependencies();
+			return base.Size;
+		}
+		set
+		{
+			if (AutoSizeAxes != Axes.None)
+				throw new InvalidOperationException("Size of composite cannot be manually set");
+
+			base.Size = value;
+		}
+	}
+
+	private bool _isComputingChildrenSizeDependencies;
+
+	private void updateChildrenSizeDependencies()
+	{
+		_isComputingChildrenSizeDependencies = true;
+
+		try
+		{
+			if (_childrenSizeDependencies.IsValid == false)
+			{
+				updateAutoSize();
+				_childrenSizeDependencies.Validate();
+			}
+		}
+		finally
+		{
+			_isComputingChildrenSizeDependencies = false;
+		}
+
+
+	}
+
+	private void updateAutoSize()
+	{
+		if (AutoSizeAxes == Axes.None) return;
+
+		Vector2 b = computeAutoSize() + Padding.Total;
+
+		base.Size = new Vector2(
+			AutoSizeAxes.HasFlagFast(Axes.X) ? b.X : base.Width,
+			AutoSizeAxes.HasFlagFast(Axes.Y) ? b.Y : base.Height);
+	}
+
+	public Vector2 computeAutoSize()
+	{
+		Boundary originalPadding = Padding;
+		Boundary originalMargin = Margin;
+
+		try
+		{
+			Padding = new Boundary();
+			Margin = new Boundary();
+
+			if (AutoSizeAxes == Axes.None) return DrawSize;
+
+			Vector2 maxBoundSize = Vector2.Zero;
+
+			foreach (var c in InternalChildren)
+			{
+				Vector2 cBound = c.RequiredParentSizeToFit;
+
+				if (c.IgnoredForAutoSizeAxes.HasFlag(Axes.X) == false)
+					maxBoundSize.X = Math.Max(maxBoundSize.X, cBound.X);
+				if (c.IgnoredForAutoSizeAxes.HasFlag(Axes.Y) == false)
+					maxBoundSize.Y = Math.Max(maxBoundSize.Y, cBound.Y);
+			}
+
+			if (AutoSizeAxes.HasFlagFast(Axes.X) == false)
+				maxBoundSize.X = DrawSize.X;
+			if (AutoSizeAxes.HasFlagFast(Axes.Y) == false)
+				maxBoundSize.Y = DrawSize.Y;
+
+			return new Vector2(maxBoundSize.X, maxBoundSize.Y);
+		}
+		finally
+		{
+			Padding = originalPadding;
+			Margin = originalMargin;
+		}
+	}
+
 	private readonly LayoutValue _childrenSizeDependencies = new(Invalidation.RequiredParentSizeToFit | Invalidation.Presence, InvalidationSource.Child);
+
+	#endregion
 
 	internal override bool BuildNonPositionalInputQueue(List<GameObject> queue)
 	{

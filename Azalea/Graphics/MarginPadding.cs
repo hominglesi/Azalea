@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 namespace Azalea.Graphics;
 
@@ -22,6 +23,7 @@ public struct Boundary : IEquatable<Boundary>
 
 	public readonly float Horizontal => Left + Right;
 	public readonly float Vertical => Top + Bottom;
+	public readonly Vector2 Total => new(Horizontal, Vertical);
 
 	public readonly bool Equals(Boundary other) => Top == other.Top && Left == other.Left && Bottom == other.Bottom && Right == other.Right;
 	public override readonly string ToString() => $@"({Top}, {Left}, {Bottom}, {Right})";
