@@ -27,12 +27,10 @@ public abstract class GameHost
 
 	public virtual void Run(AzaleaGame game)
 	{
-#if DEBUG
 		var root = new DebuggingOverlay();
-#else
-		var root = new Composition();
-#endif
 		root.Add(game);
+
+		Editor._overlay = root;
 
 		game.SetHost(this);
 

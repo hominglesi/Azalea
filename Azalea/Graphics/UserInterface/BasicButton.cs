@@ -20,10 +20,10 @@ public class BasicButton : Button
 		set => SpriteText.Color = value;
 	}
 
-	public ColorQuad BackgroundColor
+	public float FontSize
 	{
-		get => Background.Color;
-		set => Background.Color = value;
+		get => SpriteText.Font.Size;
+		set => SpriteText.Font = SpriteText.Font.With(size: value);
 	}
 
 	public ColorQuad HoveredColor
@@ -32,20 +32,15 @@ public class BasicButton : Button
 		set => HoveredBackground.Color = value;
 	}
 
-	protected Box Background;
 	protected Box HoveredBackground;
 	protected SpriteText SpriteText;
 
 	public BasicButton()
 	{
 		Size = new Vector2(200, 70);
+		BackgroundColor = Palette.Blue;
 		AddRange(new GameObject[]
 		{
-			Background = new Box()
-			{
-				RelativeSizeAxes = Axes.Both,
-				Color = Palette.Blue
-			},
 			HoveredBackground = new Box()
 			{
 				RelativeSizeAxes = Axes.Both,

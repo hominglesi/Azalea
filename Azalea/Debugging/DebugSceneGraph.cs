@@ -3,7 +3,7 @@ using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.UserInterface;
-using Azalea.Layout;
+using System;
 
 namespace Azalea.Debugging;
 public class DebugSceneGraph : FlexContainer
@@ -36,17 +36,6 @@ public class DebugSceneGraph : FlexContainer
 			AutoSizeAxes = Axes.Y
 		});
 
-		_content.OnLayout += () =>
-		{
-			CompositeGameObject? parent = _content;
-			while (parent != null)
-			{
-				parent.Invalidate(Invalidation.RequiredParentSizeToFit, InvalidationSource.Child);
-
-				parent = parent.Parent;
-			}
-		};
-
 		if (rootObject is Composition comp)
 		{
 			rootObject.Invalidated += (_, invalidation) =>
@@ -60,11 +49,6 @@ public class DebugSceneGraph : FlexContainer
 		}
 
 		toggleChildren(false);
-
-		//if (_rootObject is not Composition)
-		//{
-		//_content.Margin = new(0, 0, 0, 25);
-		//}
 	}
 
 	private void toggleChildren(bool shown)
@@ -79,6 +63,7 @@ public class DebugSceneGraph : FlexContainer
 				foreach (var child in comp.Children)
 				{
 					var childGraph = new DebugSceneGraph(child);
+					childGraph.ObjectSelected += ObjectSelected!.Invoke;
 					_content.Add(childGraph);
 				}
 			}
@@ -90,20 +75,15 @@ public class DebugSceneGraph : FlexContainer
 		}
 	}
 
+	public event Action<GameObject>? ObjectSelected;
+
 	private SpriteText createLabel(GameObject rootObject)
 	{
 		var label = new SpriteText()
 		{
 			Text = _rootObject.GetType().Name,
 		};
-		label.Click += (_) =>
-		{
-			AzaleaGame.Main.Host.Root.AddInternal(new DebugRectHighlight()
-			{
-				Position = rootObject.ScreenSpaceDrawQuad.TopLeft,
-				Size = rootObject.ScreenSpaceDrawQuad.BottomRight - rootObject.ScreenSpaceDrawQuad.TopLeft,
-			});
-		};
+		label.Click += (_) => ObjectSelected?.Invoke(rootObject);
 		return label;
 	}
 }

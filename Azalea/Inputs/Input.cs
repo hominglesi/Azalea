@@ -21,7 +21,11 @@ public static class Input
 
 	public static event Action<char>? OnTextInput;
 
-	public static IReadOnlyList<GameObject> GetHoveredObjects() => _hoveredObjects;
+	public static IReadOnlyList<GameObject> GetHoveredObjects(bool recalculate = false)
+	{
+		if (recalculate) updateHoverEvents();
+		return _hoveredObjects;
+	}
 
 	#endregion
 

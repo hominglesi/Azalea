@@ -38,6 +38,6 @@ public class ScrollableContainer : Composition
 
 		var newScrollPosition = InternalComposition.Position.Y + scrollChange;
 
-		InternalComposition.Position = new Vector2(0, Math.Max(newScrollPosition, 0));
+		InternalComposition.Position = new Vector2(0, Math.Min(newScrollPosition, 0));
 	}
 }

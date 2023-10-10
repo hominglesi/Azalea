@@ -30,7 +30,7 @@ public static class Palette
 
 	public static class Flowers
 	{
-		public static Color Azalea => new(201, 98, 143);
+		public static Color Azalea => new(238, 149, 185);
 		public static Color Cornflower => new(100, 149, 237);
 		public static Color Lavender => new(230, 230, 250);
 		public static Color Orchid => new(218, 112, 214);
