@@ -53,11 +53,23 @@ public static class RendererExtentions
 			quad.TopRight + new Vector2(-width, width),
 			quad.TopRight + new Vector2(-width, 0));
 
+		var topColor = new ColorQuad(
+			color.Color.TopLeft,
+			color.Color.TopLeft,
+			color.Color.TopRight,
+			color.Color.TopRight);
+
 		var rightQuad = new Quad(
 			quad.TopRight + new Vector2(-width, 0),
 			quad.BottomRight + new Vector2(-width, -width),
 			quad.BottomRight + new Vector2(0, -width),
 			quad.TopRight);
+
+		var rightColor = new ColorQuad(
+			color.Color.TopRight,
+			color.Color.BottomRight,
+			color.Color.BottomRight,
+			color.Color.TopRight);
 
 		var bottomQuad = new Quad(
 			quad.BottomLeft + new Vector2(width, -width),
@@ -65,15 +77,27 @@ public static class RendererExtentions
 			quad.BottomRight,
 			quad.BottomRight + new Vector2(0, -width));
 
+		var bottomColor = new ColorQuad(
+			color.Color.BottomLeft,
+			color.Color.BottomLeft,
+			color.Color.BottomRight,
+			color.Color.BottomRight);
+
 		var leftQuad = new Quad(
 			quad.TopLeft + new Vector2(0, width),
 			quad.BottomLeft,
 			quad.BottomLeft + new Vector2(width, 0),
 			quad.TopLeft + new Vector2(width, width));
 
-		renderer.DrawQuad(texture, topQuad, color);
-		renderer.DrawQuad(texture, rightQuad, color);
-		renderer.DrawQuad(texture, bottomQuad, color);
-		renderer.DrawQuad(texture, leftQuad, color);
+		var leftColor = new ColorQuad(
+			color.Color.TopLeft,
+			color.Color.BottomLeft,
+			color.Color.BottomLeft,
+			color.Color.TopLeft);
+
+		renderer.DrawQuad(texture, topQuad, new DrawColorInfo(topColor));
+		renderer.DrawQuad(texture, rightQuad, new DrawColorInfo(rightColor));
+		renderer.DrawQuad(texture, bottomQuad, new DrawColorInfo(bottomColor));
+		renderer.DrawQuad(texture, leftQuad, new DrawColorInfo(leftColor));
 	}
 }
