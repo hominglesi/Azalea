@@ -8,14 +8,6 @@ public class BasicTextBox : TextBox
 {
 	public BasicTextBox()
 	{
-		/*
-		Add(new Box
-		{
-			RelativeSizeAxes = Axes.Both,
-			Depth = 1,
-			Color = Palette.Green
-		});*/
-
 		Width = 500;
 		Height = 30;
 	}

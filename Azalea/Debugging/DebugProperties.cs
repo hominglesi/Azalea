@@ -1,8 +1,10 @@
-﻿using Azalea.Design.Containers;
+﻿using Azalea.Debugging.BindableDisplays;
+using Azalea.Design.Containers;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.UserInterface;
+using System.Reflection;
 
 namespace Azalea.Debugging;
 public class DebugProperties : FlexContainer
@@ -16,9 +18,12 @@ public class DebugProperties : FlexContainer
 	private SpriteText _invalidationCount;
 	private SpriteText _latestInvalidation;
 
+	private Composition _propertiesContainer;
+
 	public DebugProperties()
 	{
 		Direction = FlexDirection.Vertical;
+		Wrapping = FlexWrapping.NoWrapping;
 		Spacing = new(0, 5);
 		AddRange(new GameObject[]
 		{
@@ -59,6 +64,13 @@ public class DebugProperties : FlexContainer
 			_latestInvalidation = new SpriteText()
 			{
 				Color = Palette.Flowers.Azalea,
+			},
+			_propertiesContainer = new FlexContainer()
+			{
+				RelativeSizeAxes = Axes.X,
+				Width = 1,
+				Direction = FlexDirection.Vertical,
+				Wrapping = FlexWrapping.NoWrapping
 			}
 		});
 	}
@@ -77,6 +89,34 @@ public class DebugProperties : FlexContainer
 		_invalidationCount.Text = "0";
 		_latestInvalidation.Text = "";
 		_observedObject.Invalidated += AddInvalidation;
+
+		loadAllProperties(obj);
+	}
+
+	private void loadAllProperties(GameObject obj)
+	{
+		_propertiesContainer.Clear();
+
+		var properties = obj.GetType().GetProperties();
+
+		foreach (var property in properties)
+		{
+			if (property.CanWrite == false || property.CanRead == false) continue;
+
+			var propertyDisplay = getDisplayForProperty(property);
+			if (propertyDisplay is null) continue;
+
+			_propertiesContainer.Add(propertyDisplay);
+		}
+	}
+
+	private GameObject? getDisplayForProperty(PropertyInfo property)
+	{
+		return property.PropertyType.Name switch
+		{
+			"String" => new DebugStringDisplay(_observedObject, property.Name),
+			_ => null
+		};
 	}
 
 	public void AddInvalidation(GameObject _, Invalidation invalidation)

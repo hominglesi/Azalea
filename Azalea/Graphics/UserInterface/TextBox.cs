@@ -74,6 +74,7 @@ public abstract class TextBox : Composition
 
 	private string _text = string.Empty;
 
+	public event Action<string>? TextChanged;
 	public virtual string Text
 	{
 		get => _text;
@@ -136,6 +137,8 @@ public abstract class TextBox : Composition
 
 			_cursorAndLayout.Invalidate();
 		}
+
+		TextChanged?.Invoke(Text);
 	}
 
 	private void setText(string value)
@@ -245,6 +248,7 @@ public abstract class TextBox : Composition
 
 		_cursorAndLayout.Invalidate();
 
+		TextChanged?.Invoke(Text);
 		return removedText;
 	}
 
