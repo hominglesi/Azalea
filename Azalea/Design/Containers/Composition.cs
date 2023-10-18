@@ -95,12 +95,19 @@ public class Composition : CompositeGameObject
 
 	public int BorderThickness
 	{
+		get
+		{
+			if (BorderObject is null) return 0;
+
+			return (int)BorderObject.Thickness;
+		}
 		set
 		{
 			if (BorderObject is null)
 				AddInternal(BorderObject = createBorder());
 
 			BorderObject.Thickness = value;
+			_sizeLayout.Invalidate();
 		}
 	}
 

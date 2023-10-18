@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics;
+using Azalea.Graphics.Colors;
 using Azalea.Graphics.UserInterface;
 
 namespace Azalea.Debugging.BindableDisplays;
@@ -9,12 +10,11 @@ public class DebugStringDisplay : DebugBindableDisplay<string>
 	public DebugStringDisplay(object obj, string propertyName)
 		: base(obj, propertyName)
 	{
-		var currentValue = GetValue();
-
-		Add(_textbox = new BasicTextBox()
+		AddElement(_textbox = new BasicTextBox()
 		{
-			RelativeSizeAxes = Axes.Both,
-			Size = new(1, 1),
+			RelativeSizeAxes = Axes.X,
+			Size = new(1, 24),
+			BackgroundColor = new Color(85, 85, 85)
 		});
 
 		ValueChanged += onValueChanged;

@@ -4,6 +4,7 @@ using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.UserInterface;
+using System;
 using System.Reflection;
 
 namespace Azalea.Debugging;
@@ -13,10 +14,6 @@ public class DebugProperties : FlexContainer
 
 	private SpriteText _name;
 	private BasicButton _highlightButton;
-
-	private int _invalidationCounter;
-	private SpriteText _invalidationCount;
-	private SpriteText _latestInvalidation;
 
 	private Composition _propertiesContainer;
 
@@ -56,15 +53,6 @@ public class DebugProperties : FlexContainer
 					Action = () => { if (_observedObject is not null) Editor.HighlightObject(_observedObject); }
 				}
 			},
-			_invalidationCount = new SpriteText()
-			{
-				Color = Palette.Flowers.Azalea,
-				Text = "0"
-			},
-			_latestInvalidation = new SpriteText()
-			{
-				Color = Palette.Flowers.Azalea,
-			},
 			_propertiesContainer = new FlexContainer()
 			{
 				RelativeSizeAxes = Axes.X,
@@ -79,16 +67,9 @@ public class DebugProperties : FlexContainer
 	{
 		if (_observedObject == obj) return;
 
-		if (_observedObject is not null)
-			_observedObject.Invalidated -= AddInvalidation;
-
 		_observedObject = obj;
 
 		_name.Text = obj.GetType().Name ?? "";
-		_invalidationCounter = 0;
-		_invalidationCount.Text = "0";
-		_latestInvalidation.Text = "";
-		_observedObject.Invalidated += AddInvalidation;
 
 		loadAllProperties(obj);
 	}
@@ -102,6 +83,7 @@ public class DebugProperties : FlexContainer
 		foreach (var property in properties)
 		{
 			if (property.CanWrite == false || property.CanRead == false) continue;
+			if (property.GetCustomAttribute<HideInInspector>() != null) continue;
 
 			var propertyDisplay = getDisplayForProperty(property);
 			if (propertyDisplay is null) continue;
@@ -115,14 +97,12 @@ public class DebugProperties : FlexContainer
 		return property.PropertyType.Name switch
 		{
 			"String" => new DebugStringDisplay(_observedObject, property.Name),
+			"Single" => new DebugFloatDisplay(_observedObject, property.Name),
+			"Int32" => new DebugIntDisplay(_observedObject, property.Name),
 			_ => null
 		};
 	}
-
-	public void AddInvalidation(GameObject _, Invalidation invalidation)
-	{
-		_invalidationCounter++;
-		_invalidationCount.Text = _invalidationCounter.ToString();
-		_latestInvalidation.Text = invalidation.ToString();
-	}
 }
+
+[AttributeUsage(AttributeTargets.Property)]
+public class HideInInspector : Attribute { }

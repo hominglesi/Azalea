@@ -1,4 +1,5 @@
-﻿using Azalea.Design.Containers;
+﻿using Azalea.Debugging;
+using Azalea.Design.Containers;
 using Azalea.Extentions;
 using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics.Colors;
@@ -306,6 +307,7 @@ public abstract class GameObject : IGameObject
 
 	private float _fillAspectRatio = 1;
 
+	[HideInInspector]
 	public float FillAspectRatio
 	{
 		get => _fillAspectRatio;
@@ -469,6 +471,7 @@ public abstract class GameObject : IGameObject
 	internal bool IsPartOfComposite => ChildID != 0;
 
 	private float depth;
+	[HideInInspector]
 	public float Depth
 	{
 		get => depth;

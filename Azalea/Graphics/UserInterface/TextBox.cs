@@ -16,7 +16,8 @@ public abstract class TextBox : Composition
 	protected FlexContainer TextFlow { get; private set; }
 	protected Composition TextComposition { get; private set; }
 
-	private bool canAddCharacter(char character) => char.IsControl(character) == false;
+	private bool canAddCharacter(char character) => CanAddCharacter(character) && char.IsControl(character) == false;
+	protected virtual bool CanAddCharacter(char character) => true;
 
 	public int? MaxLength;
 
