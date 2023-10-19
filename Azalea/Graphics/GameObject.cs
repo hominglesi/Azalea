@@ -576,7 +576,7 @@ public abstract class GameObject : IGameObject
 		if (Parent != null)
 			pos += Parent.ChildOffset;
 
-		di.ApplyTransformations(pos, Vector2.One, Rotation, Vector2.Zero, OriginPosition);
+		di.ApplyTransformations(pos, Scale, Rotation, Vector2.Zero, OriginPosition);
 
 		return di;
 	}

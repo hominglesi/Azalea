@@ -39,7 +39,11 @@ public struct DrawInfo
 
 		if (scale != Vector2.One)
 		{
-			throw new NotImplementedException();
+			if (scale.X == 0) scale.X = Precision.FLOAT_EPSILON;
+			if (scale.Y == 0) scale.Y = Precision.FLOAT_EPSILON;
+
+			MatrixExtentions.ScaleFromLeft(ref Matrix, scale);
+			MatrixExtentions.ScaleFromRight(ref MatrixInverse, Vector2.Divide(Vector2.One, scale));
 		}
 
 		if (origin != Vector2.Zero)

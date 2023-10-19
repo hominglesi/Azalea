@@ -54,4 +54,23 @@ public static class MatrixExtentions
 		m.M21 = m21;
 		m.M31 = m31;
 	}
+
+	public static void ScaleFromLeft(ref Matrix3 m, Vector2 v)
+	{
+		m.Row0 *= v.X;
+		m.Row1 *= v.Y;
+	}
+
+	public static void ScaleFromRight(ref Matrix3 m, Vector2 v)
+	{
+		//m.Column0 *= v.X;
+		m.M11 *= v.X;
+		m.M21 *= v.X;
+		m.M31 *= v.X;
+
+		//m.Column1 *= v.Y;
+		m.M12 *= v.Y;
+		m.M22 *= v.Y;
+		m.M32 *= v.Y;
+	}
 }
