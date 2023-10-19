@@ -56,6 +56,7 @@ public abstract class GameObject : IGameObject
 		}
 	}
 
+	[HideInInspector]
 	public float X
 	{
 		get => x;
@@ -69,6 +70,7 @@ public abstract class GameObject : IGameObject
 		}
 	}
 
+	[HideInInspector]
 	public float Y
 	{
 		get => y;
@@ -160,6 +162,7 @@ public abstract class GameObject : IGameObject
 		}
 	}
 
+	[HideInInspector]
 	public virtual float Width
 	{
 		get => width;
@@ -173,6 +176,7 @@ public abstract class GameObject : IGameObject
 		}
 	}
 
+	[HideInInspector]
 	public virtual float Height
 	{
 		get => height;
@@ -269,6 +273,20 @@ public abstract class GameObject : IGameObject
 	private Vector2 _relativeToAbsoluteFactor => Parent?.RelativeToAbsoluteFactor ?? Vector2.One;
 
 	public virtual Rectangle BoundingBox => ToParentSpace(LayoutRectangle).AABBFloat;
+
+	private float _rotation;
+	public float Rotation
+	{
+		get => _rotation;
+		set
+		{
+			if (_rotation == value) return;
+
+			_rotation = value;
+
+			Invalidate(Invalidation.MiscGeometry);
+		}
+	}
 
 	protected virtual void OnSizingChanged()
 	{
@@ -558,7 +576,7 @@ public abstract class GameObject : IGameObject
 		if (Parent != null)
 			pos += Parent.ChildOffset;
 
-		di.ApplyTransformations(pos, Vector2.One, 0, Vector2.Zero, OriginPosition);
+		di.ApplyTransformations(pos, Vector2.One, Rotation, Vector2.Zero, OriginPosition);
 
 		return di;
 	}

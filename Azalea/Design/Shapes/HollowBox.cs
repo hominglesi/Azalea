@@ -3,8 +3,8 @@
 namespace Azalea.Design.Shapes;
 public partial class HollowBox : GameObject
 {
-	private float _thickness = 3;
-	public float Thickness
+	private Boundary _thickness = new(3);
+	public Boundary Thickness
 	{
 		get => _thickness;
 		set

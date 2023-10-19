@@ -103,7 +103,7 @@ public class TestingTestScene : TestScene
 			//Alpha = 0.5f,
 			BackgroundColor = ColorQuad.GradientHorizontal(Palette.Blue, Palette.Green),
 			BorderColor = new ColorQuad(Palette.Black, Palette.Gray, Palette.White, Palette.Gray),
-			BorderThickness = 6
+			BorderThickness = new(6)
 		});
 
 		Add(_scrollDisplay = new SpriteText()

@@ -1,19 +1,16 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
-using System;
 using System.Collections.Generic;
 
 namespace Azalea.Debugging.BindableDisplays;
-public class DebugBindableDisplay<T> : FlexContainer
+public abstract class DebugBindableDisplay<T> : FlexContainer
 {
 	private readonly object _observedObject;
 	private readonly string _observedProperty;
-	private T? _currentValue;
+	protected T CurrentValue;
 
 	private SpriteText _propertyNameText;
-
-	protected event Action<T>? ValueChanged;
 
 	public DebugBindableDisplay(object obj, string propertyName)
 	{
@@ -22,6 +19,7 @@ public class DebugBindableDisplay<T> : FlexContainer
 
 		_observedObject = obj;
 		_observedProperty = propertyName;
+		CurrentValue = GetValue();
 
 		RelativeSizeAxes = Axes.X;
 		Size = new(1, 0);
@@ -32,13 +30,14 @@ public class DebugBindableDisplay<T> : FlexContainer
 		});
 	}
 
+	protected abstract void OnValueChanged(T newValue);
 	protected override void Update()
 	{
 		var propertyValue = GetValue();
-		if (EqualityComparer<T>.Default.Equals(propertyValue, _currentValue) == false)
+		if (EqualityComparer<T>.Default.Equals(propertyValue, CurrentValue) == false)
 		{
-			_currentValue = propertyValue;
-			ValueChanged?.Invoke(_currentValue);
+			CurrentValue = propertyValue;
+			OnValueChanged(CurrentValue);
 		}
 	}
 

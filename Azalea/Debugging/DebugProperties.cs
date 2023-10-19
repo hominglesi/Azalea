@@ -99,6 +99,8 @@ public class DebugProperties : FlexContainer
 			"String" => new DebugStringDisplay(_observedObject, property.Name),
 			"Single" => new DebugFloatDisplay(_observedObject, property.Name),
 			"Int32" => new DebugIntDisplay(_observedObject, property.Name),
+			"Vector2" => new DebugVector2Display(_observedObject, property.Name),
+			"Boundary" => new DebugBoundaryDisplay(_observedObject, property.Name),
 			_ => null
 		};
 	}

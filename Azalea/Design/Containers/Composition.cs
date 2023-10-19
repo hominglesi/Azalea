@@ -3,7 +3,6 @@ using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Layout;
 using System.Collections.Generic;
-using System.Numerics;
 
 namespace Azalea.Design.Containers;
 
@@ -31,9 +30,9 @@ public class Composition : CompositeGameObject
 			if (BorderObject is not null && AutoSizeAxes == Axes.None)
 			{
 				var thickness = BorderObject.Thickness;
-				InternalComposition.Position = new(thickness, thickness);
+				InternalComposition.Position = new(thickness.Left, thickness.Top);
 				InternalComposition.RelativeSizeAxes = Axes.None;
-				InternalComposition.Size = DrawSize - new Vector2(thickness * 2, thickness * 2);
+				InternalComposition.Size = DrawSize - thickness.Total;
 			}
 			_sizeLayout.Validate();
 		}
@@ -93,13 +92,13 @@ public class Composition : CompositeGameObject
 		}
 	}
 
-	public int BorderThickness
+	public Boundary BorderThickness
 	{
 		get
 		{
-			if (BorderObject is null) return 0;
+			if (BorderObject is null) return Boundary.Zero;
 
-			return (int)BorderObject.Thickness;
+			return BorderObject.Thickness;
 		}
 		set
 		{

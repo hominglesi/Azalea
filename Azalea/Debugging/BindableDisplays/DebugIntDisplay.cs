@@ -17,11 +17,13 @@ internal class DebugIntDisplay : DebugBindableDisplay<int>
 			BackgroundColor = new Color(85, 85, 85)
 		});
 
-		ValueChanged += onValueChanged;
+		if (CurrentValue != 0) OnValueChanged(CurrentValue);
+		else _textbox.Text = "0";
+
 		_textbox.TextChanged += _ => SetValue(_textbox.DisplayedInt);
 	}
 
-	private void onValueChanged(int newValue)
+	protected override void OnValueChanged(int newValue)
 	{
 		_textbox.DisplayedInt = newValue;
 	}

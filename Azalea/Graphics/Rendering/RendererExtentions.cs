@@ -2,7 +2,7 @@
 using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Graphics.Textures;
-using System.Numerics;
+using Azalea.Numerics;
 
 namespace Azalea.Graphics.Rendering;
 
@@ -43,15 +43,11 @@ public static class RendererExtentions
 		});
 	}
 
-	internal static void DrawRectangle(this IRenderer renderer, Quad quad, float width, DrawColorInfo color)
+	internal static void DrawRectangle(this IRenderer renderer, Rectangle rect, Matrix3 drawMatrix, Boundary thickness, DrawColorInfo color)
 	{
 		var texture = renderer.WhitePixel;
 
-		var topQuad = new Quad(
-			quad.TopLeft,
-			quad.TopLeft + new Vector2(0, width),
-			quad.TopRight + new Vector2(-width, width),
-			quad.TopRight + new Vector2(-width, 0));
+		var topRect = new Rectangle(rect.Top, rect.Left, rect.Width - thickness.Right, thickness.Top);
 
 		var topColor = new ColorQuad(
 			color.Color.TopLeft,
@@ -59,11 +55,7 @@ public static class RendererExtentions
 			color.Color.TopRight,
 			color.Color.TopRight);
 
-		var rightQuad = new Quad(
-			quad.TopRight + new Vector2(-width, 0),
-			quad.BottomRight + new Vector2(-width, -width),
-			quad.BottomRight + new Vector2(0, -width),
-			quad.TopRight);
+		var rightRect = new Rectangle(rect.Width - thickness.Right, rect.Top, thickness.Right, rect.Height - thickness.Bottom);
 
 		var rightColor = new ColorQuad(
 			color.Color.TopRight,
@@ -71,11 +63,7 @@ public static class RendererExtentions
 			color.Color.BottomRight,
 			color.Color.TopRight);
 
-		var bottomQuad = new Quad(
-			quad.BottomLeft + new Vector2(width, -width),
-			quad.BottomLeft + new Vector2(width, 0),
-			quad.BottomRight,
-			quad.BottomRight + new Vector2(0, -width));
+		var bottomRect = new Rectangle(rect.Left + thickness.Left, rect.Height - thickness.Bottom, rect.Width - thickness.Left, thickness.Bottom);
 
 		var bottomColor = new ColorQuad(
 			color.Color.BottomLeft,
@@ -83,11 +71,7 @@ public static class RendererExtentions
 			color.Color.BottomRight,
 			color.Color.BottomRight);
 
-		var leftQuad = new Quad(
-			quad.TopLeft + new Vector2(0, width),
-			quad.BottomLeft,
-			quad.BottomLeft + new Vector2(width, 0),
-			quad.TopLeft + new Vector2(width, width));
+		var leftRect = new Rectangle(rect.Left, rect.Top + thickness.Top, thickness.Left, rect.Height - thickness.Bottom);
 
 		var leftColor = new ColorQuad(
 			color.Color.TopLeft,
@@ -95,9 +79,9 @@ public static class RendererExtentions
 			color.Color.BottomLeft,
 			color.Color.TopLeft);
 
-		renderer.DrawQuad(texture, topQuad, new DrawColorInfo(topColor));
-		renderer.DrawQuad(texture, rightQuad, new DrawColorInfo(rightColor));
-		renderer.DrawQuad(texture, bottomQuad, new DrawColorInfo(bottomColor));
-		renderer.DrawQuad(texture, leftQuad, new DrawColorInfo(leftColor));
+		renderer.DrawQuad(texture, Quad.FromRectangle(topRect) * drawMatrix, new DrawColorInfo(topColor));
+		renderer.DrawQuad(texture, Quad.FromRectangle(rightRect) * drawMatrix, new DrawColorInfo(rightColor));
+		renderer.DrawQuad(texture, Quad.FromRectangle(bottomRect) * drawMatrix, new DrawColorInfo(bottomColor));
+		renderer.DrawQuad(texture, Quad.FromRectangle(leftRect) * drawMatrix, new DrawColorInfo(leftColor));
 	}
 }

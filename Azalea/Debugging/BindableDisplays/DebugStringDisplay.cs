@@ -17,11 +17,11 @@ public class DebugStringDisplay : DebugBindableDisplay<string>
 			BackgroundColor = new Color(85, 85, 85)
 		});
 
-		ValueChanged += onValueChanged;
+		OnValueChanged(CurrentValue);
 		_textbox.TextChanged += (newText) => SetValue(newText);
 	}
 
-	private void onValueChanged(string newValue)
+	protected override void OnValueChanged(string newValue)
 	{
 		_textbox.Text = newValue;
 	}

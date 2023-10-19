@@ -17,11 +17,13 @@ internal class DebugFloatDisplay : DebugBindableDisplay<float>
 			BackgroundColor = new Color(85, 85, 85)
 		});
 
-		ValueChanged += onValueChanged;
+		if (CurrentValue != 0) OnValueChanged(CurrentValue);
+		else _textbox.Text = "0";
+
 		_textbox.TextChanged += _ => SetValue(_textbox.DisplayedFloat);
 	}
 
-	private void onValueChanged(float newValue)
+	protected override void OnValueChanged(float newValue)
 	{
 		_textbox.DisplayedFloat = newValue;
 	}

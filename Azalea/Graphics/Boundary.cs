@@ -25,6 +25,12 @@ public struct Boundary : IEquatable<Boundary>
 	public readonly float Vertical => Top + Bottom;
 	public readonly Vector2 Total => new(Horizontal, Vertical);
 
+	public static readonly Boundary Zero = new(0);
+
 	public readonly bool Equals(Boundary other) => Top == other.Top && Left == other.Left && Bottom == other.Bottom && Right == other.Right;
+	public readonly override bool Equals(object? obj) => obj is Boundary b && Equals(b);
 	public override readonly string ToString() => $@"({Top}, {Left}, {Bottom}, {Right})";
+
+	public static bool operator ==(Boundary left, Boundary right) => left.Equals(right);
+	public static bool operator !=(Boundary left, Boundary right) => left.Equals(right) == false;
 }
