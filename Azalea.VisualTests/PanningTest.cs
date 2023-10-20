@@ -1,5 +1,5 @@
 ﻿using Azalea.Design.Containers;
-using Azalea.Graphics.UserInterface;
+using Azalea.Design.UserInterface;
 using Azalea.Inputs;
 using Azalea.Platform;
 using System.Numerics;

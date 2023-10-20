@@ -1,9 +1,9 @@
 ﻿using Azalea.Debugging.BindableDisplays;
 using Azalea.Design.Containers;
+using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
-using Azalea.Graphics.UserInterface;
 using System;
 using System.Reflection;
 

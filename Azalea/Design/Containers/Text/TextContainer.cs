@@ -85,6 +85,7 @@ public class TextContainer : FlexContainer
 
 	public TextContainer(Action<SpriteText> defaultCreationParameters = null)
 	{
+		Wrapping = FlexWrapping.Wrap;
 		_defaultCreationParameters = defaultCreationParameters;
 	}
 

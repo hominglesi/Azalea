@@ -32,10 +32,10 @@ public partial struct ColorQuad : IEquatable<ColorQuad>
 
 	public static ColorQuad SolidColor(Color color) => new(color);
 
-	public static ColorQuad GradientHorizontal(Color leftColor, Color rightColor)
+	public static ColorQuad HorizontalGradient(Color leftColor, Color rightColor)
 		=> new(leftColor, leftColor, rightColor, rightColor);
 
-	public static ColorQuad GradientVertical(Color topColor, Color bottomColor)
+	public static ColorQuad VerticalGradient(Color topColor, Color bottomColor)
 		=> new(topColor, bottomColor, bottomColor, topColor);
 
 	internal Color SingleColor

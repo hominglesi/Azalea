@@ -1,6 +1,7 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
+using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using System.Numerics;
 
@@ -153,7 +154,7 @@ public class DebuggingOverlay : Composition
 
 	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		if (e.Key == Inputs.Keys.F1)
+		if (e.Key == Keys.Q && Input.GetKey(Keys.ControlLeft).Pressed)
 		{
 			if (_debuggerExpanded) hideDebugger();
 			else expandDebugger();

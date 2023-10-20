@@ -1,10 +1,11 @@
 ﻿using Azalea.Design.Shapes;
+using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs.Events;
 using System.Numerics;
 
-namespace Azalea.Graphics.UserInterface;
+namespace Azalea.Design.UserInterface;
 
 public class BasicButton : Button
 {

@@ -21,7 +21,10 @@ public class FlexContainer : FlowContainer
 		}
 	}
 
-	private FlexWrapping _wrapping = FlexWrapping.Wrap;
+	private FlexWrapping _wrapping = FlexWrapping.NoWrapping;
+	/// <summary>
+	/// Determines if this <see cref="FlexContainer"/> should wrap. (Default: NoWrapping)
+	/// </summary>
 	public FlexWrapping Wrapping
 	{
 		get => _wrapping;

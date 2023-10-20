@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Title>$(AssemblyName)</Title>
-    <Version>$(VersionPrefix)1.3.0-preview3</Version>
+    <Version>1.3.0</Version>
     <Authors>hominglesi</Authors>
     <Company>Azalea</Company>
     <Description>A 2D game engine.</Description>
@@ -14,6 +14,7 @@
     <PackageIconUrl>https://i.imgur.com/UPsEzXU.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/hominglesi/Azalea</RepositoryUrl>
     <PackageReleaseNotes>https://github.com/hominglesi/Azalea/releases</PackageReleaseNotes>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageId>$(AssemblyName)</PackageId>
   </PropertyGroup>
 
@@ -42,6 +43,7 @@
     <EmbeddedResource Include="Resources\**\*" />
     <None Remove="Resources\Textures\bullseye-pointer.png" />
     <None Include="Resources\Textures\azalea-icon.png" Pack="true" PackagePath="\" />
+    <None Include="../README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup Label="FilesToCopy">

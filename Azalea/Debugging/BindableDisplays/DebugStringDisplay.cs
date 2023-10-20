@@ -1,6 +1,6 @@
-﻿using Azalea.Graphics;
+﻿using Azalea.Design.UserInterface;
+using Azalea.Graphics;
 using Azalea.Graphics.Colors;
-using Azalea.Graphics.UserInterface;
 
 namespace Azalea.Debugging.BindableDisplays;
 public class DebugStringDisplay : DebugBindableDisplay<string>

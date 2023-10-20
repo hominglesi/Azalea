@@ -1,8 +1,8 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Design.Shapes;
+using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
-using Azalea.Graphics.UserInterface;
 using System;
 
 namespace Azalea.VisualTests;

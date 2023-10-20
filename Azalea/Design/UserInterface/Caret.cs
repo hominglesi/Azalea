@@ -1,7 +1,7 @@
 ﻿using Azalea.Design.Containers;
 using System.Numerics;
 
-namespace Azalea.Graphics.UserInterface;
+namespace Azalea.Design.UserInterface;
 
 public abstract class Caret : CompositeGameObject
 {

@@ -1,9 +1,10 @@
 ﻿using Azalea.Design.Containers;
+using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Inputs.Events;
 using System;
 
-namespace Azalea.Graphics.UserInterface;
+namespace Azalea.Design.UserInterface;
 public class Checkbox : Composition
 {
 	public bool Checked { get; private set; }

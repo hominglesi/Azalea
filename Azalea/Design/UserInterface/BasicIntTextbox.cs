@@ -1,6 +1,4 @@
-﻿using Azalea.Graphics.UserInterface;
-
-namespace Azalea.Design.UserInterface;
+﻿namespace Azalea.Design.UserInterface;
 public class BasicIntTextBox : BasicTextBox
 {
 	public int DisplayedInt

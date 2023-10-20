@@ -1,10 +1,10 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Design.Containers.Text;
 using Azalea.Design.Shapes;
+using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
-using Azalea.Graphics.UserInterface;
 using Azalea.Inputs;
 using Azalea.Layout;
 using System;
@@ -101,7 +101,7 @@ public class TestingTestScene : TestScene
 			Size = new(200, 200),
 			Position = new(500, 50),
 			//Alpha = 0.5f,
-			BackgroundColor = ColorQuad.GradientHorizontal(Palette.Blue, Palette.Green),
+			BackgroundColor = ColorQuad.HorizontalGradient(Palette.Blue, Palette.Green),
 			BorderColor = new ColorQuad(Palette.Black, Palette.Gray, Palette.White, Palette.Gray),
 			BorderThickness = new(6)
 		});

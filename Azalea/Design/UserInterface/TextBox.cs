@@ -1,5 +1,6 @@
 ﻿using Azalea.Caching;
 using Azalea.Design.Containers;
+using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
@@ -9,7 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
-namespace Azalea.Graphics.UserInterface;
+namespace Azalea.Design.UserInterface;
 
 public abstract class TextBox : Composition
 {

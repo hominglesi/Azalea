@@ -5,7 +5,7 @@ using System.Numerics;
 namespace Azalea.Design.Containers;
 public class ScrollableContainer : Composition
 {
-	public float ScrollSpeed { get; set; } = 10;
+	public float ScrollSpeed { get; set; } = 15;
 
 	private float _scrollPosition;
 	public float ScrollPosition

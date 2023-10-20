@@ -1,9 +1,9 @@
 ﻿using Azalea.Design.Compositions;
+using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.Textures;
-using Azalea.Graphics.UserInterface;
 using Azalea.IO.Assets;
 using System;
 using System.Numerics;

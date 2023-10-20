@@ -1,8 +1,9 @@
 ﻿using Azalea.Design.Shapes;
+using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using System.Numerics;
 
-namespace Azalea.Graphics.UserInterface;
+namespace Azalea.Design.UserInterface;
 
 public class BasicTextBox : TextBox
 {
@@ -45,13 +46,13 @@ public class BasicTextBox : TextBox
 			if (selectionWidth != null)
 			{
 				Position = position;
-				Width = selectionWidth.Value + (CaretWidth / 2);
+				Width = selectionWidth.Value + CaretWidth / 2;
 				Alpha = 0.5f;
 				_box.Alpha = 0.5f;
 			}
 			else
 			{
-				Position = new Vector2(position.X - (CaretWidth / 2), position.Y);
+				Position = new Vector2(position.X - CaretWidth / 2, position.Y);
 				Width = CaretWidth;
 				Alpha = 1f;
 				_box.Alpha = 1f;

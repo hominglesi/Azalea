@@ -1,8 +1,8 @@
 ﻿using Azalea.Design.Containers;
+using Azalea.Design.UserInterface;
 using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
-using Azalea.Graphics.UserInterface;
 using System;
 
 namespace Azalea.Debugging;

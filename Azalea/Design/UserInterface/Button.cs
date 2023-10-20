@@ -2,7 +2,7 @@
 using Azalea.Inputs.Events;
 using System;
 
-namespace Azalea.Graphics.UserInterface;
+namespace Azalea.Design.UserInterface;
 
 public class Button : Composition
 {

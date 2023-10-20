@@ -21,10 +21,10 @@ public class VisualTests : AzaleaGame
 		Host.Window.Resizable = true;
 
 		//Add(new DefaultUserInputTest());
-		//Add(new TestingTestScene());
+		Add(new TestingTestScene());
 		//Add(new FlexTest());
 		//Add(new InputTest());
-		Add(new PanningTest());
+		//Add(new PanningTest());
 
 		_sound = Assets.GetSound("Audio/paramore.wav");
 		_sound2 = Assets.GetSound("Audio/audio.wav");
