@@ -4,3 +4,7 @@
 
 # Azalea
 A 2D game engine.
+
+### Versions
+1.0-1.3 - Hosted on Github Packages <br>
+1.3+ - Hosted on nuget.org
