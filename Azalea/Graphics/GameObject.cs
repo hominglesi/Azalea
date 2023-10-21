@@ -1,4 +1,5 @@
-﻿using Azalea.Debugging;
+﻿using Azalea.Amends;
+using Azalea.Debugging;
 using Azalea.Design.Containers;
 using Azalea.Extentions;
 using Azalea.Extentions.EnumExtentions;
@@ -14,13 +15,14 @@ using System.Numerics;
 
 namespace Azalea.Graphics;
 
-public abstract class GameObject : IGameObject
+public abstract class GameObject : Amendable, IGameObject
 {
 	public event Action<GameObject>? OnUpdate;
 	internal event Action<GameObject, Invalidation>? Invalidated;
 
 	public virtual bool UpdateSubTree()
 	{
+		UpdateAmends();
 		Update();
 		OnUpdate?.Invoke(this);
 		return true;

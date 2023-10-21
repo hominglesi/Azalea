@@ -61,6 +61,13 @@ public class Composition : CompositeGameObject
 
 	public ColorQuad BackgroundColor
 	{
+		get
+		{
+			if (BackgroundObject == null)
+				return new Color();
+
+			return BackgroundObject.Color;
+		}
 		set
 		{
 			if (BackgroundObject == null)

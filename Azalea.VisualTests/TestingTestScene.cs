@@ -1,4 +1,5 @@
-﻿using Azalea.Design.Containers;
+﻿using Azalea.Amends;
+using Azalea.Design.Containers;
 using Azalea.Design.Containers.Text;
 using Azalea.Design.Shapes;
 using Azalea.Design.UserInterface;
@@ -37,6 +38,13 @@ public class TestingTestScene : TestScene
 			}
 		});
 
+		Add(new Box()
+		{
+			Position = new(850, 400),
+			Size = new(250, 250),
+			Origin = Anchor.Center
+		});
+
 		_composition.AddText("Text3 ", t => { t.Color = Palette.Black; });
 		_composition.AddText("Text4 ");
 
@@ -44,9 +52,16 @@ public class TestingTestScene : TestScene
 		{
 			Width = 500,
 			Height = 30,
-			Position = new Vector2(500, 500)
-		});
-		_text.Text = "Ide Gas";
+			Position = new Vector2(500, 500),
+			Text = "Ide Gas"
+		}
+		.RepositionTo(new(400, 400), 1)
+		.ChangeColorQuadPropertyTo("BackgroundColor", Palette.Olive, 1)
+		.Execute(x => x.Parent!.ScaleTo(new(2, 2), 1))
+		.Then()
+		.RepositionBy(new(0, 100), 1)
+		.ChangeColorQuadPropertyTo("BackgroundColor", new Color(255, 255, 255, 0), 1)
+		.Then().Execute(x => Console.WriteLine("AOWHFIWAf")));
 
 		Add(new BasicTextBox()
 		{
@@ -111,7 +126,7 @@ public class TestingTestScene : TestScene
 			Position = new(700, 100),
 			Text = "0"
 		});
-
+		/*
 		BasicWindow window;
 		Add(window = new BasicWindow()
 		{
@@ -125,7 +140,7 @@ public class TestingTestScene : TestScene
 					Text = "JA sam U windowu"
 				}
 			}
-		});
+		});*/
 
 
 
