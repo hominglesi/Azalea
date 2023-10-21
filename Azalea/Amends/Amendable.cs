@@ -11,6 +11,7 @@ public abstract class Amendable
 	public void UpdateAmends()
 	{
 		var deltaTime = Time.DeltaTime;
+		var soloBreak = true;
 
 		for (int i = 0; i < _amends.Count; i++)
 		{
@@ -18,7 +19,7 @@ public abstract class Amendable
 
 			if (amend is IBreakingAmend)
 			{
-				if (i == 0)
+				if (soloBreak)
 				{
 					_amends.RemoveAt(i);
 					i--;
@@ -27,6 +28,10 @@ public abstract class Amendable
 				{
 					break;
 				}
+			}
+			else
+			{
+				if (amend is not IRepeatableAmend) soloBreak = false;
 			}
 
 			if (amend.HasStarted == false) amend.Start();
@@ -44,5 +49,17 @@ public abstract class Amendable
 	public void AddAmend(IAmend amend)
 	{
 		_amends.Add(amend);
+	}
+
+	public void FinishAmends()
+	{
+		foreach (var amend in _amends)
+		{
+			if (amend.HasStarted == false) amend.Start();
+
+			amend.Finish();
+		}
+
+		_amends.Clear();
 	}
 }

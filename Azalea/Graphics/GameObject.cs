@@ -478,7 +478,7 @@ public abstract class GameObject : Amendable, IGameObject
 		{
 			if (_alpha == value) return;
 
-			_alpha = value;
+			_alpha = Math.Clamp(value, 0, 1);
 
 			Invalidate(Invalidation.Color);
 		}

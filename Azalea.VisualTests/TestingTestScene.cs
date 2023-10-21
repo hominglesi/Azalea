@@ -53,15 +53,15 @@ public class TestingTestScene : TestScene
 			Width = 500,
 			Height = 30,
 			Position = new Vector2(500, 500),
-			Text = "Ide Gas"
+			Text = "Ide Gas",
+			Alpha = 0
 		}
-		.RepositionTo(new(400, 400), 1)
-		.ChangeColorQuadPropertyTo("BackgroundColor", Palette.Olive, 1)
-		.Execute(x => x.Parent!.ScaleTo(new(2, 2), 1))
+		.RepositionBy(new(-100, 0), 0)
+		.RepositionBy(new(100, 0), 1.5f)
+		.ChangeAlphaTo(1, 1.5f)
 		.Then()
-		.RepositionBy(new(0, 100), 1)
-		.ChangeColorQuadPropertyTo("BackgroundColor", new Color(255, 255, 255, 0), 1)
-		.Then().Execute(x => Console.WriteLine("AOWHFIWAf")));
+		.Loop(x => x.RepositionBy(new(0, -100), 1)
+				.Then().RepositionBy(new(0, 100), 1), 2));
 
 		Add(new BasicTextBox()
 		{
@@ -160,5 +160,7 @@ public class TestingTestScene : TestScene
 			//_comp.Invalidate(Invalidation.RequiredParentSizeToFit, InvalidationSource.Child);
 			_comp.InternalComposition.Invalidate(Invalidation.RequiredParentSizeToFit, InvalidationSource.Child);
 		}
+
+		if (Input.GetKey(Keys.O).Down) _text.FinishAmends();
 	}
 }

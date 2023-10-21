@@ -33,6 +33,13 @@ public static class AmendableExtentions
 		return amendable;
 	}
 
+	public static T Loop<T>(this T amendable, Action<T> action, float interval)
+		where T : Amendable
+	{
+		amendable.AddAmend(new RepeatAmend<T>(amendable, action, interval));
+		return amendable;
+	}
+
 	public static T ChangeFloatPropertyTo<T>(this T amendable, string propertyName, float newValue, float duration)
 		where T : Amendable
 	{
@@ -117,6 +124,17 @@ public static class AmendableExtentions
 	public static T RecolorTo<T>(this T amendable, Color newColor, float duration)
 		where T : Amendable
 		=> amendable.ChangeColorQuadPropertyTo("Color", newColor, duration);
+
+	#endregion
+
+	#region Alpha
+	public static T ChangeAlphaBy<T>(this T amendable, float alphaChange, float duration)
+		where T : Amendable
+		=> amendable.ChangeFloatPropertyBy("Alpha", alphaChange, duration);
+
+	public static T ChangeAlphaTo<T>(this T amendable, float newAlpha, float duration)
+		where T : Amendable
+		=> amendable.ChangeFloatPropertyBy("Alpha", newAlpha, duration);
 
 	#endregion
 }
