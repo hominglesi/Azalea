@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Azalea.Graphics.GLFW;
 internal static class GLFW
@@ -24,11 +25,11 @@ internal static class GLFW
 	#region Window
 
 	[DllImport(LibraryPath, EntryPoint = "glfwCreateWindow")]
-	private static extern GLFW_Window createWindow(int width, int height, char[] title, GLFW_Monitor monitor, GLFW_Window share);
+	private static extern GLFW_Window createWindow(int width, int height, byte[] title, GLFW_Monitor monitor, GLFW_Window share);
 
 	public static GLFW_Window CreateWindow(int width, int height, string title, GLFW_Monitor? monitor, GLFW_Window? share)
 	{
-		return createWindow(width, height, title.ToCharArray(), monitor ?? IntPtr.Zero, share ?? IntPtr.Zero);
+		return createWindow(width, height, Encoding.UTF8.GetBytes(title), monitor ?? IntPtr.Zero, share ?? IntPtr.Zero);
 	}
 
 	[DllImport(LibraryPath, EntryPoint = "glfwWindowShouldClose")]

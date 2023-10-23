@@ -1,16 +1,30 @@
-﻿using Azalea.Graphics.OpenGL.Enums;
+﻿using Azalea.Graphics.Colors;
+using Azalea.Graphics.OpenGL.Enums;
+using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Azalea.Graphics.OpenGL;
-internal static class GL
+internal static unsafe class GL
 {
 	private const string LibraryPath = "opengl32.dll";
 
+	[DllImport(LibraryPath, EntryPoint = "glGetString")]
+	private static extern IntPtr getString(GLStringName name);
+	public static string GetString(GLStringName name)
+	{
+		return Marshal.PtrToStringAnsi(getString(name)) ?? "";
+	}
+
 	[DllImport(LibraryPath, EntryPoint = "glClear")]
-	public static extern void Clear(GLBufferBits bufferBits);
+	public static extern void Clear(GLBufferBit bufferBits);
 
 	[DllImport(LibraryPath, EntryPoint = "glClearColor")]
-	public static extern void ClearColor(float red, float green, float blue, float alpha);
+	private static extern void clearColor(float red, float green, float blue, float alpha);
+	public static void ClearColor(Color color)
+	{
+		clearColor(color.RNormalized, color.GNormalized, color.BNormalized, color.ANormalized);
+	}
 
 	[DllImport(LibraryPath, EntryPoint = "glBegin")]
 	public static extern void Begin(GLBeginMode mode);
@@ -18,10 +32,150 @@ internal static class GL
 	[DllImport(LibraryPath, EntryPoint = "glEnd")]
 	public static extern void End();
 
+	[DllImport(LibraryPath, EntryPoint = "glDrawArrays")]
+	public static extern void DrawArrays(GLBeginMode mode, int first, int count);
+
 	#region GLVertex
 
 	[DllImport(LibraryPath, EntryPoint = "glVertex2f")]
 	public static extern void Vertex2f(float x, float y);
+
+	#endregion
+
+	#region Modern
+
+	//Function for getting the modern function pointers
+	[DllImport(LibraryPath, EntryPoint = "wglGetProcAddress")]
+	public static extern IntPtr wglGetProcAddress(string functionName);
+	private delegate void VoidDelegate();
+	private delegate void VoidUIntDelegate(uint value);
+	private delegate uint UIntDelegate();
+
+	private delegate void CreateBuffersDelegate(int n, uint* buffers);
+	private static CreateBuffersDelegate? _glCreateBuffers;
+	public static void CreateBuffers(int n, uint* buffers) => _glCreateBuffers!(n, buffers);
+
+
+	private delegate void GenBuffersDelegate(int count, uint* buffers);
+	private static GenBuffersDelegate? _glGenBuffers;
+	public static uint GenBuffer()
+	{
+		uint buffer;
+		_glGenBuffers!(1, &buffer);
+		return buffer;
+	}
+
+	private delegate void BindBufferDelegate(GLBufferType type, uint buffer);
+	private static BindBufferDelegate? _glBindBuffer;
+	public static void BindBuffer(GLBufferType type, uint buffer) => _glBindBuffer!(type, buffer);
+
+
+	private delegate void BufferDataDelegate(GLBufferType type, IntPtr size, void* data, GLUsageHint hint);
+	private static BufferDataDelegate? _glBufferData;
+	public static void BufferData(GLBufferType type, IntPtr size, void* data, GLUsageHint hint) => _glBufferData!(type, size, data, hint);
+	public static void BufferData(GLBufferType type, float[] data, GLUsageHint hint)
+	{
+		fixed (void* ptr = &data[0])
+			GL.BufferData(GLBufferType.Array, new IntPtr(data.Length * sizeof(float)), ptr, GLUsageHint.StaticDraw);
+	}
+
+	private delegate void VertexAttribPointerDelegate(uint index, int size, GLDataType type, GLBool normalized, int stride, void* pointer);
+	private static VertexAttribPointerDelegate? _glVertexAttribPointer;
+	public static void VertexAttribPointer(uint index, int size, GLDataType type, GLBool normalized, int stride, int offset)
+	{
+		_glVertexAttribPointer!(index, size, type, normalized, stride, ((IntPtr)offset).ToPointer());
+	}
+
+
+	private static VoidUIntDelegate? _glEnableVertexAttribArray;
+	public static void EnableVertexAttribArray(uint index) => _glEnableVertexAttribArray!(index);
+
+
+	private static UIntDelegate? _glCreateProgram;
+	public static uint CreateProgram() => _glCreateProgram!();
+
+
+	private delegate uint CreateShaderDelegate(GLShaderType type);
+	private static CreateShaderDelegate? _glCreateShader;
+	public static uint CreateShader(GLShaderType type) => _glCreateShader!(type);
+
+
+	private delegate uint ShaderSourceDelegate(uint shader, int count, byte** str, int* length);
+	private static ShaderSourceDelegate? _glShaderSource;
+	public static void ShaderSource(uint shader, string source)
+	{
+		var buffer = Encoding.UTF8.GetBytes(source);
+		fixed (byte* p1 = &buffer[0])
+		{
+			var sources = new[] { p1 };
+			fixed (byte** p2 = &sources[0])
+			{
+				var length = buffer.Length;
+				_glShaderSource!(shader, 1, p2, &length);
+			}
+		}
+	}
+
+	private static VoidUIntDelegate? _glCompileShader;
+	public static void CompileShader(uint shader) => _glCompileShader!(shader);
+
+
+	private delegate void AttachShaderDelegate(uint program, uint shader);
+	private static AttachShaderDelegate? _glAttachShader;
+	public static void AttachShader(uint program, uint shader) => _glAttachShader!(program, shader);
+
+
+	private static VoidUIntDelegate? _glLinkProgram;
+	public static void LinkProgram(uint program) => _glLinkProgram!(program);
+
+
+	private static VoidUIntDelegate? _glValidateProgram;
+	public static void ValidateProgram(uint program) => _glValidateProgram!(program);
+
+
+	private static VoidUIntDelegate? _glDeleteShader;
+	public static void DeleteShader(uint shader) => _glDeleteShader!(shader);
+
+
+	private static VoidUIntDelegate? _glDeleteProgram;
+	public static void DeleteProgram(uint program) => _glDeleteProgram!(program);
+
+
+	private delegate void GetShaderivDelegate(uint shader, GLParameterName name, int* args);
+	private static GetShaderivDelegate? _glGetShaderiv;
+	public static void GetShaderiv(uint shader, GLParameterName name, int* args) => _glGetShaderiv!(shader, name, args);
+
+
+	private delegate void GetProgramivDelegate(uint program, GLParameterName name, int* args);
+	private static GetProgramivDelegate? _glGetProgramiv;
+	public static void GetProgramiv(uint program, GLParameterName name, int* args) => _glGetProgramiv!(program, name, args);
+
+
+	private static VoidUIntDelegate? _glUseProgram;
+	public static void UseProgram(uint program) => _glUseProgram!(program);
+
+
+	public static void Import()
+	{
+		_glCreateBuffers = Marshal.GetDelegateForFunctionPointer<CreateBuffersDelegate>(wglGetProcAddress("glCreateBuffers"));
+		_glGenBuffers = Marshal.GetDelegateForFunctionPointer<GenBuffersDelegate>(wglGetProcAddress("glGenBuffers"));
+		_glBindBuffer = Marshal.GetDelegateForFunctionPointer<BindBufferDelegate>(wglGetProcAddress("glBindBuffer"));
+		_glBufferData = Marshal.GetDelegateForFunctionPointer<BufferDataDelegate>(wglGetProcAddress("glBufferData"));
+		_glVertexAttribPointer = Marshal.GetDelegateForFunctionPointer<VertexAttribPointerDelegate>(wglGetProcAddress("glVertexAttribPointer"));
+		_glEnableVertexAttribArray = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glEnableVertexAttribArray"));
+		_glCreateProgram = Marshal.GetDelegateForFunctionPointer<UIntDelegate>(wglGetProcAddress("glCreateProgram"));
+		_glCreateShader = Marshal.GetDelegateForFunctionPointer<CreateShaderDelegate>(wglGetProcAddress("glCreateShader"));
+		_glShaderSource = Marshal.GetDelegateForFunctionPointer<ShaderSourceDelegate>(wglGetProcAddress("glShaderSource"));
+		_glCompileShader = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glCompileShader"));
+		_glAttachShader = Marshal.GetDelegateForFunctionPointer<AttachShaderDelegate>(wglGetProcAddress("glAttachShader"));
+		_glLinkProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glLinkProgram"));
+		_glValidateProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glValidateProgram"));
+		_glDeleteShader = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glDeleteShader"));
+		_glDeleteProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glDeleteProgram"));
+		_glGetShaderiv = Marshal.GetDelegateForFunctionPointer<GetShaderivDelegate>(wglGetProcAddress("glGetShaderiv"));
+		_glGetProgramiv = Marshal.GetDelegateForFunctionPointer<GetProgramivDelegate>(wglGetProcAddress("glGetProgramiv"));
+		_glUseProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glUseProgram"));
+	}
 
 	#endregion
 }
