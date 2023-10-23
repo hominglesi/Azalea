@@ -3,7 +3,7 @@ using Azalea.Graphics.Textures;
 using Silk.NET.OpenGL;
 using SixLabors.ImageSharp.PixelFormats;
 
-namespace Azalea.Graphics.OpenGL.Textures;
+namespace Azalea.Graphics.Silk.Textures;
 
 internal class GLTexture : INativeTexture
 {

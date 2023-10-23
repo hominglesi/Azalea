@@ -5,7 +5,7 @@ using Silk.NET.OpenGL;
 using System;
 using System.Numerics;
 
-namespace Azalea.Graphics.OpenGL.Batches;
+namespace Azalea.Graphics.Silk.Batches;
 
 internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
 	where TVertex : unmanaged, IVertex

@@ -1,5 +1,5 @@
 ﻿using Azalea.Audios;
-using Azalea.Graphics.OpenGL;
+using Azalea.Graphics.Silk;
 using Azalea.Graphics.Rendering;
 using Silk.NET.Input;
 using Silk.NET.OpenGL;
