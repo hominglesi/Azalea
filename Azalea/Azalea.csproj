@@ -41,6 +41,8 @@
 	
 	<ItemGroup>
     <EmbeddedResource Include="Resources\**\*" />
+    <None Remove="resources\shaders\fragment_shader.glsl" />
+    <None Remove="resources\shaders\vertex_shader.glsl" />
     <None Remove="Resources\Textures\bullseye-pointer.png" />
     <None Include="Resources\Textures\azalea-icon.png" Pack="true" PackagePath="\" />
     <None Include="../README.md" Pack="true" PackagePath="\" />
@@ -58,6 +60,10 @@
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <Visible>false</Visible>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\Shaders\" />
   </ItemGroup>
   
 </Project>

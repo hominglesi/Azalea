@@ -35,6 +35,14 @@ internal static unsafe class GL
 	[DllImport(LibraryPath, EntryPoint = "glDrawArrays")]
 	public static extern void DrawArrays(GLBeginMode mode, int first, int count);
 
+	[DllImport(LibraryPath, EntryPoint = "glDrawElements")]
+	private static extern void drawElements(GLBeginMode mode, int size, GLDataType type, void* indices);
+
+	public static void DrawElements(GLBeginMode mode, int size, GLDataType type, int offset)
+	{
+		drawElements(mode, size, type, ((IntPtr)offset).ToPointer());
+	}
+
 	#region GLVertex
 
 	[DllImport(LibraryPath, EntryPoint = "glVertex2f")]
@@ -73,10 +81,11 @@ internal static unsafe class GL
 	private delegate void BufferDataDelegate(GLBufferType type, IntPtr size, void* data, GLUsageHint hint);
 	private static BufferDataDelegate? _glBufferData;
 	public static void BufferData(GLBufferType type, IntPtr size, void* data, GLUsageHint hint) => _glBufferData!(type, size, data, hint);
-	public static void BufferData(GLBufferType type, float[] data, GLUsageHint hint)
+	public static void BufferData<T>(GLBufferType type, T[] data, GLUsageHint hint)
+		where T : unmanaged
 	{
 		fixed (void* ptr = &data[0])
-			GL.BufferData(GLBufferType.Array, new IntPtr(data.Length * sizeof(float)), ptr, GLUsageHint.StaticDraw);
+			BufferData(type, new IntPtr(data.Length * sizeof(T)), ptr, hint);
 	}
 
 	private delegate void VertexAttribPointerDelegate(uint index, int size, GLDataType type, GLBool normalized, int stride, void* pointer);

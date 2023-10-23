@@ -3,33 +3,11 @@ using Azalea.Graphics.GLFW;
 using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.OpenGL.Enums;
 using System;
+using System.IO;
 
 namespace Azalea;
 public static unsafe class AzProg
 {
-	private static readonly string VertexShaderSource = @"
-        #version 330
-
-		layout(location = 0) in vec4 position;
-
-        void main()
-        {
-            gl_Position = position;
-        }
-        ";
-
-	//Fragment shaders are run on each fragment/pixel of the geometry.
-	private static readonly string FragmentShaderSource = @"
-        #version 330
-
-        out vec4 FragColor;
-
-        void main()
-        {
-            FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-        }
-        ";
-
 	public static void Main()
 	{
 		if (GLFW.Init() == false)
@@ -56,8 +34,15 @@ public static unsafe class AzProg
 		float[] positions =
 		{
 			-0.5f, -0.5f,
-			0.0f, 0.5f,
 			0.5f, -0.5f,
+			0.5f, 0.5f,
+			-0.5f, 0.5f
+		};
+
+		uint[] indices =
+		{
+			0, 1, 2,
+			2, 3, 0
 		};
 
 		var buffer = GL.GenBuffer();
@@ -67,14 +52,21 @@ public static unsafe class AzProg
 		GL.EnableVertexAttribArray(0);
 		GL.VertexAttribPointer(0, 2, GLDataType.Float, GLBool.False, sizeof(float) * 2, 0);
 
-		uint shader = createShader(VertexShaderSource, FragmentShaderSource);
+		var indexBuffer = GL.GenBuffer();
+		GL.BindBuffer(GLBufferType.ElementArray, indexBuffer);
+		GL.BufferData(GLBufferType.ElementArray, indices, GLUsageHint.StaticDraw);
+
+		var vertexShaderSource = File.ReadAllText("D:\\Programming\\Azalea\\Azalea\\Resources\\Shaders\\vertex_shader.glsl");
+		var fragmentShaderSource = File.ReadAllText("D:\\Programming\\Azalea\\Azalea\\Resources\\Shaders\\fragment_shader.glsl");
+
+		uint shader = createShader(vertexShaderSource, fragmentShaderSource);
 		GL.UseProgram(shader);
 
 		while (GLFW.WindowShouldClose(window) == false)
 		{
 			GL.Clear(GLBufferBit.Color);
 
-			GL.DrawArrays(GLBeginMode.Triangles, 0, 3);
+			GL.DrawElements(GLBeginMode.Triangles, 6, GLDataType.UnsignedInt, 0);
 
 			GLFW.SwapBuffers(window);
 
