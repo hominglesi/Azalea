@@ -16,6 +16,9 @@ internal static unsafe class GL
 		return Marshal.PtrToStringAnsi(getString(name)) ?? "";
 	}
 
+	[DllImport(LibraryPath, EntryPoint = "glGetError")]
+	public static extern GLError GetError();
+
 	[DllImport(LibraryPath, EntryPoint = "glClear")]
 	public static extern void Clear(GLBufferBit bufferBits);
 
@@ -73,9 +76,22 @@ internal static unsafe class GL
 		return buffer;
 	}
 
+	private delegate void GenVertexArraysDelegate(int count, uint* arrays);
+	private static GenVertexArraysDelegate? _glGenVertexArrays;
+	public static uint GenVertexArray()
+	{
+		uint vao;
+		_glGenVertexArrays!(1, &vao);
+		return vao;
+	}
+
 	private delegate void BindBufferDelegate(GLBufferType type, uint buffer);
 	private static BindBufferDelegate? _glBindBuffer;
 	public static void BindBuffer(GLBufferType type, uint buffer) => _glBindBuffer!(type, buffer);
+
+	private delegate void BindVertexArrayDelegate(uint vertexArray);
+	private static BindVertexArrayDelegate? _glBindVertexArray;
+	public static void BindVertexArray(uint buffer) => _glBindVertexArray!(buffer);
 
 
 	private delegate void BufferDataDelegate(GLBufferType type, IntPtr size, void* data, GLUsageHint hint);
@@ -88,9 +104,9 @@ internal static unsafe class GL
 			BufferData(type, new IntPtr(data.Length * sizeof(T)), ptr, hint);
 	}
 
-	private delegate void VertexAttribPointerDelegate(uint index, int size, GLDataType type, GLBool normalized, int stride, void* pointer);
+	private delegate void VertexAttribPointerDelegate(uint index, int size, GLDataType type, bool normalized, int stride, void* pointer);
 	private static VertexAttribPointerDelegate? _glVertexAttribPointer;
-	public static void VertexAttribPointer(uint index, int size, GLDataType type, GLBool normalized, int stride, int offset)
+	public static void VertexAttribPointer(uint index, int size, GLDataType type, bool normalized, int stride, int offset)
 	{
 		_glVertexAttribPointer!(index, size, type, normalized, stride, ((IntPtr)offset).ToPointer());
 	}
@@ -163,12 +179,35 @@ internal static unsafe class GL
 	private static VoidUIntDelegate? _glUseProgram;
 	public static void UseProgram(uint program) => _glUseProgram!(program);
 
+	private delegate int GetUniformLocationDelegate(uint program, byte* name);
+	private static GetUniformLocationDelegate? _glGetUniformLocation;
+	public static int GetUniformLocation(uint program, string name)
+	{
+		var bytes = Encoding.UTF8.GetBytes(name);
+		fixed (byte* ptr = &bytes[0])
+			return _glGetUniformLocation!(program, ptr);
+	}
+
+	private delegate void Uniform4fDelegate(int location, float v0, float v1, float v2, float v3);
+	private static Uniform4fDelegate? _glUniform4f;
+	public static void Uniform4f(int location, float v0, float v1, float v2, float v3)
+	{
+		_glUniform4f!(location, v0, v1, v2, v3);
+	}
+
+	public static void UniformColor(int location, Color color)
+	{
+		_glUniform4f!(location, color.RNormalized, color.GNormalized, color.BNormalized, color.ANormalized);
+	}
+
 
 	public static void Import()
 	{
 		_glCreateBuffers = Marshal.GetDelegateForFunctionPointer<CreateBuffersDelegate>(wglGetProcAddress("glCreateBuffers"));
 		_glGenBuffers = Marshal.GetDelegateForFunctionPointer<GenBuffersDelegate>(wglGetProcAddress("glGenBuffers"));
+		_glGenVertexArrays = Marshal.GetDelegateForFunctionPointer<GenVertexArraysDelegate>(wglGetProcAddress("glGenVertexArrays"));
 		_glBindBuffer = Marshal.GetDelegateForFunctionPointer<BindBufferDelegate>(wglGetProcAddress("glBindBuffer"));
+		_glBindVertexArray = Marshal.GetDelegateForFunctionPointer<BindVertexArrayDelegate>(wglGetProcAddress("glBindVertexArray"));
 		_glBufferData = Marshal.GetDelegateForFunctionPointer<BufferDataDelegate>(wglGetProcAddress("glBufferData"));
 		_glVertexAttribPointer = Marshal.GetDelegateForFunctionPointer<VertexAttribPointerDelegate>(wglGetProcAddress("glVertexAttribPointer"));
 		_glEnableVertexAttribArray = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glEnableVertexAttribArray"));
@@ -184,6 +223,8 @@ internal static unsafe class GL
 		_glGetShaderiv = Marshal.GetDelegateForFunctionPointer<GetShaderivDelegate>(wglGetProcAddress("glGetShaderiv"));
 		_glGetProgramiv = Marshal.GetDelegateForFunctionPointer<GetProgramivDelegate>(wglGetProcAddress("glGetProgramiv"));
 		_glUseProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glUseProgram"));
+		_glGetUniformLocation = Marshal.GetDelegateForFunctionPointer<GetUniformLocationDelegate>(wglGetProcAddress("glGetUniformLocation"));
+		_glUniform4f = Marshal.GetDelegateForFunctionPointer<Uniform4fDelegate>(wglGetProcAddress("glUniform4f"));
 	}
 
 	#endregion

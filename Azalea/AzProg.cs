@@ -1,5 +1,6 @@
 ﻿using Azalea.Graphics.Colors;
 using Azalea.Graphics.GLFW;
+using Azalea.Graphics.GLFW.Enums;
 using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.OpenGL.Enums;
 using System;
@@ -15,6 +16,11 @@ public static unsafe class AzProg
 			Console.WriteLine("GLFW could not be initialized.");
 			return;
 		}
+
+
+		GLFW.WindowHint(GLFWWindowHint.ContextVersionMajor, 3);
+		GLFW.WindowHint(GLFWWindowHint.ContextVersionMinor, 3);
+		GLFW.OpenGLProfileHint(GLFWOpenGLProfile.Core);
 
 		var window = GLFW.CreateWindow(1080, 720, "Ide gas", null, null);
 
@@ -45,12 +51,15 @@ public static unsafe class AzProg
 			2, 3, 0
 		};
 
+		var vao = GL.GenVertexArray();
+		GL.BindVertexArray(vao);
+
 		var buffer = GL.GenBuffer();
 		GL.BindBuffer(GLBufferType.Array, buffer);
 		GL.BufferData(GLBufferType.Array, positions, GLUsageHint.StaticDraw);
 
 		GL.EnableVertexAttribArray(0);
-		GL.VertexAttribPointer(0, 2, GLDataType.Float, GLBool.False, sizeof(float) * 2, 0);
+		GL.VertexAttribPointer(0, 2, GLDataType.Float, false, sizeof(float) * 2, 0);
 
 		var indexBuffer = GL.GenBuffer();
 		GL.BindBuffer(GLBufferType.ElementArray, indexBuffer);
@@ -62,15 +71,32 @@ public static unsafe class AzProg
 		uint shader = createShader(vertexShaderSource, fragmentShaderSource);
 		GL.UseProgram(shader);
 
+		int location = GL.GetUniformLocation(shader, "u_Color");
+		if (location == -1) Console.WriteLine($"u_Color uniform not found");
+		GL.UniformColor(location, Palette.Beige);
+
+		GL.UseProgram(0);
+		GL.BindVertexArray(0);
+		GL.BindBuffer(GLBufferType.Array, 0);
+		GL.BindBuffer(GLBufferType.ElementArray, 0);
+		GL.EnableVertexAttribArray(0);
+		GL.VertexAttribPointer(0, 2, GLDataType.Float, false, sizeof(float) * 2, 0);
+
 		while (GLFW.WindowShouldClose(window) == false)
 		{
 			GL.Clear(GLBufferBit.Color);
+
+			GL.UseProgram(shader);
+			GL.BindVertexArray(vao);
+			GL.BindBuffer(GLBufferType.ElementArray, indexBuffer);
 
 			GL.DrawElements(GLBeginMode.Triangles, 6, GLDataType.UnsignedInt, 0);
 
 			GLFW.SwapBuffers(window);
 
 			GLFW.PollEvents();
+
+			glPrintErrors();
 		}
 
 		GL.DeleteProgram(shader);
@@ -122,6 +148,15 @@ public static unsafe class AzProg
 		}
 
 		return id;
+	}
+
+	static void glPrintErrors()
+	{
+		GLError error;
+		while ((error = GL.GetError()) != GLError.None)
+		{
+			Console.WriteLine(error);
+		}
 	}
 }
 

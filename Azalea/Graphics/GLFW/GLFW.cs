@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azalea.Graphics.GLFW.Enums;
+using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -39,6 +40,11 @@ internal static class GLFW
 	{
 		return windowShouldClose(window) == 1;
 	}
+
+	[DllImport(LibraryPath, EntryPoint = "glfwWindowHint")]
+	public static extern void WindowHint(GLFWWindowHint hint, int value);
+
+	public static void OpenGLProfileHint(GLFWOpenGLProfile profile) => WindowHint(GLFWWindowHint.OpenGLProfile, (int)profile);
 
 	[DllImport(LibraryPath, EntryPoint = "glfwMakeContextCurrent")]
 	public static extern void MakeContextCurrent(GLFW_Window window);
