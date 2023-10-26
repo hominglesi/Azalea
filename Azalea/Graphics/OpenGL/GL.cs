@@ -1,6 +1,8 @@
 ﻿using Azalea.Graphics.Colors;
 using Azalea.Graphics.OpenGL.Enums;
 using System;
+using System.Collections.Generic;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -19,6 +21,23 @@ internal static unsafe class GL
 	[DllImport(LibraryPath, EntryPoint = "glGetError")]
 	public static extern GLError GetError();
 
+	public static IEnumerable<GLError> GetErrors()
+	{
+		GLError error;
+		while ((error = GetError()) != GLError.None)
+		{
+			yield return error;
+		}
+	}
+
+	public static void PrintErrors()
+	{
+		foreach (var error in GetErrors())
+		{
+			Console.WriteLine(error);
+		}
+	}
+
 	[DllImport(LibraryPath, EntryPoint = "glClear")]
 	public static extern void Clear(GLBufferBit bufferBits);
 
@@ -28,6 +47,9 @@ internal static unsafe class GL
 	{
 		clearColor(color.RNormalized, color.GNormalized, color.BNormalized, color.ANormalized);
 	}
+
+	[DllImport(LibraryPath, EntryPoint = "glViewport")]
+	public static extern void Viewport(int x, int y, int width, int height);
 
 	[DllImport(LibraryPath, EntryPoint = "glBegin")]
 	public static extern void Begin(GLBeginMode mode);
@@ -45,6 +67,56 @@ internal static unsafe class GL
 	{
 		drawElements(mode, size, type, ((IntPtr)offset).ToPointer());
 	}
+
+	[DllImport(LibraryPath, EntryPoint = "glBlendFunc")]
+	public static extern void BlendFunc(GLBlendFunction source, GLBlendFunction destination);
+
+	[DllImport(LibraryPath, EntryPoint = "glEnable")]
+	public static extern void Enable(GLCapability capability);
+
+	[DllImport(LibraryPath, EntryPoint = "glDisable")]
+	public static extern void Disable(GLCapability capability);
+
+	#region Textures
+
+	[DllImport(LibraryPath, EntryPoint = "glBindTexture")]
+	public static extern void BindTexture(GLTextureType type, uint texture);
+
+	[DllImport(LibraryPath, EntryPoint = "glGenTextures")]
+	private static extern void genTextures(int size, uint* textures);
+	public static uint GenTexture()
+	{
+		uint texture;
+		genTextures(1, &texture);
+		return texture;
+	}
+
+	[DllImport(LibraryPath, EntryPoint = "glDeleteTextures")]
+	private static extern void deleteTextures(int size, uint* textures);
+	public static void DeleteTexture(uint texture)
+	{
+		deleteTextures(1, &texture);
+	}
+
+	[DllImport(LibraryPath, EntryPoint = "glTexParameteri")]
+	public static extern void TexParameteri(GLTextureType type, GLTextureParameter name, int value);
+
+	[DllImport(LibraryPath, EntryPoint = "glTexImage2D")]
+	private static extern void texImage2D(GLTextureType type, int level, GLColorFormat internalFormat,
+		int width, int height, int border, GLColorFormat format, GLDataType dataType, void* pixels);
+
+	public static void TexImage2D(GLTextureType type, int level, GLColorFormat internalFormat,
+		int width, int height, int border, GLColorFormat format, GLDataType dataType, byte[] pixels)
+	{
+		fixed (void* p = &pixels[0])
+			texImage2D(type, level, internalFormat, width, height, border, format, dataType, p);
+	}
+
+	private delegate void ActiveTextureDelegate(GLTextureSlot slot);
+	private static ActiveTextureDelegate? _glActiveTexture;
+	public static void ActiveTexture(uint slot) => _glActiveTexture!(GLTextureSlot.Texture0 + (int)slot);
+
+	#endregion
 
 	#region GLVertex
 
@@ -99,9 +171,13 @@ internal static unsafe class GL
 	public static void BufferData(GLBufferType type, IntPtr size, void* data, GLUsageHint hint) => _glBufferData!(type, size, data, hint);
 	public static void BufferData<T>(GLBufferType type, T[] data, GLUsageHint hint)
 		where T : unmanaged
+		=> BufferData(type, data, data.Length, hint);
+
+	public static void BufferData<T>(GLBufferType type, T[] data, int size, GLUsageHint hint)
+		where T : unmanaged
 	{
 		fixed (void* ptr = &data[0])
-			BufferData(type, new IntPtr(data.Length * sizeof(T)), ptr, hint);
+			BufferData(type, new IntPtr(size * sizeof(T)), ptr, hint);
 	}
 
 	private delegate void VertexAttribPointerDelegate(uint index, int size, GLDataType type, bool normalized, int stride, void* pointer);
@@ -110,6 +186,9 @@ internal static unsafe class GL
 	{
 		_glVertexAttribPointer!(index, size, type, normalized, stride, ((IntPtr)offset).ToPointer());
 	}
+
+	public static void VertexAttribPointer(uint index, GLVertexBufferElement element, int stride, int offset)
+		=> VertexAttribPointer(index, element.Count, element.Type, element.Normalized, stride, offset);
 
 
 	private static VoidUIntDelegate? _glEnableVertexAttribArray;
@@ -163,8 +242,11 @@ internal static unsafe class GL
 
 
 	private static VoidUIntDelegate? _glDeleteProgram;
-	public static void DeleteProgram(uint program) => _glDeleteProgram!(program);
-
+	public static void DeleteProgram(uint program)
+	{
+		if (BoundProgram == program) UseProgram(0);
+		_glDeleteProgram!(program);
+	}
 
 	private delegate void GetShaderivDelegate(uint shader, GLParameterName name, int* args);
 	private static GetShaderivDelegate? _glGetShaderiv;
@@ -175,9 +257,15 @@ internal static unsafe class GL
 	private static GetProgramivDelegate? _glGetProgramiv;
 	public static void GetProgramiv(uint program, GLParameterName name, int* args) => _glGetProgramiv!(program, name, args);
 
-
+	public static uint BoundProgram;
 	private static VoidUIntDelegate? _glUseProgram;
-	public static void UseProgram(uint program) => _glUseProgram!(program);
+	public static void UseProgram(uint program)
+	{
+		if (BoundProgram == program) return;
+
+		_glUseProgram!(program);
+		BoundProgram = program;
+	}
 
 	private delegate int GetUniformLocationDelegate(uint program, byte* name);
 	private static GetUniformLocationDelegate? _glGetUniformLocation;
@@ -186,6 +274,13 @@ internal static unsafe class GL
 		var bytes = Encoding.UTF8.GetBytes(name);
 		fixed (byte* ptr = &bytes[0])
 			return _glGetUniformLocation!(program, ptr);
+	}
+
+	private delegate void Uniform1iDelegate(int location, int v);
+	private static Uniform1iDelegate? _glUniform1i;
+	public static void Uniform1i(int location, int v)
+	{
+		_glUniform1i!(location, v);
 	}
 
 	private delegate void Uniform4fDelegate(int location, float v0, float v1, float v2, float v3);
@@ -200,6 +295,27 @@ internal static unsafe class GL
 		_glUniform4f!(location, color.RNormalized, color.GNormalized, color.BNormalized, color.ANormalized);
 	}
 
+	private delegate void UniformMatrix4fvDelegate(int location, int count, GLBool transpose, float* matrix);
+	private static UniformMatrix4fvDelegate? _glUniformMatrix4fv;
+	public static void UniformMatrix4(int location, int count, bool transpose, Matrix4x4 matrix)
+	{
+		_glUniformMatrix4fv!(location, count, transpose ? GLBool.True : GLBool.False, (float*)&matrix);
+	}
+
+
+	private delegate void DeleteBuffersDelegate(int size, uint* buffers);
+	private static DeleteBuffersDelegate? _glDeleteBuffers;
+	public static void DeleteBuffer(uint buffer)
+	{
+		_glDeleteBuffers!(1, &buffer);
+	}
+
+	private delegate void DeleteVertexArrays(int size, uint* array);
+	private static DeleteVertexArrays? _glDeleteVertexArrays;
+	public static void DeleteVertexArray(uint vertexArray)
+	{
+		_glDeleteVertexArrays!(1, &vertexArray);
+	}
 
 	public static void Import()
 	{
@@ -224,7 +340,12 @@ internal static unsafe class GL
 		_glGetProgramiv = Marshal.GetDelegateForFunctionPointer<GetProgramivDelegate>(wglGetProcAddress("glGetProgramiv"));
 		_glUseProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glUseProgram"));
 		_glGetUniformLocation = Marshal.GetDelegateForFunctionPointer<GetUniformLocationDelegate>(wglGetProcAddress("glGetUniformLocation"));
+		_glUniform1i = Marshal.GetDelegateForFunctionPointer<Uniform1iDelegate>(wglGetProcAddress("glUniform1i"));
 		_glUniform4f = Marshal.GetDelegateForFunctionPointer<Uniform4fDelegate>(wglGetProcAddress("glUniform4f"));
+		_glUniformMatrix4fv = Marshal.GetDelegateForFunctionPointer<UniformMatrix4fvDelegate>(wglGetProcAddress("glUniformMatrix4fv"));
+		_glDeleteBuffers = Marshal.GetDelegateForFunctionPointer<DeleteBuffersDelegate>(wglGetProcAddress("glDeleteBuffers"));
+		_glDeleteVertexArrays = Marshal.GetDelegateForFunctionPointer<DeleteVertexArrays>(wglGetProcAddress("glDeleteVertexArrays"));
+		_glActiveTexture = Marshal.GetDelegateForFunctionPointer<ActiveTextureDelegate>(wglGetProcAddress("glActiveTexture"));
 	}
 
 	#endregion

@@ -38,8 +38,8 @@ public class VeldridGameHost : GameHost
 
 	public override void Run(AzaleaGame game)
 	{
-		base.Run(game);
 		_window.Run();
+		base.Run(game);
 	}
 
 	protected override IClipboard? CreateClipboard() => new VeldridClipboard();

@@ -1,10 +1,12 @@
 #version 330 core
+in vec4 oCol;
+in vec2 oTex;
 
-out vec4 OutputColor;
+uniform sampler2D u_Texture;
 
-uniform vec4 u_Color;
+out vec4 FragColor;
 
 void main()
 {
-    OutputColor = u_Color;
+    FragColor = texture(u_Texture, oTex) * vec4(oCol.x, oCol.y, oCol.z, oCol.w);
 }

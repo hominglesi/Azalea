@@ -1,14 +1,19 @@
-﻿using Azalea.Graphics.Colors;
+﻿/*
+using Azalea.Graphics.Colors;
 using Azalea.Graphics.GLFW;
 using Azalea.Graphics.GLFW.Enums;
 using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.OpenGL.Enums;
 using System;
 using System.IO;
+using System.Numerics;
+
 
 namespace Azalea;
 public static unsafe class AzProg
 {
+	private static Vector2Int _viewportSize;
+
 	public static void Main()
 	{
 		if (GLFW.Init() == false)
@@ -23,6 +28,7 @@ public static unsafe class AzProg
 		GLFW.OpenGLProfileHint(GLFWOpenGLProfile.Core);
 
 		var window = GLFW.CreateWindow(1080, 720, "Ide gas", null, null);
+		_viewportSize = new(1080, 720);
 
 		if (window == IntPtr.Zero)
 		{
@@ -35,14 +41,20 @@ public static unsafe class AzProg
 		GL.Import();
 		Console.WriteLine(GL.GetString(GLStringName.Version));
 
+		GLFW.SetFramebufferSizeCallback(window, (_, width, height) =>
+		{
+			_viewportSize = new Vector2Int(width, height);
+			GL.Viewport(0, 0, width, height);
+		});
+
 		GL.ClearColor(Palette.Aqua);
 
 		float[] positions =
 		{
-			-0.5f, -0.5f,
-			0.5f, -0.5f,
-			0.5f, 0.5f,
-			-0.5f, 0.5f
+			50, 250, 0.0f, 0.0f,
+			350, 250, 1.0f, 0.0f,
+			350, 50, 1.0f, 1.0f,
+			50, 50, 0.0f, 1.0f
 		};
 
 		uint[] indices =
@@ -51,44 +63,47 @@ public static unsafe class AzProg
 			2, 3, 0
 		};
 
-		var vao = GL.GenVertexArray();
-		GL.BindVertexArray(vao);
+		var vertexArray = new GLVertexArray();
 
-		var buffer = GL.GenBuffer();
-		GL.BindBuffer(GLBufferType.Array, buffer);
-		GL.BufferData(GLBufferType.Array, positions, GLUsageHint.StaticDraw);
+		var vertexBuffer = new GLVertexBuffer();
+		vertexBuffer.SetData(positions);
 
-		GL.EnableVertexAttribArray(0);
-		GL.VertexAttribPointer(0, 2, GLDataType.Float, false, sizeof(float) * 2, 0);
+		var vbLayout = new GLVertexBufferLayout();
+		vbLayout.AddElement<float>(2);
+		vbLayout.AddElement<float>(2);
 
-		var indexBuffer = GL.GenBuffer();
-		GL.BindBuffer(GLBufferType.ElementArray, indexBuffer);
-		GL.BufferData(GLBufferType.ElementArray, indices, GLUsageHint.StaticDraw);
+		vertexArray.AddBuffer(vertexBuffer, vbLayout);
+
+		var indexBuffer = new GLIndexBuffer();
+		indexBuffer.SetData(indices);
 
 		var vertexShaderSource = File.ReadAllText("D:\\Programming\\Azalea\\Azalea\\Resources\\Shaders\\vertex_shader.glsl");
 		var fragmentShaderSource = File.ReadAllText("D:\\Programming\\Azalea\\Azalea\\Resources\\Shaders\\fragment_shader.glsl");
 
-		uint shader = createShader(vertexShaderSource, fragmentShaderSource);
-		GL.UseProgram(shader);
+		GL.Enable(GLCapability.Blend);
+		GL.BlendFunc(GLBlendFunction.SrcAlpha, GLBlendFunction.OneMinusSrcAlpha);
 
-		int location = GL.GetUniformLocation(shader, "u_Color");
-		if (location == -1) Console.WriteLine($"u_Color uniform not found");
-		GL.UniformColor(location, Palette.Beige);
+		var texture = new GLTexture("D:\\Programming\\Azalea\\Azalea\\Resources\\Textures\\azalea-icon.png");
+		texture.Bind();
 
-		GL.UseProgram(0);
-		GL.BindVertexArray(0);
-		GL.BindBuffer(GLBufferType.Array, 0);
-		GL.BindBuffer(GLBufferType.ElementArray, 0);
-		GL.EnableVertexAttribArray(0);
-		GL.VertexAttribPointer(0, 2, GLDataType.Float, false, sizeof(float) * 2, 0);
+		var shader = new GLShader(vertexShaderSource, fragmentShaderSource);
+		shader.SetUniform("u_Texture", 0);
+
+		shader.Unbind();
+		vertexArray.Unbind();
+		vertexBuffer.Unbind();
+		indexBuffer.Unbind();
 
 		while (GLFW.WindowShouldClose(window) == false)
 		{
 			GL.Clear(GLBufferBit.Color);
 
-			GL.UseProgram(shader);
-			GL.BindVertexArray(vao);
-			GL.BindBuffer(GLBufferType.ElementArray, indexBuffer);
+			shader.Bind();
+			vertexArray.Bind();
+			indexBuffer.Bind();
+
+			var projection = Matrix4x4.CreateOrthographicOffCenter(0, _viewportSize.X, _viewportSize.Y, 0, 0.1f, 100);
+			shader.SetUniform("u_Projection", projection);
 
 			GL.DrawElements(GLBeginMode.Triangles, 6, GLDataType.UnsignedInt, 0);
 
@@ -96,68 +111,17 @@ public static unsafe class AzProg
 
 			GLFW.PollEvents();
 
-			glPrintErrors();
+			GL.PrintErrors();
 		}
 
-		GL.DeleteProgram(shader);
+		vertexArray.Dispose();
+		vertexBuffer.Dispose();
+		indexBuffer.Dispose();
+		shader.Dispose();
 
 		GLFW.Terminate();
-	}
-
-	static uint createShader(string vertexShaderSource, string fragmentShaderSource)
-	{
-		var program = GL.CreateProgram();
-		var vertexShader = compileShader(GLShaderType.Vertex, vertexShaderSource);
-		var fragmentShader = compileShader(GLShaderType.Fragment, fragmentShaderSource);
-
-		GL.AttachShader(program, vertexShader);
-		GL.AttachShader(program, fragmentShader);
-
-		GL.LinkProgram(program);
-		GL.ValidateProgram(program);
-
-		GL.DeleteShader(vertexShader);
-		GL.DeleteShader(fragmentShader);
-
-		return program;
-	}
-
-	static uint compileShader(GLShaderType type, string source)
-	{
-		var id = GL.CreateShader(type);
-		GL.ShaderSource(id, source);
-		GL.CompileShader(id);
-
-		int result;
-		GL.GetShaderiv(id, GLParameterName.CompileStatus, &result);
-		if (result == 0)
-		{
-
-			int length;
-			GL.GetShaderiv(id, GLParameterName.InfoLogLength, &length);
-			Console.WriteLine(length);
-			/*
-			var str = new StringBuilder(length);
-			for(int i = 0; i < length; i++)
-			{
-				str.Append((char)Marshal.ReadByte(result, i));
-			}	*/
-			Console.WriteLine("THERE IS AN ERROR!!!!");
-			GL.DeleteShader(id);
-			return 0;
-		}
-
-		return id;
-	}
-
-	static void glPrintErrors()
-	{
-		GLError error;
-		while ((error = GL.GetError()) != GLError.None)
-		{
-			Console.WriteLine(error);
-		}
 	}
 }
 
 
+*/

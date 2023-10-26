@@ -54,6 +54,20 @@ internal static class GLFW
 
 	#endregion
 
+	#region Events
+
+	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowSizeCallback")]
+	[return: MarshalAs(UnmanagedType.FunctionPtr, MarshalTypeRef = typeof(SizeCallback))]
+	public static extern void SetWindowSizeCallback(GLFW_Window window, SizeCallback callback);
+	public delegate void SizeCallback(GLFW_Window window, int width, int height);
+
+	[DllImport(LibraryPath, EntryPoint = "glfwSetFramebufferSizeCallback")]
+	[return: MarshalAs(UnmanagedType.FunctionPtr, MarshalTypeRef = typeof(FramebufferSizeCallback))]
+	public static extern void SetFramebufferSizeCallback(GLFW_Window window, FramebufferSizeCallback callback);
+	public delegate void FramebufferSizeCallback(GLFW_Window window, int width, int height);
+
+	#endregion
+
 	#region Misc
 
 	[DllImport(LibraryPath, EntryPoint = "glfwPollEvents")]
