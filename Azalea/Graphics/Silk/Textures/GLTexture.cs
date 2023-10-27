@@ -1,12 +1,9 @@
-﻿using Azalea.Graphics.Rendering;
-using Azalea.Graphics.Textures;
-using Silk.NET.OpenGL;
-using SixLabors.ImageSharp.PixelFormats;
+﻿namespace Azalea.Graphics.Silk.Textures;
 
-namespace Azalea.Graphics.Silk.Textures;
-
+/*
 internal class GLTexture : INativeTexture
 {
+	
 	protected readonly GLRenderer Renderer;
 	protected readonly GL _gl;
 	IRenderer INativeTexture.Renderer => Renderer;
@@ -47,4 +44,5 @@ internal class GLTexture : INativeTexture
 
 		_gl.GenerateMipmap(TextureTarget.Texture2D);
 	}
-}
+	
+}*/

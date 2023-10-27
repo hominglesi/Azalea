@@ -1,8 +1,8 @@
 ﻿using Azalea.Graphics.OpenGL.Enums;
-using System;
+using Azalea.Utils;
 
 namespace Azalea.Graphics.OpenGL;
-public class GLIndexBuffer : IDisposable
+public class GLIndexBuffer : Disposable
 {
 	private uint _handle;
 
@@ -18,26 +18,8 @@ public class GLIndexBuffer : IDisposable
 	public void Bind() => GL.BindBuffer(GLBufferType.ElementArray, _handle);
 	public void Unbind() => GL.BindBuffer(GLBufferType.ElementArray, 0);
 
-	#region Disposing
-	private bool _disposed;
-	~GLIndexBuffer() => Dispose(false);
-
-	public void Dispose()
+	protected override void OnDispose()
 	{
-		Dispose(true);
-		GC.SuppressFinalize(this);
+		GL.DeleteBuffer(_handle);
 	}
-
-	protected virtual void Dispose(bool disposing)
-	{
-		if (_disposed) return;
-
-		if (disposing)
-		{
-			GL.DeleteBuffer(_handle);
-		}
-
-		_disposed = true;
-	}
-	#endregion
 }

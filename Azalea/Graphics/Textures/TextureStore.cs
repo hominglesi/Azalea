@@ -10,14 +10,14 @@ public class TextureStore : ITextureStore
 {
 	private readonly Dictionary<string, Texture> textureCache = new();
 
-	private readonly ResourceStore<TextureUpload> _uploadStore = new();
+	private readonly ResourceStore<TextureData> _uploadStore = new();
 	private readonly List<ITextureStore> _nestedStores = new();
 
 	private readonly IRenderer _renderer;
 
 	public readonly float ScaleAdjust;
 
-	public TextureStore(IRenderer renderer, IResourceStore<TextureUpload>? store = null, float scaleAdjust = 2)
+	public TextureStore(IRenderer renderer, IResourceStore<TextureData>? store = null, float scaleAdjust = 2)
 	{
 		if (store is not null)
 			AddTextureSource(store);
@@ -26,7 +26,7 @@ public class TextureStore : ITextureStore
 		ScaleAdjust = scaleAdjust;
 	}
 
-	public virtual void AddTextureSource(IResourceStore<TextureUpload> store) => _uploadStore.AddStore(store);
+	public virtual void AddTextureSource(IResourceStore<TextureData> store) => _uploadStore.AddStore(store);
 
 	public virtual void AddStore(ITextureStore store) => _nestedStores.Add(store);
 	public virtual void RemoveStore(ITextureStore store) => _nestedStores.Remove(store);
@@ -88,14 +88,13 @@ public class TextureStore : ITextureStore
 		return textureCache.TryGetValue(lookupKey, out texture);
 	}
 
-	private Texture? loadRaw(TextureUpload? upload)
+	private Texture? loadRaw(TextureData? upload)
 	{
 		if (upload is null) return null;
 
 		Texture? tex = null;
 
 		tex ??= _renderer.CreateTexture(upload.Width, upload.Height);
-		tex.ScaleAdjust = ScaleAdjust;
 		tex.SetData(upload);
 
 		return tex;

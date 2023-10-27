@@ -1,8 +1,8 @@
 ﻿using Azalea.Graphics.OpenGL.Enums;
-using System;
+using Azalea.Utils;
 
 namespace Azalea.Graphics.OpenGL;
-public class GLVertexBuffer : IDisposable
+public class GLVertexBuffer : Disposable
 {
 	private uint _handle;
 
@@ -23,26 +23,8 @@ public class GLVertexBuffer : IDisposable
 		GL.BufferData(GLBufferType.Array, data, length, hint);
 	}
 
-	#region Disposing
-	private bool _disposed;
-	~GLVertexBuffer() => Dispose(false);
-
-	public void Dispose()
+	protected override void OnDispose()
 	{
-		Dispose(true);
-		GC.SuppressFinalize(this);
+		GL.DeleteBuffer(_handle);
 	}
-
-	protected virtual void Dispose(bool disposing)
-	{
-		if (_disposed) return;
-
-		if (disposing)
-		{
-			GL.DeleteBuffer(_handle);
-		}
-
-		_disposed = true;
-	}
-	#endregion
 }

@@ -50,17 +50,15 @@ public static class Input
 
 		for (int i = 0; i < mouseButtonCount; i++)
 		{
-			_mouseButtons[i] = new ButtonState(i);
+			_mouseButtons[i] = new ButtonState();
 		}
 
-		var keyButtonCount = (int)Keys.LastKey;
+		var keyButtonCount = (int)Keys.Amount;
 		_keyboardKeys = new ButtonState[keyButtonCount];
 
 		for (int i = 0; i < keyButtonCount; i++)
 		{
-			_keyboardKeys[i] = new ButtonState(i);
-
-			_keyboardKeys[i].OnRepeat += HandleKeyboardKeyRepeat;
+			_keyboardKeys[i] = new ButtonState();
 		}
 	}
 
@@ -215,9 +213,9 @@ public static class Input
 			propagateInputEvent(new KeyUpEvent(key));
 	}
 
-	internal static void HandleKeyboardKeyRepeat(int keyCode)
+	internal static void HandleKeyboardKeyRepeat(Keys key)
 	{
-		propagateInputEvent(new KeyDownEvent((Keys)keyCode, true));
+		propagateInputEvent(new KeyDownEvent(key, true));
 	}
 
 	internal static void HandleTextInput(char input)

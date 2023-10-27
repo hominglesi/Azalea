@@ -25,9 +25,6 @@
     <PackageReference Include="Silk.NET" Version="2.17.1">
       <PrivateAssets>compile</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1">
-      <PrivateAssets>compile</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="StbImageSharp" Version="2.27.13" />
     <PackageReference Include="Veldrid" Version="4.9.0">
       <PrivateAssets>compile</PrivateAssets>

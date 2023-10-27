@@ -1,12 +1,11 @@
 ﻿using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Textures;
-using StbImageSharp;
+using Azalea.Utils;
 using System;
-using System.IO;
 
-namespace Azalea.Graphics.OpenGL;
-internal class GLTexture : INativeTexture, IDisposable
+namespace Azalea.Graphics.OpenGL.Textures;
+internal class GLTexture : Disposable, INativeTexture
 {
 	private uint _handle;
 
@@ -14,18 +13,24 @@ internal class GLTexture : INativeTexture, IDisposable
 	private int _height;
 	private GLRenderer _renderer;
 
-	public GLTexture(GLRenderer renderer, string filePath, int width, int height)
+	public GLTexture(GLRenderer renderer, int width, int height)
 	{
 		_renderer = renderer;
-
-		StbImage.stbi_set_flip_vertically_on_load(1);
-		using var stream = File.OpenRead(filePath);
-		var image = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
 		_width = width;
 		_height = height;
 
 		_handle = GL.GenTexture();
-		Bind();
+	}
+
+	internal void SetData(ITextureData image)
+	{
+		if (image.Width != _width || image.Height != _height)
+		{
+			Console.WriteLine("Provided image was not the correct size");
+			return;
+		}
+
+		Bind(0);
 
 		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MinFilter, (int)GLFunction.Linear);
 		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MagFilter, (int)GLFunction.Linear);
@@ -33,14 +38,9 @@ internal class GLTexture : INativeTexture, IDisposable
 		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.WrapT, (int)GLWrapFunction.ClampToEdge);
 
 		GL.TexImage2D(GLTextureType.Texture2D, 0, GLColorFormat.RGBA,
-			image.Width, image.Height, 0, GLColorFormat.RGBA, GLDataType.UnsignedByte, image.Data);
+			_width, _height, 0, GLColorFormat.RGBA, GLDataType.UnsignedByte, image.Data);
 
-		Unbind();
-	}
-
-	internal void SetData(ITextureUpload upload)
-	{
-
+		GL.GenerateMipmap(GLTextureType.Texture2D);
 	}
 
 	public void Bind(uint slot = 0)
@@ -56,32 +56,10 @@ internal class GLTexture : INativeTexture, IDisposable
 	public int Height => _height;
 
 
-	void INativeTexture.SetData(ITextureUpload upload)
+	void INativeTexture.SetData(ITextureData upload) => SetData(upload);
+
+	protected override void OnDispose()
 	{
-
+		GL.DeleteTexture(_handle);
 	}
-
-	#region Disposing
-	private bool _disposed;
-
-	~GLTexture() => Dispose(false);
-
-	public void Dispose()
-	{
-		Dispose(true);
-		GC.SuppressFinalize(this);
-	}
-
-	protected virtual void Dispose(bool disposing)
-	{
-		if (_disposed) return;
-
-		if (disposing)
-		{
-			GL.DeleteTexture(_handle);
-		}
-
-		_disposed = true;
-	}
-	#endregion
 }

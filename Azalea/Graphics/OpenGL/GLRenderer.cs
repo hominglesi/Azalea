@@ -1,6 +1,7 @@
 ﻿using Azalea.Graphics.Colors;
 using Azalea.Graphics.OpenGL.Batches;
 using Azalea.Graphics.OpenGL.Enums;
+using Azalea.Graphics.OpenGL.Textures;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Numerics;
@@ -17,10 +18,18 @@ internal class GLRenderer : Renderer
 		_window = window;
 	}
 
+
+	private bool _firstFrame = true;
 	internal override void FinishFrame()
 	{
 		base.FinishFrame();
-		((GLFWWindow)_window).SwapBuffers();
+
+		//One the first frame the textures are not correct for some reason
+		//so we hide it
+		if (_firstFrame)
+			_firstFrame = false;
+		else
+			((GLFWWindow)_window).SwapBuffers();
 		GL.PrintErrors();
 	}
 
@@ -34,7 +43,7 @@ internal class GLRenderer : Renderer
 		=> new GLVertexBatch<TexturedVertex2D>(_window, size);
 
 	protected override INativeTexture CreateNativeTexture(int width, int height)
-		=> new GLTexture(this, "D:\\Programming\\Azalea\\Azalea\\Resources\\Textures\\azalea-icon.png", width, height);
+		=> new GLTexture(this, width, height);
 
 	protected override bool SetTextureImplementation(INativeTexture? texture, int unit)
 	{
@@ -48,7 +57,6 @@ internal class GLRenderer : Renderer
 		switch (texture)
 		{
 			case GLTexture glTexture:
-				GL.ActiveTexture((uint)unit);
 				glTexture.Bind((uint)unit);
 				break;
 		}

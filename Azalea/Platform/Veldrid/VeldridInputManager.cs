@@ -1,10 +1,5 @@
-﻿using Azalea.Graphics.Veldrid;
-using Azalea.Inputs;
-using Veldrid;
-using Veldrid.Sdl2;
-
-namespace Azalea.Platform.Veldrid;
-
+﻿namespace Azalea.Platform.Veldrid;
+/*
 internal class VeldridInputManager
 {
 	private Sdl2Window _sdl;
@@ -71,3 +66,4 @@ internal class VeldridInputManager
 		Input.HandleScroll(args.WheelDelta);
 	}
 }
+*/

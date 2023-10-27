@@ -112,9 +112,13 @@ internal static unsafe class GL
 			texImage2D(type, level, internalFormat, width, height, border, format, dataType, p);
 	}
 
-	private delegate void ActiveTextureDelegate(GLTextureSlot slot);
-	private static ActiveTextureDelegate? _glActiveTexture;
+	private delegate void GLTextureSlotDelegate(GLTextureSlot slot);
+	private static GLTextureSlotDelegate? _glActiveTexture;
 	public static void ActiveTexture(uint slot) => _glActiveTexture!(GLTextureSlot.Texture0 + (int)slot);
+
+	private delegate void GLTextureTypeDelegate(GLTextureType slot);
+	private static GLTextureTypeDelegate? _glGenerateMipmap;
+	public static void GenerateMipmap(GLTextureType type) => _glGenerateMipmap!(type);
 
 	#endregion
 
@@ -345,7 +349,8 @@ internal static unsafe class GL
 		_glUniformMatrix4fv = Marshal.GetDelegateForFunctionPointer<UniformMatrix4fvDelegate>(wglGetProcAddress("glUniformMatrix4fv"));
 		_glDeleteBuffers = Marshal.GetDelegateForFunctionPointer<DeleteBuffersDelegate>(wglGetProcAddress("glDeleteBuffers"));
 		_glDeleteVertexArrays = Marshal.GetDelegateForFunctionPointer<DeleteVertexArrays>(wglGetProcAddress("glDeleteVertexArrays"));
-		_glActiveTexture = Marshal.GetDelegateForFunctionPointer<ActiveTextureDelegate>(wglGetProcAddress("glActiveTexture"));
+		_glActiveTexture = Marshal.GetDelegateForFunctionPointer<GLTextureSlotDelegate>(wglGetProcAddress("glActiveTexture"));
+		_glGenerateMipmap = Marshal.GetDelegateForFunctionPointer<GLTextureTypeDelegate>(wglGetProcAddress("glGenerateMipmap"));
 	}
 
 	#endregion

@@ -12,6 +12,8 @@ public class DesktopGameHost : GameHost
 	public override IRenderer Renderer => _renderer ?? throw new Exception("Cannot use Renderer before it is initialized");
 	private GLRenderer? _renderer;
 
+	private GLFWInput _input;
+
 	public DesktopGameHost(HostPreferences preferences)
 	{
 		_window = new GLFWWindow(preferences.PreferredClientSize);
@@ -24,10 +26,21 @@ public class DesktopGameHost : GameHost
 	public override void CallInitialized()
 	{
 		GL.Import();
+		GL.Enable(GLCapability.Blend);
+		GL.BlendFunc(GLBlendFunction.SrcAlpha, GLBlendFunction.OneMinusSrcAlpha);
 		Console.WriteLine(GL.GetString(GLStringName.Version));
+
 		_renderer = new GLRenderer(_window);
+		_input = new GLFWInput(_window.Handle);
 
 		base.CallInitialized();
+	}
+
+	public override void CallOnUpdate()
+	{
+		base.CallOnUpdate();
+
+		_input.Update();
 	}
 
 	public override void Run(AzaleaGame game)

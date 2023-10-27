@@ -1,6 +1,4 @@
-﻿using System;
-using Veldrid;
-
+﻿/*
 namespace Azalea.Graphics.Veldrid.Textures;
 
 internal class VeldridTextureResources : IDisposable
@@ -45,3 +43,4 @@ internal class VeldridTextureResources : IDisposable
 		Set?.Dispose();
 	}
 }
+*/

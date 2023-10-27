@@ -1,10 +1,11 @@
 ﻿using Azalea.Graphics.GLFW.Enums;
 using System;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Azalea.Graphics.GLFW;
-internal static class GLFW
+internal static unsafe class GLFW
 {
 	public const string LibraryPath = "glfw3.dll";
 
@@ -56,15 +57,46 @@ internal static class GLFW
 
 	#region Events
 
-	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowSizeCallback")]
+	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowSizeCallback", CallingConvention = CallingConvention.Cdecl)]
 	[return: MarshalAs(UnmanagedType.FunctionPtr, MarshalTypeRef = typeof(SizeCallback))]
-	public static extern void SetWindowSizeCallback(GLFW_Window window, SizeCallback callback);
+	public static extern SizeCallback SetWindowSizeCallback(GLFW_Window window, SizeCallback callback);
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	public delegate void SizeCallback(GLFW_Window window, int width, int height);
 
-	[DllImport(LibraryPath, EntryPoint = "glfwSetFramebufferSizeCallback")]
+	[DllImport(LibraryPath, EntryPoint = "glfwSetFramebufferSizeCallback", CallingConvention = CallingConvention.Cdecl)]
 	[return: MarshalAs(UnmanagedType.FunctionPtr, MarshalTypeRef = typeof(FramebufferSizeCallback))]
-	public static extern void SetFramebufferSizeCallback(GLFW_Window window, FramebufferSizeCallback callback);
+	public static extern FramebufferSizeCallback SetFramebufferSizeCallback(GLFW_Window window, FramebufferSizeCallback callback);
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	public delegate void FramebufferSizeCallback(GLFW_Window window, int width, int height);
+
+	#endregion
+
+	#region Input
+
+	[DllImport(LibraryPath, EntryPoint = "glfwSetKeyCallback", CallingConvention = CallingConvention.Cdecl)]
+	[return: MarshalAs(UnmanagedType.FunctionPtr, MarshalTypeRef = typeof(KeyCallback))]
+	public static extern KeyCallback SetKeyCallback(GLFW_Window window, KeyCallback callback);
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	public delegate void KeyCallback(GLFW_Window window, int key, int scancode, int action, int mods);
+
+	[DllImport(LibraryPath, EntryPoint = "glfwSetCursorPosCallback", CallingConvention = CallingConvention.Cdecl)]
+	[return: MarshalAs(UnmanagedType.FunctionPtr, MarshalTypeRef = typeof(PositionCallback))]
+	public static extern PositionCallback SetCursorPosCallback(GLFW_Window window, PositionCallback callback);
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	public delegate void PositionCallback(GLFW_Window window, double x, double y);
+
+	[DllImport(LibraryPath, EntryPoint = "glfwGetCursorPos")]
+	private static extern void getCursorPos(GLFW_Window window, double* xPos, double* yPos);
+
+	public static Vector2 GetCursorPos(GLFW_Window window)
+	{
+		double xPos = 0;
+		double yPos = 0;
+
+		getCursorPos(window, &xPos, &yPos);
+
+		return new Vector2((float)xPos, (float)yPos);
+	}
 
 	#endregion
 

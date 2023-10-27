@@ -1,12 +1,4 @@
-﻿using Azalea.Graphics.Colors;
-using Azalea.Graphics.Rendering;
-using Azalea.Graphics.Rendering.Vertices;
-using Azalea.Graphics.Silk.Batches;
-using Azalea.Graphics.Silk.Textures;
-using Azalea.Numerics;
-using Azalea.Platform;
-using Silk.NET.OpenGL;
-
+﻿/*
 namespace Azalea.Graphics.Silk;
 
 internal class GLRenderer : Renderer
@@ -69,3 +61,4 @@ internal class GLRenderer : Renderer
 		throw new System.NotImplementedException();
 	}
 }
+*/

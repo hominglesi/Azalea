@@ -1,20 +1,6 @@
-﻿using Silk.NET.Core;
-using Silk.NET.Input;
-using Silk.NET.Maths;
-using Silk.NET.OpenGL;
-using Silk.NET.SDL;
-using Silk.NET.Windowing;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Advanced;
-using SixLabors.ImageSharp.PixelFormats;
-using System;
-using System.IO;
-using System.Runtime.InteropServices;
-using IWindowSilk = Silk.NET.Windowing.IWindow;
-using WindowSilk = Silk.NET.Windowing.Window;
+﻿namespace Azalea.Platform.Silk;
 
-namespace Azalea.Platform.Silk;
-
+/*
 internal class SilkWindow : IWindow
 {
 	public IWindowSilk Window;
@@ -147,3 +133,4 @@ internal class SilkWindow : IWindow
 		Window.Close();
 	}
 }
+*/

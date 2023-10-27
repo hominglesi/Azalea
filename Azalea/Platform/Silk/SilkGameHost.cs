@@ -1,14 +1,5 @@
-﻿using Azalea.Audios;
-using Azalea.Graphics.Silk;
-using Azalea.Graphics.Rendering;
-using Silk.NET.Input;
-using Silk.NET.OpenGL;
-using Silk.NET.Windowing;
-using System;
-using System.Diagnostics;
-
-namespace Azalea.Platform.Silk;
-
+﻿namespace Azalea.Platform.Silk;
+/*
 internal class SilkGameHost : GameHost
 {
 	public override IWindow Window => _window ?? throw new Exception("Cannot use Window before it is initialized");
@@ -70,3 +61,4 @@ internal class SilkGameHost : GameHost
 		Audio.Dispose();
 	}
 }
+*/

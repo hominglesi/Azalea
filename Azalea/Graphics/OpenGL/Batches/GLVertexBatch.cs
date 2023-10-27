@@ -2,12 +2,13 @@
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Platform;
+using Azalea.Utils;
 using System;
 using System.IO;
 using System.Numerics;
 
 namespace Azalea.Graphics.OpenGL.Batches;
-internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>, IDisposable
+internal class GLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 	where TVertex : unmanaged, IVertex
 {
 	private IWindow _window;
@@ -103,29 +104,11 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>, IDisposable
 
 	Action<TVertex> IVertexBatch<TVertex>.AddAction => AddAction;
 
-	#region Disposing
-	private bool _disposed;
-	~GLVertexBatch() => Dispose(false);
-
-	public void Dispose()
+	protected override void OnDispose()
 	{
-		Dispose(true);
-		GC.SuppressFinalize(this);
+		_vertexArray.Dispose();
+		_indexBuffer.Dispose();
+		_vertexBuffer.Dispose();
+		_shader.Dispose();
 	}
-
-	protected virtual void Dispose(bool disposing)
-	{
-		if (_disposed) return;
-
-		if (disposing)
-		{
-			_vertexArray.Dispose();
-			_indexBuffer.Dispose();
-			_vertexBuffer.Dispose();
-			_shader.Dispose();
-		}
-
-		_disposed = true;
-	}
-	#endregion
 }

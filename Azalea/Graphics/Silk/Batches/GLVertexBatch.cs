@@ -1,12 +1,5 @@
-﻿using Azalea.Graphics.Rendering;
-using Azalea.Graphics.Rendering.Vertices;
-using Azalea.Platform;
-using Silk.NET.OpenGL;
-using System;
-using System.Numerics;
-
-namespace Azalea.Graphics.Silk.Batches;
-
+﻿namespace Azalea.Graphics.Silk.Batches;
+/*
 internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
 	where TVertex : unmanaged, IVertex
 {
@@ -184,3 +177,4 @@ internal class GLVertexBatch<TVertex> : IVertexBatch<TVertex>
 
 	Action<TVertex> IVertexBatch<TVertex>.AddAction => AddAction;
 }
+*/

@@ -41,8 +41,16 @@ public enum Keys
 	WinLeft = 7,
 	//
 	// Summary:
+	//	   The left super key.
+	SuperLeft = WinLeft,
+	//
+	// Summary:
 	//     The right win key.
 	WinRight = 8,
+	//
+	// Summary:
+	//	   The right super key.
+	SuperRight = WinRight,
 	//
 	// Summary:
 	//     The menu key.
@@ -257,12 +265,24 @@ public enum Keys
 	KeypadMinus = 61,
 	//
 	// Summary:
+	//	   The keypad subtract key.
+	KeypadSubtract = KeypadMinus,
+	//
+	// Summary:
 	//     The keypad plus key.
 	KeypadPlus = 62,
 	//
 	// Summary:
+	//	   The keypad add key.
+	KeypadAdd = KeypadPlus,
+	//
+	// Summary:
 	//     The keypad period key.
 	KeypadPeriod = 63,
+	//
+	// Summary:
+	//	   The keypad decimal key.
+	KeypadDecimal = KeypadPeriod,
 	//
 	// Summary:
 	//     The keypad enter key.
@@ -413,8 +433,12 @@ public enum Keys
 	Number9 = 100,
 	//
 	// Summary:
-	//     The tilde key.
-	Tilde = 101,
+	//     The grave key (`).
+	Grave = 101,
+	//
+	// Summary:
+	//     The tilde key (`, ~ with shift).
+	Tilde = Grave,
 	//
 	// Summary:
 	//     The minus key.
@@ -423,6 +447,10 @@ public enum Keys
 	// Summary:
 	//     The plus key.
 	Plus = 103,
+	//
+	// Summary:
+	//	   The equal key.
+	Equal = Plus,
 	//
 	// Summary:
 	//     The left bracket key.
@@ -437,8 +465,12 @@ public enum Keys
 	Semicolon = 106,
 	//
 	// Summary:
-	//     The quote key.
+	//     The quote key (').
 	Quote = 107,
+	//
+	// Summary:
+	//	   The apostrophe key (').
+	Apostrophe = Quote,
 	//
 	// Summary:
 	//     The comma key.
@@ -457,6 +489,13 @@ public enum Keys
 	BackSlash = 111,
 	//
 	// Summary:
-	//     Indicates the last available keyboard key.
-	LastKey = 112
+	//     A key that lacks clear US mapping
+	World1 = 112,
+	//
+	// Summary:
+	//	   A key that lacks clear US mapping
+	World2 = 113,
+	// Summary:
+	//	   The value of this is the same as the number of keys
+	Amount = 114
 }

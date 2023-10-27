@@ -1,16 +1,5 @@
-﻿using Azalea.Extentions.ImageExtentions;
-using Azalea.Graphics.Rendering;
-using Azalea.Graphics.Textures;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using System;
-using System.Collections.Generic;
-using Veldrid;
-
-using TextureVeldrid = Veldrid.Texture;
-
-namespace Azalea.Graphics.Veldrid.Textures;
-
+﻿namespace Azalea.Graphics.Veldrid.Textures;
+/*
 internal class VeldridTexture : INativeTexture
 {
 	protected readonly VeldridRenderer Renderer;
@@ -86,4 +75,4 @@ internal class VeldridTexture : INativeTexture
 
 		return resourcesArray!;
 	}
-}
+}*/

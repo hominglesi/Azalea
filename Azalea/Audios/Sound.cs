@@ -1,10 +1,11 @@
-﻿using Silk.NET.OpenAL;
+﻿using Azalea.Utils;
+using Silk.NET.OpenAL;
 using System;
 using System.Buffers.Binary;
 using System.Text;
 
 namespace Azalea.Audios;
-public class Sound : IDisposable
+public class Sound : Disposable
 {
 	internal uint Buffer;
 	private AL _al;
@@ -148,19 +149,8 @@ public class Sound : IDisposable
 		_length = _lengthInSamples / (float)_frequency;
 	}
 
-	protected bool Disposed;
-	public void Dispose()
+	protected override void OnDispose()
 	{
-		Dispose(true);
-		GC.SuppressFinalize(this);
-	}
-
-	protected virtual void Dispose(bool disposing)
-	{
-		if (Disposed == false)
-		{
-			_al.DeleteBuffer(Buffer);
-			Disposed = true;
-		}
+		_al.DeleteBuffer(Buffer);
 	}
 }

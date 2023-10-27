@@ -1,14 +1,4 @@
-﻿using Azalea.Graphics.Colors;
-using Azalea.Graphics.Rendering;
-using Azalea.Graphics.Rendering.Vertices;
-using Azalea.Graphics.Veldrid.Batches;
-using Azalea.Graphics.Veldrid.Textures;
-using Azalea.Numerics;
-using Azalea.Platform;
-using System;
-using System.Collections.Generic;
-using Veldrid;
-
+﻿/*
 using TextureVeldrid = Veldrid.Texture;
 
 namespace Azalea.Graphics.Veldrid;
@@ -98,3 +88,4 @@ internal class VeldridRenderer : Renderer
 			(uint)scissorRectangle.Width, (uint)scissorRectangle.Height);
 	}
 }
+*/

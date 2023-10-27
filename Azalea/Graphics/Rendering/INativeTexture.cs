@@ -1,12 +1,13 @@
 ﻿using Azalea.Graphics.Textures;
+using System;
 
 namespace Azalea.Graphics.Rendering;
 
-internal interface INativeTexture
+internal interface INativeTexture : IDisposable
 {
 	IRenderer Renderer { get; }
 	int Width { get; }
 	int Height { get; }
 
-	void SetData(ITextureUpload upload);
+	void SetData(ITextureData upload);
 }

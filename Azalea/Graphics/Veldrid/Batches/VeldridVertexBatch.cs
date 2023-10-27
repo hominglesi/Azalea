@@ -1,14 +1,5 @@
-﻿using Azalea.Graphics.Colors;
-using Azalea.Graphics.Rendering;
-using Azalea.Graphics.Rendering.Vertices;
-using Azalea.Platform;
-using System;
-using System.Numerics;
-using System.Runtime.InteropServices;
-using System.Text;
-using Veldrid;
-using Veldrid.SPIRV;
-
+﻿
+/*
 namespace Azalea.Graphics.Veldrid.Batches;
 
 internal class VeldridVertexBatch<TVertex> : IVertexBatch<TVertex>
@@ -210,3 +201,4 @@ internal class VeldridVertexBatch<TVertex> : IVertexBatch<TVertex>
 		public Vector2 TexturePosition;
 	}
 }
+*/

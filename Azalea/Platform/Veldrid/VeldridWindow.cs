@@ -1,16 +1,5 @@
-﻿using Azalea.Extentions.ImageExtentions;
-using Azalea.Graphics.Veldrid;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using System;
-using System.Diagnostics;
-using System.IO;
-using Veldrid;
-using Veldrid.Sdl2;
-using Veldrid.StartupUtilities;
-
-namespace Azalea.Platform.Veldrid;
-
+﻿namespace Azalea.Platform.Veldrid;
+/*
 public class VeldridWindow : IWindow
 {
 	public GraphicsDevice GraphicsDevice { get; private set; }
@@ -141,4 +130,4 @@ public class VeldridWindow : IWindow
 	{
 		Window.Close();
 	}
-}
+}*/

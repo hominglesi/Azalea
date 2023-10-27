@@ -19,6 +19,7 @@ public class TestingTestScene : TestScene
 	private Composition _comp;
 	private TextContainer _composition;
 	private BasicTextBox _text;
+	private Box _cursor;
 
 	private SpriteText _scrollDisplay;
 
@@ -142,7 +143,10 @@ public class TestingTestScene : TestScene
 			}
 		});*/
 
-
+		Add(_cursor = new Box()
+		{
+			Size = new(50, 50)
+		});
 
 	}
 
@@ -150,6 +154,8 @@ public class TestingTestScene : TestScene
 	{
 		//_composition.Size = Input.MousePosition - _composition.ToScreenSpace(_composition.Position);
 		//_scrollDisplay.Text = (float.Parse(_scrollDisplay.Text) + Input.MouseWheelDelta).ToString();
+
+		_cursor.Position = Input.MousePosition;
 
 		if (Input.GetKey(Keys.P).Down && _composition.Children.Count > 0) _composition.Remove(_composition.Children[0]);
 

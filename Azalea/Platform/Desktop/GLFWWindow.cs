@@ -7,7 +7,7 @@ using System.IO;
 namespace Azalea.Platform.Desktop;
 public class GLFWWindow : IWindow
 {
-	private GLFW_Window _window;
+	public GLFW_Window Handle { get; init; }
 
 	public Action<Vector2Int>? Resized;
 	public Action? Initialized;
@@ -16,6 +16,13 @@ public class GLFWWindow : IWindow
 	public Action? Render;
 
 	private Stopwatch _stopwatch = new();
+
+	#region Callbacks
+
+	private GLFW.FramebufferSizeCallback _onResizeCallback;
+	private void onResize(GLFW_Window _, int width, int height) => Resized?.Invoke(new Vector2Int(width, height));
+
+	#endregion
 
 	public GLFWWindow(Vector2Int preferredClientSize)
 	{
@@ -26,16 +33,17 @@ public class GLFWWindow : IWindow
 		GLFW.WindowHint(GLFWWindowHint.ContextVersionMinor, 3);
 		GLFW.OpenGLProfileHint(GLFWOpenGLProfile.Core);
 
-		_window = GLFW.CreateWindow(preferredClientSize.X, preferredClientSize.Y, IWindow.DefaultTitle, null, null);
-		GLFW.MakeContextCurrent(_window);
-		GLFW.SetFramebufferSizeCallback(_window, onResize);
+		Handle = GLFW.CreateWindow(preferredClientSize.X, preferredClientSize.Y, IWindow.DefaultTitle, null, null);
+		GLFW.MakeContextCurrent(Handle);
 
+		_onResizeCallback = onResize;
+		GLFW.SetFramebufferSizeCallback(Handle, _onResizeCallback);
 	}
 
 	public void Run()
 	{
 		Initialized?.Invoke();
-		while (GLFW.WindowShouldClose(_window) == false)
+		while (GLFW.WindowShouldClose(Handle) == false)
 		{
 
 			/*
@@ -54,18 +62,16 @@ public class GLFWWindow : IWindow
 			Render?.Invoke();
 
 			GLFW.PollEvents();
+			Console.WriteLine(i++);
 		}
 	}
 
-	public void SwapBuffers() => GLFW.SwapBuffers(_window);
+	private int i;
 
-	private void onResize(GLFW_Window _, int width, int height)
-	{
-		Resized?.Invoke(new(width, height));
-	}
+	public void SwapBuffers() => GLFW.SwapBuffers(Handle);
 
 	public string Title { get => ""; set { } }
-	public Vector2Int ClientSize { get => new Vector2Int(1080, 720); set { } }
+	public Vector2Int ClientSize { get => new(1280, 720); set { } }
 	public WindowState State { get => WindowState.Normal; set { } }
 	public bool Resizable { get => true; set { } }
 	public bool CursorVisible { get => true; set { } }

@@ -1,11 +1,12 @@
 ﻿using Azalea.Graphics.Colors;
 using Azalea.Graphics.OpenGL.Enums;
+using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Graphics.OpenGL;
-public class GLShader : IDisposable
+public class GLShader : Disposable
 {
 	private uint _handle;
 
@@ -98,26 +99,8 @@ public class GLShader : IDisposable
 		return location;
 	}
 
-	#region Disposing
-	private bool _disposed;
-	~GLShader() => Dispose(false);
-
-	public void Dispose()
+	protected override void OnDispose()
 	{
-		Dispose(true);
-		GC.SuppressFinalize(this);
+		GL.DeleteProgram(_handle);
 	}
-
-	protected virtual void Dispose(bool disposing)
-	{
-		if (_disposed) return;
-
-		if (disposing)
-		{
-			GL.DeleteProgram(_handle);
-		}
-
-		_disposed = true;
-	}
-	#endregion
 }

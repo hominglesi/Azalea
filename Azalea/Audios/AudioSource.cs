@@ -1,8 +1,8 @@
-﻿using Silk.NET.OpenAL;
-using System;
+﻿using Azalea.Utils;
+using Silk.NET.OpenAL;
 
 namespace Azalea.Audios;
-public class AudioSource : IDisposable
+public class AudioSource : Disposable
 {
 	private AL _al;
 
@@ -36,20 +36,8 @@ public class AudioSource : IDisposable
 		}
 	}
 
-	protected bool Disposed;
-	public void Dispose()
+	protected override void OnDispose()
 	{
-		Dispose(true);
-		GC.SuppressFinalize(this);
-	}
-
-	protected void Dispose(bool disposing)
-	{
-		if (Disposed == false)
-		{
-			_al.DeleteSource(_handle);
-
-			Disposed = true;
-		}
+		_al.DeleteSource(_handle);
 	}
 }

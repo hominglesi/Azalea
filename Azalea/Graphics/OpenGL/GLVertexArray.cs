@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Azalea.Utils;
 
 namespace Azalea.Graphics.OpenGL;
-public class GLVertexArray : IDisposable
+public class GLVertexArray : Disposable
 {
 	private uint _handle;
 
@@ -29,26 +29,8 @@ public class GLVertexArray : IDisposable
 		}
 	}
 
-	#region Disposing
-	private bool _disposed;
-	~GLVertexArray() => Dispose(false);
-
-	public void Dispose()
+	protected override void OnDispose()
 	{
-		Dispose(true);
-		GC.SuppressFinalize(this);
+		GL.DeleteVertexArray(_handle);
 	}
-
-	protected virtual void Dispose(bool disposing)
-	{
-		if (_disposed) return;
-
-		if (disposing)
-		{
-			GL.DeleteVertexArray(_handle);
-		}
-
-		_disposed = true;
-	}
-	#endregion
 }
