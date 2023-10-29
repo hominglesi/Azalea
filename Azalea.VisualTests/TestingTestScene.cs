@@ -168,5 +168,7 @@ public class TestingTestScene : TestScene
 		}
 
 		if (Input.GetKey(Keys.O).Down) _text.FinishAmends();
+
+		Console.WriteLine(Input.GetJoystick(0).GetAxis(1).Direction);
 	}
 }

@@ -30,6 +30,7 @@ internal class GLRenderer : Renderer
 			_firstFrame = false;
 		else
 			((GLFWWindow)_window).SwapBuffers();
+
 		GL.PrintErrors();
 	}
 
@@ -66,11 +67,19 @@ internal class GLRenderer : Renderer
 
 	protected override void SetScissorTestRectangle(RectangleInt scissorRectangle)
 	{
-		//throw new System.NotImplementedException();
+		if (scissorRectangle.Width < 0) scissorRectangle.Width = 0;
+		if (scissorRectangle.Height < 0) scissorRectangle.Height = 0;
+
+		var framebufferHeight = _window.ClientSize.Y;
+
+		GL.Scissor(scissorRectangle.X, framebufferHeight - scissorRectangle.Y - scissorRectangle.Height, scissorRectangle.Width, scissorRectangle.Height);
 	}
 
 	protected override void SetScissorTestState(bool enabled)
 	{
-		//throw new System.NotImplementedException();
+		if (enabled)
+			GL.Enable(GLCapability.ScissorTest);
+		else
+			GL.Disable(GLCapability.ScissorTest);
 	}
 }

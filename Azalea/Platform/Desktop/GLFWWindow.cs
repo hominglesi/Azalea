@@ -62,11 +62,8 @@ public class GLFWWindow : IWindow
 			Render?.Invoke();
 
 			GLFW.PollEvents();
-			Console.WriteLine(i++);
 		}
 	}
-
-	private int i;
 
 	public void SwapBuffers() => GLFW.SwapBuffers(Handle);
 

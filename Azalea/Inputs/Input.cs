@@ -18,6 +18,7 @@ public static class Input
 	public static ButtonState GetKey(Keys key) => GetKey((int)key);
 	public static ButtonState GetKey(int keycode) => _keyboardKeys[keycode];
 	public static ButtonState GetMouseButton(MouseButton button) => _mouseButtons[(int)button];
+	public static IJoystick GetJoystick(int i) => _joysticks[i];
 
 	public static event Action<char>? OnTextInput;
 
@@ -31,6 +32,8 @@ public static class Input
 
 	internal static ButtonState[] _mouseButtons = new ButtonState[1];
 	internal static ButtonState[] _keyboardKeys = new ButtonState[1];
+	internal static IJoystick[] _joysticks = new IJoystick[_joystickSlots];
+	internal const int _joystickSlots = 8;
 
 	private static Vector2 _lastMousePosition = Vector2.Zero;
 	private static Vector2 _mousePosition = Vector2.Zero;
@@ -59,6 +62,11 @@ public static class Input
 		for (int i = 0; i < keyButtonCount; i++)
 		{
 			_keyboardKeys[i] = new ButtonState();
+		}
+
+		for (int i = 0; i < _joystickSlots; i++)
+		{
+
 		}
 	}
 

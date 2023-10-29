@@ -71,6 +71,9 @@ internal static unsafe class GL
 	[DllImport(LibraryPath, EntryPoint = "glBlendFunc")]
 	public static extern void BlendFunc(GLBlendFunction source, GLBlendFunction destination);
 
+	[DllImport(LibraryPath, EntryPoint = "glScissor")]
+	public static extern void Scissor(int x, int y, int width, int height);
+
 	[DllImport(LibraryPath, EntryPoint = "glEnable")]
 	public static extern void Enable(GLCapability capability);
 
