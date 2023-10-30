@@ -70,6 +70,12 @@ internal static unsafe partial class GLFW
 	public static extern void SwapBuffers(GLFW_Window window);
 
 	#endregion
+	#region Title
+
+	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowTitle")]
+	public static extern void SetWindowTitle(GLFW_Window window, string title);
+
+	#endregion
 	#region Position
 
 	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowPos")]

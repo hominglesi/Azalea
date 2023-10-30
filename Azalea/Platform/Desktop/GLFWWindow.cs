@@ -61,6 +61,7 @@ public class GLFWWindow : Disposable, IWindow
 	{
 		if (GLFW.Init() == false) throw new Exception("GLFW could not be initialized.");
 
+		_title = prefs.WindowTitle;
 		_clientSize = prefs.PreferredClientSize;
 		_resizable = prefs.WindowResizable;
 		_state = WindowState.Normal;
@@ -70,7 +71,7 @@ public class GLFWWindow : Disposable, IWindow
 		GLFW.WindowHint(GLFWWindowHint.OpenGLProfile, (int)GLFWOpenGLProfile.Core);
 		GLFW.WindowHint(GLFWWindowHint.Resizable, _resizable);
 
-		Handle = GLFW.CreateWindow(_clientSize.X, _clientSize.Y, IWindow.DefaultTitle, null, null);
+		Handle = GLFW.CreateWindow(_clientSize.X, _clientSize.Y, _title, null, null);
 		GLFW.MakeContextCurrent(Handle);
 
 		_onResizeCallback = onResize;
@@ -87,6 +88,20 @@ public class GLFWWindow : Disposable, IWindow
 
 		_titleBarHeight = (int)GLFW.GetWindowFrameSize(Handle).Top;
 	}
+
+	#region Title
+
+	private string _title;
+
+	public string Title { get => _title; set => setTitle(value); }
+
+	private void setTitle(string title)
+	{
+		GLFW.SetWindowTitle(Handle, title);
+		_title = title;
+	}
+
+	#endregion
 
 	#region Resizable
 
@@ -106,8 +121,6 @@ public class GLFWWindow : Disposable, IWindow
 	public bool ShouldClose => GLFW.WindowShouldClose(Handle);
 
 	public void SwapBuffers() => GLFW.SwapBuffers(Handle);
-
-	public string Title { get => ""; set { } }
 
 	private Vector2Int _position;
 	public Vector2Int Position { get => _position; set => setWindowPosition(value); }

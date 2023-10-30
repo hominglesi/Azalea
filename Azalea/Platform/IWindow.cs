@@ -5,8 +5,6 @@ namespace Azalea.Platform;
 
 public interface IWindow : IDisposable
 {
-	internal const string DefaultTitle = "Azalea Game";
-
 	internal static Vector2Int CenterOffset = new(0, -10);
 
 	//Aproximate window center for 1920x1080 resolution
