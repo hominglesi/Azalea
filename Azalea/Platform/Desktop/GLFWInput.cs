@@ -1,10 +1,11 @@
-﻿using Azalea.Graphics.GLFW;
-using Azalea.Graphics.GLFW.Enums;
-using Azalea.Inputs;
+﻿using Azalea.Inputs;
+using Azalea.Platform.Desktop.Glfw;
+using Azalea.Platform.Desktop.Glfw.Enums;
+using Azalea.Platform.Desktop.Glfw.Native;
 using System.Collections.Generic;
 
 namespace Azalea.Platform.Desktop;
-public class GLFWInput
+public class GLFWInput : IInputManager
 {
 	private GLFW_Window _window;
 
@@ -33,6 +34,23 @@ public class GLFWInput
 
 				Input._joysticks[i] = joystick;
 			}
+		}
+	}
+
+	public void ProcessInputs()
+	{
+		GLFW.PollEvents();
+
+		Input.HandleMousePositionChange(GLFW.GetCursorPos(_window));
+
+		Input.HandleScroll(_yScroll);
+		_xScroll = 0;
+		_yScroll = 0;
+
+		foreach (var joystick in _joysticks)
+		{
+			var axies = GLFW.GetJoystickAxes(joystick.Handle);
+			joystick.SetAxies(axies);
 		}
 	}
 
@@ -65,19 +83,4 @@ public class GLFWInput
 	}
 	private float _xScroll;
 	private float _yScroll;
-
-	public void Update()
-	{
-		Input.HandleMousePositionChange(GLFW.GetCursorPos(_window));
-
-		Input.HandleScroll(_yScroll);
-		_xScroll = 0;
-		_yScroll = 0;
-
-		foreach (var joystick in _joysticks)
-		{
-			var axies = GLFW.GetJoystickAxes(joystick.Handle);
-			joystick.SetAxies(axies);
-		}
-	}
 }

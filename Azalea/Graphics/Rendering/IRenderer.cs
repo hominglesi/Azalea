@@ -21,6 +21,7 @@ public interface IRenderer
 	internal void FinishFrame();
 	public void Clear();
 	internal void FlushCurrentBatch();
+	internal void SetViewport(Vector2Int size);
 
 	internal IVertexBatch CreateQuadBatch(int size);
 	internal Texture CreateTexture(int width, int height);

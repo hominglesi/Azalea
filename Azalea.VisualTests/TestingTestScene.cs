@@ -8,6 +8,7 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Layout;
+using Azalea.Platform;
 using System;
 using System.Numerics;
 
@@ -157,8 +158,6 @@ public class TestingTestScene : TestScene
 
 		_cursor.Position = Input.MousePosition;
 
-		if (Input.GetKey(Keys.P).Down && _composition.Children.Count > 0) _composition.Remove(_composition.Children[0]);
-
 		if (Input.GetKey(Keys.Space).DownOrRepeat) Console.WriteLine("Pressed space");
 
 		if (Input.GetKey(Keys.M).Down)
@@ -167,8 +166,17 @@ public class TestingTestScene : TestScene
 			_comp.InternalComposition.Invalidate(Invalidation.RequiredParentSizeToFit, InvalidationSource.Child);
 		}
 
-		if (Input.GetKey(Keys.O).Down) _text.FinishAmends();
-
-		Console.WriteLine(Input.GetJoystick(0).GetAxis(1).Direction);
+		if (Input.GetKey(Keys.P).Down)
+		{
+			AzaleaGame.Main.Host.Window.State = WindowState.Normal;
+		}
+		else if (Input.GetKey(Keys.O).Down)
+		{
+			AzaleaGame.Main.Host.Window.State = WindowState.Minimized;
+		}
+		else if (Input.GetKey(Keys.I).Down)
+		{
+			AzaleaGame.Main.Host.Window.State = WindowState.Maximized;
+		}
 	}
 }

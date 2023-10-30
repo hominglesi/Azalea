@@ -1,4 +1,4 @@
-﻿namespace Azalea.Graphics.GLFW.Enums;
+﻿namespace Azalea.Platform.Desktop.Glfw.Enums;
 public enum GLFWOpenGLProfile
 {
 	Any = 0,

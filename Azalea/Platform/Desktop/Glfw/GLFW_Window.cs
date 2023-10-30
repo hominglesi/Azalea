@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Azalea.Graphics.GLFW;
+namespace Azalea.Platform.Desktop.Glfw;
 public readonly struct GLFW_Window
 {
 	public readonly IntPtr NativePointer;

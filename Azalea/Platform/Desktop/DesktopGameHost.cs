@@ -12,15 +12,12 @@ public class DesktopGameHost : GameHost
 	public override IRenderer Renderer => _renderer ?? throw new Exception("Cannot use Renderer before it is initialized");
 	private GLRenderer? _renderer;
 
-	private GLFWInput _input;
+	internal override IInputManager InputManager => _input ?? throw new Exception("Cannot use InputManager before it is initialized");
+	private GLFWInput? _input;
 
 	public DesktopGameHost(HostPreferences preferences)
 	{
 		_window = new GLFWWindow(preferences.PreferredClientSize);
-
-		_window.Initialized += CallInitialized;
-		_window.Render += CallOnRender;
-		_window.Update += CallOnUpdate;
 	}
 
 	public override void CallInitialized()
@@ -34,18 +31,5 @@ public class DesktopGameHost : GameHost
 		_input = new GLFWInput(_window.Handle);
 
 		base.CallInitialized();
-	}
-
-	public override void CallOnUpdate()
-	{
-		base.CallOnUpdate();
-
-		_input.Update();
-	}
-
-	public override void Run(AzaleaGame game)
-	{
-		base.Run(game);
-		_window.Run();
 	}
 }

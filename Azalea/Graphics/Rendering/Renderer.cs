@@ -1,6 +1,7 @@
 ﻿using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Graphics.Textures;
 using Azalea.Numerics;
+using Azalea.Platform;
 using StbImageSharp;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,15 @@ internal abstract class Renderer : IRenderer
 
 	public bool AutomaticallyClear { get; set; } = true;
 
+	protected IWindow Window { get; init; }
+
+	public Renderer(IWindow window)
+	{
+		Window = window;
+
+		Window.Resized += SetViewport;
+	}
+
 	protected internal virtual void Initialize()
 	{
 		defaultQuadBatch = CreateQuadBatch(100);
@@ -56,6 +66,13 @@ internal abstract class Renderer : IRenderer
 	}
 
 	protected abstract bool SetTextureImplementation(INativeTexture? texture, int unit);
+
+	public void SetViewport(Vector2Int size)
+	{
+		SetViewportImplementation(size);
+	}
+
+	protected abstract void SetViewportImplementation(Vector2Int size);
 
 	protected abstract IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size);
 	protected abstract INativeTexture CreateNativeTexture(int width, int height);

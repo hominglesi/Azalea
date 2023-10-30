@@ -11,12 +11,8 @@ using Azalea.Platform.Desktop;
 namespace Azalea.Graphics.OpenGL;
 internal class GLRenderer : Renderer
 {
-	private readonly IWindow _window;
-
 	public GLRenderer(IWindow window)
-	{
-		_window = window;
-	}
+		: base(window) { }
 
 
 	private bool _firstFrame = true;
@@ -29,9 +25,14 @@ internal class GLRenderer : Renderer
 		if (_firstFrame)
 			_firstFrame = false;
 		else
-			((GLFWWindow)_window).SwapBuffers();
+			((GLFWWindow)Window).SwapBuffers();
 
 		GL.PrintErrors();
+	}
+
+	protected override void SetViewportImplementation(Vector2Int size)
+	{
+		GL.Viewport(0, 0, size.X, size.Y);
 	}
 
 	protected internal override void SetClearColor(Color value)
@@ -41,7 +42,7 @@ internal class GLRenderer : Renderer
 		=> GL.Clear(GLBufferBit.Color);
 
 	protected override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
-		=> new GLVertexBatch<TexturedVertex2D>(_window, size);
+		=> new GLVertexBatch<TexturedVertex2D>(Window, size);
 
 	protected override INativeTexture CreateNativeTexture(int width, int height)
 		=> new GLTexture(this, width, height);
@@ -70,7 +71,7 @@ internal class GLRenderer : Renderer
 		if (scissorRectangle.Width < 0) scissorRectangle.Width = 0;
 		if (scissorRectangle.Height < 0) scissorRectangle.Height = 0;
 
-		var framebufferHeight = _window.ClientSize.Y;
+		var framebufferHeight = Window.ClientSize.Y;
 
 		GL.Scissor(scissorRectangle.X, framebufferHeight - scissorRectangle.Y - scissorRectangle.Height, scissorRectangle.Width, scissorRectangle.Height);
 	}

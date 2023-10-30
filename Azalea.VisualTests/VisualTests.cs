@@ -19,10 +19,11 @@ public class VisualTests : AzaleaGame
 
 
 		//Add(new DefaultUserInputTest());
-		Add(new TestingTestScene());
+		//Add(new TestingTestScene());
 		//Add(new FlexTest());
 		//Add(new InputTest());
 		//Add(new PanningTest());
+		Add(new IWindowTest());
 		/*
 		_sound = Assets.GetSound("Audio/paramore.wav");
 		_sound2 = Assets.GetSound("Audio/audio.wav");

@@ -1,8 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Azalea.Platform;
 
-public interface IWindow
+public interface IWindow : IDisposable
 {
 	internal const string DefaultTitle = "Azalea Game";
 
@@ -11,6 +12,10 @@ public interface IWindow
 	//Aproximate window center for 1920x1080 resolution
 	internal static Vector2Int AproximateCenterWindowPosition(Vector2Int windowSize)
 		=> new Vector2Int(960, 540) - (windowSize / 2) + CenterOffset;
+
+	internal bool ShouldClose { get; }
+
+	internal Action<Vector2Int>? Resized { get; set; }
 
 	/// <summary>
 	/// The window title.

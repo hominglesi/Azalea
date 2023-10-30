@@ -16,6 +16,8 @@ public abstract class GameHost
 {
 	public abstract IWindow Window { get; }
 	public abstract IRenderer Renderer { get; }
+	internal abstract IInputManager InputManager { get; }
+
 	public IClipboard Clipboard => _clipboard ?? throw new Exception("This GameHost does not support using the clipboard.");
 	private IClipboard? _clipboard;
 
@@ -24,6 +26,8 @@ public abstract class GameHost
 	public Composition Root => _root ?? throw new Exception("Cannot use root before the game has started.");
 
 	private Composition? _root;
+
+	private Stopwatch _stopwatch = new();
 
 	public virtual void Run(AzaleaGame game)
 	{
@@ -37,6 +41,22 @@ public abstract class GameHost
 		_clipboard = CreateClipboard();
 
 		_root = root;
+
+		//Game Loop
+		CallInitialized();
+		while (Window.ShouldClose == false)
+		{
+			if (_stopwatch.IsRunning == false) _stopwatch.Start();
+
+			InputManager.ProcessInputs();
+
+			CallOnUpdate();
+
+			CallOnRender();
+
+			Time._deltaTime = (float)_stopwatch.Elapsed.TotalSeconds;
+			_stopwatch.Restart();
+		}
 	}
 
 	public virtual void CallInitialized()
