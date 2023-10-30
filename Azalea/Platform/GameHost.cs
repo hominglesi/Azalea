@@ -48,11 +48,11 @@ public abstract class GameHost
 		{
 			if (_stopwatch.IsRunning == false) _stopwatch.Start();
 
-			InputManager.ProcessInputs();
-
 			CallOnUpdate();
 
 			CallOnRender();
+
+			InputManager.ProcessInputs();
 
 			Time._deltaTime = (float)_stopwatch.Elapsed.TotalSeconds;
 			_stopwatch.Restart();

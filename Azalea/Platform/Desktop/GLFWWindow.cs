@@ -86,6 +86,9 @@ public class GLFWWindow : Disposable, IWindow
 		_onMaximizeCallback = onMaximize;
 		GLFW.SetWindowMaximizeCallback(Handle, _onMaximizeCallback);
 
+		_onCloseCallback = onClose;
+		GLFW.SetWindowCloseCallback(Handle, _onCloseCallback);
+
 		_titleBarHeight = (int)GLFW.GetWindowFrameSize(Handle).Top;
 	}
 
@@ -118,7 +121,31 @@ public class GLFWWindow : Disposable, IWindow
 
 	#endregion
 
-	public bool ShouldClose => GLFW.WindowShouldClose(Handle);
+	#region Closing
+
+	private readonly GLFW.WindowCloseCallback _onCloseCallback;
+	private void onClose(GLFW_Window window)
+	{
+		ShouldClose = true;
+		Closing?.Invoke();
+	}
+
+	public Action? Closing { get; set; }
+
+	public void Close()
+	{
+		GLFW.SetWindowShouldClose(Handle, true);
+		onClose(Handle);
+	}
+
+	public void PreventClosure()
+	{
+		ShouldClose = false;
+	}
+
+	public bool ShouldClose { get; set; }
+
+	#endregion
 
 	public void SwapBuffers() => GLFW.SwapBuffers(Handle);
 
@@ -138,11 +165,6 @@ public class GLFWWindow : Disposable, IWindow
 
 
 	public void Center()
-	{
-
-	}
-
-	public void Close()
 	{
 
 	}

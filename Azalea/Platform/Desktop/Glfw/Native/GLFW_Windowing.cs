@@ -124,5 +124,19 @@ internal static unsafe partial class GLFW
 		return windowShouldClose(window) == 1;
 	}
 
+	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowShouldClose")]
+	private static extern void setWindowShouldClose(GLFW_Window window, int value);
+
+	public static void SetWindowShouldClose(GLFW_Window window, bool value)
+	{
+		setWindowShouldClose(window, value ? 1 : 0);
+	}
+
+	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowCloseCallback", CallingConvention = CallingConvention.Cdecl)]
+	[return: MarshalAs(UnmanagedType.FunctionPtr, MarshalTypeRef = typeof(WindowCloseCallback))]
+	public static extern WindowCloseCallback SetWindowCloseCallback(GLFW_Window window, WindowCloseCallback callback);
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	public delegate void WindowCloseCallback(GLFW_Window window);
+
 	#endregion
 }

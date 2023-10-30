@@ -8,60 +8,93 @@ using System;
 namespace Azalea.VisualTests;
 public class IWindowTest : TestScene
 {
+	private IWindow _window;
+
 	private SpriteText _windowStateText;
 	private SpriteText _windowTitleText;
 	private SpriteText _windowResizableText;
+	private SpriteText _windowPreventsClosureText;
+
+	private bool _preventsClosure;
 
 	public IWindowTest()
 	{
+		_window = AzaleaGame.Main.Host.Window;
+		_window.Closing += onWindowClosing;
+
 		AddRange(new GameObject[] {
 			new FlexContainer()
-		{
-			RelativeSizeAxes = Axes.Both,
-			Direction = FlexDirection.Vertical,
-			Spacing = new(5),
-			Wrapping = FlexWrapping.Wrap,
-			Children = new GameObject[]
 			{
-				createActionButton(
-					"Set WindowState to 'Normal'",
-					() => AzaleaGame.Main.Host.Window.State = WindowState.Normal),
-				createActionButton(
-					"Set WindowState to 'Minimized'",
-					() => AzaleaGame.Main.Host.Window.State = WindowState.Minimized),
-				createActionButton(
-					"Set WindowState to 'Maximized'",
-					() => AzaleaGame.Main.Host.Window.State = WindowState.Maximized),
-				createActionButton(
-					"Set Resizable to 'true'",
-					() => AzaleaGame.Main.Host.Window.Resizable = true),
-				createActionButton(
-					"Set Resizable to 'false'",
-					() => AzaleaGame.Main.Host.Window.Resizable = false),
-				createActionButton(
-					"Set Title to 'Azalea Game'",
-					() => AzaleaGame.Main.Host.Window.Title = "Azalea Game"),
-				createActionButton(
-					"Set Title to 'Ide Gas'",
-					() => AzaleaGame.Main.Host.Window.Title = "Ide Gas"),
-				createActionButton(
-					"Set Title to ''",
-					() => AzaleaGame.Main.Host.Window.Title = ""),
-			}
-		}, new FlexContainer()
-		{
-			Origin = Anchor.TopRight,
-			Anchor = Anchor.TopRight,
-			Width = 300,
-			Direction = FlexDirection.Vertical,
-			Children = new GameObject[]
+				RelativeSizeAxes = Axes.Both,
+				Direction = FlexDirection.Vertical,
+				Spacing = new(5),
+				Wrapping = FlexWrapping.Wrap,
+				Children = new GameObject[]
+				{
+					createActionButton(
+						"Set WindowState to 'Normal'",
+						() => _window.State = WindowState.Normal),
+					createActionButton(
+						"Set WindowState to 'Minimized'",
+						() => _window.State = WindowState.Minimized),
+					createActionButton(
+						"Set WindowState to 'Maximized'",
+						() => _window.State = WindowState.Maximized),
+					createActionButton(
+						"Set Resizable to 'true'",
+						() => _window.Resizable = true),
+					createActionButton(
+						"Set Resizable to 'false'",
+						() => _window.Resizable = false),
+					createActionButton(
+						"Set Title to 'Azalea Game'",
+						() => _window.Title = "Azalea Game"),
+					createActionButton(
+						"Set Title to 'Ide Gas'",
+						() => _window.Title = "Ide Gas"),
+					createActionButton(
+						"Set Title to ''",
+						() => _window.Title = ""),
+					createActionButton(
+						"Attempt to Close Window",
+						() => _window.Close()),
+					createActionButton(
+						"Set this test to prevent Closing",
+						() => _preventsClosure = true),
+					createActionButton(
+						"Set this test to not prevent Closing",
+						() => _preventsClosure = false),
+				}
+			},
+			new FlexContainer()
 			{
-				createInfoField("WindowState", _windowStateText = new SpriteText()),
-				createInfoField("Title", _windowTitleText = new SpriteText()),
-				createInfoField("Resizable", _windowResizableText = new SpriteText()),
+				Origin = Anchor.TopRight,
+				Anchor = Anchor.TopRight,
+				Width = 300,
+				Direction = FlexDirection.Vertical,
+				Children = new GameObject[]
+				{
+					createInfoField("WindowState", _windowStateText = new SpriteText()),
+					createInfoField("Title", _windowTitleText = new SpriteText()),
+					createInfoField("Resizable", _windowResizableText = new SpriteText()),
+					createInfoField("Prevents Closure", _windowPreventsClosureText = new SpriteText()),
+				}
 			}
-		}
 		});
+
+		_lastState = _window.State;
+		_lastTitle = _window.Title;
+		_lastResizable = _window.Resizable;
+		_lastPreventsClosure = _preventsClosure;
+	}
+
+	private void onWindowClosing()
+	{
+		if (_preventsClosure)
+		{
+			Console.WriteLine("The Window closure attempt was prevented by this Test");
+			_window.PreventClosure();
+		}
 	}
 
 	private FlexContainer createInfoField(string name, SpriteText valueText)
@@ -91,33 +124,42 @@ public class IWindowTest : TestScene
 		};
 	}
 
-	private WindowState? _lastState;
-	private string? _lastTitle;
-	private bool? _lastResizable;
+	private WindowState _lastState;
+	private string _lastTitle;
+	private bool _lastResizable;
+	private bool _lastPreventsClosure;
 
 	protected override void Update()
 	{
-		var window = AzaleaGame.Main.Host.Window;
-
-		if (window.State != _lastState)
+		if (_window.State != _lastState)
 		{
-			_windowStateText.Text = window.State.ToString();
-			Console.WriteLine($"Window state changed to {window.State}");
-			_lastState = window.State;
+			_windowStateText.Text = _window.State.ToString();
+			Console.WriteLine($"Window state changed to {_window.State}");
+			_lastState = _window.State;
 		};
 
-		if (window.Title != _lastTitle)
+		if (_window.Title != _lastTitle)
 		{
-			_windowTitleText.Text = window.Title;
-			Console.WriteLine($"Window state changed to {window.Title}");
-			_lastTitle = window.Title;
+			_windowTitleText.Text = _window.Title;
+			Console.WriteLine($"Window title changed to {_window.Title}");
+			_lastTitle = _window.Title;
 		}
 
-		if (window.Resizable != _lastResizable)
+		if (_window.Resizable != _lastResizable)
 		{
-			_windowResizableText.Text = window.Resizable.ToString();
-			Console.WriteLine($"Window resizable changed to {window.Resizable}");
-			_lastResizable = window.Resizable;
+			_windowResizableText.Text = _window.Resizable.ToString();
+			Console.WriteLine($"Window resizable changed to {_window.Resizable}");
+			_lastResizable = _window.Resizable;
+		}
+
+		if (_preventsClosure != _lastPreventsClosure)
+		{
+			_windowPreventsClosureText.Text = _preventsClosure.ToString();
+			if (_preventsClosure)
+				Console.WriteLine($"Test now prevents closure attempts");
+			else
+				Console.WriteLine($"Test no longer prevents closure attempts");
+			_lastPreventsClosure = _preventsClosure;
 		}
 	}
 }
