@@ -17,7 +17,7 @@ public class DesktopGameHost : GameHost
 
 	public DesktopGameHost(HostPreferences preferences)
 	{
-		_window = new GLFWWindow(preferences.PreferredClientSize);
+		_window = new GLFWWindow(preferences);
 	}
 
 	public override void CallInitialized()

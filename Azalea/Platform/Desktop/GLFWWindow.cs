@@ -40,20 +40,36 @@ public class GLFWWindow : Disposable, IWindow
 		}
 	}
 
+	private readonly GLFW.WindowMaximizeCallback _onMaximizeCallback;
+	private void onMaximize(GLFW_Window window, int maximized)
+	{
+		if (maximized == 1)
+		{
+			setWindowState(WindowState.Maximized);
+		}
+		else
+		{
+			unmaximize();
+		}
+	}
+
 	#endregion
 
 	private int _titleBarHeight;
 
-	public GLFWWindow(Vector2Int preferredClientSize)
+	public GLFWWindow(HostPreferences prefs)
 	{
 		if (GLFW.Init() == false) throw new Exception("GLFW could not be initialized.");
+
+		_clientSize = prefs.PreferredClientSize;
+		_resizable = prefs.WindowResizable;
+		_state = WindowState.Normal;
 
 		GLFW.WindowHint(GLFWWindowHint.ContextVersionMajor, 3);
 		GLFW.WindowHint(GLFWWindowHint.ContextVersionMinor, 3);
 		GLFW.WindowHint(GLFWWindowHint.OpenGLProfile, (int)GLFWOpenGLProfile.Core);
+		GLFW.WindowHint(GLFWWindowHint.Resizable, _resizable);
 
-		_clientSize = preferredClientSize;
-		_state = WindowState.Normal;
 		Handle = GLFW.CreateWindow(_clientSize.X, _clientSize.Y, IWindow.DefaultTitle, null, null);
 		GLFW.MakeContextCurrent(Handle);
 
@@ -66,8 +82,26 @@ public class GLFWWindow : Disposable, IWindow
 		_onInconifyCallback = onIconify;
 		GLFW.SetWindowIconifyCallback(Handle, _onInconifyCallback);
 
+		_onMaximizeCallback = onMaximize;
+		GLFW.SetWindowMaximizeCallback(Handle, _onMaximizeCallback);
+
 		_titleBarHeight = (int)GLFW.GetWindowFrameSize(Handle).Top;
 	}
+
+	#region Resizable
+
+	private bool _resizable;
+	public bool Resizable { get => _resizable; set => setResizable(value); }
+
+	private void setResizable(bool value)
+	{
+		if (_resizable == value) return;
+
+		_resizable = value;
+		GLFW.SetWindowAttribute(Handle, GLFWAttribute.Resizable, value);
+	}
+
+	#endregion
 
 	public bool ShouldClose => GLFW.WindowShouldClose(Handle);
 
@@ -85,7 +119,8 @@ public class GLFWWindow : Disposable, IWindow
 	private bool _maximized;
 	private WindowState _state;
 	public WindowState State { get => _state; set => setWindowState(value); }
-	public bool Resizable { get => true; set { } }
+
+
 	public bool CursorVisible { get => true; set { } }
 
 
@@ -125,6 +160,13 @@ public class GLFWWindow : Disposable, IWindow
 		}
 
 		setWindowState(WindowState.Normal);
+	}
+
+	private void unmaximize()
+	{
+		_maximized = false;
+		if (_state == WindowState.Maximized)
+			_state = WindowState.Normal;
 	}
 
 	private void setWindowState(WindowState state)

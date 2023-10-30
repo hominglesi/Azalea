@@ -2,5 +2,10 @@
 using Azalea.VisualTests;
 
 
-var host = Host.CreateHost(new HostPreferences { PreferredClientSize = new Vector2Int(1280, 720) });
+var host = Host.CreateHost(new HostPreferences
+{
+	PreferredClientSize = new Vector2Int(1280, 720),
+	WindowResizable = true
+});
+
 host.Run(new VisualTests());

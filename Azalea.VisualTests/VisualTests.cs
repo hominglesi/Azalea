@@ -15,7 +15,6 @@ public class VisualTests : AzaleaGame
 		Resources.AddStore(new NamespacedResourceStore<byte[]>(new DllResourceStore(typeof(VisualTests).Assembly), "Resources"));
 
 		Host.Renderer.ClearColor = Palette.Flowers.Azalea;
-		Host.Window.Resizable = true;
 
 
 		//Add(new DefaultUserInputTest());

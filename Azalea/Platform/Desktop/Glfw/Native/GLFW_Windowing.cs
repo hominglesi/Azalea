@@ -18,22 +18,32 @@ internal static unsafe partial class GLFW
 	}
 
 	#endregion
+	#region Hints & Attributes
 
-	#region Hints
-
+	//Hints
 	[DllImport(LibraryPath, EntryPoint = "glfwWindowHint")]
 	public static extern void WindowHint(GLFWWindowHint hint, int value);
+	public static void WindowHint(GLFWWindowHint hint, bool value)
+		=> WindowHint(hint, value ? 1 : 0);
+
+	//Attributes
+	[DllImport(LibraryPath, EntryPoint = "glfwGetWindowAttrib")]
+	public static extern int GetWindowAttribute(GLFW_Window window, GLFWAttribute attribute);
+
+	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowAttrib")]
+	public static extern void SetWindowAttribute(GLFW_Window window, GLFWAttribute attribute, int value);
+	public static void SetWindowAttribute(GLFW_Window window, GLFWAttribute attribute, bool value)
+		=> SetWindowAttribute(window, attribute, value ? 1 : 0);
 
 	#endregion
-
 	#region States
+
+	[DllImport(LibraryPath, EntryPoint = "glfwRestoreWindow")]
+	public static extern void RestoreWindow(GLFW_Window window);
 
 	//Minimize
 	[DllImport(LibraryPath, EntryPoint = "glfwIconifyWindow")]
 	public static extern void IconifyWindow(GLFW_Window window);
-
-	[DllImport(LibraryPath, EntryPoint = "glfwRestoreWindow")]
-	public static extern void RestoreWindow(GLFW_Window window);
 
 	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowIconifyCallback", CallingConvention = CallingConvention.Cdecl)]
 	[return: MarshalAs(UnmanagedType.FunctionPtr, MarshalTypeRef = typeof(WindowIconifyCallback))]
@@ -42,12 +52,15 @@ internal static unsafe partial class GLFW
 	public delegate void WindowIconifyCallback(GLFW_Window window, int iconified);
 
 	//Maximize
-
 	[DllImport(LibraryPath, EntryPoint = "glfwMaximizeWindow")]
 	public static extern void MaximizeWindow(GLFW_Window window);
+	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowMaximizeCallback", CallingConvention = CallingConvention.Cdecl)]
+	[return: MarshalAs(UnmanagedType.FunctionPtr, MarshalTypeRef = typeof(WindowMaximizeCallback))]
+	public static extern WindowMaximizeCallback SetWindowMaximizeCallback(GLFW_Window window, WindowMaximizeCallback callback);
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	public delegate void WindowMaximizeCallback(GLFW_Window window, int maximized);
 
 	#endregion
-
 	#region GL
 
 	[DllImport(LibraryPath, EntryPoint = "glfwMakeContextCurrent")]
@@ -57,14 +70,12 @@ internal static unsafe partial class GLFW
 	public static extern void SwapBuffers(GLFW_Window window);
 
 	#endregion
-
 	#region Position
 
 	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowPos")]
 	public static extern void SetWindowPos(GLFW_Window window, int x, int y);
 
 	#endregion
-
 	#region Size
 
 	//Window Size
@@ -97,7 +108,6 @@ internal static unsafe partial class GLFW
 	}
 
 	#endregion
-
 	#region Closing
 
 	[DllImport(LibraryPath, EntryPoint = "glfwWindowShouldClose")]
