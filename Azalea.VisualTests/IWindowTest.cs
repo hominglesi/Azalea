@@ -2,6 +2,7 @@
 using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
+using Azalea.IO.Assets;
 using Azalea.Platform;
 using System;
 
@@ -13,6 +14,7 @@ public class IWindowTest : TestScene
 	private SpriteText _windowStateText;
 	private SpriteText _windowTitleText;
 	private SpriteText _windowResizableText;
+	private SpriteText _windowPositionText;
 	private SpriteText _windowPreventsClosureText;
 
 	private bool _preventsClosure;
@@ -64,6 +66,21 @@ public class IWindowTest : TestScene
 					createActionButton(
 						"Set this test to not prevent Closing",
 						() => _preventsClosure = false),
+					createActionButton(
+						"Set icon to Azalea flower",
+						() => _window.SetIconFromStream(Assets.GetTextureStream("azalea-icon.png")!)),
+					createActionButton(
+						"Set icon to null",
+						() => _window.SetIconFromStream(null)),
+					createActionButton(
+						"Move window by (25, 25)",
+						() => _window.Position += new Vector2Int(25, 25)),
+					createActionButton(
+						"Center window",
+						() => _window.Center()),
+					createActionButton(
+						"Request Attention",
+						() => {_window.RequestAttention(); Console.WriteLine("The Window has requested attention"); })
 				}
 			},
 			new FlexContainer()
@@ -78,14 +95,23 @@ public class IWindowTest : TestScene
 					createInfoField("Title", _windowTitleText = new SpriteText()),
 					createInfoField("Resizable", _windowResizableText = new SpriteText()),
 					createInfoField("Prevents Closure", _windowPreventsClosureText = new SpriteText()),
+					createInfoField("Position", _windowPositionText = new SpriteText())
 				}
 			}
 		});
 
+		_windowStateText.Text = _window.State.ToString();
+		_windowTitleText.Text = _window.Title;
+		_windowResizableText.Text = _window.Resizable.ToString();
+		_windowPositionText.Text = _window.Position.ToString();
+		_windowPreventsClosureText.Text = _preventsClosure.ToString();
+
 		_lastState = _window.State;
 		_lastTitle = _window.Title;
 		_lastResizable = _window.Resizable;
+		_lastPosition = _window.Position;
 		_lastPreventsClosure = _preventsClosure;
+
 	}
 
 	private void onWindowClosing()
@@ -128,6 +154,7 @@ public class IWindowTest : TestScene
 	private string _lastTitle;
 	private bool _lastResizable;
 	private bool _lastPreventsClosure;
+	private Vector2Int _lastPosition;
 
 	protected override void Update()
 	{
@@ -160,6 +187,13 @@ public class IWindowTest : TestScene
 			else
 				Console.WriteLine($"Test no longer prevents closure attempts");
 			_lastPreventsClosure = _preventsClosure;
+		}
+
+		if (_window.Position != _lastPosition)
+		{
+			_windowPositionText.Text = _window.Position.ToString();
+			Console.WriteLine($"Window moved to {_window.Position}");
+			_lastPosition = _window.Position;
 		}
 	}
 }

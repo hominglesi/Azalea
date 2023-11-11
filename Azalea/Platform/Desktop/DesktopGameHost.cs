@@ -25,7 +25,6 @@ public class DesktopGameHost : GameHost
 		GL.Import();
 		GL.Enable(GLCapability.Blend);
 		GL.BlendFunc(GLBlendFunction.SrcAlpha, GLBlendFunction.OneMinusSrcAlpha);
-		Console.WriteLine(GL.GetString(GLStringName.Version));
 
 		_renderer = new GLRenderer(_window);
 		_input = new GLFWInput(_window.Handle);

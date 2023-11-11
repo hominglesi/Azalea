@@ -27,9 +27,4 @@ public class TextureData : ITextureData
 	{
 		return ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
 	}
-
-	static TextureData()
-	{
-		StbImage.stbi_set_flip_vertically_on_load(1);
-	}
 }

@@ -1,4 +1,5 @@
-﻿using Azalea.Platform.Desktop.Glfw;
+﻿using Azalea.Graphics.Textures;
+using Azalea.Platform.Desktop.Glfw;
 using Azalea.Platform.Desktop.Glfw.Enums;
 using Azalea.Platform.Desktop.Glfw.Native;
 using Azalea.Utils;
@@ -19,12 +20,6 @@ public class GLFWWindow : Disposable, IWindow
 	{
 		Resized?.Invoke(new Vector2Int(width, height));
 		_clientSize = new Vector2Int(width, height);
-	}
-
-	private readonly GLFW.WindowPositionCallback _onMoveCallback;
-	private void onMove(GLFW_Window _, int x, int y)
-	{
-		_position = new Vector2Int(x, y);
 	}
 
 	private readonly GLFW.WindowIconifyCallback _onInconifyCallback;
@@ -70,6 +65,7 @@ public class GLFWWindow : Disposable, IWindow
 		GLFW.WindowHint(GLFWWindowHint.ContextVersionMinor, 3);
 		GLFW.WindowHint(GLFWWindowHint.OpenGLProfile, (int)GLFWOpenGLProfile.Core);
 		GLFW.WindowHint(GLFWWindowHint.Resizable, _resizable);
+		GLFW.WindowHint(GLFWWindowHint.Visible, false);
 
 		Handle = GLFW.CreateWindow(_clientSize.X, _clientSize.Y, _title, null, null);
 		GLFW.MakeContextCurrent(Handle);
@@ -105,7 +101,26 @@ public class GLFWWindow : Disposable, IWindow
 	}
 
 	#endregion
+	#region Position
 
+	private Vector2Int _position;
+	public Vector2Int Position { get => _position; set => setPosition(value); }
+
+	private void setPosition(Vector2Int position)
+	{
+		if (State == WindowState.Normal)
+		{
+			GLFW.SetWindowPos(Handle, position.X, position.Y + _titleBarHeight);
+		}
+	}
+
+	private readonly GLFW.WindowPositionCallback _onMoveCallback;
+	private void onMove(GLFW_Window _, int x, int y)
+	{
+		_position = new Vector2Int(x, y);
+	}
+
+	#endregion
 	#region Resizable
 
 	private bool _resizable;
@@ -120,7 +135,13 @@ public class GLFWWindow : Disposable, IWindow
 	}
 
 	#endregion
+	#region Visibility
 
+	public void Show() => GLFW.ShowWindow(Handle);
+
+	public void Hide() => GLFW.HideWindow(Handle);
+
+	#endregion
 	#region Closing
 
 	private readonly GLFW.WindowCloseCallback _onCloseCallback;
@@ -149,9 +170,6 @@ public class GLFWWindow : Disposable, IWindow
 
 	public void SwapBuffers() => GLFW.SwapBuffers(Handle);
 
-	private Vector2Int _position;
-	public Vector2Int Position { get => _position; set => setWindowPosition(value); }
-
 	private Vector2Int _clientSize;
 	public Vector2Int ClientSize { get => _clientSize; set => GLFW.SetWindowSize(Handle, value.X, value.Y); }
 
@@ -166,20 +184,27 @@ public class GLFWWindow : Disposable, IWindow
 
 	public void Center()
 	{
+		var primaryMonitor = GLFW.GetPrimaryMonitor();
+		var workareaSize = GLFW.GetMonitorWorkarea(primaryMonitor);
 
+		Position = workareaSize / 2 - ClientSize / 2;
 	}
 
-	public void SetIconFromStream(Stream imageStream)
+	public void RequestAttention()
 	{
-
+		GLFW.RequestWindowAttention(Handle);
 	}
 
-	private void setWindowPosition(Vector2Int position)
+	public void SetIconFromStream(Stream? imageStream)
 	{
-		if (State == WindowState.Normal)
+		if (imageStream is null)
 		{
-			GLFW.SetWindowPos(Handle, position.X, position.Y + _titleBarHeight);
+			GLFW.SetWindowIcon(Handle, null);
+			return;
 		}
+
+		var data = new TextureData(TextureData.LoadFromStream(imageStream));
+		GLFW.SetWindowIcon(Handle, data);
 	}
 
 	private WindowProperties? _lastStateProperties;

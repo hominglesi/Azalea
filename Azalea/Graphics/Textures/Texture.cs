@@ -13,6 +13,8 @@ public class Texture : Disposable
 	public int Height => NativeTexture.Height;
 	public Vector2 Size => new(Width, Height);
 
+	public string AssetName { get; set; }
+
 	internal Texture(INativeTexture nativeTexture)
 	{
 		NativeTexture = nativeTexture ?? throw new ArgumentNullException(nameof(nativeTexture));

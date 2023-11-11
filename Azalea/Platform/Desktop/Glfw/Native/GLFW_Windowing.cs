@@ -1,5 +1,7 @@
 ﻿using Azalea.Graphics;
+using Azalea.Graphics.Textures;
 using Azalea.Platform.Desktop.Glfw.Enums;
+using Azalea.Platform.Desktop.Glfw.Structs;
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -34,6 +36,45 @@ internal static unsafe partial class GLFW
 	public static extern void SetWindowAttribute(GLFW_Window window, GLFWAttribute attribute, int value);
 	public static void SetWindowAttribute(GLFW_Window window, GLFWAttribute attribute, bool value)
 		=> SetWindowAttribute(window, attribute, value ? 1 : 0);
+
+	#endregion
+	#region Icon
+
+	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowIcon")]
+	private static extern void setWindowIcon(GLFW_Window window, int count, GLFWImage image);
+
+	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowIcon")]
+	private static extern void setWindowIcon(GLFW_Window window, int count, IntPtr nullPointer);
+
+	public static void SetWindowIcon(GLFW_Window window, ITextureData? data)
+	{
+		if (data is null)
+		{
+			setWindowIcon(window, 0, IntPtr.Zero);
+			return;
+		}
+
+		fixed (byte* p = data.Data)
+		{
+			var image = new GLFWImage(data.Width, data.Height, (IntPtr)p);
+			setWindowIcon(window, 1, image);
+		}
+	}
+
+	#endregion
+	#region Visibility
+
+	[DllImport(LibraryPath, EntryPoint = "glfwShowWindow")]
+	public static extern void ShowWindow(GLFW_Window window);
+
+	[DllImport(LibraryPath, EntryPoint = "glfwHideWindow")]
+	public static extern void HideWindow(GLFW_Window window);
+
+	#endregion
+	#region Focus
+
+	[DllImport(LibraryPath, EntryPoint = "glfwRequestWindowAttention")]
+	public static extern void RequestWindowAttention(GLFW_Window window);
 
 	#endregion
 	#region States
@@ -80,6 +121,12 @@ internal static unsafe partial class GLFW
 
 	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowPos")]
 	public static extern void SetWindowPos(GLFW_Window window, int x, int y);
+
+	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowPosCallback", CallingConvention = CallingConvention.Cdecl)]
+	[return: MarshalAs(UnmanagedType.FunctionPtr, MarshalTypeRef = typeof(WindowPositionCallback))]
+	public static extern WindowPositionCallback SetWindowPosCallback(GLFW_Window window, WindowPositionCallback callback);
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	public delegate void WindowPositionCallback(GLFW_Window window, int x, int y);
 
 	#endregion
 	#region Size

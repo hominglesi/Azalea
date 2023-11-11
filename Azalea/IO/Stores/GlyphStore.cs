@@ -111,13 +111,9 @@ public class GlyphStore : IResourceStore<TextureData>, IGlyphStore
 		int readableHeight = Math.Min(character.Height, page.Height - character.Y);
 		int readableWidth = Math.Min(character.Width, page.Width - character.X);
 
-		int pageSize = page.Width * page.Height;
-
-		//THIS CODE IS VERY WEIRD BECAUSE STBI LOADS IMAGES UPSIDE DOWN SO WE NEED TO ACCOUNT FOR THAT
-
 		for (int y = 0; y < character.Height; y++)
 		{
-			int readOffset = (pageSize - ((character.Y + y) * page.Width) - page.Width + character.X) * 4;
+			int readOffset = ((page.Width * (character.Y + y)) + character.X) * 4;
 			int targetOffset = y * character.Width * 4;
 
 			for (int x = 0; x < character.Width * 4; x += 4)

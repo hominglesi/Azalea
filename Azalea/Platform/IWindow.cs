@@ -5,12 +5,6 @@ namespace Azalea.Platform;
 
 public interface IWindow : IDisposable
 {
-	internal static Vector2Int CenterOffset = new(0, -10);
-
-	//Aproximate window center for 1920x1080 resolution
-	internal static Vector2Int AproximateCenterWindowPosition(Vector2Int windowSize)
-		=> new Vector2Int(960, 540) - (windowSize / 2) + CenterOffset;
-
 	internal bool ShouldClose { get; set; }
 
 	internal Action<Vector2Int>? Resized { get; set; }
@@ -51,10 +45,16 @@ public interface IWindow : IDisposable
 	/// </summary>
 	public void Center();
 
+
+	/// <summary>
+	/// Requests the users attention by highlighting the window
+	/// </summary>
+	public void RequestAttention();
+
 	/// <summary>
 	/// Sets the window icon.
 	/// </summary>
-	public void SetIconFromStream(Stream imageStream);
+	public void SetIconFromStream(Stream? imageStream);
 
 	/// <summary>
 	/// Called when the window is being closed. Can be used to prevent closure.
@@ -65,6 +65,16 @@ public interface IWindow : IDisposable
 	/// Closes the window
 	/// </summary>
 	public void Close();
+
+	/// <summary>
+	/// Shows a hidden window
+	/// </summary>
+	public void Show();
+
+	/// <summary>
+	/// Hides the window from the user
+	/// </summary>
+	public void Hide();
 
 	/// <summary>
 	/// Prevents the window closure attempt. This method is only valid within the <see cref="Closing"/> event.

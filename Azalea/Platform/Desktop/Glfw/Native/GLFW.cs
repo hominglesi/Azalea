@@ -24,16 +24,6 @@ internal static unsafe partial class GLFW
 
 	#endregion
 
-	#region Events
-
-	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowPosCallback", CallingConvention = CallingConvention.Cdecl)]
-	[return: MarshalAs(UnmanagedType.FunctionPtr, MarshalTypeRef = typeof(WindowPositionCallback))]
-	public static extern WindowPositionCallback SetWindowPosCallback(GLFW_Window window, WindowPositionCallback callback);
-	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-	public delegate void WindowPositionCallback(GLFW_Window window, int x, int y);
-
-	#endregion
-
 	#region Input
 
 	[DllImport(LibraryPath, EntryPoint = "glfwSetKeyCallback", CallingConvention = CallingConvention.Cdecl)]
@@ -102,6 +92,28 @@ internal static unsafe partial class GLFW
 		}
 
 		return axes;
+	}
+
+	#endregion
+
+	#region Monitors
+
+	[DllImport(LibraryPath, EntryPoint = "glfwGetPrimaryMonitor")]
+	public static extern GLFW_Monitor GetPrimaryMonitor();
+
+	[DllImport(LibraryPath, EntryPoint = "glfwGetMonitorWorkarea")]
+	private static extern GLFW_Monitor getMonitorWorkarea(GLFW_Monitor monitor, int* x, int* y, int* width, int* height);
+
+	public static Vector2Int GetMonitorWorkarea(GLFW_Monitor monitor)
+	{
+		int x;
+		int y;
+		int width;
+		int height;
+
+		getMonitorWorkarea(monitor, &x, &y, &width, &height);
+
+		return new Vector2Int(width, height);
 	}
 
 	#endregion
