@@ -1,4 +1,5 @@
-﻿using Azalea.Utils;
+﻿using Azalea.Platform.Desktop.Glfw.Structs;
+using Azalea.Utils;
 using System;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -114,6 +115,21 @@ internal static unsafe partial class GLFW
 		getMonitorWorkarea(monitor, &x, &y, &width, &height);
 
 		return new Vector2Int(width, height);
+	}
+
+	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowMonitor")]
+	public static extern void SetWindowMonitor(GLFW_Window window, GLFW_Monitor monitor, int x, int y, int width, int height, int refreshRate);
+
+	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowMonitor")]
+	public static extern void SetWindowMonitor(GLFW_Window window, IntPtr nullPointer, int x, int y, int width, int height, int refreshRate);
+
+	[DllImport(LibraryPath, EntryPoint = "glfwGetVideoMode")]
+	private static extern IntPtr getVideoMode(GLFW_Monitor monitor);
+
+	public static GLFWVideoMode GetVideoMode(GLFW_Monitor monitor)
+	{
+		var ptr = getVideoMode(monitor);
+		return Marshal.PtrToStructure<GLFWVideoMode>(ptr);
 	}
 
 	#endregion

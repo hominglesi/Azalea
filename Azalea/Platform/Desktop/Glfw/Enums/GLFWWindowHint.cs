@@ -5,5 +5,9 @@ public enum GLFWWindowHint
 	ContextVersionMajor = 0x00022002,
 	ContextVersionMinor = 0x00022003,
 	Resizable = 0x00020003,
-	Visible = 0x00020004
+	Visible = 0x00020004,
+	RedBits = 0x00021001,
+	GreenBits = 0x00021002,
+	BlueBits = 0x00021003,
+	RefreshRate = 0x0002100F,
 }

@@ -4,20 +4,19 @@ using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
 using Azalea.IO.Assets;
 using Azalea.Platform;
+using Azalea.Platform.Desktop;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace Azalea.VisualTests;
 public class IWindowTest : TestScene
 {
 	private IWindow _window;
-
-	private SpriteText _windowStateText;
-	private SpriteText _windowTitleText;
-	private SpriteText _windowResizableText;
-	private SpriteText _windowPositionText;
-	private SpriteText _windowPreventsClosureText;
+	private FlexContainer _observedContainer;
 
 	private bool _preventsClosure;
+	private FieldInfo _fullscreenField;
 
 	public IWindowTest()
 	{
@@ -42,6 +41,9 @@ public class IWindowTest : TestScene
 					createActionButton(
 						"Set WindowState to 'Maximized'",
 						() => _window.State = WindowState.Maximized),
+					createActionButton(
+						"Set WindowState to 'Fullscreen'",
+						() => _window.State = WindowState.Fullscreen),
 					createActionButton(
 						"Set Resizable to 'true'",
 						() => _window.Resizable = true),
@@ -80,38 +82,49 @@ public class IWindowTest : TestScene
 						() => _window.Center()),
 					createActionButton(
 						"Request Attention",
-						() => {_window.RequestAttention(); Console.WriteLine("The Window has requested attention"); })
+						() => {_window.RequestAttention(); Console.WriteLine("The Window has requested attention"); }),
+					createActionButton(
+						"Close window",
+						() => _window.Close())
 				}
 			},
-			new FlexContainer()
+			_observedContainer = new FlexContainer()
 			{
 				Origin = Anchor.TopRight,
 				Anchor = Anchor.TopRight,
 				Width = 300,
-				Direction = FlexDirection.Vertical,
-				Children = new GameObject[]
-				{
-					createInfoField("WindowState", _windowStateText = new SpriteText()),
-					createInfoField("Title", _windowTitleText = new SpriteText()),
-					createInfoField("Resizable", _windowResizableText = new SpriteText()),
-					createInfoField("Prevents Closure", _windowPreventsClosureText = new SpriteText()),
-					createInfoField("Position", _windowPositionText = new SpriteText())
-				}
+				Direction = FlexDirection.Vertical
 			}
 		});
 
-		_windowStateText.Text = _window.State.ToString();
-		_windowTitleText.Text = _window.Title;
-		_windowResizableText.Text = _window.Resizable.ToString();
-		_windowPositionText.Text = _window.Position.ToString();
-		_windowPreventsClosureText.Text = _preventsClosure.ToString();
+		_fullscreenField = typeof(GLFWWindow).GetField("_fullscreen", BindingFlags.NonPublic | BindingFlags.Instance)!;
 
-		_lastState = _window.State;
-		_lastTitle = _window.Title;
-		_lastResizable = _window.Resizable;
-		_lastPosition = _window.Position;
-		_lastPreventsClosure = _preventsClosure;
+		addObservedValue("WindowState",
+			() => _window.State,
+			(value) => $"Window state changed to {value}");
 
+		addObservedValue("Title",
+			() => _window.Title,
+			(value) => $"Window title changed to {value}");
+
+		addObservedValue("Resizable",
+			() => _window.Resizable,
+			(value) => $"Window resizable changed to {value}");
+
+		addObservedValue("Prevents Closure",
+			() => _preventsClosure,
+			(value) => value ? $"Test now prevents closure attempts" : $"Test no longer prevents closure attempts");
+
+		addObservedValue("Position",
+			() => _window.Position,
+			(value) => $"Window moved to {value}");
+
+		addObservedValue("Size",
+			() => _window.ClientSize,
+			(value) => $"Window resized to {value}");
+
+		addObservedValue("_fullscreen",
+			() => _fullscreenField.GetValue(_window));
 	}
 
 	private void onWindowClosing()
@@ -123,21 +136,9 @@ public class IWindowTest : TestScene
 		}
 	}
 
-	private FlexContainer createInfoField(string name, SpriteText valueText)
+	private void addObservedValue<T>(string name, ObservedValue<T>.ValueDelegate getter, ObservedValue<T>.LoggerDelegate? logger = null)
 	{
-		return new FlexContainer()
-		{
-			RelativeSizeAxes = Axes.X,
-			Size = new(1, 25),
-			Children = new GameObject[]
-			{
-				new SpriteText()
-				{
-					Text = $"{name}: "
-				},
-				valueText
-			}
-		};
+		_observedContainer.Add(new ObservedValue<T>(name, getter, logger));
 	}
 
 	private BasicButton createActionButton(string text, Action action)
@@ -150,50 +151,48 @@ public class IWindowTest : TestScene
 		};
 	}
 
-	private WindowState _lastState;
-	private string _lastTitle;
-	private bool _lastResizable;
-	private bool _lastPreventsClosure;
-	private Vector2Int _lastPosition;
-
-	protected override void Update()
+	private class ObservedValue<T> : FlexContainer
 	{
-		if (_window.State != _lastState)
-		{
-			_windowStateText.Text = _window.State.ToString();
-			Console.WriteLine($"Window state changed to {_window.State}");
-			_lastState = _window.State;
-		};
+		public delegate T ValueDelegate();
+		public delegate string LoggerDelegate(T value);
 
-		if (_window.Title != _lastTitle)
+		private ValueDelegate _getter;
+		private LoggerDelegate? _logger;
+		private SpriteText _valueText;
+
+		public T Value => _getter.Invoke();
+
+		public ObservedValue(string name, ValueDelegate getter, LoggerDelegate? logger = null)
 		{
-			_windowTitleText.Text = _window.Title;
-			Console.WriteLine($"Window title changed to {_window.Title}");
-			_lastTitle = _window.Title;
+			_getter = getter;
+			_logger = logger;
+
+			RelativeSizeAxes = Axes.X;
+			Size = new(1, 25);
+			Children = new GameObject[]
+			{
+				new SpriteText()
+				{
+					Text = $"{name}: "
+				},
+				_valueText = new SpriteText()
+			};
+
+			_lastValue = Value;
+			_valueText.Text = Value.ToString();
 		}
 
-		if (_window.Resizable != _lastResizable)
+		private T _lastValue;
+
+		protected override void Update()
 		{
-			_windowResizableText.Text = _window.Resizable.ToString();
-			Console.WriteLine($"Window resizable changed to {_window.Resizable}");
-			_lastResizable = _window.Resizable;
+			if (EqualityComparer<T>.Default.Equals(Value, _lastValue) == false)
+			{
+				_valueText.Text = Value.ToString()!;
+				Console.WriteLine(_logger?.Invoke(Value));
+				_lastValue = Value;
+			}
 		}
 
-		if (_preventsClosure != _lastPreventsClosure)
-		{
-			_windowPreventsClosureText.Text = _preventsClosure.ToString();
-			if (_preventsClosure)
-				Console.WriteLine($"Test now prevents closure attempts");
-			else
-				Console.WriteLine($"Test no longer prevents closure attempts");
-			_lastPreventsClosure = _preventsClosure;
-		}
-
-		if (_window.Position != _lastPosition)
-		{
-			_windowPositionText.Text = _window.Position.ToString();
-			Console.WriteLine($"Window moved to {_window.Position}");
-			_lastPosition = _window.Position;
-		}
 	}
 }

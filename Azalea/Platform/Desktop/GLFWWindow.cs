@@ -67,6 +67,13 @@ public class GLFWWindow : Disposable, IWindow
 		GLFW.WindowHint(GLFWWindowHint.Resizable, _resizable);
 		GLFW.WindowHint(GLFWWindowHint.Visible, false);
 
+		//Windowed borderless
+		var mode = GLFW.GetVideoMode(GLFW.GetPrimaryMonitor());
+		GLFW.WindowHint(GLFWWindowHint.RedBits, mode.RedBits);
+		GLFW.WindowHint(GLFWWindowHint.GreenBits, mode.GreenBits);
+		GLFW.WindowHint(GLFWWindowHint.BlueBits, mode.BlueBits);
+		GLFW.WindowHint(GLFWWindowHint.RefreshRate, mode.RefreshRate);
+
 		Handle = GLFW.CreateWindow(_clientSize.X, _clientSize.Y, _title, null, null);
 		GLFW.MakeContextCurrent(Handle);
 
@@ -175,6 +182,7 @@ public class GLFWWindow : Disposable, IWindow
 
 	private bool _minimized;
 	private bool _maximized;
+	private bool _fullscreen;
 	private WindowState _state;
 	public WindowState State { get => _state; set => setWindowState(value); }
 
@@ -207,15 +215,19 @@ public class GLFWWindow : Disposable, IWindow
 		GLFW.SetWindowIcon(Handle, data);
 	}
 
-	private WindowProperties? _lastStateProperties;
+	private WindowProperties _lastStateProperties;
 
 	private void unminimize()
 	{
-		WindowProperties props = _lastStateProperties ?? throw new Exception("When setting a window to minimized we need to save its properties");
-
-		if (props.Maximized)
+		if (_lastStateProperties.Maximized)
 		{
 			setWindowState(WindowState.Maximized);
+			return;
+		}
+
+		if (_lastStateProperties.Fullscreen)
+		{
+			setWindowState(WindowState.Fullscreen);
 			return;
 		}
 
@@ -229,45 +241,111 @@ public class GLFWWindow : Disposable, IWindow
 			_state = WindowState.Normal;
 	}
 
+	private void fullscreen()
+	{
+		if (_fullscreen) return;
+
+		_lastStateProperties.Maximized = _maximized;
+		_lastStateProperties.Minimized = _minimized;
+		_lastStateProperties.Size = ClientSize;
+		_lastStateProperties.Position = Position;
+
+		var monitor = GLFW.GetPrimaryMonitor();
+		var mode = GLFW.GetVideoMode(monitor);
+
+		GLFW.SetWindowMonitor(Handle, monitor, 0, 0, mode.Width, mode.Height, mode.RefreshRate);
+
+		_clientSize = new Vector2Int(mode.Width, mode.Height);
+		_position = Vector2Int.Zero;
+
+		_fullscreen = true;
+		_maximized = false;
+		_minimized = false;
+		_state = WindowState.BorderlessFullscreen;
+	}
+
+	private void unfullscreen()
+	{
+		var monitor = GLFW.GetPrimaryMonitor();
+		var mode = GLFW.GetVideoMode(monitor);
+
+		WindowProperties restored = _lastStateProperties;
+		GLFW.SetWindowMonitor(Handle, IntPtr.Zero, restored.Position.Y, restored.Position.X, restored.Size.X, restored.Size.Y, mode.RefreshRate);
+
+		_fullscreen = false;
+		_clientSize = restored.Size;
+		_position = restored.Position;
+
+		if (restored.Maximized) maximize();
+		if (restored.Minimized) minimize();
+	}
+
+	private void maximize()
+	{
+		if (_maximized) return;
+		if (_fullscreen) return;
+
+		_maximized = true;
+		_minimized = false;
+
+		GLFW.MaximizeWindow(Handle);
+		_state = WindowState.Maximized;
+	}
+
+	private void minimize()
+	{
+		if (_minimized) return;
+
+		_lastStateProperties.Minimized = false;
+		_lastStateProperties.Maximized = _maximized;
+		_lastStateProperties.Fullscreen = _fullscreen;
+
+		_minimized = true;
+		_maximized = false;
+		_fullscreen = false;
+
+		GLFW.IconifyWindow(Handle);
+		_state = WindowState.Minimized;
+	}
+
+	private void restore()
+	{
+		if (_minimized || _maximized)
+		{
+			_minimized = false;
+			_maximized = false;
+
+			GLFW.RestoreWindow(Handle);
+		}
+
+		if (_fullscreen)
+		{
+			unfullscreen();
+		}
+
+		_state = WindowState.Normal;
+	}
+
 	private void setWindowState(WindowState state)
 	{
 		if (state == WindowState.Minimized)
 		{
-			if (_minimized == true) return;
-
-			_lastStateProperties = new()
-			{
-				Minimized = false,
-				Maximized = _maximized
-			};
-
-			_minimized = true;
-			_maximized = false;
-
-			GLFW.IconifyWindow(Handle);
-			_state = WindowState.Minimized;
+			minimize();
 		}
 		else if (state == WindowState.Maximized)
 		{
-			if (_maximized == true) return;
-			_maximized = true;
-			_minimized = false;
-
-			GLFW.MaximizeWindow(Handle);
-			_state = WindowState.Maximized;
-
+			maximize();
 		}
 		else if (state == WindowState.Normal)
 		{
-			if (_minimized || _maximized)
-			{
-				_minimized = false;
-				_maximized = false;
-
-				GLFW.RestoreWindow(Handle);
-			}
-			_state = WindowState.Normal;
+			restore();
 		}
+		else if (state == WindowState.Fullscreen || state == WindowState.BorderlessFullscreen)
+		{
+			fullscreen();
+		}
+
+		Resized?.Invoke(ClientSize);
 	}
 
 	protected override void OnDispose()
@@ -280,5 +358,8 @@ public class GLFWWindow : Disposable, IWindow
 	{
 		public bool Minimized;
 		public bool Maximized;
+		public bool Fullscreen;
+		public Vector2Int Position;
+		public Vector2Int Size;
 	}
 }
