@@ -8,6 +8,7 @@ public struct HostPreferences
 	public WindowState PreferredWindowState = WindowState.Normal;
 	public bool WindowResizable = false;
 	public string WindowTitle = "Azalea Game";
+	public bool TransparentFramebuffer = false;
 
 	public HostPreferences() { }
 }

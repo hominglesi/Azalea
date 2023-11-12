@@ -70,8 +70,14 @@ internal static unsafe partial class GLFW
 	[DllImport(LibraryPath, EntryPoint = "glfwHideWindow")]
 	public static extern void HideWindow(GLFW_Window window);
 
+	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowOpacity")]
+	public static extern void SetWindowOpacity(GLFW_Window window, float opacity);
+
 	#endregion
 	#region Focus
+
+	[DllImport(LibraryPath, EntryPoint = "glfwFocusWindow")]
+	public static extern void FocusWindow(GLFW_Window window);
 
 	[DllImport(LibraryPath, EntryPoint = "glfwRequestWindowAttention")]
 	public static extern void RequestWindowAttention(GLFW_Window window);

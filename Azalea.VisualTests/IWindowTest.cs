@@ -16,7 +16,6 @@ public class IWindowTest : TestScene
 	private FlexContainer _observedContainer;
 
 	private bool _preventsClosure;
-	private FieldInfo _fullscreenField;
 
 	public IWindowTest()
 	{
@@ -84,6 +83,15 @@ public class IWindowTest : TestScene
 						"Request Attention",
 						() => {_window.RequestAttention(); Console.WriteLine("The Window has requested attention"); }),
 					createActionButton(
+						"Set Opacity to 1",
+						() => _window.Opacity = 1),
+					createActionButton(
+						"Set Opacity to 0.6",
+						() => _window.Opacity = 0.6f),
+					createActionButton(
+						"Set Opacity to 0.3",
+						() => _window.Opacity = 0.3f),
+					createActionButton(
 						"Close window",
 						() => _window.Close())
 				}
@@ -96,8 +104,6 @@ public class IWindowTest : TestScene
 				Direction = FlexDirection.Vertical
 			}
 		});
-
-		_fullscreenField = typeof(GLFWWindow).GetField("_fullscreen", BindingFlags.NonPublic | BindingFlags.Instance)!;
 
 		addObservedValue("WindowState",
 			() => _window.State,
@@ -123,8 +129,35 @@ public class IWindowTest : TestScene
 			() => _window.ClientSize,
 			(value) => $"Window resized to {value}");
 
+		addObservedValue("Opacity",
+			() => _window.Opacity,
+			(value) => $"Window opacity changed to {value}");
+
 		addObservedValue("_fullscreen",
-			() => _fullscreenField.GetValue(_window));
+			() => getField<bool>(_window, "_fullscreen"));
+
+		addObservedValue("_maximized",
+			() => getField<bool>(_window, "_maximized"));
+
+		addObservedValue("_minimized",
+			() => getField<bool>(_window, "_minimized"));
+
+		addObservedValue("_lastPosition",
+			() => getField<Vector2Int>(_window, "_lastPosition"));
+
+		addObservedValue("_lastSize",
+			() => getField<Vector2Int>(_window, "_lastSize"));
+
+		addObservedValue("_preMinimizedMaximized",
+			() => getField<bool>(_window, "_preMinimizedMaximized"));
+
+		addObservedValue("_preMinimizedFullscreen",
+			() => getField<bool>(_window, "_preMinimizedFullscreen"));
+	}
+
+	private T getField<T>(object? obj, string name)
+	{
+		return (T)typeof(GLFWWindow).GetField(name, BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(obj)!;
 	}
 
 	private void onWindowClosing()
@@ -156,11 +189,11 @@ public class IWindowTest : TestScene
 		public delegate T ValueDelegate();
 		public delegate string LoggerDelegate(T value);
 
-		private ValueDelegate _getter;
+		protected ValueDelegate _getter;
 		private LoggerDelegate? _logger;
 		private SpriteText _valueText;
 
-		public T Value => _getter.Invoke();
+		public virtual T Value => _getter.Invoke();
 
 		public ObservedValue(string name, ValueDelegate getter, LoggerDelegate? logger = null)
 		{
@@ -189,7 +222,8 @@ public class IWindowTest : TestScene
 			if (EqualityComparer<T>.Default.Equals(Value, _lastValue) == false)
 			{
 				_valueText.Text = Value.ToString()!;
-				Console.WriteLine(_logger?.Invoke(Value));
+				var logMessage = _logger?.Invoke(Value);
+				if (logMessage is not null) Console.WriteLine(logMessage);
 				_lastValue = Value;
 			}
 		}

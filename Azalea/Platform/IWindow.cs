@@ -41,10 +41,19 @@ public interface IWindow : IDisposable
 	public Vector2Int Position { get; set; }
 
 	/// <summary>
+	/// The opacity of this window and its decoration
+	/// </summary>
+	public float Opacity { get; set; }
+
+	/// <summary>
 	/// Centers the window on the users screen
 	/// </summary>
 	public void Center();
 
+	/// <summary>
+	/// Focuses the window for input
+	/// </summary>
+	public void Focus();
 
 	/// <summary>
 	/// Requests the users attention by highlighting the window
