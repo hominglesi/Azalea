@@ -1,4 +1,5 @@
-﻿using Azalea.Utils;
+﻿/*
+using Azalea.Utils;
 using Silk.NET.OpenAL;
 using System;
 using System.Buffers.Binary;
@@ -154,3 +155,4 @@ public class Sound : Disposable
 		_al.DeleteBuffer(Buffer);
 	}
 }
+*/

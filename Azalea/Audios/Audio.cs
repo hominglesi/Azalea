@@ -1,4 +1,5 @@
-﻿using Azalea.IO.Assets;
+﻿/*
+using Azalea.IO.Assets;
 using Silk.NET.OpenAL;
 using System;
 
@@ -72,3 +73,4 @@ public static unsafe class Audio
 		}
 	}
 }
+*/

@@ -1,4 +1,5 @@
-﻿using Azalea.Utils;
+﻿/*
+using Azalea.Utils;
 using Silk.NET.OpenAL;
 
 namespace Azalea.Audios;
@@ -41,3 +42,4 @@ public class AudioSource : Disposable
 		_al.DeleteSource(_handle);
 	}
 }
+*/

@@ -22,19 +22,7 @@
     <PackageReference Include="SharpFNT" Version="2.0.0">
       <PrivateAssets>compile</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Silk.NET" Version="2.17.1">
-      <PrivateAssets>compile</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="StbImageSharp" Version="2.27.13" />
-    <PackageReference Include="Veldrid" Version="4.9.0">
-      <PrivateAssets>compile</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Veldrid.SPIRV" Version="1.0.15">
-      <PrivateAssets>compile</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0">
-      <PrivateAssets>compile</PrivateAssets>
-    </PackageReference>
   </ItemGroup>
 	
 	<ItemGroup>
@@ -59,9 +47,4 @@
       <Visible>false</Visible>
     </Content>
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Resources\Shaders\" />
-  </ItemGroup>
-  
 </Project>

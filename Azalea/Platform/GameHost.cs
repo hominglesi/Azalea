@@ -1,4 +1,4 @@
-﻿using Azalea.Audios;
+﻿//using Azalea.Audios;
 using Azalea.Debugging;
 using Azalea.Design.Containers;
 using Azalea.Extentions;
@@ -65,7 +65,7 @@ public abstract class GameHost
 
 		Input.Initialize(_root);
 		Renderer.Initialize();
-		Audio.Initialize();
+		//Audio.Initialize();
 		Initialized?.Invoke();
 	}
 

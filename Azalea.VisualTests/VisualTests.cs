@@ -1,4 +1,4 @@
-﻿using Azalea.Audios;
+﻿//using Azalea.Audios;
 using Azalea.Graphics.Colors;
 using Azalea.IO.Stores;
 
@@ -6,10 +6,6 @@ namespace Azalea.VisualTests;
 
 public class VisualTests : AzaleaGame
 {
-	private Sound _sound;
-	private Sound _sound2;
-	private AudioInstance? _instance;
-
 	protected override void OnInitialize()
 	{
 		Resources.AddStore(new NamespacedResourceStore<byte[]>(new DllResourceStore(typeof(VisualTests).Assembly), "Resources"));
