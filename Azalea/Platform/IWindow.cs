@@ -31,9 +31,9 @@ public interface IWindow : IDisposable
 	public bool Resizable { get; set; }
 
 	/// <summary>
-	/// Controls the visibility of the cursor. (Default: true)
+	/// Controls if the window has its decorations or not
 	/// </summary>
-	public bool CursorVisible { get; set; }
+	public bool Decorated { get; set; }
 
 	/// <summary>
 	/// The position of this window on the users desktop

@@ -6,7 +6,7 @@ var host = Host.CreateHost(new HostPreferences
 {
 	PreferredClientSize = new Vector2Int(1280, 720),
 	WindowResizable = true,
-	WindowTitle = "Azalea Visual Tests"
+	WindowTitle = "Azalea Visual Tests",
 });
 
 host.Run(new VisualTests());

@@ -1,4 +1,5 @@
 ﻿using Azalea.Audios;
+using Azalea.Graphics.Colors;
 using Azalea.IO.Stores;
 
 namespace Azalea.VisualTests;
@@ -13,7 +14,7 @@ public class VisualTests : AzaleaGame
 	{
 		Resources.AddStore(new NamespacedResourceStore<byte[]>(new DllResourceStore(typeof(VisualTests).Assembly), "Resources"));
 
-		//Host.Renderer.ClearColor = Palette.Flowers.Azalea;
+		Host.Renderer.ClearColor = Palette.Flowers.Azalea;
 
 
 		//Add(new DefaultUserInputTest());

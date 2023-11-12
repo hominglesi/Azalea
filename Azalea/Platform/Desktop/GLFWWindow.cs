@@ -66,8 +66,13 @@ public class GLFWWindow : Disposable, IWindow
 		GLFW.WindowHint(GLFWWindowHint.OpenGLProfile, (int)GLFWOpenGLProfile.Core);
 		GLFW.WindowHint(GLFWWindowHint.Resizable, _resizable);
 		GLFW.WindowHint(GLFWWindowHint.Visible, false);
+
 		if (prefs.TransparentFramebuffer)
 			GLFW.WindowHint(GLFWWindowHint.TransparentFramebuffer, true);
+
+		_decorated = prefs.DecoratedWindow;
+		if (_decorated == false)
+			GLFW.WindowHint(GLFWWindowHint.Decorated, false);
 
 		//Windowed borderless
 		var mode = GLFW.GetVideoMode(GLFW.GetPrimaryMonitor());
@@ -97,19 +102,6 @@ public class GLFWWindow : Disposable, IWindow
 		_titleBarHeight = (int)GLFW.GetWindowFrameSize(Handle).Top;
 	}
 
-	#region Title
-
-	private string _title;
-
-	public string Title { get => _title; set => setTitle(value); }
-
-	private void setTitle(string title)
-	{
-		GLFW.SetWindowTitle(Handle, title);
-		_title = title;
-	}
-
-	#endregion
 	#region Position
 
 	private Vector2Int _position;
@@ -130,40 +122,67 @@ public class GLFWWindow : Disposable, IWindow
 	}
 
 	#endregion
-	#region Resizable
+
+	private string _title;
+	public string Title
+	{
+		get => _title;
+		set
+		{
+			if (_title == value) return;
+
+			GLFW.SetWindowTitle(Handle, value);
+
+			_title = value;
+		}
+	}
 
 	private bool _resizable;
-	public bool Resizable { get => _resizable; set => setResizable(value); }
-
-	private void setResizable(bool value)
+	public bool Resizable
 	{
-		if (_resizable == value) return;
+		get => _resizable;
+		set
+		{
+			if (_resizable == value) return;
 
-		_resizable = value;
-		GLFW.SetWindowAttribute(Handle, GLFWAttribute.Resizable, value);
+			GLFW.SetWindowAttribute(Handle, GLFWAttribute.Resizable, value);
+
+			_resizable = value;
+		}
 	}
 
-	#endregion
-	#region Visibility
+	private bool _decorated;
+	public bool Decorated
+	{
+		get => _decorated;
+		set
+		{
+			if (_decorated == value) return;
 
-	public void Show() => GLFW.ShowWindow(Handle);
+			GLFW.SetWindowAttribute(Handle, GLFWAttribute.Decorated, value);
 
-	public void Hide() => GLFW.HideWindow(Handle);
-
-	#endregion
-	#region Opacity
+			_decorated = value;
+		}
+	}
 
 	private float _opacity;
-	public float Opacity { get => _opacity; set => setOpacity(value); }
-
-	private void setOpacity(float value)
+	public float Opacity
 	{
-		var clamped = Math.Clamp(value, 0, 1);
-		GLFW.SetWindowOpacity(Handle, clamped);
-		_opacity = clamped;
+		get => _opacity;
+		set
+		{
+			if (_opacity == value) return;
+
+			var clamped = Math.Clamp(value, 0, 1);
+			GLFW.SetWindowOpacity(Handle, clamped);
+
+			_opacity = clamped;
+		}
 	}
 
-	#endregion
+	public void Show() => GLFW.ShowWindow(Handle);
+	public void Hide() => GLFW.HideWindow(Handle);
+
 	#region Closing
 
 	private readonly GLFW.WindowCloseCallback _onCloseCallback;

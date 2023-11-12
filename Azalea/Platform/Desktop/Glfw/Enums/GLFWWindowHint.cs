@@ -10,6 +10,6 @@ public enum GLFWWindowHint
 	GreenBits = 0x00021002,
 	BlueBits = 0x00021003,
 	RefreshRate = 0x0002100F,
-	TransparentFramebuffer = 0x0002000A
-
+	TransparentFramebuffer = 0x0002000A,
+	Decorated = 0x00020005
 }

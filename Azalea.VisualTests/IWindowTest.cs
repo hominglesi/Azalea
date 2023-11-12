@@ -92,6 +92,12 @@ public class IWindowTest : TestScene
 						"Set Opacity to 0.3",
 						() => _window.Opacity = 0.3f),
 					createActionButton(
+						"Set Decorated to true",
+						() => _window.Decorated = true),
+					createActionButton(
+						"Set Decorated to false",
+						() => _window.Decorated = false),
+					createActionButton(
 						"Close window",
 						() => _window.Close())
 				}
@@ -116,6 +122,10 @@ public class IWindowTest : TestScene
 		addObservedValue("Resizable",
 			() => _window.Resizable,
 			(value) => $"Window resizable changed to {value}");
+
+		addObservedValue("Decorated",
+			() => _window.Decorated,
+			(value) => $"Window decorated changed to {value}");
 
 		addObservedValue("Prevents Closure",
 			() => _preventsClosure,
