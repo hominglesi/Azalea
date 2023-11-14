@@ -1,10 +1,12 @@
 ﻿//using Azalea.Audios;
+using Azalea.Audio;
 using Azalea.Debugging;
 using Azalea.Design.Containers;
 using Azalea.Extentions;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Textures;
 using Azalea.Inputs;
+using Azalea.IO.Assets;
 using Azalea.IO.Stores;
 using System;
 using System.Diagnostics;
@@ -57,6 +59,10 @@ public abstract class GameHost
 			Time._deltaTime = (float)_stopwatch.Elapsed.TotalSeconds;
 			_stopwatch.Restart();
 		}
+
+		Window.Dispose();
+		AudioManager.Dispose();
+		Assets.DisposeAssets();
 	}
 
 	public virtual void CallInitialized()
@@ -65,7 +71,7 @@ public abstract class GameHost
 
 		Input.Initialize(_root);
 		Renderer.Initialize();
-		//Audio.Initialize();
+		AudioManager.Initialize();
 		Initialized?.Invoke();
 	}
 

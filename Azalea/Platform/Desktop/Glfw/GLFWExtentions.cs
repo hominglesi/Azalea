@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace Azalea.Platform.Desktop.Glfw;
-public static class GLFWExtentions
+internal static class GLFWExtentions
 {
 	public static Keys KeycodeToKey(int keycode)
 	{

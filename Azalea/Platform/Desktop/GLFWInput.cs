@@ -5,7 +5,7 @@ using Azalea.Platform.Desktop.Glfw.Native;
 using System.Collections.Generic;
 
 namespace Azalea.Platform.Desktop;
-public class GLFWInput : IInputManager
+internal class GLFWInput : IInputManager
 {
 	private GLFW_Window _window;
 

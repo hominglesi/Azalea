@@ -4,7 +4,7 @@ using Azalea.Graphics.Rendering;
 using System;
 
 namespace Azalea.Platform.Desktop;
-public class DesktopGameHost : GameHost
+internal class DesktopGameHost : GameHost
 {
 	public override IWindow Window => _window ?? throw new Exception("Cannot use Window before it is initialized");
 	private GLFWWindow _window;

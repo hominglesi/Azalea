@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace Azalea.Platform.Desktop.Glfw.Structs;
 
 [StructLayout(LayoutKind.Sequential)]
-public readonly struct GLFWImage
+internal readonly struct GLFWImage
 {
 	public readonly int Width;
 	public readonly int Height;

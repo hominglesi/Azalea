@@ -1,5 +1,5 @@
 ﻿namespace Azalea.Platform.Desktop.Glfw.Enums;
-public enum GLFWOpenGLProfile
+internal enum GLFWOpenGLProfile
 {
 	Any = 0,
 	Core = 0x00032001,

@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Azalea.Platform.Desktop.Glfw;
-public readonly struct GLFW_Monitor
+internal readonly struct GLFW_Monitor
 {
 	public readonly IntPtr NativePointer;
 

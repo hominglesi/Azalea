@@ -1,5 +1,5 @@
 ﻿namespace Azalea.Platform.Desktop.Glfw.Enums;
-public enum GLFWAttribute
+internal enum GLFWAttribute
 {
 	Decorated = 0x00020005,
 	Resizable = 0x00020003,

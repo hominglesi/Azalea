@@ -1,5 +1,5 @@
 ﻿namespace Azalea.Platform.Desktop.Glfw.Enums;
-public enum GLFWKeyEvent
+internal enum GLFWKeyEvent
 {
 	Release = 0,
 	Press = 1,

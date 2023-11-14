@@ -7,7 +7,7 @@ using System;
 using System.IO;
 
 namespace Azalea.Platform.Desktop;
-public class GLFWWindow : Disposable, IWindow
+internal class GLFWWindow : Disposable, IWindow
 {
 	public GLFW_Window Handle { get; init; }
 

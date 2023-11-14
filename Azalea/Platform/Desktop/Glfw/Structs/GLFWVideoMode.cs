@@ -2,7 +2,7 @@
 
 namespace Azalea.Platform.Desktop.Glfw.Structs;
 [StructLayout(LayoutKind.Explicit, Size = 24, Pack = 4)]
-public readonly struct GLFWVideoMode
+internal readonly struct GLFWVideoMode
 {
 	[FieldOffset(0)]
 	public readonly int Width;

@@ -18,15 +18,8 @@ public class VisualTests : AzaleaGame
 		//Add(new FlexTest());
 		//Add(new InputTest());
 		//Add(new PanningTest());
-		Add(new IWindowTest());
-		/*
-		_sound = Assets.GetSound("Audio/paramore.wav");
-		_sound2 = Assets.GetSound("Audio/audio.wav");
-
-		var color = Palette.Lime;
-		color.Luminance -= 0.45f;
-		Console.WriteLine(color);
-		*/
+		//Add(new IWindowTest());
+		Add(new AudioTest());
 	}
 
 	protected override void Update()

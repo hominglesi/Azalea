@@ -21,4 +21,9 @@ public static partial class Assets
 		_textures = game.Textures;
 		_fonts = game.Fonts;
 	}
+
+	internal static void DisposeAssets()
+	{
+		disposeAudio();
+	}
 }

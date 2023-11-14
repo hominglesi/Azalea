@@ -19,6 +19,10 @@ public abstract class Disposable : IDisposable
 		{
 			OnDispose();
 		}
+		else
+		{
+			Console.WriteLine($"The object '{this}' was garbage collected before being properly disposed.");
+		}
 
 		Disposed = true;
 	}
