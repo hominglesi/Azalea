@@ -1,5 +1,7 @@
 ﻿using Azalea.Audio;
+using Azalea.Design.UserInterface;
 using Azalea.Graphics;
+using Azalea.Inputs;
 using Azalea.IO.Assets;
 using System;
 
@@ -10,6 +12,7 @@ internal class AudioTest : TestScene
 	private Sound _hitnormal;
 
 	private AudioInstance _instance;
+	private Button _hitnormalButton;
 
 	public AudioTest()
 	{
@@ -20,9 +23,9 @@ internal class AudioTest : TestScene
 			CreateFullscreenVerticalFlex(new GameObject[]
 			{
 				CreateActionButton(
-					"Play 'goodkid.wav' at 0.1f",
-					() => _instance = AudioManager.Play(_goodkid, 0.1f)),
-				CreateActionButton(
+					"Vital play 'goodkid.wav' at 0.1f",
+					() => _instance = AudioManager.PlayVital(_goodkid, 0.1f)),
+				_hitnormalButton = CreateActionButton(
 					"Play 'hitnormal.wav' at 0.1f",
 					() => _instance = AudioManager.Play(_hitnormal, 0.1f)),
 				CreateActionButton(
@@ -31,6 +34,12 @@ internal class AudioTest : TestScene
 				CreateActionButton(
 					"Set _instance gain to 0.6f",
 					() => { if (_instance is not null) _instance.Gain = 0.6f; }),
+				CreateActionButton(
+					"Set master volume to 1f",
+					() => AudioManager.MasterVolume = 1f),
+				CreateActionButton(
+					"Set  master volume to 0.5f",
+					() => AudioManager.MasterVolume = 0.5f),
 				CreateActionButton(
 					"Stop _instance",
 					() => { _instance?.Stop(); }),
@@ -46,5 +55,17 @@ internal class AudioTest : TestScene
 					() => _instance is not null && _instance.Playing ? _instance.Gain : -1)
 			})
 		});
+	}
+
+	protected override void Update()
+	{
+		foreach (var key in Enum.GetValues<Keys>())
+		{
+			if (Input.GetKey(key).Down)
+				_hitnormalButton.SimulateClick();
+		}
+
+		if (Input.GetMouseButton(MouseButton.Left).Down)
+			_hitnormalButton.SimulateClick();
 	}
 }

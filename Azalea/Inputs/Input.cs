@@ -16,7 +16,13 @@ public static class Input
 	public static float MouseWheelDelta => _mouseWheelDelta;
 
 	public static ButtonState GetKey(Keys key) => GetKey((int)key);
-	public static ButtonState GetKey(int keycode) => _keyboardKeys[keycode];
+	public static ButtonState GetKey(int keycode)
+	{
+		if (keycode < (int)Keys.Amount)
+			return _keyboardKeys[keycode];
+		else
+			return _keyboardKeys[(int)Keys.Unknown];
+	}
 	public static ButtonState GetMouseButton(MouseButton button) => _mouseButtons[(int)button];
 	public static IJoystick GetJoystick(int i) => _joysticks[i];
 
