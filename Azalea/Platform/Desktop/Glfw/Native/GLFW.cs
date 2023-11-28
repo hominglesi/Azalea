@@ -33,6 +33,12 @@ internal static unsafe partial class GLFW
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	public delegate void KeyCallback(GLFW_Window window, int key, int scancode, int action, int mods);
 
+	[DllImport(LibraryPath, EntryPoint = "glfwSetCharCallback", CallingConvention = CallingConvention.Cdecl)]
+	[return: MarshalAs(UnmanagedType.FunctionPtr, MarshalTypeRef = typeof(CharCallback))]
+	public static extern CharCallback SetCharCallback(GLFW_Window window, CharCallback callback);
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	public delegate void CharCallback(GLFW_Window window, uint charCode);
+
 	[DllImport(LibraryPath, EntryPoint = "glfwSetCursorPosCallback", CallingConvention = CallingConvention.Cdecl)]
 	[return: MarshalAs(UnmanagedType.FunctionPtr, MarshalTypeRef = typeof(PositionCallback))]
 	public static extern PositionCallback SetCursorPosCallback(GLFW_Window window, PositionCallback callback);

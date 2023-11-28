@@ -4,6 +4,7 @@ using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace Azalea.VisualTests;
 
@@ -18,6 +19,7 @@ public class TestScene : Composition
 	{
 		return new FlexContainer()
 		{
+			Position = new Vector2(50, 50),
 			RelativeSizeAxes = Axes.Both,
 			Direction = FlexDirection.Vertical,
 			Spacing = new(5),

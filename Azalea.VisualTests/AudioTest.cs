@@ -59,6 +59,7 @@ internal class AudioTest : TestScene
 
 	protected override void Update()
 	{
+		/*
 		foreach (var key in Enum.GetValues<Keys>())
 		{
 			if (Input.GetKey(key).Down)
@@ -66,6 +67,8 @@ internal class AudioTest : TestScene
 		}
 
 		if (Input.GetMouseButton(MouseButton.Left).Down)
-			_hitnormalButton.SimulateClick();
+			_hitnormalButton.SimulateClick();*/
+
+		Console.WriteLine(Input.MousePosition);
 	}
 }

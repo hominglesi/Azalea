@@ -18,6 +18,9 @@ internal class GLFWInput : IInputManager
 		_keyCallback = onKeyEvent;
 		GLFW.SetKeyCallback(_window, _keyCallback);
 
+		_charCallback = onCharEvent;
+		GLFW.SetCharCallback(_window, _charCallback);
+
 		_mouseButtonCallback = onMouseButtonEvent;
 		GLFW.SetMouseButtonCallback(_window, _mouseButtonCallback);
 
@@ -67,6 +70,12 @@ internal class GLFWInput : IInputManager
 		{
 			Input.HandleKeyboardKeyRepeat(azkey);
 		}
+	}
+
+	private GLFW.CharCallback _charCallback;
+	private void onCharEvent(GLFW_Window window, uint charCode)
+	{
+		Input.HandleTextInput((char)charCode);
 	}
 
 	private GLFW.MouseButtonCallback _mouseButtonCallback;
