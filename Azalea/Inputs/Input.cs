@@ -16,8 +16,15 @@ public static class Input
 	public static float MouseWheelDelta => _mouseWheelDelta;
 
 	public static ButtonState GetKey(Keys key) => GetKey((int)key);
-	public static ButtonState GetKey(int keycode) => _keyboardKeys[keycode];
+	public static ButtonState GetKey(int keycode)
+	{
+		if (keycode < (int)Keys.Amount)
+			return _keyboardKeys[keycode];
+		else
+			return _keyboardKeys[(int)Keys.Unknown];
+	}
 	public static ButtonState GetMouseButton(MouseButton button) => _mouseButtons[(int)button];
+	public static IJoystick GetJoystick(int i) => _joysticks[i];
 
 	public static event Action<char>? OnTextInput;
 
@@ -31,6 +38,8 @@ public static class Input
 
 	internal static ButtonState[] _mouseButtons = new ButtonState[1];
 	internal static ButtonState[] _keyboardKeys = new ButtonState[1];
+	internal static IJoystick[] _joysticks = new IJoystick[_joystickSlots];
+	internal const int _joystickSlots = 8;
 
 	private static Vector2 _lastMousePosition = Vector2.Zero;
 	private static Vector2 _mousePosition = Vector2.Zero;
@@ -50,17 +59,20 @@ public static class Input
 
 		for (int i = 0; i < mouseButtonCount; i++)
 		{
-			_mouseButtons[i] = new ButtonState(i);
+			_mouseButtons[i] = new ButtonState();
 		}
 
-		var keyButtonCount = (int)Keys.LastKey;
+		var keyButtonCount = (int)Keys.Amount;
 		_keyboardKeys = new ButtonState[keyButtonCount];
 
 		for (int i = 0; i < keyButtonCount; i++)
 		{
-			_keyboardKeys[i] = new ButtonState(i);
+			_keyboardKeys[i] = new ButtonState();
+		}
 
-			_keyboardKeys[i].OnRepeat += HandleKeyboardKeyRepeat;
+		for (int i = 0; i < _joystickSlots; i++)
+		{
+
 		}
 	}
 
@@ -215,9 +227,9 @@ public static class Input
 			propagateInputEvent(new KeyUpEvent(key));
 	}
 
-	internal static void HandleKeyboardKeyRepeat(int keyCode)
+	internal static void HandleKeyboardKeyRepeat(Keys key)
 	{
-		propagateInputEvent(new KeyDownEvent((Keys)keyCode, true));
+		propagateInputEvent(new KeyDownEvent(key, true));
 	}
 
 	internal static void HandleTextInput(char input)

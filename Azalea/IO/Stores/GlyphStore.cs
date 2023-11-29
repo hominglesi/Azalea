@@ -1,9 +1,7 @@
 ﻿using Azalea.Graphics.Textures;
 using Azalea.Text;
 using SharpFNT;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Advanced;
-using SixLabors.ImageSharp.PixelFormats;
+using StbImageSharp;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,11 +10,11 @@ using System.Linq;
 
 namespace Azalea.IO.Stores;
 
-public class GlyphStore : IResourceStore<TextureUpload>, IGlyphStore
+public class GlyphStore : IResourceStore<TextureData>, IGlyphStore
 {
 	protected readonly string? AssetName;
 
-	protected readonly IResourceStore<TextureUpload>? TextureLoader;
+	protected readonly IResourceStore<TextureData>? TextureLoader;
 
 	public string? FontName { get; }
 
@@ -26,7 +24,7 @@ public class GlyphStore : IResourceStore<TextureUpload>, IGlyphStore
 
 	protected BitmapFont? Font;
 
-	public GlyphStore(ResourceStore<byte[]> store, string? assetName = null, IResourceStore<TextureUpload>? textureLoader = null)
+	public GlyphStore(ResourceStore<byte[]> store, string? assetName = null, IResourceStore<TextureData>? textureLoader = null)
 	{
 		Store = new ResourceStore<byte[]>(store);
 
@@ -61,14 +59,14 @@ public class GlyphStore : IResourceStore<TextureUpload>, IGlyphStore
 
 	public bool HasGlyph(char c) => Font?.Characters.ContainsKey(c) == true;
 
-	public virtual TextureUpload? GetPageImage(int page)
+	public virtual TextureData? GetPageImage(int page)
 	{
 		if (TextureLoader != null)
 			return TextureLoader.Get(GetFilenameForPage(page));
 
 		using var stream = Store.GetStream(GetFilenameForPage(page));
 		Debug.Assert(stream != null);
-		return new TextureUpload(stream);
+		return new TextureData(stream);
 	}
 
 	protected string GetFilenameForPage(int page)
@@ -89,7 +87,7 @@ public class GlyphStore : IResourceStore<TextureUpload>, IGlyphStore
 
 	public int GetKerning(char left, char right) => Font?.GetKerningAmount(left, right) ?? 0;
 
-	public TextureUpload? Get(string name)
+	public TextureData? Get(string name)
 	{
 		if (Font == null) return null;
 
@@ -101,28 +99,54 @@ public class GlyphStore : IResourceStore<TextureUpload>, IGlyphStore
 
 	protected int LoadedGlyphCount;
 
-	protected virtual TextureUpload LoadCharacter(Character character)
+	protected virtual TextureData LoadCharacter(Character character)
 	{
 		var page = GetPageImage(character.Page);
 		Debug.Assert(page != null);
 		LoadedGlyphCount++;
 
-		var image = new Image<Rgba32>(Configuration.Default, character.Width, character.Height);
 		var source = page.Data;
+		var target = new byte[character.Width * character.Height * 4];
 
 		int readableHeight = Math.Min(character.Height, page.Height - character.Y);
 		int readableWidth = Math.Min(character.Width, page.Width - character.X);
 
 		for (int y = 0; y < character.Height; y++)
 		{
-			var pixelRowMemory = image.DangerousGetPixelRowMemory(y);
-			int readOffset = (character.Y + y) * page.Width + character.X;
+			int readOffset = ((page.Width * (character.Y + y)) + character.X) * 4;
+			int targetOffset = y * character.Width * 4;
 
-			for (int x = 0; x < character.Width; x++)
-				pixelRowMemory.Span[x] = x < readableWidth && y < readableHeight ? source[readOffset + x] : new Rgba32(255, 255, 255, 0);
+			for (int x = 0; x < character.Width * 4; x += 4)
+			{
+				var sourcePixel = readOffset + x;
+				var targetPixel = targetOffset + x;
+
+				if (x / 4 < readableWidth && y / 4 < readableHeight)
+				{
+					target[targetPixel] = source[sourcePixel];
+					target[targetPixel + 1] = source[sourcePixel + 1];
+					target[targetPixel + 2] = source[sourcePixel + 2];
+					target[targetPixel + 3] = source[sourcePixel + 3];
+				}
+				else
+				{
+					target[targetPixel] = byte.MaxValue;
+					target[targetPixel + 1] = byte.MaxValue;
+					target[targetPixel + 2] = byte.MaxValue;
+					target[targetPixel + 3] = byte.MinValue;
+				}
+			}
 		}
 
-		return new TextureUpload(image);
+		var result = new ImageResult()
+		{
+			Width = character.Width,
+			Height = character.Height,
+			Data = target,
+			Comp = ColorComponents.RedGreenBlueAlpha,
+			SourceComp = ColorComponents.RedGreenBlueAlpha
+		};
+		return new TextureData(result);
 	}
 
 

@@ -1,4 +1,5 @@
 ﻿using Azalea.Design.Containers;
+using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using System;
 
@@ -20,5 +21,10 @@ public class Button : Composition
 	{
 		Action?.Invoke();
 		return true;
+	}
+
+	public void SimulateClick()
+	{
+		OnClick(new ClickEvent(MouseButton.Left, Position));
 	}
 }

@@ -22,37 +22,29 @@
     <PackageReference Include="SharpFNT" Version="2.0.0">
       <PrivateAssets>compile</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Silk.NET" Version="2.17.1">
-      <PrivateAssets>compile</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1">
-      <PrivateAssets>compile</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Veldrid" Version="4.9.0">
-      <PrivateAssets>compile</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Veldrid.SPIRV" Version="1.0.15">
-      <PrivateAssets>compile</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0">
-      <PrivateAssets>compile</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="StbImageSharp" Version="2.27.13" />
   </ItemGroup>
 	
 	<ItemGroup>
     <EmbeddedResource Include="Resources\**\*" />
+    <None Remove="resources\shaders\fragment_shader.glsl" />
+    <None Remove="resources\shaders\vertex_shader.glsl" />
     <None Remove="Resources\Textures\bullseye-pointer.png" />
     <None Include="Resources\Textures\azalea-icon.png" Pack="true" PackagePath="\" />
     <None Include="../README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup Label="FilesToCopy">
-    <Content Include="..\build\Azalea.targets" PackagePath="build\Azalea.targets" />
+    <Content Include="..\build\Azalea.targets" PackagePath="build\Azalea.targets" Visible="false" />
     <Content Include="..\build\Native\soft_oal.dll" Pack="true" PackagePath="native">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <Visible>false</Visible>
     </Content>
+    <Content Include="..\build\Native\glfw3.dll" Pack="true" PackagePath="native">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <Visible>false</Visible>
+    </Content>
   </ItemGroup>
-  
 </Project>

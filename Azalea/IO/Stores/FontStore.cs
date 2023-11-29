@@ -15,13 +15,13 @@ public class FontStore : TextureStore, ITexturedGlyphLookupStore
 
 	private readonly ConcurrentDictionary<(string, char), ITexturedCharacterGlyph?> _namespacedGlyphCache = new();
 
-	public FontStore(IRenderer renderer, IResourceStore<TextureUpload>? store = null, float scaleAdjust = 100)
+	public FontStore(IRenderer renderer, IResourceStore<TextureData>? store = null, float scaleAdjust = 100)
 		: base(renderer, store, scaleAdjust)
 	{
 
 	}
 
-	public override void AddTextureSource(IResourceStore<TextureUpload> store)
+	public override void AddTextureSource(IResourceStore<TextureData> store)
 	{
 		if (store is IGlyphStore gs)
 		{

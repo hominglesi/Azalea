@@ -1,8 +1,8 @@
 ﻿using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Graphics.Textures;
 using Azalea.Numerics;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
+using Azalea.Platform;
+using StbImageSharp;
 using System;
 using System.Collections.Generic;
 using AzaleaColor = Azalea.Graphics.Colors.Color;
@@ -31,23 +31,48 @@ internal abstract class Renderer : IRenderer
 
 	public bool AutomaticallyClear { get; set; } = true;
 
+	protected IWindow Window { get; init; }
+
+	public Renderer(IWindow window)
+	{
+		Window = window;
+
+		Window.Resized += SetViewport;
+	}
+
 	protected internal virtual void Initialize()
 	{
 		defaultQuadBatch = CreateQuadBatch(100);
 		currentActiveBatch = defaultQuadBatch;
 	}
 
-	private Texture? whitePixel;
-	public Texture WhitePixel => whitePixel ??= generateWhitePixel();
+	private Texture? _whitePixel;
+	public Texture WhitePixel => _whitePixel ??= generateWhitePixel();
 	private Texture generateWhitePixel()
 	{
 		var whitePixel = CreateTexture(1, 1);
-		var whitePixelData = new Image<Rgba32>(1, 1, new Rgba32 { R = 255, G = 255, B = 255, A = 255 });
-		whitePixel.SetData(new TextureUpload(whitePixelData));
+
+		var result = new ImageResult()
+		{
+			Width = 1,
+			Height = 1,
+			Data = new byte[4] { byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue },
+			SourceComp = ColorComponents.RedGreenBlueAlpha,
+			Comp = ColorComponents.RedGreenBlueAlpha
+		};
+
+		whitePixel.SetData(new TextureData(result));
 		return whitePixel;
 	}
 
 	protected abstract bool SetTextureImplementation(INativeTexture? texture, int unit);
+
+	public void SetViewport(Vector2Int size)
+	{
+		SetViewportImplementation(size);
+	}
+
+	protected abstract void SetViewportImplementation(Vector2Int size);
 
 	protected abstract IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size);
 	protected abstract INativeTexture CreateNativeTexture(int width, int height);

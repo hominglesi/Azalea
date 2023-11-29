@@ -1,58 +1,65 @@
 ﻿using Azalea.Graphics.Colors;
 using Azalea.Graphics.OpenGL.Batches;
+using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.OpenGL.Textures;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Numerics;
 using Azalea.Platform;
-using Silk.NET.OpenGL;
+using Azalea.Platform.Desktop;
 
 namespace Azalea.Graphics.OpenGL;
-
 internal class GLRenderer : Renderer
 {
-	private readonly GL _gl;
-	private readonly IWindow _window;
+	public GLRenderer(IWindow window)
+		: base(window) { }
 
-	public GLRenderer(GL gl, IWindow window)
+
+	private bool _firstFrame = true;
+	internal override void FinishFrame()
 	{
-		_gl = gl;
-		_window = window;
+		base.FinishFrame();
+
+		//One the first frame the textures are not correct for some reason
+		//so we hide it
+		if (_firstFrame)
+			_firstFrame = false;
+		else
+			((GLFWWindow)Window).SwapBuffers();
+
+		GL.PrintErrors();
+	}
+
+	protected override void SetViewportImplementation(Vector2Int size)
+	{
+		GL.Viewport(0, 0, size.X, size.Y);
 	}
 
 	protected internal override void SetClearColor(Color value)
-	{
-		_gl.ClearColor(value.RNormalized, value.GNormalized, value.BNormalized, value.ANormalized);
-	}
+		=> GL.ClearColor(value);
 
 	protected override void ClearImplementation(Color color)
-	{
-		_gl.Clear(ClearBufferMask.ColorBufferBit);
-	}
+		=> GL.Clear(GLBufferBit.Color);
 
 	protected override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
-		=> new GLVertexBatch<TexturedVertex2D>(this, _gl, _window, size);
+		=> new GLVertexBatch<TexturedVertex2D>(Window, size);
 
 	protected override INativeTexture CreateNativeTexture(int width, int height)
-		=> new GLTexture(this, _gl, width, height);
+		=> new GLTexture(this, width, height);
 
 	protected override bool SetTextureImplementation(INativeTexture? texture, int unit)
 	{
 		if (texture is null)
 		{
-			_gl.ActiveTexture(TextureUnit.Texture0 + unit);
-			_gl.BindTexture(TextureTarget.Texture2D, 0);
+			GL.ActiveTexture((uint)unit);
+			GL.BindTexture(GLTextureType.Texture2D, 0);
 			return true;
 		}
 
 		switch (texture)
 		{
 			case GLTexture glTexture:
-				if (glTexture.TextureId <= 0)
-					return false;
-
-				_gl.ActiveTexture(TextureUnit.Texture0 + unit);
-				_gl.BindTexture(TextureTarget.Texture2D, glTexture.TextureId);
+				glTexture.Bind((uint)unit);
 				break;
 		}
 
@@ -61,11 +68,19 @@ internal class GLRenderer : Renderer
 
 	protected override void SetScissorTestRectangle(RectangleInt scissorRectangle)
 	{
-		throw new System.NotImplementedException();
+		if (scissorRectangle.Width < 0) scissorRectangle.Width = 0;
+		if (scissorRectangle.Height < 0) scissorRectangle.Height = 0;
+
+		var framebufferHeight = Window.ClientSize.Y;
+
+		GL.Scissor(scissorRectangle.X, framebufferHeight - scissorRectangle.Y - scissorRectangle.Height, scissorRectangle.Width, scissorRectangle.Height);
 	}
 
 	protected override void SetScissorTestState(bool enabled)
 	{
-		throw new System.NotImplementedException();
+		if (enabled)
+			GL.Enable(GLCapability.ScissorTest);
+		else
+			GL.Disable(GLCapability.ScissorTest);
 	}
 }

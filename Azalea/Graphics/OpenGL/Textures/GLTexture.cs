@@ -1,50 +1,65 @@
-﻿using Azalea.Graphics.Rendering;
+﻿using Azalea.Graphics.OpenGL.Enums;
+using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Textures;
-using Silk.NET.OpenGL;
-using SixLabors.ImageSharp.PixelFormats;
+using Azalea.Utils;
+using System;
 
 namespace Azalea.Graphics.OpenGL.Textures;
-
-internal class GLTexture : INativeTexture
+internal class GLTexture : Disposable, INativeTexture
 {
-	protected readonly GLRenderer Renderer;
-	protected readonly GL _gl;
-	IRenderer INativeTexture.Renderer => Renderer;
+	private uint _handle;
 
-	public int Width { get; set; }
-	public int Height { get; set; }
+	private int _width;
+	private int _height;
+	private GLRenderer _renderer;
 
-	public uint TextureId => _textureId;
-	private uint _textureId;
-
-	public GLTexture(GLRenderer renderer, GL gl, int width, int height)
+	public GLTexture(GLRenderer renderer, int width, int height)
 	{
-		Renderer = renderer;
-		_gl = gl;
-		Width = width;
-		Height = height;
+		_renderer = renderer;
+		_width = width;
+		_height = height;
+
+		_handle = GL.GenTexture();
 	}
 
-	public unsafe void SetData(ITextureUpload upload)
+	internal void SetData(ITextureData image)
 	{
-		_textureId = _gl.GenTexture();
-		_gl.ActiveTexture(TextureUnit.Texture0);
-		_gl.BindTexture(TextureTarget.Texture2D, _textureId);
+		if (image.Width != _width || image.Height != _height)
+		{
+			Console.WriteLine("Provided image was not the correct size");
+			return;
+		}
 
-		_gl.TextureParameter(_textureId, TextureParameterName.TextureMinLod, 0);
-		_gl.TextureParameter(_textureId, TextureParameterName.TextureMaxLod, IRenderer.MAX_MIPMAP_LEVELS);
+		Bind(0);
 
-		_gl.TextureParameter(_textureId, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-		_gl.TextureParameter(_textureId, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MinFilter, (int)GLFunction.Linear);
+		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MagFilter, (int)GLFunction.Linear);
+		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.WrapS, (int)GLWrapFunction.ClampToEdge);
+		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.WrapT, (int)GLWrapFunction.ClampToEdge);
 
-		_gl.TextureParameter(_textureId, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-		_gl.TextureParameter(_textureId, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+		GL.TexImage2D(GLTextureType.Texture2D, 0, GLColorFormat.RGBA,
+			_width, _height, 0, GLColorFormat.RGBA, GLDataType.UnsignedByte, image.Data);
 
-		fixed (Rgba32* ptr = upload.Data)
-			_gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba, (uint)Width,
-				(uint)Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, ptr);
+		GL.GenerateMipmap(GLTextureType.Texture2D);
+	}
+
+	public void Bind(uint slot = 0)
+	{
+		GL.ActiveTexture(slot);
+		GL.BindTexture(GLTextureType.Texture2D, _handle);
+	}
+
+	public void Unbind() => GL.BindTexture(GLTextureType.Texture2D, 0);
+
+	public IRenderer Renderer => _renderer;
+	public int Width => _width;
+	public int Height => _height;
 
 
-		_gl.GenerateMipmap(TextureTarget.Texture2D);
+	void INativeTexture.SetData(ITextureData upload) => SetData(upload);
+
+	protected override void OnDispose()
+	{
+		GL.DeleteTexture(_handle);
 	}
 }

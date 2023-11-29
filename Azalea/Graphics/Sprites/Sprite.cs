@@ -17,7 +17,7 @@ public class Sprite : GameObject
 			texture = value;
 
 			if (Size == Vector2.Zero)
-				Size = new Vector2(texture?.DisplayWidth ?? 0, texture?.DisplayHeight ?? 0);
+				Size = new Vector2(texture?.Width ?? 0, texture?.Height ?? 0);
 		}
 	}
 

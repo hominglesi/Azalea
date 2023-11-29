@@ -1,5 +1,5 @@
 ﻿using Azalea;
-using Azalea.Design.Compositions;
+using Azalea.Design.Containers;
 using Azalea.Extentions;
 using Azalea.Graphics;
 using Azalea.Utils;
@@ -9,7 +9,7 @@ using System.Numerics;
 
 namespace SampleGame.Elements;
 
-public class MemoryField : GridComposition
+public class MemoryField : GridContainer
 {
 	private readonly ImagePool _pool;
 	private readonly Vector2Int _gridSize;

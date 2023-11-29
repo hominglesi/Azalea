@@ -8,6 +8,7 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Layout;
+using Azalea.Platform;
 using System;
 using System.Numerics;
 
@@ -19,6 +20,7 @@ public class TestingTestScene : TestScene
 	private Composition _comp;
 	private TextContainer _composition;
 	private BasicTextBox _text;
+	private Box _cursor;
 
 	private SpriteText _scrollDisplay;
 
@@ -142,7 +144,10 @@ public class TestingTestScene : TestScene
 			}
 		});*/
 
-
+		Add(_cursor = new Box()
+		{
+			Size = new(50, 50)
+		});
 
 	}
 
@@ -151,7 +156,7 @@ public class TestingTestScene : TestScene
 		//_composition.Size = Input.MousePosition - _composition.ToScreenSpace(_composition.Position);
 		//_scrollDisplay.Text = (float.Parse(_scrollDisplay.Text) + Input.MouseWheelDelta).ToString();
 
-		if (Input.GetKey(Keys.P).Down && _composition.Children.Count > 0) _composition.Remove(_composition.Children[0]);
+		_cursor.Position = Input.MousePosition;
 
 		if (Input.GetKey(Keys.Space).DownOrRepeat) Console.WriteLine("Pressed space");
 
@@ -161,6 +166,17 @@ public class TestingTestScene : TestScene
 			_comp.InternalComposition.Invalidate(Invalidation.RequiredParentSizeToFit, InvalidationSource.Child);
 		}
 
-		if (Input.GetKey(Keys.O).Down) _text.FinishAmends();
+		if (Input.GetKey(Keys.P).Down)
+		{
+			AzaleaGame.Main.Host.Window.State = WindowState.Normal;
+		}
+		else if (Input.GetKey(Keys.O).Down)
+		{
+			AzaleaGame.Main.Host.Window.State = WindowState.Minimized;
+		}
+		else if (Input.GetKey(Keys.I).Down)
+		{
+			AzaleaGame.Main.Host.Window.State = WindowState.Maximized;
+		}
 	}
 }

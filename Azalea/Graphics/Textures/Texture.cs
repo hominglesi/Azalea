@@ -1,56 +1,43 @@
 ﻿using Azalea.Graphics.Rendering;
+using Azalea.Utils;
 using System;
 using System.IO;
 using System.Numerics;
 
 namespace Azalea.Graphics.Textures;
 
-public class Texture : IDisposable
+public class Texture : Disposable
 {
 	internal virtual INativeTexture NativeTexture { get; }
-	public string AssetName = string.Empty;
+	public int Width => NativeTexture.Width;
+	public int Height => NativeTexture.Height;
+	public Vector2 Size => new(Width, Height);
 
-	public float ScaleAdjust = 1;
-
-	public float DisplayWidth => Width / ScaleAdjust;
-	public float DisplayHeight => Height / ScaleAdjust;
+	public string AssetName { get; set; }
 
 	internal Texture(INativeTexture nativeTexture)
 	{
 		NativeTexture = nativeTexture ?? throw new ArgumentNullException(nameof(nativeTexture));
 	}
 
-	public int Width => NativeTexture.Width;
-
-	public int Height => NativeTexture.Height;
-
-	public Vector2 Size => new(Width, Height);
-
 	public static Texture? FromStream(IRenderer renderer, Stream? stream)
 	{
 		if (stream is null || stream.Length == 0)
 			return null;
 
-		var data = new TextureUpload(stream);
+		var data = new TextureData(stream);
 		Texture texture = renderer.CreateTexture(data.Width, data.Height);
 		texture.SetData(data);
 		return texture;
 	}
 
-	internal void SetData(ITextureUpload upload) => setData(upload);
-
-	internal virtual void setData(ITextureUpload upload)
+	internal void SetData(ITextureData upload)
 	{
 		NativeTexture.SetData(upload);
 	}
 
-	public override string ToString() => $@"{AssetName} ({Width}, {Height})";
-
-	public void Dispose()
+	protected override void OnDispose()
 	{
-		Dispose(true);
-		GC.SuppressFinalize(this);
+		NativeTexture.Dispose();
 	}
-
-	protected virtual void Dispose(bool isDisposing) { }
 }
