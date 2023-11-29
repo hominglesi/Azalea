@@ -1,6 +1,4 @@
-﻿using Azalea.IO.Assets;
-using Azalea.IO.Stores;
-using Azalea.Layout;
+﻿using Azalea.Layout;
 using Azalea.Text;
 using System;
 using System.Collections.Generic;
@@ -12,12 +10,8 @@ public partial class SpriteText : GameObject
 {
 	private static readonly char[] default_never_fixed_width_characters = { '.', ',', ':', ' ' };
 
-	private FontStore _store { get; set; }
-
 	public SpriteText()
 	{
-		_store = Assets.Fonts;
-
 		AddLayout(_charactersCache);
 	}
 
@@ -198,8 +192,6 @@ public partial class SpriteText : GameObject
 
 	private void computeCharacters()
 	{
-		if (_store == null) return;
-
 		if (_charactersCache.IsValid) return;
 
 		_characterBacking.Clear();
@@ -238,21 +230,21 @@ public partial class SpriteText : GameObject
 
 	private TextBuilder? _textBuilderCache;
 
-	protected virtual TextBuilder CreateTextBuilder(ITexturedGlyphLookupStore store)
+	protected virtual TextBuilder CreateTextBuilder()
 	{
 		char[] excludeCharacters = FixedWidthExcludeCharacters ?? default_never_fixed_width_characters;
 
 		float builderMaxWidth = _requiresAutoSizedWidth ? MaxWidth
 			: ApplyRelativeAxes(RelativeSizeAxes, new Vector2(Math.Min(MaxWidth, base.Width), base.Height), FillMode).X - Padding.Right;
 
-		return new TextBuilder(store, Font, builderMaxWidth, UseFullGlyphHeight, new Vector2(Padding.Left, Padding.Top), Spacing,
+		return new TextBuilder(Font, builderMaxWidth, UseFullGlyphHeight, new Vector2(Padding.Left, Padding.Top), Spacing,
 			_characterBacking, excludeCharacters, FallbackCharacter, FixedWidthReferenceCharacter);
 	}
 
 	private TextBuilder getTextBuilder()
 	{
 		if (_textBuilderCache is null)
-			return _textBuilderCache = CreateTextBuilder(_store);
+			return _textBuilderCache = CreateTextBuilder();
 
 		return _textBuilderCache;
 	}

@@ -1,6 +1,6 @@
 ﻿//using Azalea.Audios;
 using Azalea.Graphics.Colors;
-using Azalea.IO.Stores;
+using Azalea.IO.Resources;
 
 namespace Azalea.VisualTests;
 
@@ -8,7 +8,7 @@ public class VisualTests : AzaleaGame
 {
 	protected override void OnInitialize()
 	{
-		Resources.AddStore(new NamespacedResourceStore<byte[]>(new DllResourceStore(typeof(VisualTests).Assembly), "Resources"));
+		Assets.AddToMainStore(new AssemblyResourceStore(typeof(VisualTests).Assembly));
 
 		Host.Renderer.ClearColor = Palette.Flowers.Azalea;
 
@@ -18,8 +18,8 @@ public class VisualTests : AzaleaGame
 		//Add(new FlexTest());
 		//Add(new InputTest());
 		//Add(new PanningTest());
-		//Add(new IWindowTest());
-		Add(new AudioTest());
+		Add(new IWindowTest());
+		//Add(new AudioTest());
 	}
 
 	protected override void Update()

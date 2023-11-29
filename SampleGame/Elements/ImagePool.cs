@@ -1,19 +1,21 @@
 ﻿using Azalea.Graphics.Textures;
+using Azalea.IO.Resources;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace SampleGame.Elements;
 
 public class ImagePool
 {
 	private readonly string[] _images;
-	private ITextureStore _store;
-	public ImagePool(ITextureStore tilesStore)
+	private IResourceStore _store;
+	public ImagePool(IResourceStore tilesStore)
 	{
 		_store = tilesStore;
-		_images = (string[])tilesStore.GetAvalibleResources();
+		_images = tilesStore.GetAvalibleResources().ToArray();
 	}
 
 	public List<Texture> GenerateTiles(int count)
@@ -29,7 +31,7 @@ public class ImagePool
 		while (count > 0)
 		{
 			var tile = remainingImages.Random();
-			var tileTexture = _store.Get(tile);
+			var tileTexture = _store.GetTexture(tile);
 			Debug.Assert(tileTexture != null);
 
 			tileTexture.AssetName = tile;

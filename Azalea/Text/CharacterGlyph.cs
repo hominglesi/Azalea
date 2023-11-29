@@ -1,6 +1,4 @@
-﻿using Azalea.IO.Stores;
-
-namespace Azalea.Text;
+﻿namespace Azalea.Text;
 
 public class CharacterGlyph : ICharacterGlyph
 {
@@ -10,11 +8,11 @@ public class CharacterGlyph : ICharacterGlyph
 	public float Baseline { get; }
 	public char Character { get; }
 
-	private readonly IGlyphStore? _containingStore;
+	private readonly FontData _containingFont;
 
-	public CharacterGlyph(char character, float xOffset, float yOffset, float xAdvance, float baseline, IGlyphStore? containingStore)
+	public CharacterGlyph(char character, float xOffset, float yOffset, float xAdvance, float baseline, FontData containingStore)
 	{
-		_containingStore = containingStore;
+		_containingFont = containingStore;
 
 		Character = character;
 		XOffset = xOffset;
@@ -25,5 +23,5 @@ public class CharacterGlyph : ICharacterGlyph
 
 	public float GetKerning<T>(T lastGlyph)
 		where T : ICharacterGlyph
-		=> _containingStore?.GetKerning(lastGlyph.Character, Character) ?? 0;
+		=> _containingFont.GetKerning(lastGlyph.Character, Character);
 }

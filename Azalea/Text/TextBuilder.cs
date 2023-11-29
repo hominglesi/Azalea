@@ -1,5 +1,6 @@
 ﻿using Azalea.Extentions;
 using Azalea.Graphics.Sprites;
+using Azalea.IO.Resources;
 using Azalea.Numerics;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,6 @@ public class TextBuilder
 	private readonly char[] _neverFixedWidthCharacters;
 	private readonly char _fallbackCharacter;
 	private readonly char _fixedWidthReferenceCharacter;
-	private readonly ITexturedGlyphLookupStore _store;
 	private readonly FontUsage _font;
 	private readonly bool _useFontSizeAsHeight;
 	private readonly Vector2 _startOffset;
@@ -39,11 +39,10 @@ public class TextBuilder
 		}
 	}
 
-	public TextBuilder(ITexturedGlyphLookupStore store, FontUsage font, float maxWidth = float.MaxValue, bool useFontSizeAsHeight = true,
+	public TextBuilder(FontUsage font, float maxWidth = float.MaxValue, bool useFontSizeAsHeight = true,
 		Vector2 startOffset = default, Vector2 spacing = default, List<TextBuilderGlyph>? characterList = null,
 		char[]? neverFixedWidthCharacters = null, char fallbackCharacter = '?', char fixedWidthReferenceCharacter = 'm')
 	{
-		_store = store;
 		_font = font;
 		_useFontSizeAsHeight = useFontSizeAsHeight;
 		_startOffset = startOffset;
@@ -257,9 +256,9 @@ public class TextBuilder
 
 	private ITexturedCharacterGlyph? getTexturedGlyph(char character)
 	{
-		return _store.Get(_font.FontName, character)
-			?? _store.Get(string.Empty, character)
-			?? _store.Get(_font.FontName, _fallbackCharacter)
-			?? _store.Get(string.Empty, _fallbackCharacter);
+		return Assets.MainStore.GetGlyph(_font.FontName, character)
+			?? Assets.MainStore.GetGlyph(string.Empty, character)
+			?? Assets.MainStore.GetGlyph(_font.FontName, _fallbackCharacter)
+			?? Assets.MainStore.GetGlyph(string.Empty, _fallbackCharacter);
 	}
 }

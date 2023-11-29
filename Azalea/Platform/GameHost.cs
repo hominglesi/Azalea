@@ -4,10 +4,8 @@ using Azalea.Debugging;
 using Azalea.Design.Containers;
 using Azalea.Extentions;
 using Azalea.Graphics.Rendering;
-using Azalea.Graphics.Textures;
 using Azalea.Inputs;
-using Azalea.IO.Assets;
-using Azalea.IO.Stores;
+using Azalea.IO.Resources;
 using System;
 using System.Diagnostics;
 using System.Numerics;
@@ -95,9 +93,6 @@ public abstract class GameHost
 
 		Input.LateUpdate();
 	}
-
-	public virtual IResourceStore<TextureData> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore)
-		=> new TextureLoaderStore(underlyingStore);
 
 	protected virtual IClipboard? CreateClipboard() => null;
 }

@@ -1,10 +1,10 @@
 ﻿using Azalea;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
-using Azalea.Graphics.Textures;
 using Azalea.Inputs;
-using Azalea.IO.Stores;
+using Azalea.IO.Resources;
 using SampleGame.Elements;
+using System;
 using System.Numerics;
 
 namespace SampleGame;
@@ -15,19 +15,24 @@ public class MemoryGame : AzaleaGame
 	private MemoryLogic? _logic;
 	private ImagePool? _images;
 
-	private TextureStore? _tilesStore;
+	private IResourceStore? _tilesStore;
 
 	protected override void OnInitialize()
 	{
 		Host.Renderer.ClearColor = new Color(189, 223, 214);
 		Host.Window.Resizable = true;
 
-		Resources.AddStore(new NamespacedResourceStore<byte[]>(new DllResourceStore(typeof(MemoryGame).Assembly), "Resources"));
-		_tilesStore = new TextureStore(Host.Renderer,
-			Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, "Textures/Tiles")));
+		var assemblyStore = new NamespacedResourceStore(new AssemblyResourceStore(typeof(MemoryGame).Assembly), "Resources");
+
+		Assets.AddToMainStore(assemblyStore);
+		_tilesStore = new NamespacedResourceStore(assemblyStore, "Textures/Tiles");
+		foreach (var item in _tilesStore.GetAvalibleResources())
+		{
+			Console.WriteLine(item);
+		}
 		_images = new ImagePool(_tilesStore);
 
-		AddFont(Resources, @"Fonts/Roboto-Medium");
+		Assets.AddFont("Fonts/Roboto-Medium.fnt", "Roboto-Medium");
 
 		Add(_field = new MemoryField(new Vector2(0.72f, 0.98f), new Vector2Int(4, 4), _images)
 		{

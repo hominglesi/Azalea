@@ -2,7 +2,7 @@
 using Azalea.Graphics.Shapes;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
-using Azalea.IO.Assets;
+using Azalea.IO.Resources;
 using Azalea.Utils;
 using System.Numerics;
 using System.Timers;

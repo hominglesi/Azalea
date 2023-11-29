@@ -1,5 +1,5 @@
 ﻿using Azalea.Graphics;
-using Azalea.IO.Assets;
+using Azalea.IO.Resources;
 using Azalea.Platform;
 using System;
 using System.Reflection;
@@ -57,7 +57,7 @@ public class IWindowTest : TestScene
 					() => _preventsClosure = false),
 				CreateActionButton(
 					"Set icon to Azalea flower",
-					() => _window.SetIconFromStream(Assets.GetTextureStream("azalea-icon.png")!)),
+					() => _window.SetIconFromStream(Assets.GetStream("azalea-icon.png")!)),
 				CreateActionButton(
 					"Set icon to null",
 					() => _window.SetIconFromStream(null)),

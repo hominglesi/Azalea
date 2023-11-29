@@ -26,6 +26,11 @@ public class Texture : Disposable
 			return null;
 
 		var data = new TextureData(stream);
+		return FromData(renderer, data);
+	}
+
+	public static Texture? FromData(IRenderer renderer, TextureData data)
+	{
 		Texture texture = renderer.CreateTexture(data.Width, data.Height);
 		texture.SetData(data);
 		return texture;

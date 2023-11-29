@@ -2,7 +2,7 @@
 using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Inputs;
-using Azalea.IO.Assets;
+using Azalea.IO.Resources;
 using System;
 
 namespace Azalea.VisualTests;
@@ -16,8 +16,8 @@ internal class AudioTest : TestScene
 
 	public AudioTest()
 	{
-		_goodkid = Assets.GetSound(@"D:\Programming\Azalea\Azalea.VisualTests\Resources\Audio\goodkid.wav");
-		_hitnormal = Assets.GetSound(@"D:\Programming\Azalea\Azalea.VisualTests\Resources\Audio\hitnormal.wav");
+		_goodkid = Assets.GetSound("Resources/Audio/goodkid.wav");
+		_hitnormal = Assets.GetSound("Resources/Audio/hitnormal.wav");
 
 		AddRange(new GameObject[] {
 			CreateFullscreenVerticalFlex(new GameObject[]

@@ -4,5 +4,5 @@ namespace Azalea.Graphics;
 
 public static class FrameworkFont
 {
-	public static FontUsage Regular => new("Fonts/Roboto/Roboto", weight: "Regular");
+	public static FontUsage Regular => new("Roboto", weight: "Regular");
 }

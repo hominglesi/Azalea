@@ -1,10 +1,10 @@
 ﻿using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
+using Azalea.IO.Resources;
 using Azalea.Platform;
 using Azalea.Utils;
 using System;
-using System.IO;
 using System.Numerics;
 
 namespace Azalea.Graphics.OpenGL.Batches;
@@ -53,8 +53,8 @@ internal class GLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 		_vertexArray.AddBuffer(_vertexBuffer, vbLayout);
 		_vertices = new float[size * IRenderer.VERTICES_PER_QUAD * _stride];
 
-		var vertexShaderSource = File.ReadAllText("D:\\Programming\\Azalea\\Azalea\\Resources\\Shaders\\vertex_shader.glsl");
-		var fragmentShaderSource = File.ReadAllText("D:\\Programming\\Azalea\\Azalea\\Resources\\Shaders\\fragment_shader.glsl");
+		var vertexShaderSource = Assets.GetText("Shaders/vertex_shader.glsl")!;
+		var fragmentShaderSource = Assets.GetText("Shaders/fragment_shader.glsl")!;
 		_shader = new GLShader(vertexShaderSource, fragmentShaderSource);
 	}
 

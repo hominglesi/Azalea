@@ -4,7 +4,7 @@ using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.Textures;
-using Azalea.IO.Assets;
+using Azalea.IO.Resources;
 using System;
 using System.Numerics;
 
@@ -12,7 +12,7 @@ namespace SampleGame.Elements;
 
 public class MemoryTile : Composition
 {
-	public const string DefaultTexturePath = @"blank.png";
+	public const string DefaultTexturePath = @"Textures/blank.png";
 
 	public bool IsShown = false;
 	public string TextureName;
@@ -62,6 +62,8 @@ public class MemoryTile : Composition
 	{
 		if (IsShown) return;
 		IsShown = true;
+
+		Console.WriteLine(_texture.AssetName);
 
 		_sprite.Texture = _texture;
 		_number.Alpha = 0;

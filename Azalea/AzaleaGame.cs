@@ -1,8 +1,6 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
-using Azalea.Graphics.Textures;
-using Azalea.IO.Assets;
-using Azalea.IO.Stores;
+using Azalea.IO.Resources;
 using Azalea.Platform;
 using System;
 
@@ -16,19 +14,9 @@ public abstract class AzaleaGame : Composition
 	public GameHost Host => _host ?? throw new Exception("GameHost has not been set");
 	private GameHost? _host;
 
-	public ResourceStore<byte[]> Resources => _resources ?? throw new Exception("Game has not been initialized");
-	private ResourceStore<byte[]>? _resources;
-	public TextureStore Textures => _textures ?? throw new Exception("Game has not been initialized");
-	private TextureStore? _textures;
-
-	public FontStore Fonts => _fonts ?? throw new Exception("Game has not been initialized");
-	private FontStore? _fonts;
-
-	private FontStore? _localFonts;
-
 	internal virtual void SetHost(GameHost host)
 	{
-		if (_main is null) _main = this;
+		_main ??= this;
 
 		_host = host;
 
@@ -42,31 +30,15 @@ public abstract class AzaleaGame : Composition
 
 	internal void CallInitialize()
 	{
-		_resources = new ResourceStore<byte[]>();
-		_resources.AddStore(new NamespacedResourceStore<byte[]>(new DllResourceStore(typeof(AzaleaGame).Assembly), @"Resources"));
+		Assets.AddFont(@"Fonts/Roboto-Regular.bin", "");
+		Assets.AddFont(@"Fonts/Roboto-Regular.bin", "Roboto-Regular");
 
-		_textures = new TextureStore(Host.Renderer,
-			Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
-
-		_fonts = new FontStore(Host.Renderer);
-		_fonts.AddStore(_localFonts = new FontStore(Host.Renderer));
-
-		addFont(_localFonts, Resources, @"Fonts/Roboto-Regular");
-
-		Assets.InitializeAssets(this);
-
-		Host.Window.SetIconFromStream(Textures.GetStream("azalea-icon.png")!);
+		Host.Window.SetIconFromStream(Assets.GetStream("Textures/azalea-icon.png")!);
 		Host.Window.Center();
 		Host.Window.Show();
 
 		OnInitialize();
 	}
-
-	public void AddFont(ResourceStore<byte[]> store, string? assetName = null, FontStore? target = null)
-		=> addFont(target ?? Fonts, store, assetName);
-
-	private void addFont(FontStore target, ResourceStore<byte[]> store, string? assetName = null)
-		=> target.AddTextureSource(new GlyphStore(store, assetName, Host.CreateTextureLoaderStore(store)));
 
 	protected virtual void OnInitialize() { }
 }

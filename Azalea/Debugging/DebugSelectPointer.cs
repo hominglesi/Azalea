@@ -4,7 +4,7 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
-using Azalea.IO.Assets;
+using Azalea.IO.Resources;
 
 namespace Azalea.Debugging;
 public class DebugSelectPointer : Sprite
