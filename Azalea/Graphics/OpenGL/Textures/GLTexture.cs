@@ -30,7 +30,7 @@ internal class GLTexture : Disposable, INativeTexture
 			return;
 		}
 
-		Bind(0);
+		_renderer.BindTexture(this, 0);
 
 		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MinFilter, (int)GLFunction.Linear);
 		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MagFilter, (int)GLFunction.Linear);

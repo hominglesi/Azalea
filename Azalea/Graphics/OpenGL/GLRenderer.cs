@@ -6,7 +6,6 @@ using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Numerics;
 using Azalea.Platform;
-using Azalea.Platform.Desktop;
 
 namespace Azalea.Graphics.OpenGL;
 internal class GLRenderer : Renderer
@@ -14,18 +13,11 @@ internal class GLRenderer : Renderer
 	public GLRenderer(IWindow window)
 		: base(window) { }
 
-
-	private bool _firstFrame = true;
 	internal override void FinishFrame()
 	{
 		base.FinishFrame();
 
-		//One the first frame the textures are not correct for some reason
-		//so we hide it
-		if (_firstFrame)
-			_firstFrame = false;
-		else
-			((GLFWWindow)Window).SwapBuffers();
+		Window.SwapBuffers();
 
 		GL.PrintErrors();
 	}

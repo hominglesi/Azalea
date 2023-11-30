@@ -89,4 +89,6 @@ public interface IWindow : IDisposable
 	/// Prevents the window closure attempt. This method is only valid within the <see cref="Closing"/> event.
 	/// </summary>
 	public void PreventClosure();
+
+	internal void SwapBuffers();
 }
