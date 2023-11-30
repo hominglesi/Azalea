@@ -23,6 +23,7 @@ public static partial class Assets
 
 	public static Stream? GetStream(string path) => MainStore.GetStream(path);
 	public static Texture GetTexture(string path) => MainStore.GetTexture(path);
+	public static Texture MissingTexture => GetTexture("Textures/missing-texture.png");
 	public static string? GetText(string path) => MainStore.GetText(path);
 	public static Sound GetSound(string path) => MainStore.GetSound(path);
 	public static void AddFont(string path, string name) => MainStore.AddFont(path, name);

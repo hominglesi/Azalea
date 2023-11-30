@@ -15,7 +15,7 @@ public static class ResourceStore_Texture
 		using var stream = store.GetStream(path);
 
 		if (stream == null)
-			return getMissingTexture() ?? throw new Exception("Texture could not be found.");
+			return Assets.MissingTexture ?? throw new Exception("Texture could not be found.");
 
 		var data = store.GetTextureData(path);
 		var texture = createTexture(data);
@@ -33,16 +33,6 @@ public static class ResourceStore_Texture
 		texture.SetData(data);
 
 		return texture;
-	}
-
-	private static Texture? _missingTextureCache;
-	private static Texture? getMissingTexture()
-	{
-		if (_missingTextureCache is not null)
-			return _missingTextureCache;
-
-		_missingTextureCache = Assets.MainStore.GetTexture("Textures/missing-texture.png");
-		return _missingTextureCache;
 	}
 
 	private static IRenderer Renderer => AzaleaGame.Main.Host.Renderer;
