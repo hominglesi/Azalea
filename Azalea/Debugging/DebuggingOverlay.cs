@@ -27,6 +27,21 @@ public class DebuggingOverlay : Composition
 	public DebugInspector Inspector;
 	private DebugSceneGraph _sceneGraph;
 
+	private FpsDisplay _fpsDisplay;
+	private bool _showFps;
+	internal bool ShowFps
+	{
+		get => _showFps;
+		set
+		{
+			if (_showFps == value) return;
+
+			_showFps = value;
+			if (_fpsDisplay is not null)
+				_fpsDisplay.Alpha = _showFps ? 1 : 0;
+		}
+	}
+
 	private bool _initialized;
 	private void initialize()
 	{
@@ -40,6 +55,13 @@ public class DebuggingOverlay : Composition
 		});
 		RemoveInternal(InternalComposition);
 		_gameContainer.Add(InternalComposition);
+
+		AddInternal(_fpsDisplay = new FpsDisplay()
+		{
+			Origin = Anchor.TopRight,
+			Anchor = Anchor.TopRight,
+			Alpha = ShowFps ? 1 : 0,
+		});
 
 		AddInternal(_leftContainer = new Composition()
 		{

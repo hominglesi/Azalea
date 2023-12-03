@@ -21,4 +21,10 @@ public static class Editor
 			Size = obj.ScreenSpaceDrawQuad.BottomRight - obj.ScreenSpaceDrawQuad.TopLeft,
 		});
 	}
+
+	public static bool ShowFps
+	{
+		get => Overlay.ShowFps;
+		set => Overlay.ShowFps = value;
+	}
 }

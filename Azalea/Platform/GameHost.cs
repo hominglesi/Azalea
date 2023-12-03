@@ -54,7 +54,7 @@ public abstract class GameHost
 
 			InputManager.ProcessInputs();
 
-			Time._deltaTime = (float)_stopwatch.Elapsed.TotalSeconds;
+			Time.Update((float)_stopwatch.Elapsed.TotalSeconds);
 			_stopwatch.Restart();
 		}
 

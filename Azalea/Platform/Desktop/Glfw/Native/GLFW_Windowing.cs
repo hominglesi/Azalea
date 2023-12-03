@@ -116,6 +116,9 @@ internal static unsafe partial class GLFW
 	[DllImport(LibraryPath, EntryPoint = "glfwSwapBuffers")]
 	public static extern void SwapBuffers(GLFW_Window window);
 
+	[DllImport(LibraryPath, EntryPoint = "glfwSwapInterval")]
+	public static extern void SwapInterval(int interval);
+
 	#endregion
 	#region Title
 
