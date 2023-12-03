@@ -8,10 +8,9 @@ public class VisualTests : AzaleaGame
 {
 	protected override void OnInitialize()
 	{
-		Assets.AddToMainStore(new AssemblyResourceStore(typeof(VisualTests).Assembly));
+		Assets.AddToMainStore(new NamespacedResourceStore(new AssemblyResourceStore(typeof(VisualTests).Assembly), "Resources"));
 
 		Host.Renderer.ClearColor = Palette.Flowers.Azalea;
-
 
 		//Add(new DefaultUserInputTest());
 		//Add(new TestingTestScene());

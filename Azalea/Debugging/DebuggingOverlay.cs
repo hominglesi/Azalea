@@ -28,7 +28,7 @@ public class DebuggingOverlay : Composition
 	private DebugSceneGraph _sceneGraph;
 
 	private FpsDisplay _fpsDisplay;
-	private bool _showFps;
+	private bool _showFps = true;
 	internal bool ShowFps
 	{
 		get => _showFps;

@@ -3,15 +3,16 @@ using Azalea.Utils;
 using System;
 using System.IO;
 using System.Numerics;
+using Rect = Azalea.Numerics.Rectangle;
 
 namespace Azalea.Graphics.Textures;
 
 public class Texture : Disposable
 {
 	internal virtual INativeTexture NativeTexture { get; }
-	public int Width => NativeTexture.Width;
-	public int Height => NativeTexture.Height;
-	public Vector2 Size => new(Width, Height);
+	public virtual int Width => NativeTexture.Width;
+	public virtual int Height => NativeTexture.Height;
+	public virtual Vector2 Size => new(Width, Height);
 
 	public string AssetName { get; set; }
 
@@ -40,6 +41,8 @@ public class Texture : Disposable
 	{
 		NativeTexture.SetData(upload);
 	}
+
+	internal virtual Rect GetUVCoordinates() => Rect.One;
 
 	protected override void OnDispose()
 	{

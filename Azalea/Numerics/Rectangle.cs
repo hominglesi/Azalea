@@ -6,6 +6,7 @@ namespace Azalea.Numerics;
 public struct Rectangle : IEquatable<Rectangle>
 {
 	public static Rectangle Empty { get; } = new Rectangle();
+	public static Rectangle One { get; } = new Rectangle(0, 0, 1, 1);
 
 	public float X;
 	public float Y;

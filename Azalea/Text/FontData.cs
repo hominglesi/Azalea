@@ -1,10 +1,8 @@
 ﻿using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
 using SharpFNT;
-using StbImageSharp;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Azalea.Text;
 public class FontData
@@ -29,8 +27,8 @@ public class FontData
 
 	public bool HasGlyph(char c) => _font.Characters.ContainsKey(c);
 	public int GetKerning(char left, char right) => _font.GetKerningAmount(left, right);
+	public Texture GetPageImage(int page) => _store.GetTexture(getFilenameForPage(page));
 
-	public TextureData GetPageImage(int page) => _store.GetTextureData(getFilenameForPage(page));
 	private string getFilenameForPage(int page)
 		=> $@"{_path}_{page.ToString().PadLeft((_font.Pages.Count - 1).ToString().Length, '0')}.png";
 
@@ -45,60 +43,7 @@ public class FontData
 		_font.Characters.TryGetValue(character, out Character? chr);
 		if (chr is null) return null;
 
-		var data = loadCharacter(chr);
-
-		return Texture.FromData(AzaleaGame.Main.Host.Renderer, data);
-	}
-
-	private int _loadedGlyphCount;
-	private TextureData loadCharacter(Character character)
-	{
-		var page = GetPageImage(character.Page);
-		Debug.Assert(page != null);
-		_loadedGlyphCount++;
-
-		var source = page.Data;
-		var target = new byte[character.Width * character.Height * 4];
-
-		int readableHeight = Math.Min(character.Height, page.Height - character.Y);
-		int readableWidth = Math.Min(character.Width, page.Width - character.X);
-
-		for (int y = 0; y < character.Height; y++)
-		{
-			int readOffset = ((page.Width * (character.Y + y)) + character.X) * 4;
-			int targetOffset = y * character.Width * 4;
-
-			for (int x = 0; x < character.Width * 4; x += 4)
-			{
-				var sourcePixel = readOffset + x;
-				var targetPixel = targetOffset + x;
-
-				if (x / 4 < readableWidth && y / 4 < readableHeight)
-				{
-					target[targetPixel] = source[sourcePixel];
-					target[targetPixel + 1] = source[sourcePixel + 1];
-					target[targetPixel + 2] = source[sourcePixel + 2];
-					target[targetPixel + 3] = source[sourcePixel + 3];
-				}
-				else
-				{
-					target[targetPixel] = byte.MaxValue;
-					target[targetPixel + 1] = byte.MaxValue;
-					target[targetPixel + 2] = byte.MaxValue;
-					target[targetPixel + 3] = byte.MinValue;
-				}
-			}
-		}
-
-		var result = new ImageResult()
-		{
-			Width = character.Width,
-			Height = character.Height,
-			Data = target,
-			Comp = ColorComponents.RedGreenBlueAlpha,
-			SourceComp = ColorComponents.RedGreenBlueAlpha
-		};
-		return new TextureData(result);
+		return new TextureRegion(GetPageImage(chr.Page), new(chr.X, chr.Y, chr.Width, chr.Height));
 	}
 
 	private Dictionary<char, TexturedCharacterGlyph> _glyphCache = new();

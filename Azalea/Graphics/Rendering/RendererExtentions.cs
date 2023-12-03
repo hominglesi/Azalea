@@ -14,32 +14,34 @@ public static class RendererExtentions
 
 		var vertexAction = renderer.DefaultQuadBatch.AddAction;
 
+		var textureRegion = texture.GetUVCoordinates();
+
 		vertexAction(new TexturedVertex2D
 		{
 			Position = vertexQuad.BottomLeft,
 			Color = drawColorInfo.Color.BottomLeft,
-			TexturePosition = new(0, 1)
+			TexturePosition = textureRegion.BottomLeft
 		});
 
 		vertexAction(new TexturedVertex2D
 		{
 			Position = vertexQuad.BottomRight,
 			Color = drawColorInfo.Color.BottomRight,
-			TexturePosition = new(1, 1)
+			TexturePosition = textureRegion.BottomRight
 		});
 
 		vertexAction(new TexturedVertex2D
 		{
 			Position = vertexQuad.TopRight,
 			Color = drawColorInfo.Color.TopRight,
-			TexturePosition = new(1, 0)
+			TexturePosition = textureRegion.TopRight
 		});
 
 		vertexAction(new TexturedVertex2D
 		{
 			Position = vertexQuad.TopLeft,
 			Color = drawColorInfo.Color.TopLeft,
-			TexturePosition = new(0, 0)
+			TexturePosition = textureRegion.TopLeft
 		});
 	}
 

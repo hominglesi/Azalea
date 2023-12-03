@@ -103,6 +103,7 @@ internal abstract class Renderer : IRenderer
 	protected internal void FlushCurrentBatch()
 	{
 		currentActiveBatch?.Draw();
+
 	}
 
 	internal bool BindTexture(Texture texture, int unit = 0)
