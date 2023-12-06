@@ -3,7 +3,7 @@ using Azalea.Graphics.Textures;
 using System;
 
 namespace Azalea.IO.Resources;
-public static class ResourceStore_Texture
+public static partial class ResourceStoreExtentions
 {
 	private static ResourceCache<Texture> _textureCache = new();
 

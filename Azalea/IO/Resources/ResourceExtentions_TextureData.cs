@@ -1,9 +1,8 @@
-﻿using Azalea.Graphics.Rendering;
-using Azalea.Graphics.Textures;
+﻿using Azalea.Graphics.Textures;
 using System;
 
 namespace Azalea.IO.Resources;
-public static class ResourceStore_TextureData
+public static partial class ResourceStoreExtentions
 {
 	private static ResourceCache<TextureData> _textureDataCache = new();
 
@@ -20,6 +19,4 @@ public static class ResourceStore_TextureData
 
 		return texture;
 	}
-
-	private static IRenderer Renderer => AzaleaGame.Main.Host.Renderer;
 }

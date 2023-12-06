@@ -2,7 +2,7 @@
 using System.IO;
 
 namespace Azalea.IO.Resources;
-public static class ResourceStore_Text
+public static partial class ResourceStoreExtentions
 {
 	private static ResourceCache<string> _textCache = new();
 	public static string? GetText(this IResourceStore store, string path)

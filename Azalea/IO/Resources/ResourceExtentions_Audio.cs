@@ -3,7 +3,7 @@ using System;
 using System.IO;
 
 namespace Azalea.IO.Resources;
-public static class ResourceStore_Audio
+public static partial class ResourceStoreExtentions
 {
 	private static ResourceCache<Sound> _audioCache = new();
 

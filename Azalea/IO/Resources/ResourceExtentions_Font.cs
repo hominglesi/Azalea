@@ -4,7 +4,7 @@ using System;
 using System.IO;
 
 namespace Azalea.IO.Resources;
-public static class ResourceStore_Font
+public static partial class ResourceStoreExtentions
 {
 	private static ResourceCache<BitmapFont> _bitmapFontCache = new();
 	public static BitmapFont? GetBitmapFont(this IResourceStore store, string path)
