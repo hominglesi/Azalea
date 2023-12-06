@@ -6,7 +6,6 @@ using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
-using Azalea.Graphics.Textures;
 using Azalea.Inputs;
 using Azalea.IO.Resources;
 using Azalea.Layout;
@@ -28,6 +27,14 @@ public class TestingTestScene : TestScene
 
 	public TestingTestScene()
 	{
+		var tileset = Assets.FileSystem.GetTileset(@"D:\Programming\monolesi.MonsterCards\Content\SpriteSheets\swordEnemySheet.tsx");
+
+		Add(new Sprite()
+		{
+			Position = new(500, 500),
+			Texture = tileset.Tiles[3]
+		});
+
 		Add(_wrapper = new Composition()
 		{
 			Child = _composition = new TextContainer(t => { t.Font = t.Font.With(size: 40); })
@@ -72,13 +79,6 @@ public class TestingTestScene : TestScene
 			Width = 500,
 			Height = 30,
 			Position = new Vector2(550, 300)
-		});
-
-		Add(new Sprite()
-		{
-			Position = new(500, 500),
-			Size = new(50, 50),
-			Texture = new TextureRegion(Assets.GetTexture("Textures/wall2.png"), new(0, 0, 100, 100))
 		});
 
 		Add(_comp = new FlexContainer()

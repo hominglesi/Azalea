@@ -7,8 +7,12 @@ namespace Azalea.IO.Resources;
 
 public static partial class Assets
 {
-	public static IResourceStore MainStore => _mainStore ?? throw new InvalidOperationException("Game has not been initialized yet");
+	public static IResourceStore MainStore => _mainStore;
 	private static ResourceStoreContainer _mainStore;
+
+	public static IResourceStore FileSystem => _fileSystemStore;
+	private static FileSystemStore _fileSystemStore;
+
 
 	public static Action? OnDispose;
 
@@ -17,6 +21,8 @@ public static partial class Assets
 		_mainStore = new ResourceStoreContainer();
 		AddToMainStore(new NamespacedResourceStore(
 			new AssemblyResourceStore(typeof(AzaleaGame).Assembly), "Resources"));
+
+		_fileSystemStore = new FileSystemStore();
 	}
 
 	public static void AddToMainStore(IResourceStore store) => _mainStore.AddStore(store);

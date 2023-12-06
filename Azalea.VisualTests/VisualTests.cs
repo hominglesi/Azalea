@@ -13,11 +13,11 @@ public class VisualTests : AzaleaGame
 		Host.Renderer.ClearColor = Palette.Flowers.Azalea;
 
 		//Add(new DefaultUserInputTest());
-		//Add(new TestingTestScene());
+		Add(new TestingTestScene());
 		//Add(new FlexTest());
 		//Add(new InputTest());
 		//Add(new PanningTest());
-		Add(new IWindowTest());
+		//Add(new IWindowTest());
 		//Add(new AudioTest());
 	}
 
