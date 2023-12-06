@@ -6,6 +6,7 @@ using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
+using Azalea.Graphics.Textures;
 using Azalea.Inputs;
 using Azalea.IO.Resources;
 using Azalea.Layout;
@@ -29,10 +30,15 @@ public class TestingTestScene : TestScene
 	{
 		var tileset = Assets.FileSystem.GetTileset(@"D:\Programming\monolesi.MonsterCards\Content\SpriteSheets\swordEnemySheet.tsx");
 
+		var animation = new TextureAnimation();
+		animation.AddFrame(tileset.Tiles[0], 0.2f);
+		animation.AddFrame(tileset.Tiles[1], 0.2f);
+		animation.AddFrame(tileset.Tiles[2], 0.2f);
+
 		Add(new Sprite()
 		{
 			Position = new(500, 500),
-			Texture = tileset.Tiles[3]
+			Texture = animation
 		});
 
 		Add(_wrapper = new Composition()

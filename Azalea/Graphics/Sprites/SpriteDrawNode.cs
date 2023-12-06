@@ -8,6 +8,7 @@ namespace Azalea.Graphics.Sprites;
 public class SpriteDrawNode : TexturedShaderDrawNode
 {
 	protected Texture? Texture { get; set; }
+	protected float Time { get; set; }
 	protected Quad ScreenSpaceDrawQuad { get; set; }
 
 	protected new Sprite Source => (Sprite)base.Source;
@@ -21,6 +22,7 @@ public class SpriteDrawNode : TexturedShaderDrawNode
 
 		Texture = Source.Texture;
 		ScreenSpaceDrawQuad = Source.ScreenSpaceDrawQuad;
+		Time = Source.Time;
 	}
 
 	protected virtual void Blit(IRenderer renderer)
@@ -31,8 +33,14 @@ public class SpriteDrawNode : TexturedShaderDrawNode
 			return;
 		}
 
+		var texture = Texture;
+		if (Texture is TextureAnimation anim)
+		{
+			texture = anim.GetTextureAtTime(Time);
+		}
+
 		renderer.DrawQuad(
-			Texture,
+			texture,
 			ScreenSpaceDrawQuad,
 			DrawColorInfo);
 	}
