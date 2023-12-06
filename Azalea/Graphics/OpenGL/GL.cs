@@ -290,6 +290,14 @@ internal static unsafe class GL
 		_glUniform1i!(location, v);
 	}
 
+	private delegate void Uniform1ivDelegate(int location, int count, int* v);
+	private static Uniform1ivDelegate? _glUniform1iv;
+	public static void Uniform1iv(int location, int[] array)
+	{
+		fixed (int* p = array)
+			_glUniform1iv!(location, array.Length, p);
+	}
+
 	private delegate void Uniform4fDelegate(int location, float v0, float v1, float v2, float v3);
 	private static Uniform4fDelegate? _glUniform4f;
 	public static void Uniform4f(int location, float v0, float v1, float v2, float v3)
@@ -348,6 +356,7 @@ internal static unsafe class GL
 		_glUseProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glUseProgram"));
 		_glGetUniformLocation = Marshal.GetDelegateForFunctionPointer<GetUniformLocationDelegate>(wglGetProcAddress("glGetUniformLocation"));
 		_glUniform1i = Marshal.GetDelegateForFunctionPointer<Uniform1iDelegate>(wglGetProcAddress("glUniform1i"));
+		_glUniform1iv = Marshal.GetDelegateForFunctionPointer<Uniform1ivDelegate>(wglGetProcAddress("glUniform1iv"));
 		_glUniform4f = Marshal.GetDelegateForFunctionPointer<Uniform4fDelegate>(wglGetProcAddress("glUniform4f"));
 		_glUniformMatrix4fv = Marshal.GetDelegateForFunctionPointer<UniformMatrix4fvDelegate>(wglGetProcAddress("glUniformMatrix4fv"));
 		_glDeleteBuffers = Marshal.GetDelegateForFunctionPointer<DeleteBuffersDelegate>(wglGetProcAddress("glDeleteBuffers"));

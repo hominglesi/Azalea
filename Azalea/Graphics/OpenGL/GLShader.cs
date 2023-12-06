@@ -67,6 +67,12 @@ public class GLShader : Disposable
 		GL.Uniform1i(getUniformLocation(name), i);
 	}
 
+	public void SetUniform(string name, int[] array)
+	{
+		Bind();
+		GL.Uniform1iv(getUniformLocation(name), array);
+	}
+
 	public void SetUniform(string name, float f0, float f1, float f2, float f3)
 	{
 		Bind();
