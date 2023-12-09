@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace Azalea.Platform;
 
@@ -39,4 +40,18 @@ public static class Time
 			_nextFpsInterval += FpsInterval;
 		}
 	}
+
+	#region Precise Time
+
+	[DllImport("Kernel32.dll", EntryPoint = "GetSystemTimePreciseAsFileTime", CallingConvention = CallingConvention.Winapi)]
+	private static extern void getSystemTimePreciseAsFileTime(out long filetime);
+
+	public static DateTime GetCurrentExactTime()
+	{
+		getSystemTimePreciseAsFileTime(out long filetime);
+
+		return DateTime.FromFileTimeUtc(filetime);
+	}
+
+	#endregion
 }
