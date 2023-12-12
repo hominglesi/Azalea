@@ -1,5 +1,6 @@
 ﻿using Azalea.Amends;
 using Azalea.Debugging;
+using Azalea.Design.Components;
 using Azalea.Design.Containers;
 using Azalea.Extentions;
 using Azalea.Extentions.EnumExtentions;
@@ -15,8 +16,13 @@ using System.Numerics;
 
 namespace Azalea.Graphics;
 
-public abstract class GameObject : Amendable, IGameObject
+public abstract partial class GameObject : Amendable, IGameObject
 {
+	public GameObject()
+	{
+		addTransform();
+	}
+
 	public event Action<GameObject>? OnUpdate;
 	internal event Action<GameObject, Invalidation>? Invalidated;
 
@@ -24,6 +30,7 @@ public abstract class GameObject : Amendable, IGameObject
 	{
 		UpdateAmends();
 		Update();
+		updateComponents();
 		OnUpdate?.Invoke(this);
 		return true;
 	}
@@ -31,60 +38,6 @@ public abstract class GameObject : Amendable, IGameObject
 	protected virtual void Update() { }
 
 	#region Position & Size
-
-	private float x;
-	private float y;
-
-	private Vector2 position
-	{
-		get => new(x, y);
-		set
-		{
-			x = value.X;
-			y = value.Y;
-		}
-	}
-
-	public Vector2 Position
-	{
-		get => position;
-		set
-		{
-			if (position == value) return;
-
-			position = value;
-
-			Invalidate(Invalidation.MiscGeometry);
-		}
-	}
-
-	[HideInInspector]
-	public float X
-	{
-		get => x;
-		set
-		{
-			if (x == value) return;
-
-			x = value;
-
-			Invalidate(Invalidation.MiscGeometry);
-		}
-	}
-
-	[HideInInspector]
-	public float Y
-	{
-		get => y;
-		set
-		{
-			if (y == value) return;
-
-			y = value;
-
-			Invalidate(Invalidation.MiscGeometry);
-		}
-	}
 
 	private Axes _relativePositionAxes;
 
@@ -127,68 +80,6 @@ public abstract class GameObject : Amendable, IGameObject
 			}
 
 			return ApplyRelativeAxes(RelativePositionAxes, Position - offset, FillMode.Stretch);
-		}
-	}
-
-	private float width;
-	private float height;
-
-	private Vector2 _size
-	{
-		get => new(width, height);
-		set
-		{
-			width = value.X;
-			height = value.Y;
-		}
-	}
-
-	public virtual Vector2 Size
-	{
-		get => _size;
-		set
-		{
-			if (_size == value) return;
-
-			Axes changedAxes = Axes.None;
-
-			if (_size.X != value.X)
-				changedAxes |= Axes.X;
-
-			if (_size.Y != value.Y)
-				changedAxes |= Axes.Y;
-
-			_size = value;
-
-			invalidateParentSizeDependencies(Invalidation.DrawSize, changedAxes);
-		}
-	}
-
-	[HideInInspector]
-	public virtual float Width
-	{
-		get => width;
-		set
-		{
-			if (width == value) return;
-
-			width = value;
-
-			invalidateParentSizeDependencies(Invalidation.DrawSize, Axes.X);
-		}
-	}
-
-	[HideInInspector]
-	public virtual float Height
-	{
-		get => height;
-		set
-		{
-			if (height == value) return;
-
-			height = value;
-
-			invalidateParentSizeDependencies(Invalidation.DrawSize, Axes.Y);
 		}
 	}
 
@@ -275,20 +166,6 @@ public abstract class GameObject : Amendable, IGameObject
 	private Vector2 _relativeToAbsoluteFactor => Parent?.RelativeToAbsoluteFactor ?? Vector2.One;
 
 	public virtual Rectangle BoundingBox => ToParentSpace(LayoutRectangle).AABBFloat;
-
-	private float _rotation;
-	public float Rotation
-	{
-		get => _rotation;
-		set
-		{
-			if (_rotation == value) return;
-
-			_rotation = value;
-
-			Invalidate(Invalidation.MiscGeometry);
-		}
-	}
 
 	protected virtual void OnSizingChanged()
 	{
@@ -582,6 +459,35 @@ public abstract class GameObject : Amendable, IGameObject
 
 		return di;
 	}
+
+	#region Components
+
+	private List<Component> _components = new();
+
+	public void AddComponent(Component component)
+	{
+		_components.Add(component);
+		component.AttachParent(this);
+	}
+	public void RemoveComponent(Component component)
+	{
+		_components.Remove(component);
+		component.DetachParent();
+	}
+	private void updateComponents() { foreach (var c in _components) c.Update(); }
+	public T? GetComponent<T>()
+		where T : Component
+	{
+		foreach (var comp in _components)
+		{
+			if (comp is T castComp)
+				return castComp;
+		}
+
+		return null;
+	}
+
+	#endregion
 
 	private InvalidationList invalidationList = new(Invalidation.All);
 	private LayoutMember? layoutList;

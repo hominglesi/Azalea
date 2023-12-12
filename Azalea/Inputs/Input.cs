@@ -107,7 +107,10 @@ public static class Input
 		_mouseWheelDelta += delta;
 
 		foreach (var obj in NonPositionalInputQueue)
-			obj.TriggerEvent(new ScrollEvent(delta));
+		{
+			if (delta != 0)
+				obj.TriggerEvent(new ScrollEvent(delta));
+		}
 	}
 
 	private static readonly List<GameObject> _lastHoveredObjects = new();

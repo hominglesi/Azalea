@@ -11,7 +11,7 @@ public class DebugSelectPointer : Sprite
 {
 	public DebugSelectPointer()
 	{
-		Texture = Assets.GetTexture("bullseye-pointer.png");
+		Texture = Assets.GetTexture("Textures/bullseye-pointer.png");
 		Color = Palette.Black;
 	}
 

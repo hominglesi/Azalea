@@ -46,7 +46,7 @@ public static class Time
 	[DllImport("Kernel32.dll", EntryPoint = "GetSystemTimePreciseAsFileTime", CallingConvention = CallingConvention.Winapi)]
 	private static extern void getSystemTimePreciseAsFileTime(out long filetime);
 
-	public static DateTime GetCurrentExactTime()
+	public static DateTime GetCurrentPreciseTime()
 	{
 		getSystemTimePreciseAsFileTime(out long filetime);
 
