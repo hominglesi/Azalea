@@ -50,4 +50,10 @@ public class TextureAnimation : Texture
 
 		_firstTexture ??= texture;
 	}
+
+	public void AddFrames(Texture[] textures, float time)
+	{
+		foreach (var texture in textures)
+			AddFrame(texture, time);
+	}
 }
