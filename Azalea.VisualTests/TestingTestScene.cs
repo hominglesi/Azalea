@@ -1,14 +1,11 @@
-﻿using Azalea.Amends;
-using Azalea.Design.Containers;
+﻿using Azalea.Design.Containers;
 using Azalea.Design.Containers.Text;
 using Azalea.Design.Shapes;
 using Azalea.Design.UserInterface;
-using Azalea.Graphics;
-using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
-using Azalea.Graphics.Textures;
+using Azalea.Inputs;
 using Azalea.IO.Resources;
-using System.Numerics;
+using Azalea.Platform;
 
 namespace Azalea.VisualTests;
 
@@ -42,13 +39,13 @@ public class TestingTestScene : TestScene
 		});
 
 		var anim = new TextureAnimation();
-		anim.AddFrames(tileset.Tiles, 0.1f);
+		anim.AddFrames(tileset.Tiles, 0.1f);*/
 
 		Add(_sprite = new Sprite()
 		{
 			Position = new(500, 600),
 			Texture = tileset.Tiles[0],
-		});*/
+		});
 
 		/*
 		var tilemap = Assets.MainStore.GetTilemap("MapForTiled/FirstMap.tmx");
@@ -89,6 +86,7 @@ public class TestingTestScene : TestScene
 			Origin = Anchor.BottomCenter
 		});
 		*/
+		/*
 		Add(_wrapper = new Composition()
 		{
 			RelativeSizeAxes = Axes.Both,
@@ -215,7 +213,7 @@ public class TestingTestScene : TestScene
 		Add(_cursor = new Box()
 		{
 			Size = new(50, 50)
-		});
+		});*/
 	}
 
 
@@ -223,7 +221,7 @@ public class TestingTestScene : TestScene
 	private float _elapsedTime = 0;
 	protected override void Update()
 	{
-		//_sprite.Position += Input.GetDirectionalMovement() * Time.DeltaTime * 200;
+		_sprite.Position += Input.GetDirectionalMovement() * Time.DeltaTime * 200;
 
 
 		/*
