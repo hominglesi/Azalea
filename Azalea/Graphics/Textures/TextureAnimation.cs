@@ -20,6 +20,12 @@ public class TextureAnimation : Texture
 
 	}
 
+	public TextureAnimation(IEnumerable<Texture> frames, float duration)
+		: base(Assets.MissingTexture.NativeTexture)
+	{
+		AddFrames(frames, duration);
+	}
+
 	private List<KeyValuePair<Texture, float>> _frames = new();
 	private float _duration;
 
@@ -51,9 +57,11 @@ public class TextureAnimation : Texture
 		_firstTexture ??= texture;
 	}
 
-	public void AddFrames(Texture[] textures, float time)
+	public void AddFrames(IEnumerable<Texture> textures, float time)
 	{
 		foreach (var texture in textures)
+		{
 			AddFrame(texture, time);
+		}
 	}
 }

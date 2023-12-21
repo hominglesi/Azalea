@@ -1,4 +1,5 @@
-﻿using Azalea.Design.Containers;
+﻿using Azalea.Debugging;
+using Azalea.Design.Containers;
 using Azalea.Graphics;
 using Azalea.Inputs.Events;
 using System;
@@ -32,6 +33,30 @@ public static class Input
 	{
 		if (recalculate) updateHoverEvents();
 		return _hoveredObjects;
+	}
+
+	public static Vector2 GetDirectionalMovement()
+	{
+		var horizontal = 0;
+		var vertical = 0;
+
+		if (GetKey(Keys.W).Pressed || GetKey(Keys.Up).Pressed)
+			vertical -= 1;
+
+		if (GetKey(Keys.S).Pressed || GetKey(Keys.Down).Pressed)
+			vertical += 1;
+
+		if (GetKey(Keys.D).Pressed || GetKey(Keys.Right).Pressed)
+			horizontal += 1;
+
+		if (GetKey(Keys.A).Pressed || GetKey(Keys.Left).Pressed)
+			horizontal -= 1;
+
+		if (horizontal == 0 && vertical == 0)
+			return Vector2.Zero;
+
+		var direction = new Vector2(horizontal, vertical);
+		return Vector2.Normalize(direction);
 	}
 
 	#endregion
@@ -99,17 +124,18 @@ public static class Input
 
 		_mousePosition = newPosition;
 
-		updateHoverEvents();
+		PerformanceTrace.RunAndTrace(updateHoverEvents, "Hover Update");
 	}
 
 	internal static void HandleScroll(float delta)
 	{
+		if (delta == 0) return;
+
 		_mouseWheelDelta += delta;
 
 		foreach (var obj in NonPositionalInputQueue)
 		{
-			if (delta != 0)
-				obj.TriggerEvent(new ScrollEvent(delta));
+			obj.TriggerEvent(new ScrollEvent(delta));
 		}
 	}
 
@@ -127,7 +153,9 @@ public static class Input
 
 		_hoveredObjects.Clear();
 
-		foreach (var obj in PositionalInputQueue)
+		var positionalQueue = PositionalInputQueue;
+
+		foreach (var obj in positionalQueue)
 		{
 			_hoveredObjects.Add(obj);
 			_lastHoveredObjects.Remove(obj);

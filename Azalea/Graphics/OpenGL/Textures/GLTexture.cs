@@ -32,8 +32,8 @@ internal class GLTexture : Disposable, INativeTexture
 
 		_renderer.BindTexture(this, 0);
 
-		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MinFilter, (int)GLFunction.Linear);
-		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MagFilter, (int)GLFunction.Linear);
+		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MinFilter, (int)GLFunction.Nearest);
+		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MagFilter, (int)GLFunction.Nearest);
 		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.WrapS, (int)GLWrapFunction.ClampToEdge);
 		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.WrapT, (int)GLWrapFunction.ClampToEdge);
 

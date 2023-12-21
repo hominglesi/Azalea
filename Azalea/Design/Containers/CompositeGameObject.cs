@@ -134,9 +134,9 @@ public partial class CompositeGameObject : GameObject
 
 	protected virtual bool RequiresChildrenUpdate => true;
 
-	public override bool UpdateSubTree()
+	public override void UpdateSubTree()
 	{
-		if (base.UpdateSubTree() == false) return false;
+		base.UpdateSubTree();
 
 		for (int i = 0; i < internalChildren.Count; ++i)
 		{
@@ -144,7 +144,16 @@ public partial class CompositeGameObject : GameObject
 		}
 
 		UpdateAfterChildren();
-		return true;
+	}
+
+	public override void FixedUpdateSubTree()
+	{
+		base.FixedUpdateSubTree();
+
+		for (int i = 0; i < internalChildren.Count; ++i)
+		{
+			internalChildren[i].FixedUpdateSubTree();
+		}
 	}
 
 	protected virtual void UpdateAfterChildren() { }

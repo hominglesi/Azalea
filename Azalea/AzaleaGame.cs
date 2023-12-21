@@ -35,7 +35,6 @@ public abstract class AzaleaGame : Composition
 
 		Host.Window.SetIconFromStream(Assets.GetStream("Textures/azalea-icon.png")!);
 		Host.Window.Center();
-		Host.Window.Show();
 
 		OnInitialize();
 	}

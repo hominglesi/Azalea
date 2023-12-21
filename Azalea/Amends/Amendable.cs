@@ -62,4 +62,9 @@ public abstract class Amendable
 
 		_amends.Clear();
 	}
+
+	public void RemoveAmends()
+	{
+		_amends.Clear();
+	}
 }

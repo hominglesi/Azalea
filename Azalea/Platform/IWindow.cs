@@ -11,6 +11,7 @@ public interface IWindow : IDisposable
 
 	/// <summary>
 	/// The window title.
+	/// Default 
 	/// </summary>
 	string Title { get; set; }
 
@@ -45,6 +46,8 @@ public interface IWindow : IDisposable
 	/// </summary>
 	public float Opacity { get; set; }
 
+	public bool VSync { get; set; }
+
 	/// <summary>
 	/// Centers the window on the users screen
 	/// </summary>
@@ -75,15 +78,7 @@ public interface IWindow : IDisposable
 	/// </summary>
 	public void Close();
 
-	/// <summary>
-	/// Shows a hidden window
-	/// </summary>
-	public void Show();
-
-	/// <summary>
-	/// Hides the window from the user
-	/// </summary>
-	public void Hide();
+	public bool Visible { get; set; }
 
 	/// <summary>
 	/// Prevents the window closure attempt. This method is only valid within the <see cref="Closing"/> event.

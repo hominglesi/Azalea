@@ -1,7 +1,8 @@
 ﻿using Azalea.Graphics.Colors;
 using System;
 using System.Collections.Generic;
-using System.Numerics;
+
+using Vector2Struct = System.Numerics.Vector2;
 
 namespace Azalea.Utils;
 
@@ -80,10 +81,10 @@ public static class Rng
 	/// Generates a random Vector2 structure containing 2D direction vector
 	/// </summary>
 	/// <returns>A random Vector2 structure containing 2D direction vector</returns>
-	public static Vector2 Direction()
+	public static Vector2Struct Direction()
 	{
-		var output = new Vector2(Float(-1, 1), Float(-1, 1));
-		return Vector2.Normalize(output);
+		var output = new Vector2Struct(Float(-1, 1), Float(-1, 1));
+		return Vector2Struct.Normalize(output);
 	}
 
 	/// <summary>
@@ -93,6 +94,16 @@ public static class Rng
 	public static Color Color()
 	{
 		return new Color(Byte(), Byte(), Byte());
+	}
+
+	public static Vector2Struct Vector2(Vector2Struct range)
+	{
+		return new Vector2Struct(Float(range.X, range.Y), Float(range.X, range.Y));
+	}
+
+	public static Vector2Struct Vector2(Vector2Struct rangeX, Vector2Struct rangeY)
+	{
+		return new Vector2Struct(Float(rangeX.X, rangeX.Y), Float(rangeY.X, rangeY.Y));
 	}
 
 	/// <summary>

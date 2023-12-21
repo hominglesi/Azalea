@@ -1,6 +1,7 @@
 ﻿using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.Rendering;
+using Azalea.Platform.Glfw;
 using System;
 
 namespace Azalea.Platform.Desktop;
@@ -17,7 +18,15 @@ internal class DesktopGameHost : GameHost
 
 	public DesktopGameHost(HostPreferences preferences)
 	{
-		_window = new GLFWWindow(preferences);
+		_window = new GLFWWindow(
+			preferences.WindowTitle,
+			preferences.PreferredClientSize.X, preferences.PreferredClientSize.Y,
+			preferences.PreferredWindowState,
+			preferences.WindowVisible,
+			preferences.WindowResizable,
+			preferences.DecoratedWindow,
+			preferences.TransparentFramebuffer);
+		_window.VSync = preferences.VSync;
 	}
 
 	public override void CallInitialized()

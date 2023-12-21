@@ -1,0 +1,1 @@
+-A static class that can be used for interacting with GLFW through C#

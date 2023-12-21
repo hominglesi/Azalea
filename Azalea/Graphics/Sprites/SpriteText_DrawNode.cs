@@ -38,7 +38,7 @@ public partial class SpriteText
 
 		private void updateScreenSpaceCharacters()
 		{
-			int partCount = Source._characters.Count;
+			int partCount = Source.Characters.Count;
 
 			if (_parts == null)
 				_parts = new List<ScreenSpaceCharacterPart>(partCount);
@@ -48,7 +48,7 @@ public partial class SpriteText
 				_parts.EnsureCapacity(partCount);
 			}
 
-			foreach (var character in Source._characters)
+			foreach (var character in Source.Characters)
 			{
 				_parts.Add(new ScreenSpaceCharacterPart
 				{

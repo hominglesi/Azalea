@@ -20,22 +20,29 @@ public abstract partial class GameObject : Amendable, IGameObject
 {
 	public GameObject()
 	{
+		AddLayout(_drawInfoBacking);
 		addTransform();
 	}
 
 	public event Action<GameObject>? OnUpdate;
 	internal event Action<GameObject, Invalidation>? Invalidated;
 
-	public virtual bool UpdateSubTree()
+	public virtual void UpdateSubTree()
 	{
 		UpdateAmends();
 		Update();
 		updateComponents();
 		OnUpdate?.Invoke(this);
-		return true;
+	}
+
+	public virtual void FixedUpdateSubTree()
+	{
+		FixedUpdate();
 	}
 
 	protected virtual void Update() { }
+
+	protected virtual void FixedUpdate() { }
 
 	#region Position & Size
 
@@ -233,17 +240,9 @@ public abstract partial class GameObject : Amendable, IGameObject
 		{
 			if (_scale == value) return;
 
-			//if(Validation.IsFinite(value) == false) throw new ArgumentException($@"{nameof(Scale)} must be finite, but is {value}.");
-
-			bool wasPresent = IsPresent;
-
 			_scale = value;
 
-			/*
-            if (IsPresent != wasPresent)
-                Invalidate(Invalidation.MiscGeometry | Invalidation.Presence);
-            else
-                Invalidate(Invalidation.MiscGeomerty);*/
+			Invalidate(Invalidation.MiscGeometry);
 		}
 	}
 
@@ -444,8 +443,25 @@ public abstract partial class GameObject : Amendable, IGameObject
 
 	protected virtual DrawNode CreateDrawNode() => new(this);
 
-	private DrawInfo? drawInfo;
-	public DrawInfo DrawInfo => (DrawInfo)(drawInfo = computeDrawInfo());
+	public DrawInfo DrawInfo
+	{
+		get
+		{
+			if (AzaleaSettings.DontCacheDrawInfo == true)
+				return computeDrawInfo();
+
+			if (_drawInfoBacking.IsValid == false)
+			{
+				_drawInfo = computeDrawInfo();
+				_drawInfoBacking.Validate();
+			}
+
+			return _drawInfo;
+		}
+	}
+
+	private DrawInfo _drawInfo;
+	private readonly LayoutValue _drawInfoBacking = new LayoutValue(Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
 	private DrawInfo computeDrawInfo()
 	{
 		DrawInfo di = Parent?.DrawInfo ?? new DrawInfo(null);
@@ -476,7 +492,7 @@ public abstract partial class GameObject : Amendable, IGameObject
 	}
 	private void updateComponents() { foreach (var c in _components) c.Update(); }
 	public T? GetComponent<T>()
-		where T : Component
+		where T : class
 	{
 		foreach (var comp in _components)
 		{
@@ -485,6 +501,16 @@ public abstract partial class GameObject : Amendable, IGameObject
 		}
 
 		return null;
+	}
+
+	public IEnumerable<T> GetComponents<T>()
+		where T : class
+	{
+		foreach (var comp in _components)
+		{
+			if (comp is T castComp)
+				yield return castComp;
+		}
 	}
 
 	#endregion
@@ -509,6 +535,21 @@ public abstract partial class GameObject : Amendable, IGameObject
 	{
 		if (invalidationList.Validate(validationType))
 			Parent?.ValidateSuperTree(validationType);
+	}
+
+	public T? GetFirstParentOfType<T>()
+		where T : GameObject
+	{
+		var parent = Parent;
+		while (parent != null)
+		{
+			if (parent is T tParent)
+				return tParent;
+
+			parent = parent.Parent;
+		}
+
+		return null;
 	}
 
 	public long InvalidationID { get; private set; } = 1;

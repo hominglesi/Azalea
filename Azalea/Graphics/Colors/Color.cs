@@ -183,8 +183,10 @@ public partial struct Color
 		else if (max == GNormalized) h = ((BNormalized - RNormalized) / diff) + 2f;
 		else if (max == BNormalized) h = ((RNormalized - GNormalized) / diff) + 4f;
 
+
 		if (h < 0) h += 6;
 		else if (h > 6) h -= 6;
+		else if (float.IsNaN(h)) h = 0;
 
 		var hue = h * 60f;
 
@@ -259,6 +261,13 @@ public partial struct Color
 		G = (byte)((g + m) * byte.MaxValue);
 		B = (byte)((b + m) * byte.MaxValue);
 		A = (byte)(alpha * byte.MaxValue);
+	}
+
+	public static Color FromHSL(Vector4 hslValues)
+	{
+		Color color = new Color();
+		color.fromHSL(hslValues);
+		return color;
 	}
 
 	/// <summary>

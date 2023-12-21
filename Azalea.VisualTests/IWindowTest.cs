@@ -30,7 +30,7 @@ public class IWindowTest : TestScene
 					() => _window.State = WindowState.Maximized),
 				CreateActionButton(
 					"Set WindowState to 'Fullscreen'",
-					() => _window.State = WindowState.Fullscreen),
+					() => _window.State = WindowState.BorderlessFullscreen),
 				CreateActionButton(
 					"Set Resizable to 'true'",
 					() => _window.Resizable = true),
@@ -57,7 +57,7 @@ public class IWindowTest : TestScene
 					() => _preventsClosure = false),
 				CreateActionButton(
 					"Set icon to Azalea flower",
-					() => _window.SetIconFromStream(Assets.GetStream("azalea-icon.png")!)),
+					() => _window.SetIconFromStream(Assets.GetStream("Textures/azalea-icon.png")!)),
 				CreateActionButton(
 					"Set icon to null",
 					() => _window.SetIconFromStream(null)),
@@ -89,6 +89,7 @@ public class IWindowTest : TestScene
 					"Close window",
 					() => _window.Close())
 			}),
+
 			CreateObservedContainer(new GameObject[]
 			{
 				CreateObservedValue("WindowState",
@@ -109,12 +110,19 @@ public class IWindowTest : TestScene
 					CreateObservedValue("Position",
 						() => _window.Position,
 						(value) => $"Window moved to {value}"),
-					CreateObservedValue("Size",
+					CreateObservedValue("_clientWidth",
+						() => getField<int>(_window, "_clientWidth"),
+						(value) => $"Window width changed to {value}"),
+					CreateObservedValue("_clientHeight",
+						() => getField<int>(_window, "_clientHeight"),
+						(value) => $"Window height changed to {value}"),
+					CreateObservedValue("ClientSize",
 						() => _window.ClientSize,
 						(value) => $"Window resized to {value}"),
 					CreateObservedValue("Opacity",
 						() => _window.Opacity,
 						(value) => $"Window opacity changed to {value}"),
+					/*
 					CreateObservedValue("_fullscreen",
 						() => getField<bool>(_window, "_fullscreen")),
 					CreateObservedValue("_maximized",
@@ -128,14 +136,14 @@ public class IWindowTest : TestScene
 					CreateObservedValue("_preMinimizedMaximized",
 						() => getField<bool>(_window, "_preMinimizedMaximized")),
 					CreateObservedValue("_preMinimizedFullscreen",
-						() => getField<bool>(_window, "_preMinimizedFullscreen")),
+						() => getField<bool>(_window, "_preMinimizedFullscreen")),*/
 			})
 		});
 	}
 
 	private T getField<T>(object? obj, string name)
 	{
-		var type = typeof(AzaleaGame).Assembly.GetType("Azalea.Platform.Desktop.GLFWWindow")!;
+		var type = typeof(AzaleaGame).Assembly.GetType("Azalea.Platform.Glfw.GLFWWindow")!;
 		return (T)type.GetField(name, BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(obj)!;
 	}
 

@@ -10,6 +10,8 @@ public struct HostPreferences
 	public string WindowTitle = "Azalea Game";
 	public bool TransparentFramebuffer = false;
 	public bool DecoratedWindow = true;
+	public bool VSync = true;
+	public bool WindowVisible = false;
 
 	public HostPreferences() { }
 }

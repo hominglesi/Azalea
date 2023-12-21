@@ -33,7 +33,7 @@ public static class Vector2Extentions
 
 	public static void Distance(ref Vector2 vec1, ref Vector2 vec2, out float result)
 	{
-		result = MathF.Sqrt((vec2.X - vec1.X) * (vec2.X - vec1.X) - (vec2.Y - vec1.Y) * (vec2.Y - vec1.Y));
+		result = MathF.Sqrt((vec2.X - vec1.X) * (vec2.X - vec1.X) + (vec2.Y - vec1.Y) * (vec2.Y - vec1.Y));
 	}
 
 	public static float PerpDot(Vector2 left, Vector2 right)

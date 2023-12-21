@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.Colors;
+﻿using Azalea.Debugging;
+using Azalea.Graphics.Colors;
 using Azalea.Graphics.OpenGL.Batches;
 using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.OpenGL.Textures;
@@ -17,9 +18,10 @@ internal class GLRenderer : Renderer
 	{
 		base.FinishFrame();
 
-		Window.SwapBuffers();
+		PerformanceTrace.RunAndTrace(Window.SwapBuffers, "Window.SwapBuffers");
 
-		GL.PrintErrors();
+		if (AzaleaSettings.IgnoreGLError == false)
+			PerformanceTrace.RunAndTrace(GL.PrintErrors, "GL.PrintErrors");
 	}
 
 	protected override void SetViewportImplementation(Vector2Int size)

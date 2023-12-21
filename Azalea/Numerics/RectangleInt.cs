@@ -34,6 +34,7 @@ public struct RectangleInt : IEquatable<RectangleInt>
 	public readonly Vector2Int BottomLeft => new(Left, Bottom);
 	public readonly Vector2Int BottomRight => new(Right, Bottom);
 
+	public readonly Vector2Int Position => new(X, Y);
 	public readonly Vector2Int Size => new(Width, Height);
 
 	public readonly RectangleInt Offset(Vector2Int pos) => Offset(pos.X, pos.Y);

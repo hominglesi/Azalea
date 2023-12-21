@@ -1,17 +1,16 @@
-﻿using Azalea.Inputs;
-using Azalea.Platform.Desktop.Glfw;
-using Azalea.Platform.Desktop.Glfw.Enums;
-using Azalea.Platform.Desktop.Glfw.Native;
+﻿using Azalea.Debugging;
+using Azalea.Inputs;
+using Azalea.Platform.Glfw;
 using System.Collections.Generic;
 
 namespace Azalea.Platform.Desktop;
 internal class GLFWInput : IInputManager
 {
-	private GLFW_Window _window;
+	private Window _window;
 
 	private List<GLFWJoystick> _joysticks = new();
 
-	public GLFWInput(GLFW_Window window)
+	public GLFWInput(Window window)
 	{
 		_window = window;
 
@@ -42,7 +41,7 @@ internal class GLFWInput : IInputManager
 
 	public void ProcessInputs()
 	{
-		GLFW.PollEvents();
+		PerformanceTrace.RunAndTrace(GLFW.PollEvents, "GLFW.PollEvents");
 
 		Input.HandleMousePositionChange(GLFW.GetCursorPos(_window));
 
@@ -58,34 +57,34 @@ internal class GLFWInput : IInputManager
 	}
 
 	private GLFW.KeyCallback _keyCallback;
-	private void onKeyEvent(GLFW_Window window, int key, int scancode, int action, int mods)
+	private void onKeyEvent(Window window, int key, int scancode, int action, int mods)
 	{
 		Keys azkey = GLFWExtentions.KeycodeToKey(key);
 
-		if (action == (int)GLFWKeyEvent.Press || action == (int)GLFWKeyEvent.Release)
+		if (action == (int)KeyEvent.Press || action == (int)KeyEvent.Release)
 		{
-			Input.HandleKeyboardKeyStateChange(azkey, action == (int)GLFWKeyEvent.Press);
+			Input.HandleKeyboardKeyStateChange(azkey, action == (int)KeyEvent.Press);
 		}
-		else if (action == (int)GLFWKeyEvent.Repeat)
+		else if (action == (int)KeyEvent.Repeat)
 		{
 			Input.HandleKeyboardKeyRepeat(azkey);
 		}
 	}
 
 	private GLFW.CharCallback _charCallback;
-	private void onCharEvent(GLFW_Window window, uint charCode)
+	private void onCharEvent(Window window, uint charCode)
 	{
 		Input.HandleTextInput((char)charCode);
 	}
 
 	private GLFW.MouseButtonCallback _mouseButtonCallback;
-	private void onMouseButtonEvent(GLFW_Window window, int button, int action, int mods)
+	private void onMouseButtonEvent(Window window, int button, int action, int mods)
 	{
-		Input.HandleMouseButtonStateChange((MouseButton)button, action == (int)GLFWKeyEvent.Press);
+		Input.HandleMouseButtonStateChange((MouseButton)button, action == (int)KeyEvent.Press);
 	}
 
 	private GLFW.ScrollCallback _scrollCallback;
-	private void onScrollEvent(GLFW_Window window, double xOffset, double yOffset)
+	private void onScrollEvent(Window window, double xOffset, double yOffset)
 	{
 		_xScroll += (float)xOffset;
 		_yScroll += (float)yOffset;

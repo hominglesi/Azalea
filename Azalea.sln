@@ -32,8 +32,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azalea.Benchmarks", "Azalea.Benchmarks\Azalea.Benchmarks.csproj", "{1876670D-27F6-4C13-92BE-2F16B1C3E963}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,14 +96,6 @@ Global
 		{81081890-063A-4D01-8F3D-15358B4AAF53}.Release|Any CPU.Build.0 = Release|Any CPU
 		{81081890-063A-4D01-8F3D-15358B4AAF53}.Release|x64.ActiveCfg = Release|x64
 		{81081890-063A-4D01-8F3D-15358B4AAF53}.Release|x64.Build.0 = Release|x64
-		{1876670D-27F6-4C13-92BE-2F16B1C3E963}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1876670D-27F6-4C13-92BE-2F16B1C3E963}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1876670D-27F6-4C13-92BE-2F16B1C3E963}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{1876670D-27F6-4C13-92BE-2F16B1C3E963}.Debug|x64.Build.0 = Debug|Any CPU
-		{1876670D-27F6-4C13-92BE-2F16B1C3E963}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1876670D-27F6-4C13-92BE-2F16B1C3E963}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1876670D-27F6-4C13-92BE-2F16B1C3E963}.Release|x64.ActiveCfg = Release|Any CPU
-		{1876670D-27F6-4C13-92BE-2F16B1C3E963}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -115,7 +115,7 @@ public class TextContainer : FlexContainer
 	}
 
 	public ITextPart AddText(string text, Action<SpriteText>? creationParameters = null)
-	=> AddPart(CreateChunkFor(text, CreateSpriteText, creationParameters));
+		=> AddPart(CreateChunkFor(text ??= "", CreateSpriteText, creationParameters));
 
 	protected internal virtual TextChunk<TSpriteText> CreateChunkFor<TSpriteText>(string text, Func<TSpriteText> creationFunc,
 		Action<TSpriteText>? creationParameters = null)

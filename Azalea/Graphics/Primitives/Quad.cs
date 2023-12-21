@@ -47,6 +47,7 @@ public readonly struct Quad
 
 	public float Width => Vector2Extentions.Distance(TopLeft, TopRight);
 	public float Height => Vector2Extentions.Distance(TopLeft, BottomLeft);
+	public Vector2 Size => new(Width, Height);
 
 	public Rectangle AABBFloat
 	{

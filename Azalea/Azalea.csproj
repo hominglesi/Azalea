@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Title>$(AssemblyName)</Title>
-    <Version>1.4</Version>
+    <Version>1.4.1-preRelease3</Version>
     <Authors>hominglesi</Authors>
     <Company>Azalea</Company>
     <Description>A 2D game engine.</Description>
@@ -16,6 +16,9 @@
     <PackageReleaseNotes>https://github.com/hominglesi/Azalea/releases</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageId>$(AssemblyName)</PackageId>
+    <DebugSymbols>true</DebugSymbols>
+    <EmbedAllSources>true</EmbedAllSources>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,9 +30,6 @@
 	
 	<ItemGroup>
     <EmbeddedResource Include="Resources\**\*" />
-    <None Remove="resources\shaders\fragment_shader.glsl" />
-    <None Remove="resources\shaders\vertex_shader.glsl" />
-    <None Remove="Resources\Textures\bullseye-pointer.png" />
     <None Include="Resources\Textures\azalea-icon.png" Pack="true" PackagePath="\" />
     <None Include="../README.md" Pack="true" PackagePath="\" />
   </ItemGroup>

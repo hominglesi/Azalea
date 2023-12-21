@@ -1,6 +1,5 @@
 ﻿using Azalea.Layout;
 using Azalea.Text;
-using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -8,8 +7,6 @@ namespace Azalea.Graphics.Sprites;
 
 public partial class SpriteText : GameObject
 {
-	private static readonly char[] default_never_fixed_width_characters = { '.', ',', ':', ' ' };
-
 	public SpriteText()
 	{
 		AddLayout(_charactersCache);
@@ -22,7 +19,7 @@ public partial class SpriteText : GameObject
 		get => _text;
 		set
 		{
-			if (_text.Equals(value))
+			if (_text == value)
 				return;
 
 			_text = value;
@@ -41,76 +38,16 @@ public partial class SpriteText : GameObject
 		}
 	}
 
-	private bool _useFullGlyphHeight = true;
+	private Vector2 _spacing;
 
-	public bool UseFullGlyphHeight
+	public Vector2 Spacing
 	{
-		get => _useFullGlyphHeight;
+		get => _spacing;
 		set
 		{
-			if (_useFullGlyphHeight == value) return;
+			if (_spacing == value) return;
 
-			_useFullGlyphHeight = value;
-
-			invalidate(true, true);
-		}
-	}
-
-	private bool _requiresAutoSizedWidth => _explicitWidth == null && (RelativeSizeAxes & Axes.X) == 0;
-	private bool _requiresAutoSizedHeight => _explicitHeight == null && (RelativeSizeAxes & Axes.Y) == 0;
-
-	private float? _explicitWidth;
-
-	public override float Width
-	{
-		get
-		{
-			if (_requiresAutoSizedWidth)
-				computeCharacters();
-			return base.Width;
-		}
-		set
-		{
-			if (_explicitWidth == value)
-				return;
-
-			base.Width = value;
-			_explicitWidth = value;
-
-			invalidate(true, true);
-		}
-	}
-
-	private float? _explicitHeight;
-
-	public override float Height
-	{
-		get
-		{
-			if (_requiresAutoSizedHeight) computeCharacters();
-			return base.Height;
-		}
-		set
-		{
-			if (_explicitHeight == value) return;
-
-			base.Height = value;
-			_explicitHeight = value;
-
-			invalidate(true, true);
-		}
-	}
-
-	private float _maxWidth = float.PositiveInfinity;
-
-	public float MaxWidth
-	{
-		get => _maxWidth;
-		set
-		{
-			if (_maxWidth == value) return;
-
-			_maxWidth = value;
+			_spacing = value;
 			invalidate(true, true);
 		}
 	}
@@ -123,64 +60,15 @@ public partial class SpriteText : GameObject
 		set
 		{
 			if (_padding.Equals(value)) return;
-
 			_padding = value;
 
 			invalidate(true, true);
 		}
 	}
 
-	public override Vector2 Size
-	{
-		get
-		{
-			if (_requiresAutoSizedWidth || _requiresAutoSizedHeight)
-				computeCharacters();
+	private List<ScreenSpaceCharacterPart>? _parts;
 
-			return base.Size;
-		}
-		set
-		{
-			Width = value.X;
-			Height = value.Y;
-		}
-	}
-
-	private Vector2 _spacing;
-
-	public Vector2 Spacing
-	{
-		get => _spacing;
-		set
-		{
-			if (_spacing == value) return;
-
-			_spacing = value;
-
-			invalidate(true, true);
-		}
-	}
-
-	private readonly LayoutValue _charactersCache = new(Invalidation.DrawSize | Invalidation.Presence, InvalidationSource.Parent);
-
-	public override bool IsPresent => base.IsPresent && (AlwaysPresent || string.IsNullOrEmpty(_displayedText) == false);
-
-	protected override DrawNode CreateDrawNode() => new SpriteTextDrawNode(this);
-
-	private void invalidate(bool characters = false, bool textBuilder = false)
-	{
-		if (characters)
-			_charactersCache.Invalidate();
-
-		if (textBuilder)
-			_textBuilderCache = null;
-	}
-
-	private string _displayedText => _text;
-
-
-	private readonly List<TextBuilderGlyph> _characterBacking = new();
-
+	public List<TextBuilderGlyph> Characters => _characters;
 	private List<TextBuilderGlyph> _characters
 	{
 		get
@@ -189,6 +77,12 @@ public partial class SpriteText : GameObject
 			return _characterBacking;
 		}
 	}
+
+	private bool _requiresAutoSizedWidth => (RelativeSizeAxes & Axes.X) == 0;
+	private bool _requiresAutoSizedHeight => (RelativeSizeAxes & Axes.Y) == 0;
+
+	private readonly List<TextBuilderGlyph> _characterBacking = new();
+	private readonly LayoutValue _charactersCache = new(Invalidation.DrawSize | Invalidation.Presence, InvalidationSource.Parent);
 
 	private void computeCharacters()
 	{
@@ -200,45 +94,24 @@ public partial class SpriteText : GameObject
 
 		try
 		{
-			if (string.IsNullOrEmpty(_displayedText))
+			if (string.IsNullOrEmpty(Text))
 				return;
 
 			TextBuilder textBuilder = getTextBuilder();
 
 			textBuilder.Reset();
-			textBuilder.AddText(_displayedText);
+			textBuilder.AddText(Text);
 			textBounds = textBuilder.Bounds;
 		}
 		finally
 		{
 			if (_requiresAutoSizedWidth)
-				base.Width = textBounds.X + Padding.Right;
+				Width = textBounds.X + Padding.Right;
 			if (_requiresAutoSizedHeight)
-				base.Height = textBounds.Y + Padding.Bottom;
-
-			base.Width = Math.Min(base.Width, MaxWidth);
+				Height = textBounds.Y + Padding.Bottom;
 
 			_charactersCache.Validate();
 		}
-	}
-
-	protected virtual char[]? FixedWidthExcludeCharacters => null;
-
-	protected virtual char FixedWidthReferenceCharacter => 'm';
-
-	protected virtual char FallbackCharacter => '?';
-
-	private TextBuilder? _textBuilderCache;
-
-	protected virtual TextBuilder CreateTextBuilder()
-	{
-		char[] excludeCharacters = FixedWidthExcludeCharacters ?? default_never_fixed_width_characters;
-
-		float builderMaxWidth = _requiresAutoSizedWidth ? MaxWidth
-			: ApplyRelativeAxes(RelativeSizeAxes, new Vector2(Math.Min(MaxWidth, base.Width), base.Height), FillMode).X - Padding.Right;
-
-		return new TextBuilder(Font, builderMaxWidth, UseFullGlyphHeight, new Vector2(Padding.Left, Padding.Top), Spacing,
-			_characterBacking, excludeCharacters, FallbackCharacter, FixedWidthReferenceCharacter);
 	}
 
 	private TextBuilder getTextBuilder()
@@ -249,12 +122,30 @@ public partial class SpriteText : GameObject
 		return _textBuilderCache;
 	}
 
-	public float LineBaseHeight
+	private TextBuilder? _textBuilderCache;
+	protected virtual char[]? FixedWidthExcludeCharacters => null;
+	protected virtual char FixedWidthReferenceCharacter => 'm';
+	protected virtual char FallbackCharacter => '?';
+	private static readonly char[] default_never_fixed_width_characters = { '.', ',', ':', ' ' };
+	protected virtual TextBuilder CreateTextBuilder()
 	{
-		get
-		{
-			computeCharacters();
-			return _textBuilderCache == null ? (_textBuilderCache = getTextBuilder()).LineBaseHeight : _textBuilderCache.LineBaseHeight;
-		}
+		char[] excludeCharacters = FixedWidthExcludeCharacters ?? default_never_fixed_width_characters;
+
+		float builderMaxWidth = _requiresAutoSizedWidth ? float.PositiveInfinity
+			: ApplyRelativeAxes(RelativeSizeAxes, new Vector2(Width, Height), FillMode).X - Padding.Right;
+
+		return new TextBuilder(Font, builderMaxWidth, true, new Vector2(Padding.Left, Padding.Top), Spacing,
+			_characterBacking, excludeCharacters, FallbackCharacter, FixedWidthReferenceCharacter);
+	}
+
+	protected override DrawNode CreateDrawNode() => new SpriteTextDrawNode(this);
+
+	private void invalidate(bool characters = false, bool textBuilder = false)
+	{
+		if (characters)
+			_charactersCache.Invalidate();
+
+		if (textBuilder)
+			_textBuilderCache = null;
 	}
 }

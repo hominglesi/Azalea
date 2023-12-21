@@ -21,8 +21,6 @@ public class AssemblyResourceStore : IResourceStore
 	{
 		var resourcePath = getResourcePath(path);
 
-		var x = _assembly.GetManifestResourceNames();
-
 		return _assembly?.GetManifestResourceStream(resourcePath);
 	}
 

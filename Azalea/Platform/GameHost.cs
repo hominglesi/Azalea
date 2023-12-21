@@ -1,5 +1,4 @@
-﻿//using Azalea.Audios;
-using Azalea.Audio;
+﻿using Azalea.Audio;
 using Azalea.Debugging;
 using Azalea.Design.Containers;
 using Azalea.Extentions;
@@ -27,8 +26,6 @@ public abstract class GameHost
 
 	private Composition? _root;
 
-	private Stopwatch _stopwatch = new();
-
 	public virtual void Run(AzaleaGame game)
 	{
 		var root = new DebuggingOverlay();
@@ -42,25 +39,64 @@ public abstract class GameHost
 
 		_root = root;
 
+		float accumulator = 0;
+		float targetFrameTime = 1 / (float)60;
+
+		DateTime lastFrameTime = Time.GetCurrentPreciseTime();
+		DateTime frameTime;
+		float deltaTime;
+
+		var firstWindowShow = false;
+
 		//Game Loop
 		CallInitialized();
 		while (Window.ShouldClose == false)
 		{
-			if (_stopwatch.IsRunning == false) _stopwatch.Start();
+			StartFrame();
 
-			CallOnUpdate();
+			frameTime = Time.GetCurrentPreciseTime();
+			deltaTime = (float)frameTime.Subtract(lastFrameTime).TotalSeconds;
+			lastFrameTime = frameTime;
 
-			CallOnRender();
+			accumulator += deltaTime;
 
-			InputManager.ProcessInputs();
+			while (accumulator >= targetFrameTime)
+			{
+				PerformanceTrace.RunAndTrace(CallOnFixedUpdate, "FixedUpdate");
+				accumulator -= targetFrameTime;
+			}
 
-			Time.Update((float)_stopwatch.Elapsed.TotalSeconds);
-			_stopwatch.Restart();
+			PerformanceTrace.RunAndTrace(CallOnUpdate, "Update");
+			PerformanceTrace.RunAndTrace(CallOnRender, "Render");
+
+			if (firstWindowShow == false)
+			{
+				Window.Visible = true;
+				firstWindowShow = true;
+			}
+
+			PerformanceTrace.RunAndTrace(InputManager.ProcessInputs, "Input");
+
+			EndFrame();
+			Time.Update(deltaTime);
 		}
+
+		PerformanceTrace.SaveEventsTo("D:\\Programming\\trace.txt");
 
 		Window.Dispose();
 		AudioManager.Dispose();
 		Assets.DisposeAssets();
+	}
+
+	private long _frameStart;
+	internal void StartFrame()
+	{
+		_frameStart = PerformanceTrace.StartEvent();
+	}
+
+	protected void EndFrame()
+	{
+		PerformanceTrace.AddEvent(_frameStart, "Frame");
 	}
 
 	public virtual void CallInitialized()
@@ -92,6 +128,11 @@ public abstract class GameHost
 		Root.UpdateSubTree();
 
 		Input.LateUpdate();
+	}
+
+	public virtual void CallOnFixedUpdate()
+	{
+		Root.FixedUpdateSubTree();
 	}
 
 	protected virtual IClipboard? CreateClipboard() => null;

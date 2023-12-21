@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace Azalea.Platform;
 
@@ -43,14 +43,23 @@ public static class Time
 
 	#region Precise Time
 
-	[DllImport("Kernel32.dll", EntryPoint = "GetSystemTimePreciseAsFileTime", CallingConvention = CallingConvention.Winapi)]
-	private static extern void getSystemTimePreciseAsFileTime(out long filetime);
+	private static long getTicksSinceStartup() => Stopwatch.GetTimestamp();
+	private static long getCurrentTicks() => _startTime + getTicksSinceStartup();
+
+	private static long _startTime;
+	static Time()
+	{
+		_startTime = DateTime.UtcNow.Ticks - getTicksSinceStartup();
+	}
 
 	public static DateTime GetCurrentPreciseTime()
 	{
-		getSystemTimePreciseAsFileTime(out long filetime);
+		return DateTime.FromFileTimeUtc(getCurrentTicks());
+	}
 
-		return DateTime.FromFileTimeUtc(filetime);
+	public static float GetPreciseMilisecondsSince(DateTime time)
+	{
+		return (float)GetCurrentPreciseTime().Subtract(time).TotalMilliseconds;
 	}
 
 	#endregion
