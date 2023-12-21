@@ -42,14 +42,14 @@ public abstract class GameHost
 		float accumulator = 0;
 		float targetFrameTime = 1 / (float)60;
 
+		CallInitialized();
+
 		DateTime lastFrameTime = Time.GetCurrentPreciseTime();
 		DateTime frameTime;
 		float deltaTime;
-
 		var firstWindowShow = false;
 
 		//Game Loop
-		CallInitialized();
 		while (Window.ShouldClose == false)
 		{
 			StartFrame();
@@ -57,6 +57,8 @@ public abstract class GameHost
 			frameTime = Time.GetCurrentPreciseTime();
 			deltaTime = (float)frameTime.Subtract(lastFrameTime).TotalSeconds;
 			lastFrameTime = frameTime;
+
+			Time.Update(deltaTime);
 
 			accumulator += deltaTime;
 
@@ -78,7 +80,6 @@ public abstract class GameHost
 			PerformanceTrace.RunAndTrace(InputManager.ProcessInputs, "Input");
 
 			EndFrame();
-			Time.Update(deltaTime);
 		}
 
 		PerformanceTrace.SaveEventsTo("D:\\Programming\\trace.txt");
