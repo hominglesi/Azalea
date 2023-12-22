@@ -1,4 +1,5 @@
-﻿using Azalea.Design.Containers;
+﻿using Azalea.Amends;
+using Azalea.Design.Containers;
 using Azalea.Design.Containers.Text;
 using Azalea.Design.Shapes;
 using Azalea.Design.UserInterface;
@@ -43,9 +44,16 @@ public class TestingTestScene : TestScene
 
 		Add(_sprite = new Sprite()
 		{
-			Position = new(500, 600),
+			Position = new(0, 600),
 			Texture = tileset.Tiles[0],
 		});
+
+		_sprite.Loop((s) =>
+		{
+			s.RepositionBy(new(1000, 0), 3)
+			.Then().RepositionBy(new(-1000, 0), 3);
+		}, 6);
+
 
 		/*
 		var tilemap = Assets.MainStore.GetTilemap("MapForTiled/FirstMap.tmx");
