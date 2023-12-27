@@ -2,6 +2,7 @@
 using System;
 
 namespace Azalea.IO.Resources;
+
 public static partial class ResourceStoreExtentions
 {
 	private static ResourceCache<Texture> _textureCache = new();

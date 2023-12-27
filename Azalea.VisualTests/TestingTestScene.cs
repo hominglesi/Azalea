@@ -2,11 +2,16 @@
 using Azalea.Design.Containers;
 using Azalea.Design.Containers.Text;
 using Azalea.Design.Shapes;
+using Azalea.Design.Tiled;
 using Azalea.Design.UserInterface;
+using Azalea.Graphics;
+using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
+using Azalea.Graphics.Textures;
 using Azalea.Inputs;
 using Azalea.IO.Resources;
 using Azalea.Platform;
+using System.Numerics;
 
 namespace Azalea.VisualTests;
 
@@ -54,8 +59,6 @@ public class TestingTestScene : TestScene
 			.Then().RepositionBy(new(-1000, 0), 3);
 		}, 6);
 
-
-		/*
 		var tilemap = Assets.MainStore.GetTilemap("MapForTiled/FirstMap.tmx");
 
 		//var zoomMultiplier = new Vector2(1280, 720) / new Vector2(tilemap.Width * tilemap.TileWidth, tilemap.Height * tilemap.TileHeight);
@@ -93,8 +96,6 @@ public class TestingTestScene : TestScene
 			Size = new(50, 50),
 			Origin = Anchor.BottomCenter
 		});
-		*/
-		/*
 		Add(_wrapper = new Composition()
 		{
 			RelativeSizeAxes = Axes.Both,
@@ -221,7 +222,7 @@ public class TestingTestScene : TestScene
 		Add(_cursor = new Box()
 		{
 			Size = new(50, 50)
-		});*/
+		});
 	}
 
 

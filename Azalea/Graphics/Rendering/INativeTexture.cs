@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azalea.Graphics.Textures;
+using System;
 
 namespace Azalea.Graphics.Rendering;
 
@@ -9,4 +10,5 @@ internal interface INativeTexture : IDisposable
 	int Height { get; }
 
 	void SetData(Image upload);
+	void SetFiltering(TextureFiltering minFilter, TextureFiltering magFilter);
 }

@@ -1,5 +1,7 @@
 ﻿using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.Rendering;
+using Azalea.Graphics.Textures;
+using Azalea.IO.Resources;
 using Azalea.Utils;
 using System;
 
@@ -31,8 +33,7 @@ internal class GLTexture : Disposable, INativeTexture
 
 		_renderer.BindTexture(this, 0);
 
-		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MinFilter, (int)GLFunction.Nearest);
-		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MagFilter, (int)GLFunction.Nearest);
+		SetFiltering(Assets.DefaultMinFiltering, Assets.DefaultMagFiltering);
 		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.WrapS, (int)GLWrapFunction.ClampToEdge);
 		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.WrapT, (int)GLWrapFunction.ClampToEdge);
 
@@ -40,6 +41,15 @@ internal class GLTexture : Disposable, INativeTexture
 			_width, _height, 0, GLColorFormat.RGBA, GLDataType.UnsignedByte, image.Data);
 
 		GL.GenerateMipmap(GLTextureType.Texture2D);
+	}
+
+	public void SetFiltering(TextureFiltering minFilter, TextureFiltering magFilter)
+	{
+		_renderer.BindTexture(this, 0);
+		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MinFilter,
+			minFilter == TextureFiltering.Nearest ? (int)GLFunction.Nearest : (int)GLFunction.Linear);
+		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MagFilter,
+			magFilter == TextureFiltering.Nearest ? (int)GLFunction.Nearest : (int)GLFunction.Linear);
 	}
 
 	public void Bind(uint slot = 0)
