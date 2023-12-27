@@ -24,7 +24,7 @@ public interface IRenderer
 	internal void SetViewport(Vector2Int size);
 
 	internal IVertexBatch CreateQuadBatch(int size);
-	internal Texture CreateTexture(int width, int height);
+	internal Texture CreateTexture(Image image);
 	internal bool BindTexture(Texture texture, int unit = 0);
 
 	internal void PushScissor(RectangleInt scissorRect);

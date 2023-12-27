@@ -13,7 +13,6 @@ public static partial class Assets
 	public static IResourceStore FileSystem => _fileSystemStore;
 	private static FileSystemStore _fileSystemStore;
 
-
 	public static Action? OnDispose;
 
 	static Assets()

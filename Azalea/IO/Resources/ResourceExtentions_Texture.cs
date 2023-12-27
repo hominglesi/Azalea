@@ -1,5 +1,4 @@
-﻿using Azalea.Graphics.Rendering;
-using Azalea.Graphics.Textures;
+﻿using Azalea.Graphics.Textures;
 using System;
 
 namespace Azalea.IO.Resources;
@@ -17,23 +16,10 @@ public static partial class ResourceStoreExtentions
 		if (stream == null)
 			return Assets.MissingTexture ?? throw new Exception("Texture could not be found.");
 
-		var data = store.GetTextureData(path);
-		var texture = createTexture(data);
+		var data = store.GetImage(path);
+		var texture = AzaleaGame.Main.Host.Renderer.CreateTexture(data);
 		_textureCache.AddValue(store, path, texture);
 
 		return texture;
 	}
-
-	public static Texture CreateTexture(this IResourceStore store, TextureData data)
-		=> createTexture(data);
-
-	private static Texture createTexture(TextureData data)
-	{
-		var texture = Renderer.CreateTexture(data.Width, data.Height);
-		texture.SetData(data);
-
-		return texture;
-	}
-
-	private static IRenderer Renderer => AzaleaGame.Main.Host.Renderer;
 }

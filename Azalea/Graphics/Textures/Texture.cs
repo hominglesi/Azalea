@@ -1,7 +1,6 @@
 ﻿using Azalea.Graphics.Rendering;
 using Azalea.Utils;
 using System;
-using System.IO;
 using System.Numerics;
 using Rect = Azalea.Numerics.Rectangle;
 
@@ -21,23 +20,7 @@ public class Texture : Disposable
 		NativeTexture = nativeTexture ?? throw new ArgumentNullException(nameof(nativeTexture));
 	}
 
-	public static Texture? FromStream(IRenderer renderer, Stream? stream)
-	{
-		if (stream is null || stream.Length == 0)
-			return null;
-
-		var data = new TextureData(stream);
-		return FromData(renderer, data);
-	}
-
-	public static Texture? FromData(IRenderer renderer, TextureData data)
-	{
-		Texture texture = renderer.CreateTexture(data.Width, data.Height);
-		texture.SetData(data);
-		return texture;
-	}
-
-	internal void SetData(ITextureData upload)
+	internal void SetData(Image upload)
 	{
 		NativeTexture.SetData(upload);
 	}

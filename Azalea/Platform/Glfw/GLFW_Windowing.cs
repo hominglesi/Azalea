@@ -1,5 +1,4 @@
 ﻿using Azalea.Graphics;
-using Azalea.Graphics.Textures;
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -45,7 +44,7 @@ internal static unsafe partial class GLFW
 	[DllImport(LibraryPath, EntryPoint = "glfwSetWindowIcon")]
 	private static extern void setWindowIcon(Window window, int count, IntPtr nullPointer);
 
-	public static void SetWindowIcon(Window window, ITextureData? data)
+	public static void SetWindowIcon(Window window, Graphics.Image? data)
 	{
 		if (data is null)
 		{

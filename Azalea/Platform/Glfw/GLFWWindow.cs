@@ -1,5 +1,4 @@
-﻿using Azalea.Graphics.Textures;
-using System;
+﻿using System;
 
 namespace Azalea.Platform.Glfw;
 internal class GLFWWindow : PlatformWindow
@@ -139,7 +138,7 @@ internal class GLFWWindow : PlatformWindow
 		=> GLFW.RequestWindowAttention(Handle);
 	protected override void FocusImplementation()
 		=> GLFW.FocusWindow(Handle);
-	protected override void SetIconImplementation(ITextureData? data)
+	protected override void SetIconImplementation(Graphics.Image? data)
 		=> GLFW.SetWindowIcon(Handle, data);
 	protected override void SetShouldCloseImplementation(bool shouldClose)
 		=> GLFW.SetWindowShouldClose(Handle, shouldClose);

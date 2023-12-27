@@ -1,6 +1,5 @@
 ﻿using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.Rendering;
-using Azalea.Graphics.Textures;
 using Azalea.Utils;
 using System;
 
@@ -22,7 +21,7 @@ internal class GLTexture : Disposable, INativeTexture
 		_handle = GL.GenTexture();
 	}
 
-	internal void SetData(ITextureData image)
+	internal void SetData(Image image)
 	{
 		if (image.Width != _width || image.Height != _height)
 		{
@@ -56,7 +55,7 @@ internal class GLTexture : Disposable, INativeTexture
 	public int Height => _height;
 
 
-	void INativeTexture.SetData(ITextureData upload) => SetData(upload);
+	void INativeTexture.SetData(Image upload) => SetData(upload);
 
 	protected override void OnDispose()
 	{

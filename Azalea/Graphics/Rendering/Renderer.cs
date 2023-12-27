@@ -2,7 +2,6 @@
 using Azalea.Graphics.Textures;
 using Azalea.Numerics;
 using Azalea.Platform;
-using StbImageSharp;
 using System;
 using System.Collections.Generic;
 using AzaleaColor = Azalea.Graphics.Colors.Color;
@@ -50,19 +49,10 @@ internal abstract class Renderer : IRenderer
 	public Texture WhitePixel => _whitePixel ??= generateWhitePixel();
 	private Texture generateWhitePixel()
 	{
-		var whitePixel = CreateTexture(1, 1);
+		var whitePixel = new Image(1, 1,
+			new byte[4] { byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue });
 
-		var result = new ImageResult()
-		{
-			Width = 1,
-			Height = 1,
-			Data = new byte[4] { byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue },
-			SourceComp = ColorComponents.RedGreenBlueAlpha,
-			Comp = ColorComponents.RedGreenBlueAlpha
-		};
-
-		whitePixel.SetData(new TextureData(result));
-		return whitePixel;
+		return CreateTexture(whitePixel);
 	}
 
 	protected abstract bool SetTextureImplementation(INativeTexture? texture, int unit);
@@ -76,11 +66,13 @@ internal abstract class Renderer : IRenderer
 
 	protected abstract IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size);
 	protected abstract INativeTexture CreateNativeTexture(int width, int height);
-	public Texture CreateTexture(int width, int height)
-		=> CreateTexture(CreateNativeTexture(width, height));
+	public Texture CreateTexture(Image image)
+	{
+		var nativeTexture = CreateNativeTexture(image.Width, image.Height);
+		nativeTexture.SetData(image);
 
-	internal Texture CreateTexture(INativeTexture nativeTexture)
-		=> new(nativeTexture);
+		return new Texture(nativeTexture);
+	}
 
 	internal virtual void BeginFrame()
 	{

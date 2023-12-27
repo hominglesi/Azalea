@@ -1,4 +1,4 @@
-﻿using Azalea.Graphics.Textures;
+﻿using Azalea.Graphics;
 using Azalea.Utils;
 using System;
 using System.IO;
@@ -215,10 +215,10 @@ internal abstract class PlatformWindow : Disposable, IWindow
 	protected abstract void FocusImplementation();
 	public void Focus() => FocusImplementation();
 
-	protected abstract void SetIconImplementation(ITextureData? data);
+	protected abstract void SetIconImplementation(Image? data);
 	public void SetIconFromStream(Stream? imageStream)
 	{
-		var data = imageStream is null ? null : new TextureData(TextureData.LoadFromStream(imageStream));
+		var data = imageStream is null ? null : Image.FromStream(imageStream);
 		SetIconImplementation(data);
 	}
 

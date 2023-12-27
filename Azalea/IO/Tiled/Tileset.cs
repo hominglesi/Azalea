@@ -1,4 +1,5 @@
 ﻿using Azalea.Extentions;
+using Azalea.Graphics;
 using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
 using Azalea.Numerics;
@@ -38,13 +39,13 @@ public readonly struct Tileset
 			margin = tilesetNode.GetIntAttribute("margin");
 
 		var imageNodes = tilesetNode.SelectNodes("image")!;
-		var sources = new TextureData[imageNodes.Count];
+		var sources = new Image[imageNodes.Count];
 
 		for (int i = 0; i < imageNodes.Count; i++)
 		{
 			var image = imageNodes[i]!;
 			var imagePath = image.GetAttribute("source");
-			var imageData = store.GetTextureData(FileSystemUtils.CombinePaths(Path.GetDirectoryName(path)!, imagePath));
+			var imageData = store.GetImage(FileSystemUtils.CombinePaths(Path.GetDirectoryName(path)!, imagePath));
 
 			sources[i] = imageData;
 		}
@@ -60,7 +61,7 @@ public readonly struct Tileset
 
 		var textureSeeker = new Vector2Int(0, 0);
 
-		var builder = new TextureDataBuilder(textureSize);
+		var atlas = new Image(textureSize.X, textureSize.Y);
 
 		// Add Tileset Texture data to our Texture
 
@@ -68,7 +69,7 @@ public readonly struct Tileset
 		{
 			var source = sources[0];
 			//Copy tile
-			builder.CopyFromTexture(source,
+			atlas.CopyFromSource(source,
 				new RectangleInt(tileSeeker, tileSize),
 				new RectangleInt(textureSeeker + new Vector2Int(1, 1), tileSize));
 
@@ -77,42 +78,42 @@ public readonly struct Tileset
 			var singlePixel = new Vector2Int(1, 1);
 
 			//Copy tile top
-			builder.CopyFromTexture(source,
+			atlas.CopyFromSource(source,
 				new RectangleInt(tileSeeker, horizontalSlice),
 				new RectangleInt(textureSeeker + new Vector2Int(1, 0), horizontalSlice));
 
 			//Copy tile right
-			builder.CopyFromTexture(source,
+			atlas.CopyFromSource(source,
 				new RectangleInt(tileSeeker + new Vector2Int(tileSize.X - 1, 0), verticalSlice),
 				new RectangleInt(textureSeeker + new Vector2Int(paddedSize.X - 1, 1), verticalSlice));
 
 			//Copy tile bottom
-			builder.CopyFromTexture(source,
+			atlas.CopyFromSource(source,
 				new RectangleInt(tileSeeker + new Vector2Int(0, tileSize.Y - 1), horizontalSlice),
 				new RectangleInt(textureSeeker + new Vector2Int(1, paddedSize.Y - 1), horizontalSlice));
 
 			//Copy tile left
-			builder.CopyFromTexture(source,
+			atlas.CopyFromSource(source,
 				new RectangleInt(tileSeeker, verticalSlice),
 				new RectangleInt(textureSeeker + new Vector2Int(0, 1), verticalSlice));
 
 			//Copy tile top-left
-			builder.CopyFromTexture(source,
+			atlas.CopyFromSource(source,
 				new RectangleInt(tileSeeker, singlePixel),
 				new RectangleInt(textureSeeker, singlePixel));
 
 			//Copy tile top-right
-			builder.CopyFromTexture(source,
+			atlas.CopyFromSource(source,
 				new RectangleInt(tileSeeker + new Vector2Int(tileSize.X - 1, 0), singlePixel),
 				new RectangleInt(textureSeeker + new Vector2Int(paddedSize.X - 1, 0), singlePixel));
 
 			//Copy tile bottom-right
-			builder.CopyFromTexture(source,
+			atlas.CopyFromSource(source,
 				new RectangleInt(tileSeeker + tileSize - Vector2Int.One, singlePixel),
 				new RectangleInt(textureSeeker + paddedSize - Vector2Int.One, singlePixel));
 
 			//Copy tile bottom-left
-			builder.CopyFromTexture(source,
+			atlas.CopyFromSource(source,
 				new RectangleInt(tileSeeker + new Vector2Int(0, tileSize.Y - 1), singlePixel),
 				new RectangleInt(textureSeeker + new Vector2Int(0, paddedSize.Y - 1), singlePixel));
 
@@ -132,14 +133,14 @@ public readonly struct Tileset
 		}
 
 		// Create our Texture
-		var builtTexture = builder.Create();
+		var atlasTexture = AzaleaGame.Main.Host.Renderer.CreateTexture(atlas);
 
 		// Create all texture regions
 
 		textureSeeker = Vector2Int.Zero;
 		for (int i = 0; i < tiles.Length; i++)
 		{
-			tiles[i] = new TextureRegion(builtTexture, new RectangleInt(textureSeeker + Vector2Int.One, tileSize));
+			tiles[i] = new TextureRegion(atlasTexture, new RectangleInt(textureSeeker + Vector2Int.One, tileSize));
 
 			textureSeeker.X += paddedSize.X;
 			if (textureSeeker.X + paddedSize.X > textureSize.X)
@@ -158,7 +159,7 @@ public readonly struct Tileset
 			TileSize = tileSize,
 			Spacing = spacing,
 			Margin = margin,
-			Source = builtTexture,
+			Source = atlasTexture,
 			Tiles = tiles
 		};
 	}
