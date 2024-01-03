@@ -41,7 +41,7 @@ internal abstract class Renderer : IRenderer
 
 	protected internal virtual void Initialize()
 	{
-		defaultQuadBatch = CreateQuadBatch(100);
+		defaultQuadBatch = CreateQuadBatch(17000);
 		currentActiveBatch = defaultQuadBatch;
 	}
 

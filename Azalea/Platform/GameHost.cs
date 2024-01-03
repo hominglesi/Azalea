@@ -82,7 +82,7 @@ public abstract class GameHost
 			EndFrame();
 		}
 
-		PerformanceTrace.SaveEventsTo("D:\\Programming\\trace.txt");
+		PerformanceTrace.SaveEventsTo("C:\\Programming\\trace.txt");
 
 		Window.Dispose();
 		AudioManager.Dispose();

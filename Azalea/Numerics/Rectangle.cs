@@ -43,6 +43,14 @@ public struct Rectangle : IEquatable<Rectangle>
 	public readonly bool Contains(Vector2 point)
 		=> X <= point.X && point.X < X + Width && Y <= point.Y && point.Y < Y + Height;
 
+	public readonly bool Intersects(Rectangle other)
+	{
+		if (Left < other.Right && Right > other.Left && Top < other.Bottom)
+			return Bottom > other.Top;
+
+		return false;
+	}
+
 	public readonly bool Equals(Rectangle other)
 		=> X.Equals(other.X) && Y.Equals(other.Y) && Width.Equals(other.Width) && Height.Equals(other.Height);
 	public override readonly bool Equals(object? obj)

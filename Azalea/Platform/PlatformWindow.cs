@@ -64,12 +64,10 @@ internal abstract class PlatformWindow : Disposable, IWindow
 		{
 			if (value == _clientSize) return;
 
-			if (_state == WindowState.BorderlessFullscreen)
-			{
-				//Updating client size while fullscreen should only save it so we have it when leaving fullscreen
-				_clientSize = value;
-				return;
-			}
+			_clientSize = value;
+
+			//Updating client size while fullscreen should only save it so we have it when leaving fullscreen
+			if (_state == WindowState.BorderlessFullscreen) return;
 
 			//GLFW has an onResize callback which will get called anyway so we don't need to update it manually
 			//_clientSize = value;

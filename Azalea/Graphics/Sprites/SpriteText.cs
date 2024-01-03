@@ -23,6 +23,7 @@ public partial class SpriteText : GameObject
 				return;
 
 			_text = value;
+			computeCharacters();
 			invalidate(true, true);
 		}
 	}

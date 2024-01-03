@@ -9,6 +9,8 @@ public class SpriteDrawNode : TexturedShaderDrawNode
 {
 	protected Texture? Texture { get; set; }
 	protected float Time { get; set; }
+	protected float Alpha { get; set; }
+
 	protected Quad ScreenSpaceDrawQuad { get; set; }
 
 	protected new Sprite Source => (Sprite)base.Source;
@@ -22,6 +24,7 @@ public class SpriteDrawNode : TexturedShaderDrawNode
 
 		Texture = Source.Texture;
 		ScreenSpaceDrawQuad = Source.ScreenSpaceDrawQuad;
+		Alpha = Source.Alpha;
 		Time = Source.Time;
 	}
 
@@ -48,6 +51,8 @@ public class SpriteDrawNode : TexturedShaderDrawNode
 	public override void Draw(IRenderer renderer)
 	{
 		base.Draw(renderer);
+
+		if (Alpha <= 0) return;
 
 		Blit(renderer);
 	}
