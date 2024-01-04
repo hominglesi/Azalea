@@ -1,4 +1,5 @@
-﻿using Azalea.Design.Shapes;
+﻿using Azalea.Debugging;
+using Azalea.Design.Shapes;
 using Azalea.Graphics.Colors;
 using Azalea.Numerics;
 using Azalea.Utils;
@@ -24,6 +25,8 @@ public class BreakoutTest : TestScene
 
 	public BreakoutTest()
 	{
+		DebuggingOverlay.FpsDisplay.Origin = Graphics.Anchor.BottomRight;
+		DebuggingOverlay.FpsDisplay.Anchor = Graphics.Anchor.BottomRight;
 		AzaleaGame.Main.Host.Renderer.ClearColor = Palette.Black;
 		var window = AzaleaGame.Main.Host.Window;
 		window.ClientSize = new(GameWidth, GameHeight);

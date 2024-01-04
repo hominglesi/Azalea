@@ -1,6 +1,7 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
+using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using System.Numerics;
@@ -27,18 +28,17 @@ public class DebuggingOverlay : Composition
 	public DebugInspector Inspector;
 	private DebugSceneGraph _sceneGraph;
 
-	private FpsDisplay _fpsDisplay;
-	private bool _showFps = true;
-	internal bool ShowFps
+	private static SpriteText? _fpsDislpay;
+	public static SpriteText FpsDisplay
 	{
-		get => _showFps;
-		set
+		get
 		{
-			if (_showFps == value) return;
-
-			_showFps = value;
-			if (_fpsDisplay is not null)
-				_fpsDisplay.Alpha = _showFps ? 1 : 0;
+			_fpsDislpay ??= new FpsDisplay()
+			{
+				Origin = Anchor.TopRight,
+				Anchor = Anchor.TopRight,
+			};
+			return _fpsDislpay;
 		}
 	}
 
@@ -56,12 +56,7 @@ public class DebuggingOverlay : Composition
 		RemoveInternal(InternalComposition);
 		_gameContainer.Add(InternalComposition);
 
-		AddInternal(_fpsDisplay = new FpsDisplay()
-		{
-			Origin = Anchor.TopRight,
-			Anchor = Anchor.TopRight,
-			Alpha = ShowFps ? 1 : 0,
-		});
+		AddInternal(FpsDisplay);
 
 		AddInternal(_leftContainer = new Composition()
 		{

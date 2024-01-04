@@ -28,16 +28,20 @@ public abstract class GameHost
 
 	public virtual void Run(AzaleaGame game)
 	{
-		var root = new DebuggingOverlay();
-		root.Add(game);
+		if (AzaleaSettings.EnableDebugging)
+		{
+			var root = new DebuggingOverlay();
+			_root = root;
+			Editor._overlay = root;
+		}
+		else
+			_root = new Composition();
 
-		Editor._overlay = root;
+		_root.Add(game);
 
 		game.SetHost(this);
 
 		_clipboard = CreateClipboard();
-
-		_root = root;
 
 		float accumulator = 0;
 		float targetFrameTime = 1 / (float)60;
