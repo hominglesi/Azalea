@@ -1,21 +1,38 @@
-﻿using Azalea.Extentions.IEnumerableExtentions;
-using Azalea.Graphics;
+﻿using Azalea.Graphics;
+using System;
 using System.Collections.Generic;
 
 namespace Azalea.Design.Containers.Text;
-
-public class TextNewLine : TextPart
+public class TextNewLine : GameObject, ITextPart
 {
-	private readonly bool _indicatesNewParagraph;
+	private GameObject _text;
 
-	public TextNewLine(bool indicatesNewParagraph)
+	public TextNewLine()
 	{
-		_indicatesNewParagraph = indicatesNewParagraph;
+		_text = new NewLine();
 	}
 
-	public override IEnumerable<GameObject> CreateGameObjectsFor(TextContainer textComposition)
+	public IEnumerable<GameObject> GameObjects
 	{
-		var newLineComposition = new TextContainer.NewLineComposition();
-		return newLineComposition.Yield();
+		get
+		{
+			yield return _text;
+		}
+	}
+
+	public event Action<IEnumerable<GameObject>>? GameObjectPartsRecreated;
+
+	public void RecreateGameObjectsFor(TextContainer textComposition)
+	{
+
+	}
+
+	private class NewLine : GameObject
+	{
+		public NewLine()
+		{
+			RelativeSizeAxes = Axes.X;
+			Size = new(1, 1);
+		}
 	}
 }

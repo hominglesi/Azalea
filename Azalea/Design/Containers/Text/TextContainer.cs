@@ -122,7 +122,7 @@ public class TextContainer : FlexContainer
 		where TSpriteText : SpriteText, new()
 		=> new(text, creationFunc, creationParameters);
 
-	public void NewLine() => AddPart(new TextNewLine(false));
+	public void NewLine() => AddPart(new TextNewLine());
 
 	protected internal virtual SpriteText CreateSpriteText() => new SpriteText();
 
