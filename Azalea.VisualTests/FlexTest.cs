@@ -18,7 +18,7 @@ public class FlexTest : TestScene
 		Add(_flex = new FlexContainer()
 		{
 			RelativeSizeAxes = Axes.Both,
-
+			Wrapping = FlexWrapping.Wrap
 		});
 	}
 
@@ -63,6 +63,9 @@ public class FlexTest : TestScene
 		if (Input.GetKey(Keys.A).Down)
 			_flex.Alignment = _flex.Alignment.NextValue();
 
+		if (Input.GetKey(Keys.W).Down)
+			_flex.Wrapping = _flex.Wrapping.NextValue();
+
 		if (Input.GetKey(Keys.KeypadPlus).DownOrRepeat)
 			_flex.Spacing += Vector2.One;
 
@@ -75,7 +78,7 @@ public class FlexTest : TestScene
 		if (Input.GetKey(Keys.Enter).Down)
 			_flex.AddNewLine();
 
-		if (Input.GetKey(Keys.Backspace).DownOrRepeat)
+		if (Input.GetKey(Keys.Backspace).DownOrRepeat && _flex.Children.Count > 0)
 			_flex.Remove(_flex.Children[_flex.Children.Count - 1]);
 	}
 }

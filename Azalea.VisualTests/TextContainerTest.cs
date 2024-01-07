@@ -2,7 +2,6 @@
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Utils;
-using System;
 
 namespace Azalea.VisualTests;
 public class TextContainerTest : TestScene
@@ -19,8 +18,9 @@ public class TextContainerTest : TestScene
 
 		_scrollable.Add(_flex = new FlexContainer()
 		{
-			Height = 10000,
+			AutoSizeAxes = Graphics.Axes.Y,
 			RelativeSizeAxes = Graphics.Axes.X,
+			InternalRelativeSizeAxes = Graphics.Axes.X,
 			Direction = FlexDirection.Vertical,
 			Spacing = new(0, 50),
 			BorderColor = Palette.Brown
@@ -30,9 +30,10 @@ public class TextContainerTest : TestScene
 		{
 			var container = new TextContainer((t) => { t.Font = FontUsage.Default.With(size: 20); })
 			{
-				RelativeSizeAxes = Graphics.Axes.X,
-				Width = 0.6f,
 				AutoSizeAxes = Graphics.Axes.Y,
+				RelativeSizeAxes = Graphics.Axes.X,
+				InternalRelativeSizeAxes = Graphics.Axes.X,
+				Width = 0.6f,
 				Origin = i % 2 == 0 ? Graphics.Anchor.TopLeft : Graphics.Anchor.TopRight,
 				Anchor = i % 2 == 0 ? Graphics.Anchor.TopLeft : Graphics.Anchor.TopRight,
 				Justification = i % 2 == 0 ? FlexJustification.Start : FlexJustification.End,
@@ -59,11 +60,12 @@ public class TextContainerTest : TestScene
 
 		var maxChildOffset = 0f;
 
+		/*
 		foreach (var child in _flex.Children)
 		{
 			maxChildOffset = MathF.Max(maxChildOffset, child.Y + child.Height);
-		}
+		}*/
 
-		_scrollable.ContentBoundaries = new Graphics.Boundary(0, 0, maxChildOffset, 0);
+		_scrollable.ContentBoundaries = new Graphics.Boundary(0, 0, _flex.Height, 0);
 	}
 }

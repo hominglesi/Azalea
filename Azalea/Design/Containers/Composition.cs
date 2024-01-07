@@ -49,6 +49,15 @@ public class Composition : CompositeGameObject
 		}
 	}
 
+	public Axes InternalRelativeSizeAxes
+	{
+		get => InternalComposition.RelativeSizeAxes;
+		set
+		{
+			InternalComposition.RelativeSizeAxes = value;
+		}
+	}
+
 	protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
 	{
 		InternalComposition.Invalidate(invalidation, source);

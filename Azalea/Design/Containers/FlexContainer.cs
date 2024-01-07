@@ -266,74 +266,108 @@ public class FlexContainer : FlowContainer
 			{
 				orderByDirectionHorizontally(ref positions, ref children);
 
-				int startIndex = 0;
-				var verticalOffset = 0f;
-
-				while (true)
+				if (Wrapping == FlexWrapping.NoWrapping)
 				{
-					var endIndex = getNextChunkHorizontally(ref positions, ref children, startIndex, layoutSize.X);
-					var contentWidth = getTotalWidth(ref children, startIndex, endIndex);
-					var xOffset = Justification switch
-					{
-						FlexJustification.End => layoutSize.X - contentWidth,
-						FlexJustification.Center => (layoutSize.X - contentWidth) / 2,
-						_ => 0
-					};
+					var startIndex = 0;
+					var endIndex = children.Length - 1;
+
 					if (Direction == FlexDirection.Horizontal)
-						placeRow(ref positions, startIndex, endIndex, xOffset, verticalOffset);
+						placeRow(ref positions, startIndex, endIndex, 0, 0);
 					else
-						placeRowReverse(ref positions, ref children, startIndex, endIndex, layoutSize.X, xOffset, verticalOffset);
+					{
+						var totalWidth = getTotalWidth(ref children, startIndex, endIndex);
+						placeRowReverse(ref positions, ref children, startIndex, endIndex, totalWidth, 0, 0);
+					}
 
 					alignRow(ref positions, ref children, startIndex, endIndex);
-
-					verticalOffset += getMaxHeight(ref children, startIndex, endIndex);
-					verticalOffset += Spacing.Y;
-
-					if (children[endIndex] is FlowNewLine nl)
-						verticalOffset += nl.Length;
-
-					if (endIndex >= children.Length - 1)
-						break;
-
-					startIndex = endIndex + 1;
 				}
+				else
+				{
+					int startIndex = 0;
+					var verticalOffset = 0f;
 
+					while (true)
+					{
+						var endIndex = getNextChunkHorizontally(ref positions, ref children, startIndex, layoutSize.X);
+						var contentWidth = getTotalWidth(ref children, startIndex, endIndex);
+						var xOffset = Justification switch
+						{
+							FlexJustification.End => layoutSize.X - contentWidth,
+							FlexJustification.Center => (layoutSize.X - contentWidth) / 2,
+							_ => 0
+						};
+						if (Direction == FlexDirection.Horizontal)
+							placeRow(ref positions, startIndex, endIndex, xOffset, verticalOffset);
+						else
+							placeRowReverse(ref positions, ref children, startIndex, endIndex, layoutSize.X, xOffset, verticalOffset);
 
+						alignRow(ref positions, ref children, startIndex, endIndex);
+
+						verticalOffset += getMaxHeight(ref children, startIndex, endIndex);
+						verticalOffset += Spacing.Y;
+
+						if (children[endIndex] is FlowNewLine nl)
+							verticalOffset += nl.Length;
+
+						if (endIndex >= children.Length - 1)
+							break;
+
+						startIndex = endIndex + 1;
+					}
+				}
 			}
 			else
 			{
 				orderByDirectionVertically(ref positions, ref children);
 
-				int startIndex = 0;
-				var horizontalOffset = 0f;
-
-				while (true)
+				if (Wrapping == FlexWrapping.NoWrapping)
 				{
-					var endIndex = getNextChunkVertically(ref positions, ref children, startIndex, layoutSize.Y);
-					var contentHeight = getTotalHeight(ref children, startIndex, endIndex);
-					var yOffset = Justification switch
-					{
-						FlexJustification.End => layoutSize.Y - contentHeight,
-						FlexJustification.Center => (layoutSize.Y - contentHeight) / 2,
-						_ => 0
-					};
+					var startIndex = 0;
+					var endIndex = children.Length - 1;
+
 					if (Direction == FlexDirection.Vertical)
-						placeColumn(ref positions, startIndex, endIndex, horizontalOffset, yOffset);
+						placeColumn(ref positions, startIndex, endIndex, 0, 0);
 					else
-						placeColumnReverse(ref positions, ref children, startIndex, endIndex, layoutSize.Y, horizontalOffset, yOffset);
+					{
+						var totalHeight = getTotalHeight(ref children, startIndex, endIndex);
+						placeColumnReverse(ref positions, ref children, startIndex, endIndex, totalHeight, 0, 0);
+					}
 
 					alignColumn(ref positions, ref children, startIndex, endIndex);
+				}
+				else
+				{
+					int startIndex = 0;
+					var horizontalOffset = 0f;
 
-					horizontalOffset += getMaxWidth(ref children, startIndex, endIndex);
-					horizontalOffset += Spacing.X;
+					while (true)
+					{
+						var endIndex = getNextChunkVertically(ref positions, ref children, startIndex, layoutSize.Y);
+						var contentHeight = getTotalHeight(ref children, startIndex, endIndex);
+						var yOffset = Justification switch
+						{
+							FlexJustification.End => layoutSize.Y - contentHeight,
+							FlexJustification.Center => (layoutSize.Y - contentHeight) / 2,
+							_ => 0
+						};
+						if (Direction == FlexDirection.Vertical)
+							placeColumn(ref positions, startIndex, endIndex, horizontalOffset, yOffset);
+						else
+							placeColumnReverse(ref positions, ref children, startIndex, endIndex, layoutSize.Y, horizontalOffset, yOffset);
 
-					if (children[endIndex] is FlowNewLine nl)
-						horizontalOffset += nl.Length;
+						alignColumn(ref positions, ref children, startIndex, endIndex);
 
-					if (endIndex >= children.Length - 1)
-						break;
+						horizontalOffset += getMaxWidth(ref children, startIndex, endIndex);
+						horizontalOffset += Spacing.X;
 
-					startIndex = endIndex + 1;
+						if (children[endIndex] is FlowNewLine nl)
+							horizontalOffset += nl.Length;
+
+						if (endIndex >= children.Length - 1)
+							break;
+
+						startIndex = endIndex + 1;
+					}
 				}
 			}
 
