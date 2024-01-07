@@ -67,6 +67,14 @@ public partial struct Color
 		A = (byte)(A * alpha);
 	}
 
+	public readonly float Brightness
+	{
+		get
+		{
+			return ((R * 299) + (G * 587) + (B * 114)) / 1000;
+		}
+	}
+
 	#region Linear
 
 	private float toLinear(float srgb)

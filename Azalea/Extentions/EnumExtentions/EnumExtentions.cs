@@ -6,7 +6,8 @@ namespace Azalea.Extentions.EnumExtentions;
 public static class EnumExtentions
 {
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public static unsafe bool HasFlagFast<T>(this T enumValue, T flag) where T : unmanaged, Enum
+	public static unsafe bool HasFlagFast<T>(this T enumValue, T flag)
+		where T : unmanaged, Enum
 	{
 		if (sizeof(T) == 1)
 		{
@@ -37,5 +38,21 @@ public static class EnumExtentions
 		}
 
 		throw new ArgumentException($"Invalid enum type provided: {typeof(T)}.");
+	}
+
+	public static T NextValue<T>(this T e)
+		where T : unmanaged, Enum
+	{
+		var values = Enum.GetValues<T>();
+		for (int i = 0; i < values.Length; i++)
+		{
+			if (values[i].ToString() == e.ToString())
+			{
+				if (i == values.Length - 1)
+					return values[0];
+				return values[i + 1];
+			}
+		}
+		return values[0];
 	}
 }

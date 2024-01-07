@@ -1,22 +1,69 @@
-﻿using Azalea.Design.Containers.Text;
+﻿using Azalea.Design.Containers;
+using Azalea.Graphics.Colors;
+using Azalea.Graphics.Sprites;
+using Azalea.Utils;
+using System;
 
 namespace Azalea.VisualTests;
 public class TextContainerTest : TestScene
 {
-	private TextContainer _container;
+	private ScrollableContainer _scrollable;
+	private FlexContainer _flex;
+
 	public TextContainerTest()
 	{
-		Add(_container = new TextContainer()
+		Add(_scrollable = new ScrollableContainer()
 		{
-			Width = 1000,
+			RelativeSizeAxes = Graphics.Axes.Both,
 		});
-		//_container.Text = "New Line\nI sada je New Line\nllkwanldkadw\n";
-		_container.AddText("New Line");
-		_container.NewLine();
-		_container.AddText("I sada je New Line");
-		_container.NewLine();
-		_container.AddText("llkwanldkadw");
-		_container.NewLine();
-		_container.AddText("awdioanoudwda");
+
+		_scrollable.Add(_flex = new FlexContainer()
+		{
+			Height = 10000,
+			RelativeSizeAxes = Graphics.Axes.X,
+			Direction = FlexDirection.Vertical,
+			Spacing = new(0, 50),
+			BorderColor = Palette.Brown
+		});
+
+		for (int i = 0; i < 6; i++)
+		{
+			var container = new TextContainer((t) => { t.Font = FontUsage.Default.With(size: 20); })
+			{
+				RelativeSizeAxes = Graphics.Axes.X,
+				Width = 0.6f,
+				AutoSizeAxes = Graphics.Axes.Y,
+				Origin = i % 2 == 0 ? Graphics.Anchor.TopLeft : Graphics.Anchor.TopRight,
+				Anchor = i % 2 == 0 ? Graphics.Anchor.TopLeft : Graphics.Anchor.TopRight,
+				Justification = i % 2 == 0 ? FlexJustification.Start : FlexJustification.End,
+			};
+
+			for (int j = 0; j < 3; j++)
+			{
+				container.AddText(TextUtils.GenerateLoremIpsum(Rng.Int(10, 40)));
+				if (Rng.Int(2) == 0)
+					container.AddText("\n");
+				if (Rng.Int(2) == 0)
+					container.AddText("\n");
+			}
+
+
+			_flex.Add(container);
+		}
+
+	}
+
+	protected override void UpdateAfterChildren()
+	{
+		base.UpdateAfterChildren();
+
+		var maxChildOffset = 0f;
+
+		foreach (var child in _flex.Children)
+		{
+			maxChildOffset = MathF.Max(maxChildOffset, child.Y + child.Height);
+		}
+
+		_scrollable.ContentBoundaries = new Graphics.Boundary(0, 0, maxChildOffset, 0);
 	}
 }

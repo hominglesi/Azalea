@@ -1,11 +1,11 @@
-﻿using Azalea.Inputs.Events;
-using System;
+﻿using Azalea.Graphics;
+using Azalea.Inputs.Events;
 using System.Numerics;
 
 namespace Azalea.Design.Containers;
 public class ScrollableContainer : Composition
 {
-	public float ScrollSpeed { get; set; } = 15;
+	public float ScrollSpeed { get; set; } = 30;
 
 	private float _scrollPosition;
 	public float ScrollPosition
@@ -15,7 +15,21 @@ public class ScrollableContainer : Composition
 		{
 			if (_scrollPosition == value) return;
 
-			_scrollPosition = value;
+			scrollTo(value);
+		}
+	}
+
+	private Boundary _contentBoundaries;
+	public Boundary ContentBoundaries
+	{
+		get => _contentBoundaries;
+		set
+		{
+			if (_contentBoundaries == value) return;
+
+			_contentBoundaries = value;
+
+			_scrollPosition = clampWithinBoundaries(new Vector2(0, _scrollPosition)).Y;
 		}
 	}
 
@@ -29,15 +43,31 @@ public class ScrollableContainer : Composition
 	{
 		if (Hovered == false) return;
 
-		scrollBy(e.ScrollDelta);
+		scrollBy(e.ScrollDelta * ScrollSpeed);
 	}
 
 	private void scrollBy(float scrollValue)
 	{
-		var scrollChange = scrollValue * ScrollSpeed;
+		_scrollPosition = clampWithinBoundaries(new Vector2(0, _scrollPosition + scrollValue)).Y;
 
-		var newScrollPosition = InternalComposition.Position.Y + scrollChange;
+		InternalComposition.Position = new Vector2(0, _scrollPosition);
+	}
 
-		InternalComposition.Position = new Vector2(0, Math.Min(newScrollPosition, 0));
+	private void scrollTo(float scrollPosition)
+	{
+		_scrollPosition = clampWithinBoundaries(new Vector2(0, scrollPosition)).Y;
+
+		InternalComposition.Position = new Vector2(0, _scrollPosition);
+	}
+
+	private Vector2 clampWithinBoundaries(Vector2 position)
+	{
+		if (position.Y > _contentBoundaries.Top)
+			position.Y = _contentBoundaries.Top;
+
+		if (-position.Y > _contentBoundaries.Bottom - DrawHeight)
+			position.Y = -(_contentBoundaries.Bottom - DrawHeight);
+
+		return position;
 	}
 }

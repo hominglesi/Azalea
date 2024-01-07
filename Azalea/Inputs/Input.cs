@@ -260,6 +260,8 @@ public static class Input
 
 	internal static void HandleKeyboardKeyRepeat(Keys key)
 	{
+		_keyboardKeys[(int)key].SetRepeat();
+
 		propagateInputEvent(new KeyDownEvent(key, true));
 	}
 

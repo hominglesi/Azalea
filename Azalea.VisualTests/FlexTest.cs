@@ -1,95 +1,81 @@
 ﻿using Azalea.Design.Containers;
-using Azalea.Design.Containers.Text;
 using Azalea.Design.Shapes;
+using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
+using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
+using Azalea.Utils;
+using System.Numerics;
 
 namespace Azalea.VisualTests;
 public class FlexTest : TestScene
 {
 	private FlexContainer _flex;
-	private Box _firstChild;
-
-	private TextContainer _textFlex;
 
 	public FlexTest()
 	{
-		AddRange(new GameObject[]
+		Add(_flex = new FlexContainer()
 		{
-			new Composition()
-			{
-				RelativeSizeAxes = Axes.Both,
-				Size = new(1, 0.25f),
-				Children = new GameObject[]
-				{
-					new Box()
-					{
-						RelativeSizeAxes = Axes.Both,
-						Color = Palette.White,
-					},
-					_flex = createFirstFlex()
-				}
-			},
-			_textFlex = new TextContainer()
-			{
-				Width = 1000,
-				Height = 1000,
-			}
+			RelativeSizeAxes = Axes.Both,
+
 		});
 	}
 
-	private FlexContainer createFirstFlex()
+	private GameObject createBox(Vector2 size, int number)
 	{
-		return new FlexContainer()
+		var comp = new Composition()
+		{
+			Size = size
+		};
+		var color = Rng.Color();
+		comp.Add(new Box()
 		{
 			RelativeSizeAxes = Axes.Both,
-			Wrapping = FlexWrapping.Wrap,
-			Children = new GameObject[]
-			{
-				_firstChild = new Box()
-				{
-					Color = Palette.Flowers.Azalea,
-					RelativeSizeAxes = Axes.Both,
-					Size = new(0.2f, 0.5f)
-				},
-				new Box()
-				{
-					Color = Palette.Aqua,
-					RelativeSizeAxes = Axes.Both,
-					Size = new(0.2f, 0.5f)
-				},
-				new Box()
-				{
-					Color = Palette.Black,
-					RelativeSizeAxes = Axes.Both,
-					Size = new(0.6f, 0.5f),
-				},
-				new Box()
-				{
-					Color = Palette.Black,
-					RelativeSizeAxes = Axes.Both,
-					Size = new(0.2f, 0.5f),
-				}
-			}
-		};
+			Color = color
+		});
+
+		comp.Add(new SpriteText()
+		{
+			Origin = Anchor.Center,
+			Anchor = Anchor.Center,
+			Text = number.ToString(),
+			Color = color.Brightness > 127 ? Palette.Black : Palette.White,
+			Font = FontUsage.Default.With(size: 28)
+		});
+		return comp;
 	}
 
 	protected override void Update()
 	{
-		if (Input.GetKey(Keys.P).Down)
+		if (Input.GetKey(Keys.Space).DownOrRepeat)
 		{
-			_firstChild.Size = new(_firstChild.Size.X + 0.10f, _firstChild.Size.Y);
+			var size = Input.GetKey(Keys.ShiftLeft).Pressed ? Rng.Int(50, 150) : 100;
+			_flex.Add(createBox(new(size), _flex.Children.Count));
 		}
 
-		var tempChildren = new GameObject[_flex.Children.Count];
-		for (int i = 0; i < tempChildren.Length; i++)
-		{
-			tempChildren[i] = _flex.Children[i];
-		}
-		_flex.Clear();
-		_flex.AddRange(tempChildren);
+		if (Input.GetKey(Keys.D).Down)
+			_flex.Direction = _flex.Direction.NextValue();
 
-		_textFlex.Text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum";
+		if (Input.GetKey(Keys.J).Down)
+			_flex.Justification = _flex.Justification.NextValue();
+
+		if (Input.GetKey(Keys.A).Down)
+			_flex.Alignment = _flex.Alignment.NextValue();
+
+		if (Input.GetKey(Keys.KeypadPlus).DownOrRepeat)
+			_flex.Spacing += Vector2.One;
+
+		if (Input.GetKey(Keys.KeypadMinus).DownOrRepeat && _flex.Spacing.X > 0)
+			_flex.Spacing -= Vector2.One;
+
+		if (Input.GetKey(Keys.Delete).Down)
+			_flex.Clear();
+
+		if (Input.GetKey(Keys.Enter).Down)
+			_flex.AddNewLine();
+
+		if (Input.GetKey(Keys.Backspace).DownOrRepeat)
+			_flex.Remove(_flex.Children[_flex.Children.Count - 1]);
 	}
 }
