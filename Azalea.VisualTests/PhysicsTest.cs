@@ -1,26 +1,18 @@
-﻿using Azalea.Design.Containers;
-using Azalea.Design.Shapes;
+﻿using Azalea.Design.Shapes;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.IO.Resources;
-using Azalea.Numerics;
 using Azalea.Physics;
 using Azalea.Physics.Colliders;
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Numerics;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Azalea.VisualTests;
 public class PhysicsTest : TestScene
 {
-	PhysicsGenerator PGen=new PhysicsGenerator();
+	PhysicsGenerator PGen = new PhysicsGenerator();
 	public Box box1;
 	public Box box2;
 	public Box box3;
@@ -34,6 +26,12 @@ public class PhysicsTest : TestScene
 	bool charging = false;
 	public PhysicsTest()
 	{
+		Add(new Line()
+		{
+			StartPoint = new(500, 40),
+			EndPoint = new(200, 400)
+		});
+
 		/*
 		Add(box1 = new Box()
 		{
@@ -125,7 +123,7 @@ public class PhysicsTest : TestScene
 		circle1.AddComponent(new CircleCollider()
 		{
 			Radius = 25
-		}) ;
+		});
 
 		Add(circle2 = new Sprite()
 		{
@@ -167,12 +165,12 @@ public class PhysicsTest : TestScene
 
 	protected override void Update()
 	{
-		if(Input.GetKey(Keys.Space).Down)
+		if (Input.GetKey(Keys.Space).Down)
 		{
 			circle1.GetComponent<RigidBody>().AddForce(new(0f, -1f), 50);
-		//	box1.Rotation += 5f;
-		//	box2.GetComponent<RigidBody>().AddForce(new(0f, -1f), 100);
-		//	box3.GetComponent<RigidBody>().AddForce(new(0f, -1f), 10);
+			//	box1.Rotation += 5f;
+			//	box2.GetComponent<RigidBody>().AddForce(new(0f, -1f), 100);
+			//	box3.GetComponent<RigidBody>().AddForce(new(0f, -1f), 10);
 		}
 
 		if (Input.GetKey(Keys.W).Pressed)
@@ -200,7 +198,7 @@ public class PhysicsTest : TestScene
 		{
 			circle1.Rotation -= 3f;
 		}
-		
+
 		CircleCollider crCol = circle1.GetComponent<CircleCollider>();
 		if (Input.MousePosition.X < circle1.Position.X + crCol.Radius && Input.MousePosition.X > circle1.Position.X - crCol.Radius
 			&& Input.MousePosition.Y < circle1.Position.Y + crCol.Radius && Input.MousePosition.Y > circle1.Position.Y - crCol.Radius)
@@ -211,20 +209,20 @@ public class PhysicsTest : TestScene
 			}
 		}
 
-		if(charging && Input.GetMouseButton(MouseButton.Left).Released)
+		if (charging && Input.GetMouseButton(MouseButton.Left).Released)
 		{
 			charging = false;
-		//	directionVector = new Vector2(mouseX - whiteBallPosition.X, mouseY - whiteBallPosition.Y);
-			Vector2 directionVector= Vector2.Normalize(circle1.Position -Input.MousePosition);
+			//	directionVector = new Vector2(mouseX - whiteBallPosition.X, mouseY - whiteBallPosition.Y);
+			Vector2 directionVector = Vector2.Normalize(circle1.Position - Input.MousePosition);
 			float power = 1f;
-			float distance = Vector2.Distance(Input.MousePosition , circle1.Position);
+			float distance = Vector2.Distance(Input.MousePosition, circle1.Position);
 			power *= distance / 10;
 			circle1.GetComponent<RigidBody>().AddForce(directionVector, power);
 		}
 	}
 	protected override void FixedUpdate()
 	{
-		
+
 		PGen.Update(this.Children.Where(x => x.GetComponent<RigidBody>() != null).ToList());
 		/*
 		//Fake Floor
