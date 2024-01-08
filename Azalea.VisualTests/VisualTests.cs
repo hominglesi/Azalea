@@ -15,11 +15,12 @@ public class VisualTests : AzaleaGame
 		//Add(new DefaultUserInputTest());
 		//Add(new TestingTestScene());
 		//Add(new FlexTest());
-		Add(new TextContainerTest());
+		//Add(new TextContainerTest());
 		//Add(new InputTest());
 		//Add(new PanningTest());
 		//Add(new IWindowTest());
 		//Add(new AudioTest());
+		Add(new PhysicsTest());
 		//Add(new BreakoutTest());
 		//Add(new BoundingBoxTreeTest());
 	}
