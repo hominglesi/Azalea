@@ -12,7 +12,7 @@ public class RectCollider : Collider
 	public float SideA { get; set; }
 	//Left And Right side
 	public float SideB { get; set; }
-
+	public override float ShortestDistance =>  SideA < SideB ? SideA : SideB;
 	public override Vector2[] GetVertices()
 	{
 		// Vertices in local space

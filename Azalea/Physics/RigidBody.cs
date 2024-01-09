@@ -27,12 +27,12 @@ public class RigidBody : Component
 	public float DynamicFriction { get; set; } = 1;
 	public float AngularVelocity { get; set; }
 	public bool IsDynamic { get; set; } = true;
-	public void AddForce(Vector2 forceVector, float force)
+	public void ApplyForce(Vector2 forceVector, float force)
 	{
 		Force += forceVector*force;
 	}
 
-	public void AddImpulse(Vector2 impulseVector)
+	public void ApplyImpulse(Vector2 impulseVector)
 	{
 
 	}

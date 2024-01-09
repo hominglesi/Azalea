@@ -16,6 +16,11 @@ public class PhysicsGenerator
 {
 	//u slucaju da ima potrebe za neki tip gravity manipulationa, stavio sam ovo da moze da se menja
 	public Vector2 GravityConstant { get; set; } = new Vector2(0, 9.81f);
+	public static int UpdateRate => 60;
+	public bool IsTopDown { get; set; }
+	public float StaticFriction { get; set; } = 0.1f;
+	public float DynamicFriction { get; set; } = 0.05f;
+	public bool DebugMode { get; set; }
 
 	public bool UsesGravity { get; set; } = true;
 	public bool UsesFriction { get; set; } = true;
@@ -27,6 +32,9 @@ public class PhysicsGenerator
 		if (UsesGravity)
 			ApplyGravity(objects.Where(x => x.GetComponent<RigidBody>().UsesGravity).ToList());
 
+		if (IsTopDown)
+			ApplyTopDownFriction(objects.Where(x => x.GetComponent<RigidBody>().UsesFriction).ToList());
+
 		ApplyForces(objects);
 	}
 
@@ -35,7 +43,26 @@ public class PhysicsGenerator
 		foreach (GameObject ob in objects)
 		{
 			RigidBody rb = ob.GetComponent<RigidBody>();
-			rb.Force += rb.Mass * GravityConstant / 60;
+			rb.Force += rb.Mass * GravityConstant / UpdateRate;
+		}
+	}
+
+	private void ApplyTopDownFriction(List<GameObject> objects)
+	{
+		foreach(GameObject ob in objects)
+		{
+			RigidBody rb = ob.GetComponent<RigidBody>();
+
+				if(rb.Velocity.Length()>0)
+				if (rb.Velocity == new Vector2(0, 0))
+				{
+					rb.Force += -(Vector2.Normalize(rb.Velocity) * rb.Mass * GravityConstant.Y / UpdateRate) * StaticFriction;
+				}
+				else
+				{
+					rb.Force += -(Vector2.Normalize(rb.Velocity) * rb.Mass * GravityConstant.Y / UpdateRate) * DynamicFriction;
+				}
+		
 		}
 	}
 
@@ -56,7 +83,7 @@ public class PhysicsGenerator
 			}
 				
 
-			rb.Position += rb.Velocity;
+			
 			
 
 
@@ -64,9 +91,12 @@ public class PhysicsGenerator
 			rb.AngularVelocity += rb.AngularAcceleration;
 			rb.Rotation += rb.AngularVelocity;
 
-
-			CheckCollisions(ob, objects);
-
+			int numOfAttempts = 1 + (int)MathF.Ceiling(rb.Velocity.Length() / ob.GetComponent<Collider>().ShortestDistance);
+			for (int i = 0; i < numOfAttempts; i++)
+			{
+				rb.Position += rb.Velocity/numOfAttempts;
+				CheckCollisions(ob, objects);
+			}
 			rb.Torque = new Vector2(0, 0);
 			rb.Force = new Vector2(0, 0);
 		}
@@ -112,7 +142,10 @@ public class PhysicsGenerator
 		{
 			float penetration = circle1.Radius + circle2.Radius - distanceOfCenters;
 			ResolveCircleOnCircleCCollision(circle1, circle2, penetration);
-			circle1.Parent.Color = Palette.Cyan;
+			if (DebugMode)
+			{
+				circle1.Parent.Color = Palette.Cyan;
+			}
 			return true;
 		}
 		return false;
@@ -156,12 +189,18 @@ public class PhysicsGenerator
 			Vector2 rotatedRectPosition = new Vector2(unrotatedRectPositionX, unrotatedRectPositionY);
 			float penetration = (float)(circle.Radius-distance);
 			ResolveCircleOnRectCollision(circle, rect, penetration,collisionNormal,rotatedRectPosition);
-			circle.Parent.Color = Palette.Orange;
-			rect.Parent.Color = Palette.Orange;
-			return true;
+			if (DebugMode)
+			{
+				circle.Parent.Color = Palette.Orange;
+				rect.Parent.Color = Palette.Orange;
+			}
+				return true;
 		}
-		circle.Parent.Color = Palette.Black;
-		rect.Parent.Color = Palette.Black;
+		if (DebugMode)
+		{
+			circle.Parent.Color = Palette.Black;
+			rect.Parent.Color = Palette.Black;
+		}
 		return false;
 	}
 

@@ -20,7 +20,8 @@ public class VisualTests : AzaleaGame
 		//Add(new PanningTest());
 		//Add(new IWindowTest());
 		//Add(new AudioTest());
-		Add(new PhysicsTest());
+		//Add(new PhysicsTest());
+		Add(new BilliardTest());
 		//Add(new BreakoutTest());
 		//Add(new BoundingBoxTreeTest());
 	}

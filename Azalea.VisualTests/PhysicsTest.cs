@@ -39,6 +39,7 @@ public class PhysicsTest : TestScene
 	bool charging = false;
 	public PhysicsTest()
 	{
+		PGen.DebugMode = true;
 		PGen.UsesGravity = false;
 		Add(line=new Line()
 		{
@@ -416,7 +417,7 @@ public class PhysicsTest : TestScene
 			float power = 2f;
 			float distance = Vector2.Distance(Input.MousePosition, circle1.Position);
 			power *= 1 + distance / 10;
-			circle1.GetComponent<RigidBody>().AddForce(directionVector, power);
+			circle1.GetComponent<RigidBody>().ApplyForce(directionVector, power);
 		}
 	}
 	protected override void FixedUpdate()

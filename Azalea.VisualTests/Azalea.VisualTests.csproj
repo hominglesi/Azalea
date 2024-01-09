@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Textures\Ball.png" />
     <None Remove="Resources\Textures\Circle.png" />
   </ItemGroup>
 

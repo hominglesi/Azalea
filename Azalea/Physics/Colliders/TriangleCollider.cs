@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace Azalea.Physics.Colliders;
 public class TriangleCollider : Collider
 {
+	public override float ShortestDistance => throw new NotImplementedException();
 
 	public override Vector2[] GetVertices()
 	{

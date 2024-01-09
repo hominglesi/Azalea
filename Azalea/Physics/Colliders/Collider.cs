@@ -13,5 +13,7 @@ public abstract class Collider : Component
 	public Vector2 Scale { get { return Parent.Scale; } set { Parent.Scale = value; } }
 	public float Rotation { get { return Parent.Rotation; } set { Parent.Rotation = value; } }
 
+	public abstract float ShortestDistance { get; }
+
 	public abstract Vector2[] GetVertices();
 }
