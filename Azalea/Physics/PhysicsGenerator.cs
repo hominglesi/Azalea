@@ -49,7 +49,16 @@ public class PhysicsGenerator
 
 			rb.Acceleration = rb.Force / rb.Mass;
 			rb.Velocity += rb.Acceleration;
+			if (float.IsNaN(rb.Velocity.X) || float.IsNaN(rb.Velocity.Y))
+			{
+				rb.Velocity = new(0,0);
+				rb.Position = new(100, 100);
+			}
+				
+
 			rb.Position += rb.Velocity;
+			
+
 
 	//		rb.AngularAccelaration 
 			rb.AngularVelocity += rb.AngularAcceleration;
@@ -123,15 +132,23 @@ public class PhysicsGenerator
 		float distanceX = rotatedCircleX - closestX;
 		float distanceY = rotatedCircleY - closestY;
 
+		if(distanceX == 0 && distanceY == 0)
+		{
+			return false;
+		}
+
 		Vector2 collisionNormal=Vector2.Normalize(new Vector2(distanceX, distanceY));
-		collisionNormal = Vector2Extentions.Rotate(collisionNormal, rectAngle, false);
+		if (float.IsNaN(collisionNormal.X) || float.IsNaN(collisionNormal.Y))
+			Console.WriteLine("Collision Normal is NAN");
+		collisionNormal = Vector2Extentions.Rotate(collisionNormal, +rectAngle);
 
 			//x2 = cosβx1 − sinβy1
 			//y2 = sinβx1 + cosβy1
 
 		double distance = Math.Sqrt(Math.Pow(distanceX,2) + Math.Pow(distanceY , 2));
 
-		if(distance <= circle.Radius)
+		
+		if(distance < circle.Radius)
 		{
 			float unrotatedRectPositionX = (float)((closestX - rect.Position.X) * Math.Cos(rectAngle) + (closestY - rect.Position.Y) * Math.Sin(rectAngle) + rect.Position.X);
 			float unrotatedRectPositionY = (float)(-(closestX - rect.Position.X) * Math.Sin(rectAngle) + (closestY - rect.Position.Y) * Math.Cos(rectAngle) + rect.Position.Y);
@@ -143,6 +160,8 @@ public class PhysicsGenerator
 			rect.Parent.Color = Palette.Orange;
 			return true;
 		}
+		circle.Parent.Color = Palette.Black;
+		rect.Parent.Color = Palette.Black;
 		return false;
 	}
 
@@ -171,7 +190,7 @@ public class PhysicsGenerator
 
 		Vector2 relativeVelocity = rbCircle2.Velocity - rbCircle1.Velocity;
 		float impulse = (2 * rbCircle1.Mass * rbCircle2.Mass) / (rbCircle1.Mass + rbCircle2.Mass) * Vector2.Dot(relativeVelocity, collisionNormal) * (rbCircle1.Restitution + rbCircle2.Restitution) / 2;
-
+	
 		// Update velocities based on impulse and mass
 		rbCircle1.Velocity += impulse / rbCircle1.Mass * collisionNormal;
 		rbCircle2.Velocity -= impulse / rbCircle2.Mass * collisionNormal;
@@ -181,6 +200,10 @@ public class PhysicsGenerator
 	private void ResolveCircleOnRectCollision(CircleCollider circle, RectCollider rect, float penetration, Vector2 collisionNormal, Vector2 rotatedRectPosition)
 	{
 		float displacement = penetration;
+		Console.WriteLine($"Displacement: {displacement}");
+		if (float.IsNaN(collisionNormal.X) || float.IsNaN(collisionNormal.Y))
+			collisionNormal = new(1, 1);
+
 		if (circle.Parent.GetComponent<RigidBody>().IsDynamic)
 			circle.Position += collisionNormal * (displacement / 2);
 		else
@@ -198,10 +221,25 @@ public class PhysicsGenerator
 		Vector2 relativeVelocity = rbRect.Velocity - rbCircle.Velocity;
 		float impulse = (2 * rbCircle.Mass * rbRect.Mass) / (rbCircle.Mass + rbRect.Mass) * Vector2.Dot(relativeVelocity, collisionNormal) * ( rbCircle.Restitution + rbRect.Restitution) / 2;
 
+		if (float.IsNaN(impulse))
+			impulse = 10;
+
 		// Update velocities based on impulse and mass
-		rbCircle.Velocity += impulse / rbCircle.Mass * collisionNormal;
+		if (float.IsNaN(((Vector2)(impulse / rbCircle.Mass * collisionNormal)).X) || float.IsNaN(((Vector2)(impulse / rbCircle.Mass * collisionNormal)).Y))
+			rbCircle.Velocity += rbCircle.Velocity*2;
+		else
+			rbCircle.Velocity += impulse / rbCircle.Mass * collisionNormal;
 		rbRect.Velocity -= impulse / rbRect.Mass * collisionNormal;
-		
+
+
+
+		Console.WriteLine($"Impact: Circle Velocity: {rbCircle.Velocity}");
+		Console.WriteLine($"Impact: Rect Velocity: {rbRect.Velocity}");
+
+
+		//rbCircle.AddForce(collisionNormal, impulse);
+		//	rbRect.AddForce(collisionNormal, -impulse);
+
 		/*Vdd 
 		rbRect.Mome
 		float angularVelocityRect = Vector2Extentions(radiusRect, -collisionNormal * impulse) / rbRect.MomentOfInertia;*/

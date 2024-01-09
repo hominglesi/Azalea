@@ -54,8 +54,8 @@ public static class Vector2Extentions
 
 	public static Vector2 Rotate(Vector2 vector, float angle, bool isDegrees=true)
 	{
-		if (!isDegrees)
-			angle = (angle * 180) / MathF.PI;
+	//	if (!isDegrees)
+	//		angle = (angle * 180) / MathF.PI;
 
 		return new Vector2(MathF.Cos(angle) * vector.X - MathF.Sin(angle) * vector.Y,
 						   MathF.Sin(angle) * vector.X + MathF.Cos(angle) * vector.Y);

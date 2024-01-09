@@ -39,7 +39,7 @@ public class PhysicsTest : TestScene
 	bool charging = false;
 	public PhysicsTest()
 	{
-		//PGen.UsesGravity = false;
+		PGen.UsesGravity = false;
 		Add(line=new Line()
 		{
 			StartPoint = new(500, 40),
@@ -65,7 +65,7 @@ public class PhysicsTest : TestScene
 		{
 			Radius = 25
 		});
-
+/*
 		Add(testCircle1 = new Sprite()
 		{
 			Position = new(200, 400),
@@ -103,7 +103,7 @@ public class PhysicsTest : TestScene
 		{
 			Radius = 15,
 			
-		});
+		});*/
 		/*
 		Add(circle2 = new Sprite()
 		{
@@ -208,7 +208,7 @@ public class PhysicsTest : TestScene
 			Size = new(200, 60),
 			Color = Palette.Brown,
 			Origin = Graphics.Anchor.Center,
-		//	Rotation =180
+			Rotation =120
 		});
 		platform2.AddComponent(new RigidBody()
 		{
@@ -359,9 +359,7 @@ public class PhysicsTest : TestScene
 
 		if (Input.GetKey(Keys.P).Down)
 		{
-			circle1.GetComponent<RigidBody>().AddForce(new(1f, 0), 10);
-			testCircle1.GetComponent<RigidBody>().AddForce(new(1f, 0), 10);
-			testCircle2.GetComponent<RigidBody>().AddForce(new(-1f, 0), 10);
+			Console.WriteLine($"Circle1 Position:{circle1.Position}");
 		}
 		/*
 		Console.WriteLine($"Box1 Position: {box1.Position}");
