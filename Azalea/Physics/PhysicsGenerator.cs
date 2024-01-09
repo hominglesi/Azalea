@@ -1,4 +1,6 @@
-﻿using Azalea.Graphics;
+﻿using Azalea.Design.Components;
+using Azalea.Extentions;
+using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Physics.Colliders;
 using System;
@@ -45,11 +47,18 @@ public class PhysicsGenerator
 			if (rb.IsDynamic == false)
 				return;
 
-			rb.Velocity += rb.Force / rb.Mass;
+			rb.Acceleration = rb.Force / rb.Mass;
+			rb.Velocity += rb.Acceleration;
 			rb.Position += rb.Velocity;
+
+	//		rb.AngularAccelaration 
+			rb.AngularVelocity += rb.AngularAcceleration;
+			rb.Rotation += rb.AngularVelocity;
+
 
 			CheckCollisions(ob, objects);
 
+			rb.Torque = new Vector2(0, 0);
 			rb.Force = new Vector2(0, 0);
 		}
 	}
@@ -100,8 +109,40 @@ public class PhysicsGenerator
 		return false;
 	}
 
-	private bool CheckCircleOnRectCollision(CircleCollider circle1, RectCollider rect2)
+	private bool CheckCircleOnRectCollision(CircleCollider circle, RectCollider rect)
 	{
+		float rectAngle = rect.Rotation / 180 * MathF.PI;
+		int rotatedCircleX = (int)((circle.Position.X - rect.Position.X) * Math.Cos(-rectAngle) - (circle.Position.Y - rect.Position.Y) * Math.Sin(-rectAngle) + rect.Position.X);
+		int rotatedCircleY = (int)((circle.Position.X - rect.Position.X) * Math.Sin(-rectAngle) + (circle.Position.Y - rect.Position.Y) * Math.Cos(-rectAngle) + rect.Position.Y);
+
+		// Find closest point on the rotated rectangle
+		float closestX = Math.Clamp(rotatedCircleX, rect.Position.X-rect.SideA/2, rect.Position.X + rect.SideA / 2);
+		float closestY = Math.Clamp(rotatedCircleY, rect.Position.Y-rect.SideB/2, rect.Position.Y + rect.SideB / 2);
+	
+		// Calculate distance
+		float distanceX = rotatedCircleX - closestX;
+		float distanceY = rotatedCircleY - closestY;
+
+		Vector2 collisionNormal=Vector2.Normalize(new Vector2(distanceX, distanceY));
+		collisionNormal = Vector2Extentions.Rotate(collisionNormal, rectAngle, false);
+
+			//x2 = cosβx1 − sinβy1
+			//y2 = sinβx1 + cosβy1
+
+		double distance = Math.Sqrt(Math.Pow(distanceX,2) + Math.Pow(distanceY , 2));
+
+		if(distance <= circle.Radius)
+		{
+			float unrotatedRectPositionX = (float)((closestX - rect.Position.X) * Math.Cos(rectAngle) + (closestY - rect.Position.Y) * Math.Sin(rectAngle) + rect.Position.X);
+			float unrotatedRectPositionY = (float)(-(closestX - rect.Position.X) * Math.Sin(rectAngle) + (closestY - rect.Position.Y) * Math.Cos(rectAngle) + rect.Position.Y);
+
+			Vector2 rotatedRectPosition = new Vector2(unrotatedRectPositionX, unrotatedRectPositionY);
+			float penetration = (float)(circle.Radius-distance);
+			ResolveCircleOnRectCollision(circle, rect, penetration,collisionNormal,rotatedRectPosition);
+			circle.Parent.Color = Palette.Orange;
+			rect.Parent.Color = Palette.Orange;
+			return true;
+		}
 		return false;
 	}
 
@@ -112,12 +153,58 @@ public class PhysicsGenerator
 
 	private void ResolveCircleOnCircleCCollision(CircleCollider circle1, CircleCollider circle2, float penetration)
 	{
+		//Displacing the balls :D
 		Vector2 collisionNormal = Vector2.Normalize(circle2.Position - circle1.Position);
-		circle1.Position -= collisionNormal * (penetration / 2);
-		circle2.Position += collisionNormal * (penetration / 2);
+		float displacement = penetration;
+		if (circle1.Parent.GetComponent<RigidBody>().IsDynamic)
+			circle1.Position -= collisionNormal * (displacement / 2);
+		else
+			displacement *= 2;
+		if (circle2.Parent.GetComponent<RigidBody>().IsDynamic)
+			circle2.Position += collisionNormal * (displacement / 2);
 
+		//Applying newtons lawsssss
+		RigidBody rbCircle1 = circle1.Parent.GetComponent<RigidBody>();
+		RigidBody rbCircle2 = circle2.Parent.GetComponent<RigidBody>();
 
+		Vector2 totalForce = rbCircle1.Force + rbCircle2.Force;
+
+		Vector2 relativeVelocity = rbCircle2.Velocity - rbCircle1.Velocity;
+		float impulse = (2 * rbCircle1.Mass * rbCircle2.Mass) / (rbCircle1.Mass + rbCircle2.Mass) * Vector2.Dot(relativeVelocity, collisionNormal) * (rbCircle1.Restitution + rbCircle2.Restitution) / 2;
+
+		// Update velocities based on impulse and mass
+		rbCircle1.Velocity += impulse / rbCircle1.Mass * collisionNormal;
+		rbCircle2.Velocity -= impulse / rbCircle2.Mass * collisionNormal;
+	//	rbCircle1.AddForce(collisionNormal,)
 	}
 
+	private void ResolveCircleOnRectCollision(CircleCollider circle, RectCollider rect, float penetration, Vector2 collisionNormal, Vector2 rotatedRectPosition)
+	{
+		float displacement = penetration;
+		if (circle.Parent.GetComponent<RigidBody>().IsDynamic)
+			circle.Position += collisionNormal * (displacement / 2);
+		else
+			displacement *= 2;
 
+		if (rect.Parent.GetComponent<RigidBody>().IsDynamic)
+			rect.Position -= collisionNormal * (displacement / 2);
+
+		//Applying newtons lawsssss
+		RigidBody rbCircle = circle.Parent.GetComponent<RigidBody>();
+		RigidBody rbRect = rect.Parent.GetComponent<RigidBody>();
+
+	//	Vector2 totalForce = rbCircle.Force + rbRect.Force;
+
+		Vector2 relativeVelocity = rbRect.Velocity - rbCircle.Velocity;
+		float impulse = (2 * rbCircle.Mass * rbRect.Mass) / (rbCircle.Mass + rbRect.Mass) * Vector2.Dot(relativeVelocity, collisionNormal) * ( rbCircle.Restitution + rbRect.Restitution) / 2;
+
+		// Update velocities based on impulse and mass
+		rbCircle.Velocity += impulse / rbCircle.Mass * collisionNormal;
+		rbRect.Velocity -= impulse / rbRect.Mass * collisionNormal;
+		
+		/*Vdd 
+		rbRect.Mome
+		float angularVelocityRect = Vector2Extentions(radiusRect, -collisionNormal * impulse) / rbRect.MomentOfInertia;*/
+
+	}
 }

@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 namespace Azalea.Physics.Colliders;
 public class RectCollider : Collider
 {
+	//Upper and Bottom side
 	public float SideA { get; set; }
+	//Left And Right side
 	public float SideB { get; set; }
 
 	public override Vector2[] GetVertices()
