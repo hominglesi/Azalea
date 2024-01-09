@@ -1,19 +1,16 @@
-﻿using Azalea.Design.Shapes;
+﻿using Azalea.Design.Components;
+using Azalea.Design.Containers;
+using Azalea.Design.Shapes;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.IO.Resources;
-using Azalea.Physics.Colliders;
 using Azalea.Physics;
+using Azalea.Physics.Colliders;
+using Azalea.Platform;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-using Azalea.Platform;
-using Azalea.Design.Containers;
 
 namespace Azalea.VisualTests;
 public class BilliardTest : TestScene
@@ -41,7 +38,7 @@ public class BilliardTest : TestScene
 	Box wallR;
 
 	Sprite whiteBall;
-	Sprite[] redBalls=new Sprite[15];
+	Sprite[] redBalls = new Sprite[15];
 	Sprite blueBall;
 	Sprite yellowBall;
 	Sprite blackBall;
@@ -70,7 +67,7 @@ public class BilliardTest : TestScene
 	Vector2 greenPosition = new Vector2(1180, 580);
 	Vector2 redPosition = new Vector2(540, 480);
 	Vector2 pinkPosition = new Vector2(570, 480);
-	Vector2 blackPosition = new Vector2(540 - 5 * 2 *15 - 5, 480);
+	Vector2 blackPosition = new Vector2(540 - 5 * 2 * 15 - 5, 480);
 	Vector2 bluePosition = new Vector2(840, 480);
 
 	Line line;
@@ -95,24 +92,24 @@ public class BilliardTest : TestScene
 
 		Add(tableMat = new Box()
 		{
-			Position = new(panelWidth/2, panelHeight/2),
+			Position = new(panelWidth / 2, panelHeight / 2),
 			Size = new(tableWidth, tableHeight),
 			Color = Palette.Green,
 			Origin = Graphics.Anchor.Center,
-			Depth = 15
+			Depth = 25
 			//Rotation = 15
-		}) ;
+		});
 
 		GenerateBalls();
 
 
 		Add(topEdge = new Box()
 		{
-			Position = new(panelWidth/2,panelHeight/2-tableHeight/2),
+			Position = new(panelWidth / 2, panelHeight / 2 - tableHeight / 2),
 			Size = new(tableWidth, edgeThickness),
-			Color = new Graphics.Colors.Color(20,9,3),
+			Color = new Graphics.Colors.Color(20, 9, 3),
 			Origin = Graphics.Anchor.Center,
-			//Depth = 20,
+			Depth = 20,
 			//Rotation = 15
 		});
 		topEdge.AddComponent(new RigidBody()
@@ -130,10 +127,11 @@ public class BilliardTest : TestScene
 
 		Add(bottomEdge = new Box()
 		{
-			Position = new(panelWidth / 2, panelHeight/2+tableHeight/2),
+			Position = new(panelWidth / 2, panelHeight / 2 + tableHeight / 2),
 			Size = new(tableWidth, edgeThickness),
 			Color = new Graphics.Colors.Color(20, 9, 3),
 			Origin = Graphics.Anchor.Center,
+			Depth = 20,
 			//Rotation = 15
 		});
 		bottomEdge.AddComponent(new RigidBody()
@@ -151,10 +149,11 @@ public class BilliardTest : TestScene
 
 		Add(leftEdge = new Box()
 		{
-			Position = new(panelWidth/2-tableWidth/2, panelHeight/2),
-			Size = new(edgeThickness,tableHeight),
+			Position = new(panelWidth / 2 - tableWidth / 2, panelHeight / 2),
+			Size = new(edgeThickness, tableHeight),
 			Color = new Graphics.Colors.Color(20, 9, 3),
 			Origin = Graphics.Anchor.Center,
+			Depth = 20,
 			//Rotation = 15
 		});
 		leftEdge.AddComponent(new RigidBody()
@@ -172,10 +171,11 @@ public class BilliardTest : TestScene
 
 		Add(rightEdge = new Box()
 		{
-			Position = new(panelWidth/2+tableWidth/2, panelHeight/2),
+			Position = new(panelWidth / 2 + tableWidth / 2, panelHeight / 2),
 			Size = new(edgeThickness, tableHeight),
 			Color = new Graphics.Colors.Color(20, 9, 3),
 			Origin = Graphics.Anchor.Center,
+			Depth = 20,
 			//Rotation = 15
 		});
 		rightEdge.AddComponent(new RigidBody()
@@ -190,12 +190,12 @@ public class BilliardTest : TestScene
 			SideA = edgeThickness,
 			SideB = tableHeight
 		});
-		topLeftHolePosition   = new Vector2(panelWidth/2-tableWidth/2,panelHeight/2-tableHeight/2);
+		topLeftHolePosition = new Vector2(panelWidth / 2 - tableWidth / 2, panelHeight / 2 - tableHeight / 2);
 		topMiddleHolePosition = new Vector2(panelWidth / 2, panelHeight / 2 - tableHeight / 2);
 		topRightHolePosition = new Vector2(panelWidth / 2 + tableWidth / 2, panelHeight / 2 - tableHeight / 2);
-		bottomLeftHolePosition =new Vector2(panelWidth / 2 - tableWidth / 2, panelHeight / 2 + tableHeight / 2);
-		bottomMiddleHolePosition= new Vector2(panelWidth / 2, panelHeight / 2 + tableHeight / 2);
-		bottomRightHolePosition	=new Vector2(panelWidth / 2 + tableWidth / 2, panelHeight / 2 + tableHeight / 2);
+		bottomLeftHolePosition = new Vector2(panelWidth / 2 - tableWidth / 2, panelHeight / 2 + tableHeight / 2);
+		bottomMiddleHolePosition = new Vector2(panelWidth / 2, panelHeight / 2 + tableHeight / 2);
+		bottomRightHolePosition = new Vector2(panelWidth / 2 + tableWidth / 2, panelHeight / 2 + tableHeight / 2);
 		GenerateHoles();
 
 
@@ -205,7 +205,7 @@ public class BilliardTest : TestScene
 	{
 		Add(whiteBall = new Sprite()
 		{
-			Position =whitePosition,
+			Position = whitePosition,
 			Size = new(30, 30),
 			Origin = Graphics.Anchor.Center,
 			Texture = Assets.GetTexture("Textures/Ball.png"),
@@ -243,14 +243,14 @@ public class BilliardTest : TestScene
 		});
 		int redRow = 1;
 		int numInRow = 0;
-		for(int i=0;i<15;i++)
+		for (int i = 0; i < 15; i++)
 		{
 			Vector2 position = redPosition;
-			Vector2 startPos = new Vector2(position.X - 15*2* (redRow-1), position.Y+ 15 * (redRow-1) - 15 * 2 * numInRow);
+			Vector2 startPos = new Vector2(position.X - 15 * 2 * (redRow - 1), position.Y + 15 * (redRow - 1) - 15 * 2 * numInRow);
 			Add(redBalls[i] = new Sprite()
 			{
 
-				Position =startPos,
+				Position = startPos,
 				Size = new(30, 30),
 				Origin = Graphics.Anchor.Center,
 				Color = Palette.Red,
@@ -260,7 +260,7 @@ public class BilliardTest : TestScene
 			redBalls[i].AddComponent(new RigidBody()
 			{
 				Mass = 10,
-			//	IsDynamic=false,
+				//	IsDynamic=false,
 				UsesGravity = true,
 				Restitution = 0.9f,
 			});
@@ -386,7 +386,7 @@ public class BilliardTest : TestScene
 			Origin = Graphics.Anchor.Center,
 			Color = new Graphics.Colors.Color(27, 27, 27),
 			Texture = Assets.GetTexture("Textures/Ball.png"),
-			//Depth = 6
+			Depth = 6
 		});
 		hole.AddComponent(new RigidBody()
 		{
@@ -401,12 +401,12 @@ public class BilliardTest : TestScene
 	}
 	public void GenerateHoles()
 	{
-		topLeftHole=GenerateHole(topLeftHolePosition);
-		topMiddleHole=GenerateHole( topMiddleHolePosition);
-		topRightHole=GenerateHole(topRightHolePosition);
-		bottomLeftHole=GenerateHole( bottomLeftHolePosition);
-		bottomMiddleHole=GenerateHole(bottomMiddleHolePosition);
-		bottomRightHole=GenerateHole(bottomRightHolePosition);
+		topLeftHole = GenerateHole(topLeftHolePosition);
+		topMiddleHole = GenerateHole(topMiddleHolePosition);
+		topRightHole = GenerateHole(topRightHolePosition);
+		bottomLeftHole = GenerateHole(bottomLeftHolePosition);
+		bottomMiddleHole = GenerateHole(bottomMiddleHolePosition);
+		bottomRightHole = GenerateHole(bottomRightHolePosition);
 	}
 	protected override void Update()
 	{
@@ -473,10 +473,10 @@ public class BilliardTest : TestScene
 	}
 	protected override void FixedUpdate()
 	{
-		if(Input.GetKey(Keys.G).Down)
-		foreach(var ob in this.Children.Where(x => x.GetComponent<RigidBody>() != null).ToList())
-			Console.WriteLine(ob.GetType());
-		PGen.Update(this.Children.Where(x => x.GetComponent<RigidBody>() != null).ToList());
+		if (Input.GetKey(Keys.G).Down)
+			foreach (var ob in this.Children.Where(x => x.GetComponent<RigidBody>() != null).ToList())
+				Console.WriteLine(ob.GetType());
+		PGen.Update(ComponentStorage<RigidBody>.GetComponents());
 		/*
 		//Fake Floor
 		if (box1.Y>600)

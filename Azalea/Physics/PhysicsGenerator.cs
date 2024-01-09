@@ -1,5 +1,4 @@
-﻿using Azalea.Design.Components;
-using Azalea.Extentions;
+﻿using Azalea.Extentions;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Physics.Colliders;
@@ -7,9 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Security.AccessControl;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Azalea.Physics;
 public class PhysicsGenerator
@@ -27,33 +23,31 @@ public class PhysicsGenerator
 	public bool UsesAirResistance { get; set; } = true;
 
 
-	public void Update(List<GameObject> objects)
+	public void Update(IReadOnlyList<RigidBody> bodies)
 	{
 		if (UsesGravity)
-			ApplyGravity(objects.Where(x => x.GetComponent<RigidBody>().UsesGravity).ToList());
+			ApplyGravity(bodies.Where(x => x.UsesGravity).ToList());
 
 		if (IsTopDown)
-			ApplyTopDownFriction(objects.Where(x => x.GetComponent<RigidBody>().UsesFriction).ToList());
+			ApplyTopDownFriction(bodies.Where(x => x.UsesFriction).ToList());
 
-		ApplyForces(objects);
+		ApplyForces(bodies);
 	}
 
-	private void ApplyGravity(List<GameObject> objects)
+	private void ApplyGravity(IReadOnlyList<RigidBody> bodies)
 	{
-		foreach (GameObject ob in objects)
+		foreach (RigidBody rb in bodies)
 		{
-			RigidBody rb = ob.GetComponent<RigidBody>();
 			rb.Force += rb.Mass * GravityConstant / UpdateRate;
 		}
 	}
 
-	private void ApplyTopDownFriction(List<GameObject> objects)
+	private void ApplyTopDownFriction(IReadOnlyList<RigidBody> bodies)
 	{
-		foreach(GameObject ob in objects)
+		foreach (RigidBody rb in bodies)
 		{
-			RigidBody rb = ob.GetComponent<RigidBody>();
 
-				if(rb.Velocity.Length()>0)
+			if (rb.Velocity.Length() > 0)
 				if (rb.Velocity == new Vector2(0, 0))
 				{
 					rb.Force += -(Vector2.Normalize(rb.Velocity) * rb.Mass * GravityConstant.Y / UpdateRate) * StaticFriction;
@@ -62,15 +56,14 @@ public class PhysicsGenerator
 				{
 					rb.Force += -(Vector2.Normalize(rb.Velocity) * rb.Mass * GravityConstant.Y / UpdateRate) * DynamicFriction;
 				}
-		
+
 		}
 	}
 
-	private void ApplyForces(List<GameObject> objects)
+	private void ApplyForces(IReadOnlyList<RigidBody> bodies)
 	{
-		foreach (GameObject ob in objects)
+		foreach (RigidBody rb in bodies)
 		{
-			RigidBody rb = ob.GetComponent<RigidBody>();
 			if (rb.IsDynamic == false)
 				return;
 
@@ -78,42 +71,40 @@ public class PhysicsGenerator
 			rb.Velocity += rb.Acceleration;
 			if (float.IsNaN(rb.Velocity.X) || float.IsNaN(rb.Velocity.Y))
 			{
-				rb.Velocity = new(0,0);
+				rb.Velocity = new(0, 0);
 				rb.Position = new(100, 100);
 			}
-				
-
-			
-			
 
 
-	//		rb.AngularAccelaration 
+
+
+
+
+			//		rb.AngularAccelaration 
 			rb.AngularVelocity += rb.AngularAcceleration;
 			rb.Rotation += rb.AngularVelocity;
 
-			int numOfAttempts = 1 + (int)MathF.Ceiling(rb.Velocity.Length() / ob.GetComponent<Collider>().ShortestDistance);
+			int numOfAttempts = 1 + (int)MathF.Ceiling(rb.Velocity.Length() / rb.Parent.GetComponent<Collider>().ShortestDistance);
 			for (int i = 0; i < numOfAttempts; i++)
 			{
-				rb.Position += rb.Velocity/numOfAttempts;
-				CheckCollisions(ob, objects);
+				rb.Position += rb.Velocity / numOfAttempts;
+				CheckCollisions(rb.Parent, bodies);
 			}
 			rb.Torque = new Vector2(0, 0);
 			rb.Force = new Vector2(0, 0);
 		}
 	}
 
-	private void CheckCollisions(GameObject currentObject, List<GameObject> objects)
+	private void CheckCollisions(GameObject currentObject, IReadOnlyList<RigidBody> bodies)
 	{
 		Collider currentCollider = currentObject.GetComponent<Collider>();
-		RigidBody currentRigidBody = currentObject.GetComponent<RigidBody>();
 
-		foreach (GameObject otherObject in objects)
+		foreach (RigidBody otherBody in bodies)
 		{
-			if (otherObject == currentObject)
+			if (otherBody.Parent == currentObject)
 				continue;
 
-			Collider otherCollider = otherObject.GetComponent<Collider>();
-			RigidBody otherRigidBody = otherObject.GetComponent<RigidBody>();
+			Collider otherCollider = otherBody.Parent.GetComponent<Collider>();
 
 			if (currentCollider is CircleCollider crCol1 && otherCollider is CircleCollider crCol2)
 			{
@@ -135,10 +126,10 @@ public class PhysicsGenerator
 		}
 	}
 
-	private bool CheckCircleOnCircleCollision(CircleCollider circle1,CircleCollider circle2)
+	private bool CheckCircleOnCircleCollision(CircleCollider circle1, CircleCollider circle2)
 	{
-		float distanceOfCenters=Vector2.Distance(circle1.Position, circle2.Position);
-		if(circle1.Radius+circle2.Radius>=distanceOfCenters)
+		float distanceOfCenters = Vector2.Distance(circle1.Position, circle2.Position);
+		if (circle1.Radius + circle2.Radius >= distanceOfCenters)
 		{
 			float penetration = circle1.Radius + circle2.Radius - distanceOfCenters;
 			ResolveCircleOnCircleCCollision(circle1, circle2, penetration);
@@ -158,43 +149,43 @@ public class PhysicsGenerator
 		int rotatedCircleY = (int)((circle.Position.X - rect.Position.X) * Math.Sin(-rectAngle) + (circle.Position.Y - rect.Position.Y) * Math.Cos(-rectAngle) + rect.Position.Y);
 
 		// Find closest point on the rotated rectangle
-		float closestX = Math.Clamp(rotatedCircleX, rect.Position.X-rect.SideA/2, rect.Position.X + rect.SideA / 2);
-		float closestY = Math.Clamp(rotatedCircleY, rect.Position.Y-rect.SideB/2, rect.Position.Y + rect.SideB / 2);
-	
+		float closestX = Math.Clamp(rotatedCircleX, rect.Position.X - rect.SideA / 2, rect.Position.X + rect.SideA / 2);
+		float closestY = Math.Clamp(rotatedCircleY, rect.Position.Y - rect.SideB / 2, rect.Position.Y + rect.SideB / 2);
+
 		// Calculate distance
 		float distanceX = rotatedCircleX - closestX;
 		float distanceY = rotatedCircleY - closestY;
 
-		if(distanceX == 0 && distanceY == 0)
+		if (distanceX == 0 && distanceY == 0)
 		{
 			return false;
 		}
 
-		Vector2 collisionNormal=Vector2.Normalize(new Vector2(distanceX, distanceY));
+		Vector2 collisionNormal = Vector2.Normalize(new Vector2(distanceX, distanceY));
 		if (float.IsNaN(collisionNormal.X) || float.IsNaN(collisionNormal.Y))
 			Console.WriteLine("Collision Normal is NAN");
 		collisionNormal = Vector2Extentions.Rotate(collisionNormal, +rectAngle);
 
-			//x2 = cosβx1 − sinβy1
-			//y2 = sinβx1 + cosβy1
+		//x2 = cosβx1 − sinβy1
+		//y2 = sinβx1 + cosβy1
 
-		double distance = Math.Sqrt(Math.Pow(distanceX,2) + Math.Pow(distanceY , 2));
+		double distance = Math.Sqrt(Math.Pow(distanceX, 2) + Math.Pow(distanceY, 2));
 
-		
-		if(distance < circle.Radius)
+
+		if (distance < circle.Radius)
 		{
 			float unrotatedRectPositionX = (float)((closestX - rect.Position.X) * Math.Cos(rectAngle) + (closestY - rect.Position.Y) * Math.Sin(rectAngle) + rect.Position.X);
 			float unrotatedRectPositionY = (float)(-(closestX - rect.Position.X) * Math.Sin(rectAngle) + (closestY - rect.Position.Y) * Math.Cos(rectAngle) + rect.Position.Y);
 
 			Vector2 rotatedRectPosition = new Vector2(unrotatedRectPositionX, unrotatedRectPositionY);
-			float penetration = (float)(circle.Radius-distance);
-			ResolveCircleOnRectCollision(circle, rect, penetration,collisionNormal,rotatedRectPosition);
+			float penetration = (float)(circle.Radius - distance);
+			ResolveCircleOnRectCollision(circle, rect, penetration, collisionNormal, rotatedRectPosition);
 			if (DebugMode)
 			{
 				circle.Parent.Color = Palette.Orange;
 				rect.Parent.Color = Palette.Orange;
 			}
-				return true;
+			return true;
 		}
 		if (DebugMode)
 		{
@@ -229,11 +220,11 @@ public class PhysicsGenerator
 
 		Vector2 relativeVelocity = rbCircle2.Velocity - rbCircle1.Velocity;
 		float impulse = (2 * rbCircle1.Mass * rbCircle2.Mass) / (rbCircle1.Mass + rbCircle2.Mass) * Vector2.Dot(relativeVelocity, collisionNormal) * (rbCircle1.Restitution + rbCircle2.Restitution) / 2;
-	
+
 		// Update velocities based on impulse and mass
 		rbCircle1.Velocity += impulse / rbCircle1.Mass * collisionNormal;
 		rbCircle2.Velocity -= impulse / rbCircle2.Mass * collisionNormal;
-	//	rbCircle1.AddForce(collisionNormal,)
+		//	rbCircle1.AddForce(collisionNormal,)
 	}
 
 	private void ResolveCircleOnRectCollision(CircleCollider circle, RectCollider rect, float penetration, Vector2 collisionNormal, Vector2 rotatedRectPosition)
@@ -255,10 +246,10 @@ public class PhysicsGenerator
 		RigidBody rbCircle = circle.Parent.GetComponent<RigidBody>();
 		RigidBody rbRect = rect.Parent.GetComponent<RigidBody>();
 
-	//	Vector2 totalForce = rbCircle.Force + rbRect.Force;
+		//	Vector2 totalForce = rbCircle.Force + rbRect.Force;
 
 		Vector2 relativeVelocity = rbRect.Velocity - rbCircle.Velocity;
-		float impulse = (2 * rbCircle.Mass * rbRect.Mass) / (rbCircle.Mass + rbRect.Mass) * Vector2.Dot(relativeVelocity, collisionNormal) * ( rbCircle.Restitution + rbRect.Restitution) / 2;
+		float impulse = (2 * rbCircle.Mass * rbRect.Mass) / (rbCircle.Mass + rbRect.Mass) * Vector2.Dot(relativeVelocity, collisionNormal) * (rbCircle.Restitution + rbRect.Restitution) / 2;
 
 		if (float.IsNaN(impulse))
 			impulse = 10;
