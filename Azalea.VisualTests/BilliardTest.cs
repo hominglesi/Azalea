@@ -3,15 +3,18 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.IO.Resources;
-using Azalea.Physics;
 using Azalea.Physics.Colliders;
+using Azalea.Physics;
 using System;
-using System.Data;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Text;
+using System.Threading.Tasks;
+using Azalea.Platform;
 
 namespace Azalea.VisualTests;
-public class PhysicsTest : TestScene
+public class BilliardTest : TestScene
 {
 	PhysicsGenerator PGen = new PhysicsGenerator();
 	public Box box1;
@@ -37,16 +40,21 @@ public class PhysicsTest : TestScene
 
 	Line line;
 	bool charging = false;
-	public PhysicsTest()
+
+	private IWindow _window;
+	public BilliardTest()
 	{
+		_window = AzaleaGame.Main.Host.Window;
+		_window.ClientSize = new(1680, 960);
+
 		PGen.UsesGravity = false;
-		Add(line=new Line()
+		Add(line = new Line()
 		{
 			StartPoint = new(500, 40),
 			EndPoint = new(200, 400),
-			Alpha=0f
+			Alpha = 0f
 		});
-		
+
 		Add(circle1 = new Sprite()
 		{
 			Position = new(1000, 100),
@@ -59,51 +67,51 @@ public class PhysicsTest : TestScene
 		{
 			Mass = 10,
 			UsesGravity = true,
-			Restitution= 0.6f,
+			Restitution = 0.6f,
 		});
 		circle1.AddComponent(new CircleCollider()
 		{
 			Radius = 25
 		});
-/*
-		Add(testCircle1 = new Sprite()
-		{
-			Position = new(200, 400),
-			Size = new(30, 30),
-			Color = Palette.Purple,
-			Origin = Graphics.Anchor.Center,
-			Texture = Assets.GetTexture("Textures/Circle.png")
-		});
-		testCircle1.AddComponent(new RigidBody()
-		{
-			Mass = 5,
-			UsesGravity = true,
-			Restitution = 0.5f
-		});
-		testCircle1.AddComponent(new CircleCollider()
-		{
-			Radius = 15
-		});
+		/*
+				Add(testCircle1 = new Sprite()
+				{
+					Position = new(200, 400),
+					Size = new(30, 30),
+					Color = Palette.Purple,
+					Origin = Graphics.Anchor.Center,
+					Texture = Assets.GetTexture("Textures/Circle.png")
+				});
+				testCircle1.AddComponent(new RigidBody()
+				{
+					Mass = 5,
+					UsesGravity = true,
+					Restitution = 0.5f
+				});
+				testCircle1.AddComponent(new CircleCollider()
+				{
+					Radius = 15
+				});
 
-		Add(testCircle2 = new Sprite()
-		{
-			Position = new(900, 400),
-			Size = new(30, 30),
-			Color = Palette.Silver,
-			Origin = Graphics.Anchor.Center,
-			Texture = Assets.GetTexture("Textures/Circle.png")
-		});
-		testCircle2.AddComponent(new RigidBody()
-		{
-			Mass = 5,
-			UsesGravity = true,
-			Restitution = 0.5f
-		});
-		testCircle2.AddComponent(new CircleCollider()
-		{
-			Radius = 15,
-			
-		});*/
+				Add(testCircle2 = new Sprite()
+				{
+					Position = new(900, 400),
+					Size = new(30, 30),
+					Color = Palette.Silver,
+					Origin = Graphics.Anchor.Center,
+					Texture = Assets.GetTexture("Textures/Circle.png")
+				});
+				testCircle2.AddComponent(new RigidBody()
+				{
+					Mass = 5,
+					UsesGravity = true,
+					Restitution = 0.5f
+				});
+				testCircle2.AddComponent(new CircleCollider()
+				{
+					Radius = 15,
+
+				});*/
 		/*
 		Add(circle2 = new Sprite()
 		{
@@ -147,12 +155,12 @@ public class PhysicsTest : TestScene
 			Size = new(50, 50),
 			Color = Palette.Yellow,
 			Origin = Graphics.Anchor.Center,
-			Rotation=35
+			Rotation = 35
 		});
 		box1.AddComponent(new RigidBody()
 		{
 			Mass = 10,
-		//	UsesGravity = false,
+			//	UsesGravity = false,
 			//AngularAcceleration = 0.0001f
 		});
 		box1.AddComponent(new RectCollider()
@@ -160,7 +168,7 @@ public class PhysicsTest : TestScene
 			SideA = 50,
 			SideB = 50
 		});
-		
+
 		Add(platform = new Box()
 		{
 			Position = new(600, 600),
@@ -173,7 +181,7 @@ public class PhysicsTest : TestScene
 		{
 			Mass = 1000000,
 			UsesGravity = false,
-			IsDynamic=false,
+			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
 		platform.AddComponent(new RectCollider()
@@ -209,7 +217,7 @@ public class PhysicsTest : TestScene
 			Size = new(200, 60),
 			Color = Palette.Brown,
 			Origin = Graphics.Anchor.Center,
-			Rotation =120
+			Rotation = 120
 		});
 		platform2.AddComponent(new RigidBody()
 		{
@@ -312,13 +320,13 @@ public class PhysicsTest : TestScene
 
 	protected override void Update()
 	{
-		
+
 		if (Input.GetKey(Keys.Space).Down)
 		{
 			PGen.UsesGravity = true;
 		}
 
-		if(Input.GetKey(Keys.O).Down)
+		if (Input.GetKey(Keys.O).Down)
 		{
 			Add(testCircle1 = new Sprite()
 			{
@@ -411,7 +419,7 @@ public class PhysicsTest : TestScene
 		{
 			charging = false;
 			line.Alpha = 0;
-			Vector2 directionVector= Vector2.Normalize(circle1.Position -Input.MousePosition);
+			Vector2 directionVector = Vector2.Normalize(circle1.Position - Input.MousePosition);
 
 			float power = 2f;
 			float distance = Vector2.Distance(Input.MousePosition, circle1.Position);
