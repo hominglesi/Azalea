@@ -39,7 +39,7 @@ public class PhysicsTest : TestScene
 	bool charging = false;
 	public PhysicsTest()
 	{
-		PGen.UsesGravity = false;
+	//	PGen.UsesGravity = false;
 		Add(line=new Line()
 		{
 			StartPoint = new(500, 40),
@@ -59,7 +59,7 @@ public class PhysicsTest : TestScene
 		{
 			Mass = 10,
 			UsesGravity = true,
-			Restitution= 0.9f,
+			Restitution= 0.6f,
 		});
 		circle1.AddComponent(new CircleCollider()
 		{

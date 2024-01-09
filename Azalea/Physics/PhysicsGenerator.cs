@@ -224,11 +224,16 @@ public class PhysicsGenerator
 		if (float.IsNaN(impulse))
 			impulse = 10;
 
+
+		/// Calculate impulse in the normal direction
+		Vector2 impulseNormal = impulse * collisionNormal;
+
+		// Calculate impulse in the tangential direction (forward)
+		Vector2 impulseTangential = relativeVelocity - Vector2.Dot(relativeVelocity, collisionNormal) * collisionNormal;
+
 		// Update velocities based on impulse and mass
-		if (float.IsNaN(((Vector2)(impulse / rbCircle.Mass * collisionNormal)).X) || float.IsNaN(((Vector2)(impulse / rbCircle.Mass * collisionNormal)).Y))
-			rbCircle.Velocity += rbCircle.Velocity*2;
-		else
-			rbCircle.Velocity += impulse / rbCircle.Mass * collisionNormal;
+		rbCircle.Velocity += impulseNormal / rbCircle.Mass;
+		rbCircle.Velocity += impulseTangential / rbCircle.Mass;
 		rbRect.Velocity -= impulse / rbRect.Mass * collisionNormal;
 
 
