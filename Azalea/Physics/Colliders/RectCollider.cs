@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 
 namespace Azalea.Physics.Colliders;
 public class RectCollider : Collider
 {
+	//TODO: Rework with Quad
+
 	//Upper and Bottom side
 	public float SideA { get; set; }
 	//Left And Right side
 	public float SideB { get; set; }
-	public override float ShortestDistance =>  SideA < SideB ? SideA : SideB;
+
+	public override float ShortestDistance => SideA < SideB ? SideA : SideB;
 	public override Vector2[] GetVertices()
 	{
 		// Vertices in local space

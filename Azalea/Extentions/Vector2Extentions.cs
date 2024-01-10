@@ -40,22 +40,18 @@ public static class Vector2Extentions
 		=> left.X * right.Y - left.Y * right.X;
 
 	public static float Cross(Vector2 left, Vector2 right)
-	{
-		return left.X * right.Y - left.Y * right.X;
-	}
-	public static Vector2 Cross(Vector2 vector, float s)
-	{
-		return new Vector2(s * vector.Y, -s * vector.X);
-	}
-	public static Vector2 Cross(float s, Vector2 vector)
-	{
-		return new Vector2(-s * vector.Y, s * vector.X);
-	}
+		=> left.X * right.Y - left.Y * right.X;
 
-	public static Vector2 Rotate(Vector2 vector, float angle, bool isDegrees=true)
+	public static Vector2 Cross(Vector2 vector, float s)
+		=> new(s * vector.Y, -s * vector.X);
+
+	public static Vector2 Cross(float s, Vector2 vector)
+		=> new(-s * vector.Y, s * vector.X);
+
+	public static Vector2 Rotate(this Vector2 vector, float angle, bool isDegrees = true)
 	{
-	//	if (!isDegrees)
-	//		angle = (angle * 180) / MathF.PI;
+		if (isDegrees)
+			angle = (angle / 180) * MathF.PI;
 
 		return new Vector2(MathF.Cos(angle) * vector.X - MathF.Sin(angle) * vector.Y,
 						   MathF.Sin(angle) * vector.X + MathF.Cos(angle) * vector.Y);

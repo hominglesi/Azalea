@@ -1,17 +1,15 @@
 ﻿using Azalea.Extentions;
-using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Physics.Colliders;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 
 namespace Azalea.Physics;
 public class PhysicsGenerator
 {
 	//u slucaju da ima potrebe za neki tip gravity manipulationa, stavio sam ovo da moze da se menja
-	public Vector2 GravityConstant { get; set; } = new Vector2(0, 9.81f);
+	public Vector2 GravityConstant { get; set; } = new(0, 9.81f);
 	public static int UpdateRate => 60;
 	public bool IsTopDown { get; set; }
 	public float StaticFriction { get; set; } = 0.1f;
@@ -23,85 +21,64 @@ public class PhysicsGenerator
 	public bool UsesAirResistance { get; set; } = true;
 
 
-	public void Update(IReadOnlyList<RigidBody> bodies)
+	public void Update(IEnumerable<RigidBody> bodies)
 	{
-		if (UsesGravity)
-			ApplyGravity(bodies.Where(x => x.UsesGravity).ToList());
-
-		if (IsTopDown)
-			ApplyTopDownFriction(bodies.Where(x => x.UsesFriction).ToList());
-
-		ApplyForces(bodies);
-	}
-
-	private void ApplyGravity(IReadOnlyList<RigidBody> bodies)
-	{
-		foreach (RigidBody rb in bodies)
+		foreach (var rb in bodies)
 		{
-			rb.Force += rb.Mass * GravityConstant / UpdateRate;
+			if (UsesGravity) applyGravity(rb);
+			if (IsTopDown) applyTopDownFriction(rb);
+			applyForces(rb, bodies);
 		}
 	}
 
-	private void ApplyTopDownFriction(IReadOnlyList<RigidBody> bodies)
+	private void applyGravity(RigidBody rb)
 	{
-		foreach (RigidBody rb in bodies)
-		{
-
-			if (rb.Velocity.Length() > 0)
-				if (rb.Velocity == new Vector2(0, 0))
-				{
-					rb.Force += -(Vector2.Normalize(rb.Velocity) * rb.Mass * GravityConstant.Y / UpdateRate) * StaticFriction;
-				}
-				else
-				{
-					rb.Force += -(Vector2.Normalize(rb.Velocity) * rb.Mass * GravityConstant.Y / UpdateRate) * DynamicFriction;
-				}
-
-		}
+		rb.Force += rb.Mass * GravityConstant / UpdateRate;
 	}
 
-	private void ApplyForces(IReadOnlyList<RigidBody> bodies)
+	private void applyTopDownFriction(RigidBody rb)
 	{
-		foreach (RigidBody rb in bodies)
-		{
-			if (rb.IsDynamic == false)
-				return;
-
-			rb.Acceleration = rb.Force / rb.Mass;
-			rb.Velocity += rb.Acceleration;
-			if (float.IsNaN(rb.Velocity.X) || float.IsNaN(rb.Velocity.Y))
-			{
-				rb.Velocity = new(0, 0);
-				rb.Position = new(100, 100);
-			}
-
-
-
-
-
-
-			//		rb.AngularAccelaration 
-			rb.AngularVelocity += rb.AngularAcceleration;
-			rb.Rotation += rb.AngularVelocity;
-
-			int numOfAttempts = 1 + (int)MathF.Ceiling(rb.Velocity.Length() / rb.Parent.GetComponent<Collider>().ShortestDistance);
-			for (int i = 0; i < numOfAttempts; i++)
-			{
-				rb.Position += rb.Velocity / numOfAttempts;
-				CheckCollisions(rb.Parent, bodies);
-			}
-			rb.Torque = new Vector2(0, 0);
-			rb.Force = new Vector2(0, 0);
-		}
+		if (rb.Velocity.Length() > 0)
+			if (rb.Velocity == new Vector2(0, 0))
+				rb.Force += -(Vector2.Normalize(rb.Velocity) * rb.Mass * GravityConstant.Y / UpdateRate) * StaticFriction;
+			else
+				rb.Force += -(Vector2.Normalize(rb.Velocity) * rb.Mass * GravityConstant.Y / UpdateRate) * DynamicFriction;
 	}
 
-	private void CheckCollisions(GameObject currentObject, IReadOnlyList<RigidBody> bodies)
+	private void applyForces(RigidBody rb, IEnumerable<RigidBody> others)
 	{
-		Collider currentCollider = currentObject.GetComponent<Collider>();
+		if (rb.IsDynamic == false)
+			return;
+
+		rb.Acceleration = rb.Force / rb.Mass;
+		rb.Velocity += rb.Acceleration;
+		if (float.IsNaN(rb.Velocity.X) || float.IsNaN(rb.Velocity.Y))
+		{
+			rb.Velocity = new(0, 0);
+			rb.Position = new(100, 100);
+		}
+
+		//		rb.AngularAccelaration 
+		rb.AngularVelocity += rb.AngularAcceleration;
+		rb.Rotation += rb.AngularVelocity;
+
+		int numOfAttempts = 1 + (int)MathF.Ceiling(rb.Velocity.Length() / rb.Parent.GetComponent<Collider>().ShortestDistance);
+		for (int i = 0; i < numOfAttempts; i++)
+		{
+			rb.Position += rb.Velocity / numOfAttempts;
+			CheckCollisions(rb, others);
+		}
+		rb.Torque = new Vector2(0, 0);
+		rb.Force = new Vector2(0, 0);
+	}
+
+	private void CheckCollisions(RigidBody rb, IEnumerable<RigidBody> bodies)
+	{
+		Collider currentCollider = rb.Parent.GetComponent<Collider>();
 
 		foreach (RigidBody otherBody in bodies)
 		{
-			if (otherBody.Parent == currentObject)
+			if (otherBody == rb)
 				continue;
 
 			Collider otherCollider = otherBody.Parent.GetComponent<Collider>();
@@ -157,14 +134,12 @@ public class PhysicsGenerator
 		float distanceY = rotatedCircleY - closestY;
 
 		if (distanceX == 0 && distanceY == 0)
-		{
 			return false;
-		}
 
 		Vector2 collisionNormal = Vector2.Normalize(new Vector2(distanceX, distanceY));
 		if (float.IsNaN(collisionNormal.X) || float.IsNaN(collisionNormal.Y))
 			Console.WriteLine("Collision Normal is NAN");
-		collisionNormal = Vector2Extentions.Rotate(collisionNormal, +rectAngle);
+		collisionNormal = collisionNormal.Rotate(rectAngle);
 
 		//x2 = cosβx1 − sinβy1
 		//y2 = sinβx1 + cosβy1
