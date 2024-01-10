@@ -1,22 +1,81 @@
-﻿using Azalea.Design.Containers.Text;
+﻿using Azalea.Design.Containers;
+using Azalea.Design.Shapes;
+using Azalea.Graphics.Colors;
+using Azalea.Graphics.Sprites;
+using Azalea.Inputs;
+using Azalea.Utils;
 
 namespace Azalea.VisualTests;
 public class TextContainerTest : TestScene
 {
-	private TextContainer _container;
+	private ScrollableContainer _scrollable;
+	private FlexContainer _flex;
+
+	private Box _box;
+
 	public TextContainerTest()
 	{
-		Add(_container = new TextContainer()
+		var x = AzaleaGame.Main.Host.Window;
+		x.ClientSize = new(1680, 960);
+
+		Add(_box = new Box
 		{
-			Width = 1000,
+			Width = 100,
+			Height = 100,
+			Origin = Graphics.Anchor.Center,
+			Position = new(900, 400)
 		});
-		//_container.Text = "New Line\nI sada je New Line\nllkwanldkadw\n";
-		_container.AddText("New Line");
-		_container.NewLine();
-		_container.AddText("I sada je New Line");
-		_container.NewLine();
-		_container.AddText("llkwanldkadw");
-		_container.NewLine();
-		_container.AddText("awdioanoudwda");
+
+
+		Add(_scrollable = new ScrollableContainer()
+		{
+			BorderColor = Palette.Teal,
+			Size = new(800, 600),
+			Position = new(50, 50)
+			//RelativeSizeAxes = Graphics.Axes.Both,
+		});
+
+		_scrollable.Add(_flex = new FlexContainer()
+		{
+			AutoSizeAxes = Graphics.Axes.Y,
+			RelativeSizeAxes = Graphics.Axes.X,
+			Direction = FlexDirection.Vertical,
+			Spacing = new(0, 50)
+		});
+
+		for (int i = 0; i < 6; i++)
+		{
+			var container = new TextContainer((t) => { t.Font = FontUsage.Default.With(size: 24); })
+			{
+				AutoSizeAxes = Graphics.Axes.Y,
+				RelativeSizeAxes = Graphics.Axes.X,
+				Width = 0.6f,
+				Origin = i % 2 == 0 ? Graphics.Anchor.TopLeft : Graphics.Anchor.TopRight,
+				Anchor = i % 2 == 0 ? Graphics.Anchor.TopLeft : Graphics.Anchor.TopRight,
+				Justification = i % 2 == 0 ? FlexJustification.Start : FlexJustification.End,
+			};
+
+			for (int j = 0; j < 3; j++)
+			{
+				container.AddText(TextUtils.GenerateLoremIpsum(Rng.Int(10, 40)));
+				if (Rng.Int(2) == 0)
+					container.AddText("\n");
+				if (Rng.Int(2) == 0)
+					container.AddText("\n");
+			}
+
+
+			_flex.Add(container);
+		}
+
+	}
+
+	protected override void Update()
+	{
+		if (Input.GetMouseButton(0).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
+		{
+			_scrollable.Size = _scrollable.ToLocalSpace(Input.MousePosition);
+		}
+		_box.Rotation += 0.5f;
 	}
 }

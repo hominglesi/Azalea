@@ -8,14 +8,11 @@ using System.Numerics;
 
 namespace Azalea.Design.Containers;
 
-/// <summary>
-/// A composition that can be used to fluently arrange its children.
-/// </summary>
 public abstract class FlowContainer : Composition
 {
-	internal event Action? OnLayout;
+	private Dictionary<GameObject, float> _childOrder = new();
 
-	protected FlowContainer()
+	public FlowContainer()
 	{
 		AddLayout(_layout);
 		AddLayout(_childLayout);
@@ -24,15 +21,11 @@ public abstract class FlowContainer : Composition
 	private readonly LayoutValue _layout = new(Invalidation.DrawSize);
 	private readonly LayoutValue _childLayout = new(Invalidation.RequiredParentSizeToFit | Invalidation.Presence, InvalidationSource.Child);
 
-	protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate || !_layout.IsValid;
-
-	protected virtual void InvalidateLayout() => _layout.Invalidate();
-
-	private readonly Dictionary<GameObject, float> _layoutChildren = new();
+	public virtual void InvalidateLayout() => _layout.Invalidate();
 
 	public override void Add(GameObject gameObject)
 	{
-		_layoutChildren.Add(gameObject, 0f);
+		_childOrder.Add(gameObject, 0);
 
 		InvalidateLayout();
 		base.Add(gameObject);
@@ -40,7 +33,7 @@ public abstract class FlowContainer : Composition
 
 	public override bool Remove(GameObject gameObject)
 	{
-		_layoutChildren.Remove(gameObject);
+		_childOrder.Remove(gameObject);
 
 		InvalidateLayout();
 		return base.Remove(gameObject);
@@ -48,81 +41,61 @@ public abstract class FlowContainer : Composition
 
 	public override void Clear()
 	{
-		_layoutChildren.Clear();
+		_childOrder.Clear();
 
 		InvalidateLayout();
 		base.Clear();
 	}
 
-	public void SetLayoutPosition(GameObject gameObject, float newPosition)
+	public void SetChildOrder(GameObject obj, float index)
 	{
-		if (!_layoutChildren.ContainsKey(gameObject))
-			throw new InvalidOperationException($"Cannot change layout position of game object which is not contained within this {nameof(FlowContainer)}.");
+		if (_childOrder.ContainsKey(obj) == false)
+			throw new Exception("Cannot change order of an object that is not a child of this container.");
 
-		_layoutChildren[gameObject] = newPosition;
+		_childOrder[obj] = index;
 		InvalidateLayout();
 	}
 
-	public void Insert(int position, GameObject obj)
+	public float GetChildOrder(GameObject obj)
 	{
-		Add(obj);
-		SetLayoutPosition(obj, position);
+		if (_childOrder.ContainsKey(obj) == false)
+			throw new Exception("Cannot get order of an object that is not a child of this container.");
+
+		return _childOrder[obj];
 	}
 
-	public float GetLayoutPosition(GameObject gameObject)
-	{
-		if (!_layoutChildren.ContainsKey(gameObject))
-			throw new InvalidOperationException($"Cannot get layout position of game object which is not contained within this {nameof(FlowContainer)}.");
-
-		return _layoutChildren[gameObject];
-	}
-
-	public virtual IEnumerable<GameObject> FlowingChildren => Children.Where(d => d.IsPresent).OrderBy(d => _layoutChildren[d]).ThenBy(d => d.ChildID);
+	protected IEnumerable<GameObject> FlexChildren => Children.Where(x => x.IsPresent).OrderBy(x => _childOrder[x]).ThenBy(x => x.ChildID);
 
 	protected abstract IEnumerable<Vector2> ComputeLayoutPositions();
 
 	private void performLayout()
 	{
-		OnLayout?.Invoke();
-
-		if (!Children.Any())
+		if (Children.Any() == false)
 			return;
 
-		int processedCount = 0;
+		using var positionEnumerator = ComputeLayoutPositions().GetEnumerator();
+		using var childEnumerator = FlexChildren.GetEnumerator();
 
-		using (IEnumerator<Vector2> positionEnumerator = ComputeLayoutPositions().GetEnumerator())
-		using (IEnumerator<GameObject> gameObjectEnumerator = FlowingChildren.GetEnumerator())
+		while (true)
 		{
-			while (true)
-			{
-				bool nextPos = positionEnumerator.MoveNext();
-				bool nextGameObject = gameObjectEnumerator.MoveNext();
+			bool nextPosition = positionEnumerator.MoveNext();
+			bool nextChild = childEnumerator.MoveNext();
 
-				if (nextPos != nextGameObject)
-				{
-					throw new InvalidOperationException(
-						$"{GetType().FullName}.{nameof(ComputeLayoutPositions)} returned a total of {processedCount} positions for {FlowingChildren.Count()} children. {nameof(ComputeLayoutPositions)} must return 1 position per child.");
-				}
+			if (nextPosition != nextChild)
+				throw new Exception($"{nameof(ComputeLayoutPositions)} must return the same amount of positions as FlexChildren");
 
-				if (!nextPos)
-					return;
+			if (nextPosition == false)
+				return;
 
-				var drawable = gameObjectEnumerator.Current;
-				var pos = positionEnumerator.Current;
+			var obj = childEnumerator.Current;
+			var pos = positionEnumerator.Current;
 
-				processedCount++;
+			Debug.Assert(obj is not null);
 
-				Debug.Assert(drawable is not null);
+			if (obj.RelativePositionAxes != Axes.None)
+				throw new InvalidOperationException($"A flow composition cannot contain a child with relative positioning.");
 
-				if (drawable.RelativePositionAxes != Axes.None)
-					throw new InvalidOperationException($"A flow composition cannot contain a child with relative positioning (it is {drawable.RelativePositionAxes}).");
-
-				Vector2 currentTargetPos = drawable.Position;
-
-				if (currentTargetPos == pos) continue;
-
-				drawable.Position = pos;
-			}
+			obj.Position = pos;
 		}
 	}
 
@@ -140,6 +113,19 @@ public abstract class FlowContainer : Composition
 		{
 			performLayout();
 			_layout.Validate();
+		}
+	}
+
+	public void AddNewLine(float newLineSize = 0)
+		=> Add(new FlowNewLine(newLineSize));
+
+	public class FlowNewLine : GameObject
+	{
+		public float Length { get; init; }
+
+		public FlowNewLine(float length = 0)
+		{
+			Length = length;
 		}
 	}
 }

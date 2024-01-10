@@ -28,8 +28,16 @@ public struct DrawInfo
 		if (rotation != 0)
 		{
 			float radians = MathUtils.DegreesToRadians(rotation);
-			MatrixExtentions.RotateFromLeft(ref Matrix, radians);
-			MatrixExtentions.RotateFromRight(ref MatrixInverse, -radians);
+			if (AzaleaSettings.RotateClockwise)
+			{
+				MatrixExtentions.RotateFromLeft(ref Matrix, radians);
+				MatrixExtentions.RotateFromRight(ref MatrixInverse, -radians);
+			}
+			else
+			{
+				MatrixExtentions.RotateFromLeft(ref Matrix, -radians);
+				MatrixExtentions.RotateFromRight(ref MatrixInverse, radians);
+			}
 		}
 
 		if (shear != Vector2.Zero)

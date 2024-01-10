@@ -27,6 +27,7 @@ public class DebuggingOverlay : Composition
 
 	public DebugInspector Inspector;
 	private DebugSceneGraph _sceneGraph;
+	private ColliderDebug _colliderDebug;
 
 	private static SpriteText? _fpsDislpay;
 	public static SpriteText FpsDisplay
@@ -53,8 +54,9 @@ public class DebuggingOverlay : Composition
 			RelativeSizeAxes = Axes.Both,
 			Size = new(1f, 1f)
 		});
-		RemoveInternal(InternalComposition);
-		_gameContainer.Add(InternalComposition);
+		//REMOVED WHEN COMPOSITION WAS SIMPLIFIED PROBABLY BROKE SOMETHING
+		//RemoveInternal(InternalComposition);
+		//_gameContainer.Add(InternalComposition);
 
 		AddInternal(FpsDisplay);
 
@@ -74,6 +76,8 @@ public class DebuggingOverlay : Composition
 			Size = new(1 - LeftContainerSize, 0),
 			BackgroundColor = new Color(82, 82, 82),
 		});
+
+		AddInternal(_colliderDebug = new ColliderDebug());
 	}
 
 	private bool _debuggerExpanded;

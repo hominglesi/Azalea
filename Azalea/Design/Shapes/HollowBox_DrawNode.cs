@@ -12,6 +12,7 @@ public partial class HollowBox : GameObject
 		protected new HollowBox Source => (HollowBox)base.Source;
 
 		protected Boundary Thickness { get; set; }
+		protected bool OutsideContent { get; set; }
 		protected Rectangle DrawRectangle { get; set; }
 		protected DrawColorInfo ColorInfo { get; set; }
 		protected Matrix3 DrawMatrix { get; set; }
@@ -27,13 +28,14 @@ public partial class HollowBox : GameObject
 			DrawRectangle = Source.DrawRectangle;
 			ColorInfo = Source.DrawColorInfo;
 			DrawMatrix = Source.DrawInfo.Matrix;
+			OutsideContent = Source.OutsideContent;
 		}
 
 		public override void Draw(IRenderer renderer)
 		{
 			base.Draw(renderer);
 
-			renderer.DrawRectangle(DrawRectangle, DrawMatrix, Thickness, ColorInfo);
+			renderer.DrawRectangle(DrawRectangle, DrawMatrix, Thickness, ColorInfo, OutsideContent);
 		}
 	}
 }

@@ -14,7 +14,7 @@ public class ButtonState
 	public bool Up => _up;
 	public bool DownOrRepeat => _down || _repeat;
 
-	internal void SetState(bool pressed, bool repeat = false)
+	internal void SetState(bool pressed)
 	{
 		_pressed = pressed;
 
@@ -26,9 +26,9 @@ public class ButtonState
 		{
 			_up = true;
 		}
-
-		if (repeat) _repeat = true;
 	}
+
+	internal void SetRepeat() => _repeat = true;
 
 	internal void Update()
 	{

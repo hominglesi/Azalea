@@ -1,59 +1,17 @@
 ﻿using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
-using Azalea.Layout;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Azalea.Design.Containers;
 
 public class Composition : CompositeGameObject
 {
-	public Composition()
-	{
-		AddLayout(_sizeLayout);
-		AddInternal(InternalComposition = new CompositeGameObject()
-		{
-			RelativeSizeAxes = Axes.Both
-		});
-	}
+	private List<GameObject> _publicChildren = new();
 
-	public CompositeGameObject InternalComposition;
-
-	private LayoutValue _sizeLayout = new(Invalidation.DrawSize);
-
-	protected override void UpdateAfterChildren()
-	{
-		base.UpdateAfterChildren();
-
-		if (_sizeLayout.IsValid == false)
-		{
-			if (BorderObject is not null && AutoSizeAxes == Axes.None)
-			{
-				var thickness = BorderObject.Thickness;
-				InternalComposition.Position = new(thickness.Left, thickness.Top);
-				InternalComposition.RelativeSizeAxes = Axes.None;
-				InternalComposition.Size = DrawSize - thickness.Total;
-			}
-			_sizeLayout.Validate();
-		}
-	}
-
-	public override Axes AutoSizeAxes
-	{
-		get => base.AutoSizeAxes;
-		set
-		{
-			InternalComposition.RelativeSizeAxes = Axes.None;
-			InternalComposition.AutoSizeAxes = value;
-			base.AutoSizeAxes = value;
-		}
-	}
-
-	protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
-	{
-		InternalComposition.Invalidate(invalidation, source);
-		return base.OnInvalidate(invalidation, source);
-	}
+	protected virtual IReadOnlyList<GameObject> PublicChildren => _publicChildren;
 
 	#region Background
 
@@ -93,9 +51,10 @@ public class Composition : CompositeGameObject
 		set
 		{
 			if (BorderObject is null)
-				AddInternal(BorderObject = createBorder());
+				AddInternal(BorderObject = CreateBorderObject());
 
 			BorderObject.Color = value;
+			MaskingPadding = BorderObject.Thickness;
 		}
 	}
 
@@ -110,19 +69,20 @@ public class Composition : CompositeGameObject
 		set
 		{
 			if (BorderObject is null)
-				AddInternal(BorderObject = createBorder());
+				AddInternal(BorderObject = CreateBorderObject());
 
 			BorderObject.Thickness = value;
-			_sizeLayout.Invalidate();
+			MaskingPadding = value;
 		}
 	}
 
-	private HollowBox createBorder() => new()
+	protected virtual HollowBox CreateBorderObject() => new()
 	{
 		RelativeSizeAxes = Axes.Both,
 		IgnoredForAutoSizeAxes = Axes.Both,
 		Depth = -1000,
-		Color = ColorQuad.SolidColor(Palette.Black)
+		Color = ColorQuad.SolidColor(Palette.Black),
+		OutsideContent = true
 	};
 	#endregion
 
@@ -130,10 +90,7 @@ public class Composition : CompositeGameObject
 
 	public IReadOnlyList<GameObject> Children
 	{
-		get
-		{
-			return InternalComposition.InternalChildren;
-		}
+		get => PublicChildren;
 		set
 		{
 			Clear();
@@ -143,6 +100,13 @@ public class Composition : CompositeGameObject
 
 	public GameObject Child
 	{
+		get
+		{
+			if (PublicChildren.Count != 1)
+				throw new Exception("The 'Child' property can only be used when this Composition has exactly one child");
+
+			return PublicChildren[0];
+		}
 		set
 		{
 			Clear();
@@ -164,7 +128,9 @@ public class Composition : CompositeGameObject
 
 	public virtual void Add(GameObject gameObject)
 	{
-		InternalComposition.AddInternal(gameObject);
+		_publicChildren.Add(gameObject);
+
+		AddInternal(gameObject);
 	}
 
 	public virtual void AddRange(IEnumerable<GameObject> range)
@@ -175,7 +141,9 @@ public class Composition : CompositeGameObject
 
 	public virtual bool Remove(GameObject gameObject)
 	{
-		return InternalComposition.RemoveInternal(gameObject);
+		_publicChildren.Remove(gameObject);
+
+		return RemoveInternal(gameObject);
 	}
 
 	public void RemoveRange(IEnumerable<GameObject> range)
@@ -189,12 +157,17 @@ public class Composition : CompositeGameObject
 
 	public virtual void Clear()
 	{
-		InternalComposition.ClearInternal();
+		var children = PublicChildren.ToArray();
+
+		foreach (var child in children)
+		{
+			Remove(child);
+		}
 	}
 
 	public void ChangeChildDepth(GameObject child, float newDepth)
 	{
-		InternalComposition.ChangeInternalChildDepth(child, newDepth);
+		ChangeInternalChildDepth(child, newDepth);
 	}
 
 	#endregion

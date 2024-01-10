@@ -26,8 +26,9 @@ public class BasicWindow : Window
 			BackgroundColor = Palette.White,
 		});
 
-		RemoveInternal(InternalComposition);
-		_contentContainer.AddInternal(InternalComposition);
+		//REMOVED WHEN COMPOSITION WAS SIMPLIFIED PROBABLY BROKE SOMETHING
+		//RemoveInternal(InternalComposition);
+		//_contentContainer.AddInternal(InternalComposition);
 
 		AddDragableSurface(draggableBar);
 	}

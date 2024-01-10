@@ -45,11 +45,13 @@ public static class RendererExtentions
 		});
 	}
 
-	internal static void DrawRectangle(this IRenderer renderer, Rectangle rect, Matrix3 drawMatrix, Boundary thickness, DrawColorInfo color)
+	internal static void DrawRectangle(this IRenderer renderer, Rectangle rect, Matrix3 drawMatrix, Boundary thickness, DrawColorInfo color, bool towardsOutside)
 	{
 		var texture = renderer.WhitePixel;
 
-		var topRect = new Rectangle(rect.Top, rect.Left, rect.Width - thickness.Right, thickness.Top);
+		var topRect = towardsOutside ?
+			new Rectangle(rect.Top - thickness.Top, rect.Left - thickness.Left, rect.Width + thickness.Left, thickness.Top) :
+			new Rectangle(rect.Top, rect.Left, rect.Width - thickness.Right, thickness.Top);
 
 		var topColor = new ColorQuad(
 			color.Color.TopLeft,
@@ -57,7 +59,9 @@ public static class RendererExtentions
 			color.Color.TopRight,
 			color.Color.TopRight);
 
-		var rightRect = new Rectangle(rect.Width - thickness.Right, rect.Top, thickness.Right, rect.Height - thickness.Bottom);
+		var rightRect = towardsOutside ?
+			new Rectangle(rect.Width, rect.Top - thickness.Top, thickness.Right, rect.Height + thickness.Top) :
+			new Rectangle(rect.Width - thickness.Right, rect.Top, thickness.Right, rect.Height - thickness.Bottom);
 
 		var rightColor = new ColorQuad(
 			color.Color.TopRight,
@@ -65,7 +69,9 @@ public static class RendererExtentions
 			color.Color.BottomRight,
 			color.Color.TopRight);
 
-		var bottomRect = new Rectangle(rect.Left + thickness.Left, rect.Height - thickness.Bottom, rect.Width - thickness.Left, thickness.Bottom);
+		var bottomRect = towardsOutside ?
+			new Rectangle(rect.Left, rect.Height, rect.Width + thickness.Right, thickness.Bottom) :
+			new Rectangle(rect.Left + thickness.Left, rect.Height - thickness.Bottom, rect.Width - thickness.Left, thickness.Bottom);
 
 		var bottomColor = new ColorQuad(
 			color.Color.BottomLeft,
@@ -73,7 +79,9 @@ public static class RendererExtentions
 			color.Color.BottomRight,
 			color.Color.BottomRight);
 
-		var leftRect = new Rectangle(rect.Left, rect.Top + thickness.Top, thickness.Left, rect.Height - thickness.Bottom);
+		var leftRect = towardsOutside ?
+			new Rectangle(rect.Left - thickness.Left, rect.Top, thickness.Left, rect.Height + thickness.Bottom) :
+			new Rectangle(rect.Left, rect.Top + thickness.Top, thickness.Left, rect.Height - thickness.Bottom);
 
 		var leftColor = new ColorQuad(
 			color.Color.TopLeft,
