@@ -91,6 +91,8 @@ public class BilliardTest : TestScene
 	Sprite bottomRightHole;
 
 
+	FlexContainer infoContainer;
+
 	Vector2 topLeftHolePosition;
 	Vector2 topMiddleHolePosition;
 	Vector2 topRightHolePosition;
@@ -164,8 +166,42 @@ public class BilliardTest : TestScene
 
 		GenerateUI();
 
+		GenerateInfo();
 	}
 
+	private void GenerateInfo()
+	{
+		Add(infoContainer = new FlexContainer()
+		{
+			Size = new(1400, 800),
+			Origin = Graphics.Anchor.Center,
+			Anchor = Graphics.Anchor.Center,
+			BorderThickness = new Graphics.Boundary(3),
+			BackgroundColor = Palette.Cyan,
+			Alpha = 0,
+		}); ;
+		infoContainer.Add(new Composition()
+		{
+			RelativeSizeAxes = Graphics.Axes.Both,
+			Size = new(0.33f, 1f),
+			BorderThickness = new Graphics.Boundary(2),
+
+		});
+		infoContainer.Add(new Composition()
+		{
+			RelativeSizeAxes = Graphics.Axes.Both,
+			Size = new(0.33f, 1f),
+			BorderThickness = new Graphics.Boundary(2),
+
+		});
+		infoContainer.Add(new Composition()
+		{
+			RelativeSizeAxes = Graphics.Axes.Both,
+			Size = new(0.33f, 1f),
+			BorderThickness = new Graphics.Boundary(2),
+
+		});
+	}
 
 	private void GenerateUI()
 	{
@@ -462,6 +498,12 @@ public class BilliardTest : TestScene
 		{
 			Console.WriteLine($"Circle1 Position:{whiteBall.Position}");
 		}
+
+		if (Input.GetKey(Keys.Tilde).Down)
+		{
+			infoContainer.Alpha = infoContainer.Alpha != 1f ? 1f : 0f;
+		}
+
 		/*
 		Console.WriteLine($"Box1 Position: {box1.Position}");
 		Console.WriteLine($"Circle1 Position: {circle1.Position}");
