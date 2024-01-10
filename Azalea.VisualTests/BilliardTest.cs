@@ -33,7 +33,32 @@ public class BilliardTest : TestScene
 	Box bottomRightEdge;
 	Box leftEdge;
 	Box rightEdge;
+
+	Box topLeftHoleEdgeLeft;
+	Box topLeftHoleEdgeRight;
+	Box topMiddleHoleEdgeLeft;
+	Box topMiddleHoleEdgeRight;
+	Box topRightHoleEdgeLeft;
+	Box topRightHoleEdgeRight;
+
+	Box bottomLeftHoleEdgeLeft;
+	Box bottomLeftHoleEdgeRight;
+	Box bottomMiddleHoleEdgeLeft;
+	Box bottomMiddleHoleEdgeRight;
+	Box bottomRightHoleEdgeLeft;
+	Box bottomRightHoleEdgeRight;
+
+	SpriteText player1Text;
+	SpriteText player2Text;
+
+	int holeOffset = 10;
+	int middleOffset = 25;
+
 	Box tableMat;
+
+	Player player1;
+	Player player2;
+	Player currentPlayer;
 
 
 	Box wallL;
@@ -41,14 +66,16 @@ public class BilliardTest : TestScene
 
 	float holeRadius = 25;
 
-	Sprite whiteBall;
-	Sprite[] redBalls = new Sprite[15];
-	Sprite blueBall;
-	Sprite yellowBall;
-	Sprite blackBall;
-	Sprite greenBall;
-	Sprite brownBall;
-	Sprite pinkBall;
+	BallType targetBallType = BallType.Red;
+	BallType firstHitBallType;
+	SnookerBall whiteBall;
+	SnookerBall[] redBalls = new SnookerBall[15];
+	SnookerBall blueBall;
+	SnookerBall yellowBall;
+	SnookerBall blackBall;
+	SnookerBall greenBall;
+	SnookerBall brownBall;
+	SnookerBall pinkBall;
 
 	Sprite topLeftHole;
 	Sprite topMiddleHole;
@@ -76,6 +103,8 @@ public class BilliardTest : TestScene
 
 	Line line;
 	bool charging = false;
+	bool waitingForBalls = false;
+	bool scored = false;
 
 	private IWindow _window;
 	public BilliardTest()
@@ -106,11 +135,58 @@ public class BilliardTest : TestScene
 
 		GenerateBalls();
 
+		topLeftHolePosition = new Vector2(panelWidth / 2 - tableWidth / 2 + holeRadius / 2, panelHeight / 2 - tableHeight / 2 + holeRadius / 2);
+		topMiddleHolePosition = new Vector2(panelWidth / 2, panelHeight / 2 - tableHeight / 2);
+		topRightHolePosition = new Vector2(panelWidth / 2 + tableWidth / 2 - holeRadius / 2, panelHeight / 2 - tableHeight / 2 + holeRadius / 2);
+		bottomLeftHolePosition = new Vector2(panelWidth / 2 - tableWidth / 2 + holeRadius / 2, panelHeight / 2 + tableHeight / 2 - holeRadius / 2);
+		bottomMiddleHolePosition = new Vector2(panelWidth / 2, panelHeight / 2 + tableHeight / 2);
+		bottomRightHolePosition = new Vector2(panelWidth / 2 + tableWidth / 2 - holeRadius / 2, panelHeight / 2 + tableHeight / 2 - holeRadius / 2);
+		GenerateHoles();
 
+		player1 = new Player("Toma Zdravkovic");
+		player2 = new Player("Novica Zdravkovic");
+		currentPlayer = player1;
+
+		GenerateHoleCorners();
+		GenerateEdges();
+
+		GenerateUI();
+
+	}
+
+
+	private void GenerateUI()
+	{
+		Composition uiComp;
+		Add(uiComp = new Composition()
+		{
+			Origin = Graphics.Anchor.TopCenter,
+			Anchor = Graphics.Anchor.TopCenter,
+			Size = new Vector2(panelWidth * 0.9f, panelHeight),
+			Position = new Vector2(0, 50),
+		});
+		uiComp.Add(player1Text = new SpriteText()
+		{
+			Origin = Graphics.Anchor.TopLeft,
+			Anchor = Graphics.Anchor.TopLeft,
+			Font = FontUsage.Default.With(size: 50),
+			Text = player1.ToString(),
+		});
+		uiComp.Add(player2Text = new SpriteText()
+		{
+			Origin = Graphics.Anchor.TopRight,
+			Anchor = Graphics.Anchor.TopRight,
+			Font = FontUsage.Default.With(size: 50),
+			Text = player2.ToString(),
+		});
+		HighlightPlayers();
+	}
+	private void GenerateEdges()
+	{
 		Add(topLeftEdge = new Box()
 		{
-			Position = new(panelWidth / 2 - tableWidth / 4, panelHeight / 2 - tableHeight / 2),
-			Size = new(tableWidth / 4 - holeRadius, edgeThickness),
+			Position = new(panelWidth / 2 - tableWidth / 4 + holeRadius / 2, panelHeight / 2 - tableHeight / 2),
+			Size = new(tableWidth / 2 - 3 * holeRadius - holeOffset - middleOffset + 3, edgeThickness),
 			Color = new Graphics.Colors.Color(20, 9, 3),
 			Origin = Graphics.Anchor.Center,
 			Depth = 20,
@@ -125,14 +201,14 @@ public class BilliardTest : TestScene
 		});
 		topLeftEdge.AddComponent(new RectCollider()
 		{
-			SideA = tableWidth / 2,
+			SideA = tableWidth / 2 - 3 * holeRadius - holeOffset - middleOffset + 3,
 			SideB = edgeThickness
 		});
-		/*
+
 		Add(topRightEdge = new Box()
 		{
-			Position = new(panelWidth / 2 + tableWidth / 4, panelHeight / 2 - tableHeight / 2),
-			Size = new(tableWidth / 4 - -3 * holeRadius, edgeThickness),
+			Position = new(panelWidth / 2 + tableWidth / 4 - holeRadius / 2, panelHeight / 2 - tableHeight / 2),
+			Size = new(tableWidth / 2 - 3 * holeRadius - holeOffset - middleOffset + 3, edgeThickness),
 			Color = new Graphics.Colors.Color(20, 9, 3),
 			Origin = Graphics.Anchor.Center,
 			Depth = 20,
@@ -147,14 +223,14 @@ public class BilliardTest : TestScene
 		});
 		topRightEdge.AddComponent(new RectCollider()
 		{
-			SideA = tableWidth,
+			SideA = tableWidth / 2 - 3 * holeRadius - holeOffset - middleOffset + 3,
 			SideB = edgeThickness
-		});*/
+		});
 
 		Add(bottomLeftEdge = new Box()
 		{
-			Position = new(panelWidth / 2, panelHeight / 2 + tableHeight / 2),
-			Size = new(tableWidth, edgeThickness),
+			Position = new(panelWidth / 2 - tableWidth / 4 + holeRadius / 2, panelHeight / 2 + tableHeight / 2),
+			Size = new(tableWidth / 2 - 3 * holeRadius - holeOffset - middleOffset + 3, edgeThickness),
 			Color = new Graphics.Colors.Color(20, 9, 3),
 			Origin = Graphics.Anchor.Center,
 			Depth = 20,
@@ -169,14 +245,14 @@ public class BilliardTest : TestScene
 		});
 		bottomLeftEdge.AddComponent(new RectCollider()
 		{
-			SideA = tableWidth,
+			SideA = tableWidth / 2 - 3 * holeRadius - holeOffset - middleOffset + 3,
 			SideB = edgeThickness
 		});
-		/*
+
 		Add(bottomRightEdge = new Box()
 		{
-			Position = new(panelWidth / 2, panelHeight / 2 + tableHeight / 2),
-			Size = new(tableWidth, edgeThickness),
+			Position = new(panelWidth / 2 + tableWidth / 4 - holeRadius / 2, panelHeight / 2 + tableHeight / 2),
+			Size = new(tableWidth / 2 - 3 * holeRadius - holeOffset - middleOffset + 3, edgeThickness),
 			Color = new Graphics.Colors.Color(20, 9, 3),
 			Origin = Graphics.Anchor.Center,
 			Depth = 20,
@@ -191,14 +267,14 @@ public class BilliardTest : TestScene
 		});
 		bottomRightEdge.AddComponent(new RectCollider()
 		{
-			SideA = tableWidth,
+			SideA = tableWidth / 2 - 3 * holeRadius - holeOffset - middleOffset + 3,
 			SideB = edgeThickness
-		});*/
+		});
 
 		Add(leftEdge = new Box()
 		{
 			Position = new(panelWidth / 2 - tableWidth / 2, panelHeight / 2),
-			Size = new(edgeThickness, tableHeight),
+			Size = new(edgeThickness, tableHeight - holeRadius * 3 - holeOffset - middleOffset - holeOffset - 10),
 			Color = new Graphics.Colors.Color(20, 9, 3),
 			Origin = Graphics.Anchor.Center,
 			Depth = 20,
@@ -214,13 +290,13 @@ public class BilliardTest : TestScene
 		leftEdge.AddComponent(new RectCollider()
 		{
 			SideA = edgeThickness,
-			SideB = tableHeight
+			SideB = tableHeight - holeRadius * 3 - holeOffset - middleOffset - holeOffset - 10
 		});
 
 		Add(rightEdge = new Box()
 		{
 			Position = new(panelWidth / 2 + tableWidth / 2, panelHeight / 2),
-			Size = new(edgeThickness, tableHeight),
+			Size = new(edgeThickness, tableHeight - holeRadius * 3 - holeOffset - middleOffset - holeOffset - 10),
 			Color = new Graphics.Colors.Color(20, 9, 3),
 			Origin = Graphics.Anchor.Center,
 			Depth = 20,
@@ -236,86 +312,74 @@ public class BilliardTest : TestScene
 		rightEdge.AddComponent(new RectCollider()
 		{
 			SideA = edgeThickness,
-			SideB = tableHeight
+			SideB = tableHeight - holeRadius * 3 - holeOffset - holeOffset - 10 - middleOffset,
 		});
-		topLeftHolePosition = new Vector2(panelWidth / 2 - tableWidth / 2, panelHeight / 2 - tableHeight / 2);
-		topMiddleHolePosition = new Vector2(panelWidth / 2, panelHeight / 2 - tableHeight / 2);
-		topRightHolePosition = new Vector2(panelWidth / 2 + tableWidth / 2, panelHeight / 2 - tableHeight / 2);
-		bottomLeftHolePosition = new Vector2(panelWidth / 2 - tableWidth / 2, panelHeight / 2 + tableHeight / 2);
-		bottomMiddleHolePosition = new Vector2(panelWidth / 2, panelHeight / 2 + tableHeight / 2);
-		bottomRightHolePosition = new Vector2(panelWidth / 2 + tableWidth / 2, panelHeight / 2 + tableHeight / 2);
-		GenerateHoles();
-
-
 	}
+	private void GenerateHoleCorners()
+	{
+		topLeftHoleEdgeLeft = GenerateHoleCorner(new Vector2(topLeftHolePosition.X - holeRadius / 2 + 5, topLeftHolePosition.Y + holeRadius * 1.5f), new(holeRadius / 2, holeRadius * 2), -40);
+		topRightHoleEdgeRight = GenerateHoleCorner(new Vector2(topRightHolePosition.X + holeRadius / 2 - 5, topRightHolePosition.Y + holeRadius * 1.5f), new(holeRadius / 2, holeRadius * 2), 40);
+
+		topLeftHoleEdgeRight = GenerateHoleCorner(new Vector2(topLeftHolePosition.X + holeRadius * 1.5f, topLeftHolePosition.Y - 0.5f * holeRadius + 5), new(holeRadius / 2, holeRadius * 2), -50);
+		topRightHoleEdgeLeft = GenerateHoleCorner(new Vector2(topRightHolePosition.X - holeRadius * 1.5f, topRightHolePosition.Y - 0.5f * holeRadius + 5), new(holeRadius / 2, holeRadius * 2), 50);
+
+		topMiddleHoleEdgeLeft = GenerateHoleCorner(new Vector2(topMiddleHolePosition.X - 1.5f * holeRadius, topMiddleHolePosition.Y + holeRadius / 2 - 1), new(holeRadius / 2, holeRadius), 35);
+		topMiddleHoleEdgeRight = GenerateHoleCorner(new Vector2(topMiddleHolePosition.X + 1.5f * holeRadius, topMiddleHolePosition.Y + holeRadius / 2 - 1), new(holeRadius / 2, holeRadius), -35);
+
+		bottomMiddleHoleEdgeLeft = GenerateHoleCorner(new Vector2(bottomMiddleHolePosition.X - 1.5f * holeRadius, bottomMiddleHolePosition.Y - holeRadius / 2 + 1), new(holeRadius / 2, holeRadius), -35);
+		bottomMiddleHoleEdgeRight = GenerateHoleCorner(new Vector2(bottomMiddleHolePosition.X + 1.5f * holeRadius, bottomMiddleHolePosition.Y - holeRadius / 2 + 1), new(holeRadius / 2, holeRadius), +35);
+
+		bottomLeftHoleEdgeRight = GenerateHoleCorner(new Vector2(bottomLeftHolePosition.X + holeRadius * 1.5f, bottomLeftHolePosition.Y + 0.5f * holeRadius - 5), new(holeRadius / 2, holeRadius * 2), 50);
+		bottomRightHoleEdgeLeft = GenerateHoleCorner(new Vector2(bottomRightHolePosition.X - holeRadius * 1.5f, bottomRightHolePosition.Y + 0.5f * holeRadius - 5), new(holeRadius / 2, holeRadius * 2), -50);
+
+		bottomLeftHoleEdgeLeft = GenerateHoleCorner(new Vector2(bottomLeftHolePosition.X - holeRadius / 2 + 5, bottomLeftHolePosition.Y - holeRadius * 1.5f), new(holeRadius / 2, holeRadius * 2), 40);
+		bottomRightHoleEdgeRight = GenerateHoleCorner(new Vector2(bottomRightHolePosition.X + holeRadius / 2 - 5, bottomRightHolePosition.Y - holeRadius * 1.5f), new(holeRadius / 2, holeRadius * 2), -40);
+	}
+
+	private Box GenerateHoleCorner(Vector2 position, Vector2 size, float angle)
+	{
+		Box box;
+		Add(box = topLeftEdge = new Box()
+		{
+			Position = position,
+			Size = size,
+			Color = new Graphics.Colors.Color(67, 31, 21),
+			Origin = Graphics.Anchor.Center,
+			Depth = 19,
+			Rotation = angle
+		});
+		topLeftEdge.AddComponent(new RigidBody()
+		{
+			Mass = 1000000,
+			UsesGravity = false,
+			IsDynamic = false,
+			//AngularAcceleration = 0.0001f
+		});
+		topLeftEdge.AddComponent(new RectCollider()
+		{
+			SideA = size.X,
+			SideB = size.Y,
+		});
+		return box;
+	}
+
 
 	private void GenerateBalls()
 	{
-		Add(whiteBall = new Sprite()
-		{
-			Position = whitePosition,
-			Size = new(30, 30),
-			Origin = Graphics.Anchor.Center,
-			Texture = Assets.GetTexture("Textures/Ball.png"),
-			Depth = 5
-		});
-		whiteBall.AddComponent(new RigidBody()
-		{
-			Mass = 10,
-			UsesGravity = true,
-			Restitution = 0.9f,
-		});
-		whiteBall.AddComponent(new CircleCollider()
-		{
-			Radius = 15
-		});
-
-		Add(blueBall = new Sprite()
-		{
-			Position = bluePosition,
-			Size = new(30, 30),
-			Origin = Graphics.Anchor.Center,
-			Color = Palette.Blue,
-			Texture = Assets.GetTexture("Textures/Ball.png"),
-			Depth = 5
-		});
-		blueBall.AddComponent(new RigidBody()
-		{
-			Mass = 10,
-			UsesGravity = true,
-			Restitution = 0.9f,
-		});
-		blueBall.AddComponent(new CircleCollider()
-		{
-			Radius = 15
-		});
+		Add(whiteBall = new SnookerBall(whitePosition, Palette.White, 0, BallType.White));
+		Add(blackBall = new SnookerBall(blackPosition, Palette.Black, 7, BallType.Color));
+		Add(blueBall = new SnookerBall(bluePosition, Palette.Blue, 5, BallType.Color));
+		Add(yellowBall = new SnookerBall(yellowPosition, Palette.Yellow, 2, BallType.Color));
+		Add(greenBall = new SnookerBall(greenPosition, Palette.Lime, 3, BallType.Color));
+		Add(brownBall = new SnookerBall(brownPosition, Palette.Brown, 4, BallType.Color));
+		Add(pinkBall = new SnookerBall(pinkPosition, Palette.Pink, 6, BallType.Color));
 		int redRow = 1;
 		int numInRow = 0;
 		for (int i = 0; i < 15; i++)
 		{
 			Vector2 position = redPosition;
-			Vector2 startPos = new Vector2(position.X - 15 * 2 * (redRow - 1), position.Y + 15 * (redRow - 1) - 15 * 2 * numInRow);
-			Add(redBalls[i] = new Sprite()
-			{
-
-				Position = startPos,
-				Size = new(30, 30),
-				Origin = Graphics.Anchor.Center,
-				Color = Palette.Red,
-				Texture = Assets.GetTexture("Textures/Ball.png"),
-				Depth = 5
-			});
-			redBalls[i].AddComponent(new RigidBody()
-			{
-				Mass = 10,
-				//	IsDynamic=false,
-				UsesGravity = true,
-				Restitution = 0.9f,
-			});
-			redBalls[i].AddComponent(new CircleCollider()
-			{
-				Radius = 15
-			});
+			Vector2 startPos = new Vector2(position.X - 10 * 2 * (redRow - 1), position.Y + 10 * (redRow - 1) - 10 * 2 * numInRow);
+			Add(redBalls[i] = new SnookerBall(startPos, Palette.Red, 1, BallType.Red));
 			numInRow++;
 			if (numInRow >= redRow)
 			{
@@ -323,105 +387,6 @@ public class BilliardTest : TestScene
 				numInRow = 0;
 			}
 		}
-		Add(blackBall = new Sprite()
-		{
-			Position = blackPosition,
-			Size = new(30, 30),
-			Origin = Graphics.Anchor.Center,
-			Color = Palette.Black,
-			Texture = Assets.GetTexture("Textures/Ball.png"),
-			Depth = 5
-		});
-		blackBall.AddComponent(new RigidBody()
-		{
-			Mass = 10,
-			UsesGravity = true,
-			Restitution = 0.9f,
-		});
-		blackBall.AddComponent(new CircleCollider()
-		{
-			Radius = 15
-		});
-
-		Add(pinkBall = new Sprite()
-		{
-			Position = pinkPosition,
-			Size = new(30, 30),
-			Origin = Graphics.Anchor.Center,
-			Color = Palette.Pink,
-			Texture = Assets.GetTexture("Textures/Ball.png"),
-			Depth = 5
-		});
-		pinkBall.AddComponent(new RigidBody()
-		{
-			Mass = 10,
-			UsesGravity = true,
-			Restitution = 0.9f,
-		});
-		pinkBall.AddComponent(new CircleCollider()
-		{
-			Radius = 15
-		});
-
-		Add(brownBall = new Sprite()
-		{
-			Position = brownPosition,
-			Size = new(30, 30),
-			Origin = Graphics.Anchor.Center,
-			Color = Palette.Brown,
-			Texture = Assets.GetTexture("Textures/Ball.png"),
-			Depth = 5
-		});
-		brownBall.AddComponent(new RigidBody()
-		{
-			Mass = 10,
-			UsesGravity = true,
-			Restitution = 0.9f,
-		});
-		brownBall.AddComponent(new CircleCollider()
-		{
-			Radius = 15
-		});
-
-		Add(greenBall = new Sprite()
-		{
-			Position = greenPosition,
-			Size = new(30, 30),
-			Origin = Graphics.Anchor.Center,
-			Color = Palette.Lime,
-			Texture = Assets.GetTexture("Textures/Ball.png"),
-			Depth = 5
-		});
-		greenBall.AddComponent(new RigidBody()
-		{
-			Mass = 10,
-			UsesGravity = true,
-			Restitution = 0.9f,
-		});
-		greenBall.AddComponent(new CircleCollider()
-		{
-			Radius = 15
-		});
-
-		Add(yellowBall = new Sprite()
-		{
-			Position = yellowPosition,
-			Size = new(30, 30),
-			Origin = Graphics.Anchor.Center,
-			Color = Palette.Yellow,
-			Texture = Assets.GetTexture("Textures/Ball.png"),
-			Depth = 5
-		});
-		yellowBall.AddComponent(new RigidBody()
-		{
-			Mass = 10,
-			UsesGravity = true,
-			Restitution = 0.9f,
-		});
-		yellowBall.AddComponent(new CircleCollider()
-		{
-			Radius = 15
-		});
 	}
 
 	public Sprite GenerateHole(Vector2 position)
@@ -441,10 +406,17 @@ public class BilliardTest : TestScene
 			Mass = 10,
 			IsDynamic = false,
 		});
-		hole.AddComponent(new CircleCollider()
+		Collider holeCollider;
+		hole.AddComponent(holeCollider = new CircleCollider()
 		{
-			Radius = 10
+			Radius = 8,
+			IsTrigger = true,
 		});
+		holeCollider.OnCollision += (other) =>
+		{
+			if (other.Parent.Alpha != 0)
+				Score(holeCollider, other);
+		};
 		return hole;
 	}
 	public void GenerateHoles()
@@ -500,7 +472,7 @@ public class BilliardTest : TestScene
 		if (Input.MousePosition.X < whiteBall.Position.X + crCol.Radius && Input.MousePosition.X > whiteBall.Position.X - crCol.Radius
 			&& Input.MousePosition.Y < whiteBall.Position.Y + crCol.Radius && Input.MousePosition.Y > whiteBall.Position.Y - crCol.Radius)
 		{
-			if (Input.GetMouseButton(MouseButton.Left).Down)
+			if (Input.GetMouseButton(MouseButton.Left).Down && waitingForBalls == false)
 			{
 				line.Alpha = 1;
 				charging = true;
@@ -517,6 +489,7 @@ public class BilliardTest : TestScene
 			float distance = Vector2.Distance(Input.MousePosition, whiteBall.Position);
 			power *= 1 + distance / 10;
 			whiteBall.GetComponent<RigidBody>().ApplyForce(directionVector, power);
+			waitingForBalls = true;
 		}
 	}
 	protected override void FixedUpdate()
@@ -525,26 +498,147 @@ public class BilliardTest : TestScene
 			foreach (var ob in this.Children.Where(x => x.GetComponent<RigidBody>() != null).ToList())
 				Console.WriteLine(ob.GetType());
 		PGen.Update(ComponentStorage<RigidBody>.GetComponents());
-		/*
-		//Fake Floor
-		if (box1.Y>600)
+
+		if (waitingForBalls)
 		{
-			RigidBody rb = box1.GetComponent<RigidBody>();
-			rb.Force = new(0,0);
-			rb.Velocity = new(0, 0);
-			rb.Position = new(rb.Position.X, 600);
+			bool allStopped = true;
+			foreach (RigidBody body in ComponentStorage<RigidBody>.GetComponents())
+			{
+				if (body.Parent is SnookerBall ball && body.Velocity.Length() > 0.01 && ball.Alpha != 0)
+				{
+					allStopped = false;
+				}
+			}
+
+			if (allStopped)
+			{
+				waitingForBalls = false;
+				FinishTurn();
+			}
 		}
-		if (box2.Y > 600)
-		{
-			RigidBody rb = box2.GetComponent<RigidBody>();
-			rb.Force = new(0, 0);
-			rb.Velocity = new(0, 0);
-			rb.Position = new(rb.Position.X, 600);
-		}*/
 	}
 
-	private class BilliardBall : Composition
+	public void Score(Collider holeCollider, Collider other)
 	{
+		if (other.Parent is SnookerBall ball)
+		{
+			ball.Alpha = 0;
 
+			//if not foul	if()
+			currentPlayer.Score += ball.PointValue;
+
+			player1Text.Text = player1.ToString();
+			player2Text.Text = player2.ToString();
+			scored = true;
+
+		}
+	}
+
+	public void FinishTurn()
+	{
+		if (scored == true)
+		{
+			if (firstHitBallType == targetBallType)
+			{
+				targetBallType = targetBallType != BallType.Red ? BallType.Red : BallType.Color;
+			}
+			else
+			{
+				currentPlayer = currentPlayer != player1 ? player1 : player2;
+				targetBallType = BallType.Red;
+			}
+		}
+		else
+		{
+			currentPlayer = currentPlayer != player1 ? player1 : player2;
+		}
+
+		if (firstHitBallType == BallType.None)
+			targetBallType = BallType.Red;
+
+		firstHitBallType = BallType.None;
+		HighlightPlayers();
+
+		scored = false;
+	}
+
+	private void HighlightPlayers()
+	{
+		if (currentPlayer == player1)
+		{
+			player1Text.Color = Palette.Gold;
+			player2Text.Color = Palette.White;
+		}
+
+		else
+		{
+			player1Text.Color = Palette.White;
+			player2Text.Color = Palette.Gold;
+		}
+	}
+
+	private enum BallType { None, White, Color, Red };
+	private class SnookerBall : Composition
+	{
+		public SnookerBall(Vector2 position, Color color, int pointValue, BallType type)
+		{
+			Position = position;
+			Size = new(20, 20);
+			Origin = Graphics.Anchor.Center;
+			Color = color;
+			Depth = 5;
+			Type = type;
+			PointValue = pointValue;
+
+			Add(BallSprite = new Sprite()
+			{
+				RelativeSizeAxes = Graphics.Axes.Both,
+
+				Texture = Assets.GetTexture("Textures/Ball.png"),
+			});
+			AddComponent(new RigidBody()
+			{
+				Mass = 10,
+				UsesGravity = true,
+				Restitution = 0.9f,
+			});
+			Collider collider;
+			AddComponent(collider = new CircleCollider()
+			{
+				Radius = 10
+			});
+			if (Type == BallType.White)
+			{
+				collider.OnCollision += (other) =>
+				{
+					if (other.Parent is SnookerBall ball)
+					{
+						ball.GetFirstParentOfType<BilliardTest>().firstHitBallType = ball.Type;
+					}
+				};
+			}
+
+		}
+
+		public Sprite BallSprite;
+		public int PointValue;
+		public BallType Type;
+
+	}
+
+	private class Player
+	{
+		public Player(string name)
+		{
+			Name = name;
+
+		}
+
+		public string Name;
+		public int Score;
+		public override string ToString()
+		{
+			return $"{Name}: {Score}";
+		}
 	}
 }

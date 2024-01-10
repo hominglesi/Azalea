@@ -25,8 +25,8 @@ public class PhysicsGenerator
 	{
 		foreach (var rb in bodies)
 		{
-			if (UsesGravity) applyGravity(rb);
-			if (IsTopDown) applyTopDownFriction(rb);
+			if (UsesGravity && rb.UsesGravity) applyGravity(rb);
+			if (IsTopDown && rb.UsesFriction) applyTopDownFriction(rb);
 			applyForces(rb, bodies);
 		}
 	}
@@ -40,9 +40,13 @@ public class PhysicsGenerator
 	{
 		if (rb.Velocity.Length() > 0)
 			if (rb.Velocity == new Vector2(0, 0))
+			{
 				rb.Force += -(Vector2.Normalize(rb.Velocity) * rb.Mass * GravityConstant.Y / UpdateRate) * StaticFriction;
+			}
 			else
+			{
 				rb.Force += -(Vector2.Normalize(rb.Velocity) * rb.Mass * GravityConstant.Y / UpdateRate) * DynamicFriction;
+			}
 	}
 
 	private void applyForces(RigidBody rb, IEnumerable<RigidBody> others)
@@ -66,18 +70,19 @@ public class PhysicsGenerator
 		for (int i = 0; i < numOfAttempts; i++)
 		{
 			rb.Position += rb.Velocity / numOfAttempts;
-			CheckCollisions(rb, others);
+			CheckCollisions(rb, others, true);
 		}
 		rb.Torque = new Vector2(0, 0);
 		rb.Force = new Vector2(0, 0);
 	}
 
-	private void CheckCollisions(RigidBody rb, IEnumerable<RigidBody> bodies)
+	private bool CheckCollisions(RigidBody rb, IEnumerable<RigidBody> bodies, bool shouldResolveCollision = false)
 	{
 		Collider currentCollider = rb.Parent.GetComponent<Collider>();
-
+		bool isColliding = false;
 		foreach (RigidBody otherBody in bodies)
 		{
+			bool collided = false;
 			if (otherBody == rb)
 				continue;
 
@@ -85,31 +90,38 @@ public class PhysicsGenerator
 
 			if (currentCollider is CircleCollider crCol1 && otherCollider is CircleCollider crCol2)
 			{
-				CheckCircleOnCircleCollision(crCol1, crCol2);
+				collided = CheckCircleOnCircleCollision(crCol1, crCol2, shouldResolveCollision);
 			}
 			else if (currentCollider is CircleCollider crCol3 && otherCollider is RectCollider rectCol1)
 			{
-				CheckCircleOnRectCollision(crCol3, rectCol1);
+				collided = CheckCircleOnRectCollision(crCol3, rectCol1, shouldResolveCollision);
 			}
 			else if (currentCollider is RectCollider rectCol2 && otherCollider is CircleCollider crCol4)
 			{
-				CheckCircleOnRectCollision(crCol4, rectCol2);
+				collided = CheckCircleOnRectCollision(crCol4, rectCol2, shouldResolveCollision);
 			}
 			else if (currentCollider is RectCollider rectCol3 && otherCollider is RectCollider rectCol4)
 			{
-				CheckRectOnRectCollision(rectCol3, rectCol4);
-			}
-
+				collided = CheckRectOnRectCollision(rectCol3, rectCol4, shouldResolveCollision);
+			};
+			if (collided)
+				isColliding = true;
 		}
+		return isColliding;
 	}
 
-	private bool CheckCircleOnCircleCollision(CircleCollider circle1, CircleCollider circle2)
+	private bool CheckCircleOnCircleCollision(CircleCollider circle1, CircleCollider circle2, bool shouldResolveCollision)
 	{
 		float distanceOfCenters = Vector2.Distance(circle1.Position, circle2.Position);
 		if (circle1.Radius + circle2.Radius >= distanceOfCenters)
 		{
 			float penetration = circle1.Radius + circle2.Radius - distanceOfCenters;
-			ResolveCircleOnCircleCCollision(circle1, circle2, penetration);
+			if (circle1.IsTrigger == false && circle2.IsTrigger == false && shouldResolveCollision)
+				ResolveCircleOnCircleCCollision(circle1, circle2, penetration);
+
+			circle1.OnCollide(circle2);
+			circle2.OnCollide(circle1);
+
 			if (DebugMode)
 			{
 				circle1.Parent.Color = Palette.Cyan;
@@ -119,7 +131,7 @@ public class PhysicsGenerator
 		return false;
 	}
 
-	private bool CheckCircleOnRectCollision(CircleCollider circle, RectCollider rect)
+	private bool CheckCircleOnRectCollision(CircleCollider circle, RectCollider rect, bool shouldResolveCollision)
 	{
 		float rectAngle = rect.Rotation / 180 * MathF.PI;
 		int rotatedCircleX = (int)((circle.Position.X - rect.Position.X) * Math.Cos(-rectAngle) - (circle.Position.Y - rect.Position.Y) * Math.Sin(-rectAngle) + rect.Position.X);
@@ -154,7 +166,12 @@ public class PhysicsGenerator
 
 			Vector2 rotatedRectPosition = new Vector2(unrotatedRectPositionX, unrotatedRectPositionY);
 			float penetration = (float)(circle.Radius - distance);
-			ResolveCircleOnRectCollision(circle, rect, penetration, collisionNormal, rotatedRectPosition);
+			if (circle.IsTrigger == false && rect.IsTrigger == false && shouldResolveCollision)
+				ResolveCircleOnRectCollision(circle, rect, penetration, collisionNormal, rotatedRectPosition);
+
+			circle.OnCollide(rect);
+			rect.OnCollide(circle);
+
 			if (DebugMode)
 			{
 				circle.Parent.Color = Palette.Orange;
@@ -170,7 +187,7 @@ public class PhysicsGenerator
 		return false;
 	}
 
-	private bool CheckRectOnRectCollision(RectCollider rect1, RectCollider rect2)
+	private bool CheckRectOnRectCollision(RectCollider rect1, RectCollider rect2, bool shouldResolveCollision)
 	{
 		return false;
 	}
