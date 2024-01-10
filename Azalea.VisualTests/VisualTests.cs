@@ -14,9 +14,9 @@ public class VisualTests : AzaleaGame
 
 		//Add(new DefaultUserInputTest());
 		//Add(new TestingTestScene());
-		//Add(new FlexTest());
+		Add(new FlexTest());
 		//Add(new TextContainerTest());
-		Add(new PhysicsTest());
+		//Add(new PhysicsTest());
 		//Add(new SliderTests());
 		//Add(new AutoSizeTest());
 		//Add(new InputTest());

@@ -22,6 +22,7 @@ public class Checkbox : Composition
 			Color = Palette.White,
 			BorderColor = Palette.Black
 		});
+		_box.BorderObject.OutsideContent = false;
 	}
 
 	protected override bool OnClick(ClickEvent e)
