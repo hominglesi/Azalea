@@ -3,7 +3,9 @@ using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
+using Azalea.Numerics;
 using Azalea.Physics.Colliders;
+using System.Numerics;
 
 namespace Azalea.Debugging;
 public class ColliderDebug : GameObject
@@ -44,7 +46,8 @@ public class ColliderDebug : GameObject
 			{
 				foreach (var collider in ComponentStorage<RectCollider>.GetComponents())
 				{
-					renderer.DrawRectangle(collider.Parent.DrawRectangle, collider.Parent.DrawInfo.Matrix, new Boundary(4), new DrawColorInfo(new Color(20, 255, 20)), false);
+					var colliderRect = new Rectangle(Vector2.Zero, new(collider.SideA, collider.SideB));
+					renderer.DrawRectangle(colliderRect, collider.Parent.DrawInfo.Matrix, new Boundary(4), new DrawColorInfo(new Color(20, 255, 20)), false);
 				}
 			}
 		}

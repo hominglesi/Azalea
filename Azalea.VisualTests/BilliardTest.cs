@@ -27,8 +27,10 @@ public class BilliardTest : TestScene
 	int panelHeight = 960;
 	int edgeThickness = 50;
 
-	Box topEdge;
-	Box bottomEdge;
+	Box topLeftEdge;
+	Box topRightEdge;
+	Box bottomLeftEdge;
+	Box bottomRightEdge;
 	Box leftEdge;
 	Box rightEdge;
 	Box tableMat;
@@ -36,6 +38,8 @@ public class BilliardTest : TestScene
 
 	Box wallL;
 	Box wallR;
+
+	float holeRadius = 25;
 
 	Sprite whiteBall;
 	Sprite[] redBalls = new Sprite[15];
@@ -103,29 +107,51 @@ public class BilliardTest : TestScene
 		GenerateBalls();
 
 
-		Add(topEdge = new Box()
+		Add(topLeftEdge = new Box()
 		{
-			Position = new(panelWidth / 2, panelHeight / 2 - tableHeight / 2),
-			Size = new(tableWidth, edgeThickness),
+			Position = new(panelWidth / 2 - tableWidth / 4, panelHeight / 2 - tableHeight / 2),
+			Size = new(tableWidth / 4 - holeRadius, edgeThickness),
 			Color = new Graphics.Colors.Color(20, 9, 3),
 			Origin = Graphics.Anchor.Center,
 			Depth = 20,
 			//Rotation = 15
 		});
-		topEdge.AddComponent(new RigidBody()
+		topLeftEdge.AddComponent(new RigidBody()
 		{
 			Mass = 1000000,
 			UsesGravity = false,
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		topEdge.AddComponent(new RectCollider()
+		topLeftEdge.AddComponent(new RectCollider()
 		{
 			SideA = tableWidth,
 			SideB = edgeThickness
 		});
 
-		Add(bottomEdge = new Box()
+		Add(topRightEdge = new Box()
+		{
+			Position = new(panelWidth / 2 + tableWidth / 4, panelHeight / 2 - tableHeight / 2),
+			Size = new(tableWidth / 4 - -3 * holeRadius, edgeThickness),
+			Color = new Graphics.Colors.Color(20, 9, 3),
+			Origin = Graphics.Anchor.Center,
+			Depth = 20,
+			//Rotation = 15
+		});
+		topRightEdge.AddComponent(new RigidBody()
+		{
+			Mass = 1000000,
+			UsesGravity = false,
+			IsDynamic = false,
+			//AngularAcceleration = 0.0001f
+		});
+		topRightEdge.AddComponent(new RectCollider()
+		{
+			SideA = tableWidth,
+			SideB = edgeThickness
+		});
+
+		Add(bottomLeftEdge = new Box()
 		{
 			Position = new(panelWidth / 2, panelHeight / 2 + tableHeight / 2),
 			Size = new(tableWidth, edgeThickness),
@@ -134,14 +160,36 @@ public class BilliardTest : TestScene
 			Depth = 20,
 			//Rotation = 15
 		});
-		bottomEdge.AddComponent(new RigidBody()
+		bottomLeftEdge.AddComponent(new RigidBody()
 		{
 			Mass = 1000000,
 			UsesGravity = false,
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		bottomEdge.AddComponent(new RectCollider()
+		bottomLeftEdge.AddComponent(new RectCollider()
+		{
+			SideA = tableWidth,
+			SideB = edgeThickness
+		});
+
+		Add(bottomRightEdge = new Box()
+		{
+			Position = new(panelWidth / 2, panelHeight / 2 + tableHeight / 2),
+			Size = new(tableWidth, edgeThickness),
+			Color = new Graphics.Colors.Color(20, 9, 3),
+			Origin = Graphics.Anchor.Center,
+			Depth = 20,
+			//Rotation = 15
+		});
+		bottomRightEdge.AddComponent(new RigidBody()
+		{
+			Mass = 1000000,
+			UsesGravity = false,
+			IsDynamic = false,
+			//AngularAcceleration = 0.0001f
+		});
+		bottomRightEdge.AddComponent(new RectCollider()
 		{
 			SideA = tableWidth,
 			SideB = edgeThickness
@@ -382,7 +430,7 @@ public class BilliardTest : TestScene
 		Add(hole = new Sprite()
 		{
 			Position = position,
-			Size = new(50, 50),
+			Size = new(holeRadius * 2, holeRadius * 2),
 			Origin = Graphics.Anchor.Center,
 			Color = new Graphics.Colors.Color(27, 27, 27),
 			Texture = Assets.GetTexture("Textures/Ball.png"),
