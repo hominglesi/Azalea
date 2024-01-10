@@ -125,10 +125,10 @@ public class BilliardTest : TestScene
 		});
 		topLeftEdge.AddComponent(new RectCollider()
 		{
-			SideA = tableWidth,
+			SideA = tableWidth / 2,
 			SideB = edgeThickness
 		});
-
+		/*
 		Add(topRightEdge = new Box()
 		{
 			Position = new(panelWidth / 2 + tableWidth / 4, panelHeight / 2 - tableHeight / 2),
@@ -149,7 +149,7 @@ public class BilliardTest : TestScene
 		{
 			SideA = tableWidth,
 			SideB = edgeThickness
-		});
+		});*/
 
 		Add(bottomLeftEdge = new Box()
 		{
@@ -172,7 +172,7 @@ public class BilliardTest : TestScene
 			SideA = tableWidth,
 			SideB = edgeThickness
 		});
-
+		/*
 		Add(bottomRightEdge = new Box()
 		{
 			Position = new(panelWidth / 2, panelHeight / 2 + tableHeight / 2),
@@ -193,7 +193,7 @@ public class BilliardTest : TestScene
 		{
 			SideA = tableWidth,
 			SideB = edgeThickness
-		});
+		});*/
 
 		Add(leftEdge = new Box()
 		{
