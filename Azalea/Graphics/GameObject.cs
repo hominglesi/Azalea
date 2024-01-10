@@ -503,6 +503,10 @@ public abstract partial class GameObject : Amendable, IGameObject
 		return null;
 	}
 
+	public bool HasComponent<T>()
+		where T : class
+		=> GetComponent<T> != null;
+
 	public IEnumerable<T> GetComponents<T>()
 		where T : class
 	{
