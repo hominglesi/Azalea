@@ -8,7 +8,9 @@ using Azalea.IO.Resources;
 using Azalea.Physics;
 using Azalea.Physics.Colliders;
 using Azalea.Platform;
+using Azalea.Utils;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
@@ -50,6 +52,7 @@ public class BilliardTest : TestScene
 
 	SpriteText player1Text;
 	SpriteText player2Text;
+	SpriteText targetBallText;
 
 	int holeOffset = 10;
 	int middleOffset = 25;
@@ -68,6 +71,7 @@ public class BilliardTest : TestScene
 
 	BallType targetBallType = BallType.Red;
 	BallType firstHitBallType;
+	List<SnookerBall> scoredBallsThisTurn = new List<SnookerBall>();
 	SnookerBall whiteBall;
 	SnookerBall[] redBalls = new SnookerBall[15];
 	SnookerBall blueBall;
@@ -102,6 +106,11 @@ public class BilliardTest : TestScene
 	Vector2 bluePosition = new Vector2(840, 480);
 
 	Line line;
+	Line aimLine = new Line()
+	{
+		Thickness = 1,
+		Color = Palette.Gray
+	};
 	bool charging = false;
 	bool waitingForBalls = false;
 	bool scored = false;
@@ -122,6 +131,7 @@ public class BilliardTest : TestScene
 			EndPoint = new(200, 400),
 			Alpha = 0f
 		});
+		Add(aimLine);
 
 		Add(tableMat = new Box()
 		{
@@ -178,6 +188,13 @@ public class BilliardTest : TestScene
 			Anchor = Graphics.Anchor.TopRight,
 			Font = FontUsage.Default.With(size: 50),
 			Text = player2.ToString(),
+		});
+		uiComp.Add(targetBallText = new SpriteText()
+		{
+			Origin = Graphics.Anchor.TopCenter,
+			Anchor = Graphics.Anchor.TopCenter,
+			Font = FontUsage.Default.With(size: 50),
+			Text = $"Target Color: {BallType.Red.ToString()}",
 		});
 		HighlightPlayers();
 	}
@@ -479,11 +496,12 @@ public class BilliardTest : TestScene
 			}
 		}
 
+		Vector2 directionVector = Vector2.Normalize(whiteBall.Position - Input.MousePosition);
 		if (charging && Input.GetMouseButton(MouseButton.Left).Released)
 		{
 			charging = false;
 			line.Alpha = 0;
-			Vector2 directionVector = Vector2.Normalize(whiteBall.Position - Input.MousePosition);
+
 
 			float power = 4f;
 			float distance = Vector2.Distance(Input.MousePosition, whiteBall.Position);
@@ -491,6 +509,24 @@ public class BilliardTest : TestScene
 			whiteBall.GetComponent<RigidBody>().ApplyForce(directionVector, power);
 			waitingForBalls = true;
 		}
+
+		if (waitingForBalls == false)
+		{
+			aimLine.Alpha = 1;
+			float angle = MathF.Atan2(directionVector.Y, directionVector.X);
+			Console.WriteLine($"Angle: {angle}");
+			Ray ray = new Ray(PGen, whiteBall.Position, angle, 1500)
+			{
+				MinimumRange = 13,
+			};
+			ray = RayCast.Cast(ray);
+			if (ray.Hit)
+				Console.WriteLine("HIT");
+			aimLine.StartPoint = whiteBall.Position;
+			aimLine.EndPoint = aimLine.StartPoint + MathUtils.GetVectorFromAngle(angle) * ray.Distance;
+		}
+		else
+			aimLine.Alpha = 0;
 	}
 	protected override void FixedUpdate()
 	{
@@ -516,6 +552,7 @@ public class BilliardTest : TestScene
 				FinishTurn();
 			}
 		}
+
 	}
 
 	public void Score(Collider holeCollider, Collider other)
@@ -529,6 +566,7 @@ public class BilliardTest : TestScene
 
 			player1Text.Text = player1.ToString();
 			player2Text.Text = player2.ToString();
+			scoredBallsThisTurn.Add(ball);
 			scored = true;
 
 		}
@@ -536,7 +574,7 @@ public class BilliardTest : TestScene
 
 	public void FinishTurn()
 	{
-		if (scored == true)
+		if (scoredBallsThisTurn.Where(x => x.Type == targetBallType).Count() > 0)
 		{
 			if (firstHitBallType == targetBallType)
 			{
@@ -557,9 +595,11 @@ public class BilliardTest : TestScene
 			targetBallType = BallType.Red;
 
 		firstHitBallType = BallType.None;
+		targetBallText.Text = $"Target Color: {targetBallType}";
 		HighlightPlayers();
 
 		scored = false;
+		scoredBallsThisTurn.Clear();
 	}
 
 	private void HighlightPlayers()
@@ -575,6 +615,15 @@ public class BilliardTest : TestScene
 			player1Text.Color = Palette.White;
 			player2Text.Color = Palette.Gold;
 		}
+	}
+
+	private void resetBall(SnookerBall ball)
+	{
+		if (ball.Type == BallType.Color)
+		{
+
+		}
+
 	}
 
 	private enum BallType { None, White, Color, Red };

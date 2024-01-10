@@ -3,6 +3,7 @@ using Azalea.Graphics.Colors;
 using Azalea.Physics.Colliders;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 
 namespace Azalea.Physics;
@@ -12,17 +13,21 @@ public class PhysicsGenerator
 	public Vector2 GravityConstant { get; set; } = new(0, 9.81f);
 	public static int UpdateRate => 60;
 	public bool IsTopDown { get; set; }
-	public float StaticFriction { get; set; } = 0.1f;
-	public float DynamicFriction { get; set; } = 0.05f;
+	public float StaticFriction { get; set; } = 0.15f;
+	public float DynamicFriction { get; set; } = 0.1f;
 	public bool DebugMode { get; set; }
-
 	public bool UsesGravity { get; set; } = true;
 	public bool UsesFriction { get; set; } = true;
 	public bool UsesAirResistance { get; set; } = true;
 
+	private float VelocityStopThreshold = 0.1f;
+
+	public List<RigidBody> RigidBodies { get; set; } = new List<RigidBody>();
 
 	public void Update(IEnumerable<RigidBody> bodies)
 	{
+		RigidBodies.Clear();
+		RigidBodies.AddRange(bodies);
 		foreach (var rb in bodies)
 		{
 			if (UsesGravity && rb.UsesGravity) applyGravity(rb);
@@ -56,37 +61,36 @@ public class PhysicsGenerator
 
 		rb.Acceleration = rb.Force / rb.Mass;
 		rb.Velocity += rb.Acceleration;
-		if (float.IsNaN(rb.Velocity.X) || float.IsNaN(rb.Velocity.Y))
-		{
+		if (rb.Velocity.Length() < VelocityStopThreshold)
 			rb.Velocity = new(0, 0);
-			rb.Position = new(100, 100);
-		}
 
-		//		rb.AngularAccelaration 
-		rb.AngularVelocity += rb.AngularAcceleration;
-		rb.Rotation += rb.AngularVelocity;
+
+		/*	if (float.IsNaN(rb.Velocity.X) || float.IsNaN(rb.Velocity.Y))
+			{
+				rb.Velocity = new(0, 0);
+				rb.Position = new(100, 100);
+			}*/
+		//rb.AngularVelocity += rb.AngularAcceleration;
+		//rb.Rotation += rb.AngularVelocity;
 
 		int numOfAttempts = 1 + (int)MathF.Ceiling(rb.Velocity.Length() / rb.Parent.GetComponent<Collider>().ShortestDistance);
 		for (int i = 0; i < numOfAttempts; i++)
 		{
 			rb.Position += rb.Velocity / numOfAttempts;
-			CheckCollisions(rb, others, true);
+			CheckCollisions(rb.Parent.GetComponent<Collider>(), others.Select(x => x.Parent.GetComponent<Collider>()), true);
 		}
 		rb.Torque = new Vector2(0, 0);
 		rb.Force = new Vector2(0, 0);
 	}
 
-	private bool CheckCollisions(RigidBody rb, IEnumerable<RigidBody> bodies, bool shouldResolveCollision = false)
+	public bool CheckCollisions(Collider currentCollider, IEnumerable<Collider> colliders, bool shouldResolveCollision = false)
 	{
-		Collider currentCollider = rb.Parent.GetComponent<Collider>();
 		bool isColliding = false;
-		foreach (RigidBody otherBody in bodies)
+		foreach (Collider otherCollider in colliders)
 		{
 			bool collided = false;
-			if (otherBody == rb)
+			if (otherCollider == currentCollider)
 				continue;
-
-			Collider otherCollider = otherBody.Parent.GetComponent<Collider>();
 
 			if (currentCollider is CircleCollider crCol1 && otherCollider is CircleCollider crCol2)
 			{
