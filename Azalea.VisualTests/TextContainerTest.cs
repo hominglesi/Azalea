@@ -1,6 +1,8 @@
 ﻿using Azalea.Design.Containers;
+using Azalea.Design.Shapes;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
+using Azalea.Inputs;
 using Azalea.Utils;
 
 namespace Azalea.VisualTests;
@@ -9,30 +11,44 @@ public class TextContainerTest : TestScene
 	private ScrollableContainer _scrollable;
 	private FlexContainer _flex;
 
+	private Box _box;
+
 	public TextContainerTest()
 	{
+		var x = AzaleaGame.Main.Host.Window;
+		x.ClientSize = new(1680, 960);
+
+		Add(_box = new Box
+		{
+			Width = 100,
+			Height = 100,
+			Origin = Graphics.Anchor.Center,
+			Position = new(900, 400)
+		});
+
+
 		Add(_scrollable = new ScrollableContainer()
 		{
-			RelativeSizeAxes = Graphics.Axes.Both,
+			BorderColor = Palette.Teal,
+			Size = new(800, 600),
+			Position = new(50, 50)
+			//RelativeSizeAxes = Graphics.Axes.Both,
 		});
 
 		_scrollable.Add(_flex = new FlexContainer()
 		{
 			AutoSizeAxes = Graphics.Axes.Y,
 			RelativeSizeAxes = Graphics.Axes.X,
-			InternalRelativeSizeAxes = Graphics.Axes.X,
 			Direction = FlexDirection.Vertical,
-			Spacing = new(0, 50),
-			BorderColor = Palette.Brown
+			Spacing = new(0, 50)
 		});
 
 		for (int i = 0; i < 6; i++)
 		{
-			var container = new TextContainer((t) => { t.Font = FontUsage.Default.With(size: 20); })
+			var container = new TextContainer((t) => { t.Font = FontUsage.Default.With(size: 24); })
 			{
 				AutoSizeAxes = Graphics.Axes.Y,
 				RelativeSizeAxes = Graphics.Axes.X,
-				InternalRelativeSizeAxes = Graphics.Axes.X,
 				Width = 0.6f,
 				Origin = i % 2 == 0 ? Graphics.Anchor.TopLeft : Graphics.Anchor.TopRight,
 				Anchor = i % 2 == 0 ? Graphics.Anchor.TopLeft : Graphics.Anchor.TopRight,
@@ -54,18 +70,12 @@ public class TextContainerTest : TestScene
 
 	}
 
-	protected override void UpdateAfterChildren()
+	protected override void Update()
 	{
-		base.UpdateAfterChildren();
-
-		var maxChildOffset = 0f;
-
-		/*
-		foreach (var child in _flex.Children)
+		if (Input.GetMouseButton(0).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
 		{
-			maxChildOffset = MathF.Max(maxChildOffset, child.Y + child.Height);
-		}*/
-
-		_scrollable.ContentBoundaries = new Graphics.Boundary(0, 0, _flex.Height, 0);
+			_scrollable.Size = _scrollable.ToLocalSpace(Input.MousePosition);
+		}
+		_box.Rotation += 0.5f;
 	}
 }

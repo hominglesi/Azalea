@@ -31,6 +31,8 @@ public partial class CompositeGameObject : GameObject
 		}
 	}
 
+	internal Boundary MaskingPadding = Boundary.Zero;
+
 	#region Parenting
 
 	private readonly SortedList<GameObject> internalChildren;

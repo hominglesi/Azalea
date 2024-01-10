@@ -1,6 +1,7 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.Rendering;
 using Azalea.Numerics;
+using Azalea.Utils;
 using System.Collections.Generic;
 
 namespace Azalea.Design.Containers;
@@ -11,6 +12,7 @@ public partial class CompositeGameObject
 	{
 		public List<DrawNode>? Children { get; set; }
 		protected bool Masking { get; set; }
+		protected Boundary MaskingPadding { get; set; }
 
 		protected new CompositeGameObject Source => (CompositeGameObject)base.Source;
 
@@ -22,6 +24,7 @@ public partial class CompositeGameObject
 			base.ApplyState();
 
 			Masking = Source.Masking;
+			MaskingPadding = Source.MaskingPadding;
 		}
 
 		public override void Draw(IRenderer renderer)
@@ -31,6 +34,13 @@ public partial class CompositeGameObject
 			if (Masking)
 			{
 				var newScissor = (RectangleInt)Source.ScreenSpaceDrawQuad;
+				if (MaskingPadding != Boundary.Zero)
+				{
+					newScissor.X -= MathUtils.Ceiling(MaskingPadding.Left);
+					newScissor.Width += MathUtils.Ceiling(MaskingPadding.Horizontal);
+					newScissor.Y -= MathUtils.Ceiling(MaskingPadding.Top);
+					newScissor.Height += MathUtils.Ceiling(MaskingPadding.Vertical);
+				}
 				renderer.PushScissor(newScissor);
 			}
 

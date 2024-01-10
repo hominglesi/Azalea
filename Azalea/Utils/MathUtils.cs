@@ -21,6 +21,7 @@ public static class MathUtils
 
 	public static float Map(float value, float from1, float to1, float from2, float to2)
 	{
+		if (from1 == to1) return from2;
 		return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
 	}
 }

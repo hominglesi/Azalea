@@ -53,8 +53,9 @@ public class DebuggingOverlay : Composition
 			RelativeSizeAxes = Axes.Both,
 			Size = new(1f, 1f)
 		});
-		RemoveInternal(InternalComposition);
-		_gameContainer.Add(InternalComposition);
+		//REMOVED WHEN COMPOSITION WAS SIMPLIFIED PROBABLY BROKE SOMETHING
+		//RemoveInternal(InternalComposition);
+		//_gameContainer.Add(InternalComposition);
 
 		AddInternal(FpsDisplay);
 

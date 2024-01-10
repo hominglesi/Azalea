@@ -7,12 +7,14 @@ public partial class HollowBox : GameObject
 	public Boundary Thickness
 	{
 		get => _thickness;
-		set
-		{
-			if (_thickness == value) return;
+		set => _thickness = value;
+	}
 
-			_thickness = value;
-		}
+	private bool _outsideContent = false;
+	public bool OutsideContent
+	{
+		get => _outsideContent;
+		set => _outsideContent = value;
 	}
 
 	protected override DrawNode CreateDrawNode() => new HollowBoxDrawNode(this);
