@@ -81,6 +81,8 @@ public class BilliardTest : TestScene
 	SnookerBall brownBall;
 	SnookerBall pinkBall;
 
+	List<SnookerBall> AllBalls = new List<SnookerBall>();
+
 	Sprite topLeftHole;
 	Sprite topMiddleHole;
 	Sprite topRightHole;
@@ -196,7 +198,7 @@ public class BilliardTest : TestScene
 			Font = FontUsage.Default.With(size: 50),
 			Text = $"Target Color: {BallType.Red.ToString()}",
 		});
-		HighlightPlayers();
+		highlightPlayers();
 	}
 	private void GenerateEdges()
 	{
@@ -397,13 +399,22 @@ public class BilliardTest : TestScene
 			Vector2 position = redPosition;
 			Vector2 startPos = new Vector2(position.X - 10 * 2 * (redRow - 1), position.Y + 10 * (redRow - 1) - 10 * 2 * numInRow);
 			Add(redBalls[i] = new SnookerBall(startPos, Palette.Red, 1, BallType.Red));
+			AllBalls.Add(redBalls[i]);
 			numInRow++;
 			if (numInRow >= redRow)
 			{
 				redRow++;
 				numInRow = 0;
 			}
+
 		}
+		AllBalls.Add(whiteBall);
+		AllBalls.Add(blackBall);
+		AllBalls.Add(blueBall);
+		AllBalls.Add(yellowBall);
+		AllBalls.Add(greenBall);
+		AllBalls.Add(brownBall);
+		AllBalls.Add(pinkBall);
 	}
 
 	public Sprite GenerateHole(Vector2 position)
@@ -431,7 +442,7 @@ public class BilliardTest : TestScene
 		});
 		holeCollider.OnCollision += (other) =>
 		{
-			if (other.Parent.Alpha != 0)
+			if (other.Parent.Alpha > 0.5f)
 				Score(holeCollider, other);
 		};
 		return hole;
@@ -514,14 +525,14 @@ public class BilliardTest : TestScene
 		{
 			aimLine.Alpha = 1;
 			float angle = MathF.Atan2(directionVector.Y, directionVector.X);
-			Console.WriteLine($"Angle: {angle}");
+			//	Console.WriteLine($"Angle: {angle}");
 			Ray ray = new Ray(PGen, whiteBall.Position, angle, 1500)
 			{
 				MinimumRange = 13,
 			};
 			ray = RayCast.Cast(ray);
-			if (ray.Hit)
-				Console.WriteLine("HIT");
+			//		if (ray.Hit)
+			//			Console.WriteLine("HIT");
 			aimLine.StartPoint = whiteBall.Position;
 			aimLine.EndPoint = aimLine.StartPoint + MathUtils.GetVectorFromAngle(angle) * ray.Distance;
 		}
@@ -530,9 +541,6 @@ public class BilliardTest : TestScene
 	}
 	protected override void FixedUpdate()
 	{
-		if (Input.GetKey(Keys.G).Down)
-			foreach (var ob in this.Children.Where(x => x.GetComponent<RigidBody>() != null).ToList())
-				Console.WriteLine(ob.GetType());
 		PGen.Update(ComponentStorage<RigidBody>.GetComponents());
 
 		if (waitingForBalls)
@@ -540,7 +548,7 @@ public class BilliardTest : TestScene
 			bool allStopped = true;
 			foreach (RigidBody body in ComponentStorage<RigidBody>.GetComponents())
 			{
-				if (body.Parent is SnookerBall ball && body.Velocity.Length() > 0.01 && ball.Alpha != 0)
+				if (body.Parent is SnookerBall ball && body.Velocity.Length() > 0.01 && ball.Alpha > 0.5)
 				{
 					allStopped = false;
 				}
@@ -555,15 +563,16 @@ public class BilliardTest : TestScene
 
 	}
 
-	public void Score(Collider holeCollider, Collider other)
+	private void Score(Collider holeCollider, Collider other)
 	{
 		if (other.Parent is SnookerBall ball)
 		{
-			ball.Alpha = 0;
+			ball.Alpha = 0.3f;
 
 			//if not foul	if()
 			currentPlayer.Score += ball.PointValue;
-
+			ball.GetComponent<RigidBody>().Velocity = new Vector2(0, 0);
+			ball.Position = new(-500, -500);
 			player1Text.Text = player1.ToString();
 			player2Text.Text = player2.ToString();
 			scoredBallsThisTurn.Add(ball);
@@ -572,37 +581,105 @@ public class BilliardTest : TestScene
 		}
 	}
 
-	public void FinishTurn()
+	private void Foul(Player player)
 	{
-		if (scoredBallsThisTurn.Where(x => x.Type == targetBallType).Count() > 0)
+		player.Score -= 4;
+		player1Text.Text = player1.ToString();
+		player2Text.Text = player2.ToString();
+
+		foreach (SnookerBall ball in scoredBallsThisTurn)
 		{
-			if (firstHitBallType == targetBallType)
+			ball.Alpha = 1;
+		}
+
+		foreach (var ball in AllBalls.Where(x => x.Alpha > 0.5))
+		{
+			ball.GetComponent<RigidBody>().Velocity = new(0, 0);
+			ball.GetComponent<RigidBody>().IsDynamic = false;
+		}
+		foreach (var ball in AllBalls.Where(x => x.Alpha > 0.5))
+		{
+			ball.Position = ball.PreviousPosition;
+		}
+		foreach (var ball in AllBalls.Where(x => x.Alpha > 0.5))
+		{
+			ball.GetComponent<RigidBody>().IsDynamic = true;
+		}
+
+
+	}
+	private void FinishTurn()
+	{
+		bool fouled = false;
+		Console.WriteLine($"Scored Balls: {scoredBallsThisTurn.Count()}");
+		if (scoredBallsThisTurn.Count() != 0)
+		{
+			if (scoredBallsThisTurn.Where(x => x.Type != targetBallType).Count() > 0)
 			{
-				targetBallType = targetBallType != BallType.Red ? BallType.Red : BallType.Color;
-			}
-			else
-			{
+				fouled = true;
+				Foul(currentPlayer);
 				currentPlayer = currentPlayer != player1 ? player1 : player2;
-				targetBallType = BallType.Red;
+			}
+			else if (scoredBallsThisTurn.Where(x => x.Type == targetBallType).Count() > 0)
+			{
+				if (firstHitBallType == targetBallType)
+				{
+					targetBallType = targetBallType != BallType.Red ? BallType.Red : BallType.Color;
+					currentPlayer.Score += scoredBallsThisTurn.Sum(x => x.PointValue);
+				}
+				else
+				{
+					fouled = true;
+					Foul(currentPlayer);
+					currentPlayer = currentPlayer != player1 ? player1 : player2;
+					targetBallType = BallType.Red;
+				}
 			}
 		}
 		else
 		{
-			currentPlayer = currentPlayer != player1 ? player1 : player2;
+			if (firstHitBallType == targetBallType)
+			{
+				currentPlayer = currentPlayer != player1 ? player1 : player2;
+				targetBallType = BallType.Red;
+			}
+			else
+			{
+				fouled = true;
+				Foul(currentPlayer);
+				currentPlayer = currentPlayer != player1 ? player1 : player2;
+				targetBallType = BallType.Red;
+			}
+
 		}
 
+
+		if (fouled == false)
+		{
+			foreach (SnookerBall ball in AllBalls)
+			{
+				ball.PreviousPosition = ball.Position;
+			}
+			foreach (SnookerBall ball in scoredBallsThisTurn)
+			{
+				resetBall(ball);
+				ball.PreviousPosition = ball.Position;
+			}
+		}
 		if (firstHitBallType == BallType.None)
 			targetBallType = BallType.Red;
 
 		firstHitBallType = BallType.None;
 		targetBallText.Text = $"Target Color: {targetBallType}";
-		HighlightPlayers();
+		highlightPlayers();
+
+
 
 		scored = false;
 		scoredBallsThisTurn.Clear();
 	}
 
-	private void HighlightPlayers()
+	private void highlightPlayers()
 	{
 		if (currentPlayer == player1)
 		{
@@ -621,7 +698,24 @@ public class BilliardTest : TestScene
 	{
 		if (ball.Type == BallType.Color)
 		{
+			if (AllBalls.Select(x => x.Alpha > 0.5f && x.Type == BallType.Red).ToList().Count() > 0)
+			{
+				return;
+			}
 
+			ball.Alpha = 1;
+			if (greenBall == ball)
+				ball.Position = greenPosition;
+			if (brownBall == ball)
+				ball.Position = brownPosition;
+			if (yellowBall == ball)
+				ball.Position = yellowPosition;
+			if (blackBall == ball)
+				ball.Position = blackPosition;
+			if (blueBall == ball)
+				ball.Position = bluePosition;
+			if (pinkBall == ball)
+				ball.Position = pinkPosition;
 		}
 
 	}
@@ -631,6 +725,7 @@ public class BilliardTest : TestScene
 	{
 		public SnookerBall(Vector2 position, Color color, int pointValue, BallType type)
 		{
+			PreviousPosition = position;
 			Position = position;
 			Size = new(20, 20);
 			Origin = Graphics.Anchor.Center;
@@ -662,7 +757,8 @@ public class BilliardTest : TestScene
 				{
 					if (other.Parent is SnookerBall ball)
 					{
-						ball.GetFirstParentOfType<BilliardTest>().firstHitBallType = ball.Type;
+						if (ball.GetFirstParentOfType<BilliardTest>().firstHitBallType == BallType.None)
+							ball.GetFirstParentOfType<BilliardTest>().firstHitBallType = ball.Type;
 					}
 				};
 			}
@@ -672,6 +768,7 @@ public class BilliardTest : TestScene
 		public Sprite BallSprite;
 		public int PointValue;
 		public BallType Type;
+		public Vector2 PreviousPosition;
 
 	}
 
