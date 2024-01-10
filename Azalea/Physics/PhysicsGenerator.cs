@@ -139,7 +139,7 @@ public class PhysicsGenerator
 		Vector2 collisionNormal = Vector2.Normalize(new Vector2(distanceX, distanceY));
 		if (float.IsNaN(collisionNormal.X) || float.IsNaN(collisionNormal.Y))
 			Console.WriteLine("Collision Normal is NAN");
-		collisionNormal = collisionNormal.Rotate(rectAngle);
+		collisionNormal = collisionNormal.Rotate(rectAngle, false);
 
 		//x2 = cosβx1 − sinβy1
 		//y2 = sinβx1 + cosβy1

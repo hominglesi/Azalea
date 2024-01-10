@@ -24,4 +24,7 @@ public static class MathUtils
 		if (from1 == to1) return from2;
 		return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
 	}
+
+	public static int Ceiling(float value)
+		=> (int)MathF.Ceiling(value);
 }
