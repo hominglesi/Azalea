@@ -1,6 +1,10 @@
-﻿using Azalea.Layout;
+﻿using Azalea.Graphics.Primitives;
+using Azalea.Graphics.Rendering;
+using Azalea.Graphics.Textures;
+using Azalea.Layout;
 using Azalea.Text;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace Azalea.Graphics.Sprites;
@@ -139,7 +143,34 @@ public partial class SpriteText : GameObject
 			_characterBacking, excludeCharacters, FallbackCharacter, FixedWidthReferenceCharacter);
 	}
 
-	protected override DrawNode CreateDrawNode() => new SpriteTextDrawNode(this);
+	public override void Draw(IRenderer renderer)
+	{
+		int partCount = Characters.Count;
+
+		if (_parts == null)
+			_parts = new List<ScreenSpaceCharacterPart>(partCount);
+		else
+		{
+			_parts.Clear();
+			_parts.EnsureCapacity(partCount);
+		}
+
+		foreach (var character in Characters)
+		{
+			_parts.Add(new ScreenSpaceCharacterPart
+			{
+				DrawQuad = ToScreenSpace(character.DrawRectangle),
+				Texture = character.Texture
+			});
+		}
+
+		Debug.Assert(_parts is not null);
+
+		for (int i = 0; i < _parts.Count; i++)
+		{
+			renderer.DrawQuad(_parts[i].Texture, _parts[i].DrawQuad, DrawColorInfo);
+		}
+	}
 
 	private void invalidate(bool characters = false, bool textBuilder = false)
 	{
@@ -148,5 +179,12 @@ public partial class SpriteText : GameObject
 
 		if (textBuilder)
 			_textBuilderCache = null;
+	}
+
+	internal struct ScreenSpaceCharacterPart
+	{
+		public Quad DrawQuad;
+
+		public Texture Texture;
 	}
 }

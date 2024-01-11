@@ -12,46 +12,19 @@ public class Line : GameObject
 
 	public float Thickness { get; set; } = 3;
 
-	protected override DrawNode CreateDrawNode() => new LineDrawNode(this);
-
-	private class LineDrawNode : DrawNode
+	public override void Draw(IRenderer renderer)
 	{
-		protected new Line Source => (Line)base.Source;
+		var halfLine = new Vector2(0, Thickness / 2);
 
-		private Vector2 StartPoint { get; set; }
-		private Vector2 EndPoint { get; set; }
-		private DrawInfo Info { get; set; }
-		private float Thickness { get; set; }
+		var quad = new Quad(
+			StartPoint + halfLine,
+			StartPoint - halfLine,
+			EndPoint - halfLine,
+			EndPoint + halfLine);
 
-		public override void ApplyState()
-		{
-			base.ApplyState();
-
-			StartPoint = Source.StartPoint;
-			EndPoint = Source.EndPoint;
-			Thickness = Source.Thickness;
-			Info = Source.DrawInfo;
-		}
-
-		public LineDrawNode(Line source)
-			: base(source) { }
-
-		public override void Draw(IRenderer renderer)
-		{
-			base.Draw(renderer);
-
-			var halfLine = new Vector2(0, Thickness / 2);
-
-			var quad = new Quad(
-				StartPoint + halfLine,
-				StartPoint - halfLine,
-				EndPoint - halfLine,
-				EndPoint + halfLine);
-
-			renderer.DrawQuad(
-			AzaleaGame.Main.Host.Renderer.WhitePixel,
-			quad * Info.Matrix,
-			DrawColorInfo);
-		}
+		renderer.DrawQuad(
+		AzaleaGame.Main.Host.Renderer.WhitePixel,
+		quad * DrawInfo.Matrix,
+		DrawColorInfo);
 	}
 }

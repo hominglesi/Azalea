@@ -13,8 +13,8 @@ public class VisualTests : AzaleaGame
 		Host.Renderer.ClearColor = Palette.Flowers.Azalea;
 
 		//Add(new DefaultUserInputTest());
-		//Add(new TestingTestScene());
-		Add(new FlexTest());
+		Add(new TestingTestScene());
+		//Add(new FlexTest());
 		//Add(new TextContainerTest());
 		//Add(new PhysicsTest());
 		//Add(new SliderTests());

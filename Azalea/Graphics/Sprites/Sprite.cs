@@ -1,5 +1,7 @@
-﻿using Azalea.Graphics.Textures;
+﻿using Azalea.Graphics.Rendering;
+using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
+using System;
 using System.Numerics;
 
 namespace Azalea.Graphics.Sprites;
@@ -31,5 +33,25 @@ public class Sprite : GameObject
 		_time += Platform.Time.DeltaTime;
 	}
 
-	protected override DrawNode CreateDrawNode() => new SpriteDrawNode(this);
+	public override void Draw(IRenderer renderer)
+	{
+		if (Alpha <= 0) return;
+
+		if (Texture is null)
+		{
+			Console.WriteLine("Couldn't draw sprite because texture was null");
+			return;
+		}
+
+		var texture = Texture;
+		if (Texture is TextureAnimation anim)
+		{
+			texture = anim.GetTextureAtTime(Time);
+		}
+
+		renderer.DrawQuad(
+			texture,
+			ScreenSpaceDrawQuad,
+			DrawColorInfo);
+	}
 }

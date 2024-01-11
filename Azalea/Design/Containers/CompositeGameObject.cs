@@ -1,7 +1,10 @@
 ﻿using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics;
+using Azalea.Graphics.Rendering;
 using Azalea.Layout;
 using Azalea.Lists;
+using Azalea.Numerics;
+using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -192,43 +195,29 @@ public partial class CompositeGameObject : GameObject
 		return base.OnInvalidate(invalidation, source);
 	}
 
-	protected override DrawNode CreateDrawNode() => new CompositeGameObjectDrawNode(this);
-
-	public override DrawNode? GenerateDrawNodeSubtree()
+	public override void Draw(IRenderer renderer)
 	{
-		var drawNode = base.GenerateDrawNodeSubtree();
-
-		if ((drawNode is ICompositeDrawNode compositeNode) == false)
-			return null;
-
-		compositeNode.Children ??= new List<DrawNode>();
-
-		int j = 0;
-		addFromComposite(ref j, this, compositeNode.Children);
-
-		if (j < compositeNode.Children.Count)
-			compositeNode.Children.RemoveRange(j, compositeNode.Children.Count - j);
-
-		return drawNode;
-	}
-
-	private static void addFromComposite(ref int j, CompositeGameObject parentComposite, List<DrawNode> target)
-	{
-		var children = parentComposite.internalChildren;
-
-		for (int i = 0; i < children.Count; i++)
+		if (Masking)
 		{
-			var drawable = children[i];
+			var newScissor = (RectangleInt)ScreenSpaceDrawQuad;
+			if (MaskingPadding != Boundary.Zero)
+			{
+				newScissor.X -= MathUtils.Ceiling(MaskingPadding.Left);
+				newScissor.Width += MathUtils.Ceiling(MaskingPadding.Horizontal);
+				newScissor.Y -= MathUtils.Ceiling(MaskingPadding.Top);
+				newScissor.Height += MathUtils.Ceiling(MaskingPadding.Vertical);
+			}
+			renderer.PushScissor(newScissor);
+		}
 
-			DrawNode? next = drawable.GenerateDrawNodeSubtree();
-			if (next == null) continue;
+		foreach (var child in internalChildren)
+		{
+			child.Draw(renderer);
+		}
 
-			if (j < target.Count)
-				target[j] = next;
-			else
-				target.Add(next);
-
-			j++;
+		if (Masking)
+		{
+			renderer.PopScissor();
 		}
 	}
 

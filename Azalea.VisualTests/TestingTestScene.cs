@@ -87,8 +87,6 @@ public class TestingTestScene : TestScene
 			}
 		}
 
-
-
 		Add(_igrac = new()
 		{
 			Color = Palette.Orange,

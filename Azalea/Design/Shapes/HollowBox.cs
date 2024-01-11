@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics;
+using Azalea.Graphics.Rendering;
 
 namespace Azalea.Design.Shapes;
 public partial class HollowBox : GameObject
@@ -17,5 +18,8 @@ public partial class HollowBox : GameObject
 		set => _outsideContent = value;
 	}
 
-	protected override DrawNode CreateDrawNode() => new HollowBoxDrawNode(this);
+	public override void Draw(IRenderer renderer)
+	{
+		renderer.DrawRectangle(DrawRectangle, DrawInfo.Matrix, Thickness, DrawColorInfo, OutsideContent);
+	}
 }

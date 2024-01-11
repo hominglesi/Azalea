@@ -6,6 +6,7 @@ using Azalea.Extentions;
 using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Primitives;
+using Azalea.Graphics.Rendering;
 using Azalea.Inputs.Events;
 using Azalea.Layout;
 using Azalea.Numerics;
@@ -441,7 +442,10 @@ public abstract partial class GameObject : Amendable, IGameObject
 		}
 	}
 
-	protected virtual DrawNode CreateDrawNode() => new(this);
+	public virtual void Draw(IRenderer renderer)
+	{
+
+	}
 
 	public DrawInfo DrawInfo
 	{
@@ -770,15 +774,6 @@ public abstract partial class GameObject : Amendable, IGameObject
 		info.Color.ApplyChild(colorInfo);
 
 		return info;
-	}
-
-	private DrawNode? drawNode;
-
-	public virtual DrawNode? GenerateDrawNodeSubtree()
-	{
-		drawNode ??= CreateDrawNode();
-
-		return drawNode;
 	}
 }
 
