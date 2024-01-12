@@ -1,6 +1,7 @@
 ﻿//using Azalea.Audios;
 using Azalea.Graphics.Colors;
 using Azalea.IO.Resources;
+using Azalea.VisualTests.Breakout;
 
 namespace Azalea.VisualTests;
 
@@ -13,7 +14,7 @@ public class VisualTests : AzaleaGame
 		Host.Renderer.ClearColor = Palette.Flowers.Azalea;
 
 		//Add(new DefaultUserInputTest());
-		Add(new TestingTestScene());
+		//Add(new TestingTestScene());
 		//Add(new FlexTest());
 		//Add(new TextContainerTest());
 		//Add(new PhysicsTest());
@@ -23,7 +24,7 @@ public class VisualTests : AzaleaGame
 		//Add(new PanningTest());
 		//Add(new IWindowTest());
 		//Add(new AudioTest());
-		//Add(new BreakoutTest());
+		Add(new BreakoutTest());
 		//Add(new BoundingBoxTreeTest());
 	}
 
