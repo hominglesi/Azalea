@@ -1,9 +1,9 @@
 ﻿using Azalea;
-using Azalea.Platform;
-using Azalea.VisualTests;
+
+DELETETHIS.Run();
 
 //PerformanceTrace.Enabled = true;
-
+/*
 var host = Host.CreateHost(new HostPreferences
 {
 	PreferredClientSize = new Vector2Int(1280, 720),
@@ -13,4 +13,4 @@ var host = Host.CreateHost(new HostPreferences
 	VSync = true
 });
 
-host.Run(new VisualTests());
+host.Run(new VisualTests());*/

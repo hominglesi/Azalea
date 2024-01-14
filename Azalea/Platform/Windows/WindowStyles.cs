@@ -1,0 +1,16 @@
+﻿using System;
+
+namespace Azalea.Platform.Windows;
+
+[Flags]
+internal enum WindowStyles : uint
+{
+	WS_MAXIMIZEBOX = 0x10000,
+	WS_MINIMIZEBOX = 0x20000,
+	WS_CAPTION = 0xc00000,
+	WS_SIZEFRAME = 0x40000,
+	WS_SYSMENU = 0x80000,
+	WS_OVERLAPPED = 0x0,
+	WS_OVERLAPPEDWINDOW = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_SIZEFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX,
+
+}
