@@ -166,6 +166,9 @@ internal class GLFWWindow : PlatformWindow
 	protected override void MinimizeImplementation()
 		=> GLFW.IconifyWindow(Handle);
 
+	public override void ProcessEvents()
+		=> GLFW.PollEvents();
+
 	#endregion
 
 	protected override void OnDispose()

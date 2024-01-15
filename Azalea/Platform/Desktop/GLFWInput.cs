@@ -1,5 +1,4 @@
-﻿using Azalea.Debugging;
-using Azalea.Inputs;
+﻿using Azalea.Inputs;
 using Azalea.Platform.Glfw;
 using System.Collections.Generic;
 
@@ -41,8 +40,6 @@ internal class GLFWInput : IInputManager
 
 	public void ProcessInputs()
 	{
-		PerformanceTrace.RunAndTrace(GLFW.PollEvents, "GLFW.PollEvents");
-
 		Input.HandleMousePositionChange(GLFW.GetCursorPos(_window));
 
 		Input.HandleScroll(_yScroll);

@@ -81,7 +81,8 @@ public abstract class GameHost
 				firstWindowShow = true;
 			}
 
-			PerformanceTrace.RunAndTrace(InputManager.ProcessInputs, "Input");
+			Window.ProcessEvents();
+			//PerformanceTrace.RunAndTrace(InputManager.ProcessInputs, "Input");
 
 			EndFrame();
 		}

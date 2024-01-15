@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azalea.Numerics;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Azalea.Platform.Windows;
@@ -43,12 +44,26 @@ internal static class WinAPI
 	private static extern sbyte getMessage(out Message message, IntPtr window, uint wMsgFilterMin, uint wMsgFilterMax);
 	public static sbyte GetMessage(out Message message, IntPtr window) => getMessage(out message, window, 0, 0);
 
+	[DllImport(User32Path, EntryPoint = "GetWindowRect")]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	private static extern bool getWindowRect(IntPtr window, out WinRectangle rect);
+	public static RectangleInt GetWindowRect(IntPtr window)
+	{
+		getWindowRect(window, out var rect);
+		return rect;
+	}
+
 	[DllImport(User32Path, EntryPoint = "IsDialogMessageW", CharSet = CharSet.Unicode)]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool IsDialogMessage(IntPtr window, [In] ref Message message);
 
 	[DllImport(User32Path, EntryPoint = "LoadCursorW", CharSet = CharSet.Unicode)]
 	public static extern IntPtr LoadCursor(IntPtr instance, uint cursorValue);
+
+	[DllImport(User32Path, EntryPoint = "PeekMessageW", CharSet = CharSet.Unicode)]
+	private static extern sbyte peekMessage(out Message message, IntPtr window, uint minFilter, uint maxFilter, uint remove);
+	public static sbyte PeekMessage(out Message message, IntPtr window)
+		=> peekMessage(out message, window, 0, 0, 0x0001); // 0x0001 = PM_REMOVE
 
 	[DllImport(User32Path, EntryPoint = "PostQuitMessage")]
 	public static extern void PostQuitMessage(int exitCode);
@@ -91,4 +106,7 @@ internal static class WinAPI
 
 	[DllImport(User32Path, EntryPoint = "UpdateWindow")]
 	public static extern bool UpdateWindow(IntPtr window);
+
+	[DllImport(User32Path, EntryPoint = "WindowFromPoint")]
+	public static extern IntPtr WindowFromPoint(Vector2Int point);
 }

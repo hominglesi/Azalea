@@ -86,4 +86,6 @@ public interface IWindow : IDisposable
 	public void PreventClosure();
 
 	internal void SwapBuffers();
+
+	internal void ProcessEvents();
 }

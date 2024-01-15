@@ -1,14 +1,14 @@
 ﻿using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.Rendering;
-using Azalea.Platform.Glfw;
+using Azalea.Platform.Windows;
 using System;
 
 namespace Azalea.Platform.Desktop;
 internal class DesktopGameHost : GameHost
 {
 	public override IWindow Window => _window ?? throw new Exception("Cannot use Window before it is initialized");
-	private GLFWWindow _window;
+	private Win32Window _window;
 
 	public override IRenderer Renderer => _renderer ?? throw new Exception("Cannot use Renderer before it is initialized");
 	private GLRenderer? _renderer;
@@ -18,6 +18,8 @@ internal class DesktopGameHost : GameHost
 
 	public DesktopGameHost(HostPreferences preferences)
 	{
+		_window = new Win32Window();
+		/*
 		_window = new GLFWWindow(
 			preferences.WindowTitle,
 			preferences.PreferredClientSize.X, preferences.PreferredClientSize.Y,
@@ -26,7 +28,7 @@ internal class DesktopGameHost : GameHost
 			preferences.WindowResizable,
 			preferences.DecoratedWindow,
 			preferences.TransparentFramebuffer);
-		_window.VSync = preferences.VSync;
+		_window.VSync = preferences.VSync;*/
 	}
 
 	public override void CallInitialized()
@@ -36,7 +38,7 @@ internal class DesktopGameHost : GameHost
 		GL.BlendFunc(GLBlendFunction.SrcAlpha, GLBlendFunction.OneMinusSrcAlpha);
 
 		_renderer = new GLRenderer(_window);
-		_input = new GLFWInput(_window.Handle);
+		//_input = new GLFWInput(_window.Handle);
 
 		base.CallInitialized();
 	}

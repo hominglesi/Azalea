@@ -1,7 +1,6 @@
 ﻿//using Azalea.Audios;
 using Azalea.Graphics.Colors;
 using Azalea.IO.Resources;
-using Azalea.VisualTests.Breakout;
 
 namespace Azalea.VisualTests;
 
@@ -22,9 +21,9 @@ public class VisualTests : AzaleaGame
 		//Add(new AutoSizeTest());
 		//Add(new InputTest());
 		//Add(new PanningTest());
-		//Add(new IWindowTest());
+		Add(new IWindowTest());
 		//Add(new AudioTest());
-		Add(new BreakoutTest());
+		//Add(new BreakoutTest());
 		//Add(new BoundingBoxTreeTest());
 	}
 

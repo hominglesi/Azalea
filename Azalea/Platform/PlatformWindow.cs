@@ -12,7 +12,7 @@ internal abstract class PlatformWindow : Disposable, IWindow
 	internal const WindowState DEFAULT_STATE = WindowState.Normal;
 	internal const int DEFAULT_POSITION_X = 100;
 	internal const int DEFAULT_POSITION_Y = 100;
-	internal const bool DEFAULT_VISIBLE = true;
+	internal const bool DEFAULT_VISIBLE = false;
 	internal const bool DEFAULT_RESIZABLE = false;
 	internal const bool DEFAULT_DECORATED = true;
 	internal const bool DEFAULT_TRANSPARENT_FRAMEBUFFER = false;
@@ -237,6 +237,9 @@ internal abstract class PlatformWindow : Disposable, IWindow
 			SetShouldCloseImplementation(value);
 		}
 	}
+
+	public abstract void ProcessEvents();
+
 	public void Close()
 	{
 		ShouldClose = true;

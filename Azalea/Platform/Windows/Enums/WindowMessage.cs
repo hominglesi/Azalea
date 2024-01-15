@@ -14,5 +14,55 @@ internal enum WindowMessage : uint
 	/// or <see cref="WinAPI.RedrawWindow"/> function is called, or by the DispatchMessage function when the
 	/// application obtains a <see cref="WindowMessage.Paint"/> message by using the <see cref="WinAPI.GetMessage"/> or PeekMessage function.
 	/// </summary>
-	Paint = 15
+	Paint = 15,
+	/// <summary>
+	/// Sent as a signal that a window or an application should terminate.
+	/// A window receives this message through its <see cref="WindowProcedure"/> function.
+	/// </summary>
+	Close = 16,
+	/// <summary>
+	/// Sent to a window if the mouse causes the cursor to move within a window and mouse input is not captured.
+	/// </summary>
+	SetCursor = 32,
+	/// <summary>
+	/// Sent to a window in order to determine what part of the window corresponds to a particular screen coordinate.
+	/// This can happen, for example, when the cursor moves, when a mouse button is pressed or released,
+	/// or in response to a call to a function such as <see cref="WinAPI.WindowFromPoint"/>. If the mouse is not captured,
+	/// the message is sent to the window beneath the cursor. Otherwise, the message is sent to the window
+	/// that has captured the mouse. A window receives this message through its <see cref="WindowProcedure"/> function.
+	/// </summary>
+	NonclientHittest = 132,
+	/// <summary>
+	/// Posted when the user releases the left mouse button while the cursor is within the nonclient area of a window.
+	/// This message is posted to the window that contains the cursor.
+	/// If a window has captured the mouse, this message is not posted.
+	/// A window receives this message through its <see cref="WindowProcedure"/> function.
+	/// </summary>
+	NonclientLeftButtonUp = 162,
+	/// <summary>
+	/// A window receives this message when the user chooses a command from the Window menu
+	/// (formerly known as the system or control menu) or when the user chooses the maximize button, minimize button,
+	/// restore button, or close button.
+	/// </summary>
+	SysCommand = 274,
+	/// <summary>
+	/// Posted to a window when the cursor moves. If the mouse is not captured, the message is posted
+	/// to the window that contains the cursor. Otherwise, the message is posted to the window that has captured the mouse.
+	/// A window receives this message through its <see cref="WindowProcedure"/> function.
+	/// </summary>
+	MouseMove = 512,
+	/// <summary>
+	/// Posted when the user presses the left mouse button while the cursor is in the client area of a window.
+	/// If the mouse is not captured, the message is posted to the window beneath the cursor.
+	/// Otherwise, the message is posted to the window that has captured the mouse.
+	/// A window receives this message through its <see cref="WindowProcedure"/> function.
+	/// </summary>
+	LeftButtonDown = 513,
+	/// <summary>
+	/// Posted when the user releases the left mouse button while the cursor is in the client area of a window.
+	/// If the mouse is not captured, the message is posted to the window beneath the cursor.
+	/// Otherwise, the message is posted to the window that has captured the mouse.
+	/// A window receives this message through its <see cref="WindowProcedure"/> function.
+	/// </summary>
+	LeftButtonUp = 514,
 }
