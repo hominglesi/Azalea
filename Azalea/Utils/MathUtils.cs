@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 namespace Azalea.Utils;
 
@@ -27,4 +28,20 @@ public static class MathUtils
 
 	public static int Ceiling(float value)
 		=> (int)MathF.Ceiling(value);
+
+	public static float GetAngleTowards(Vector2 startPositon, Vector2 endPositon)
+	{
+		var yDifference = endPositon.Y - startPositon.Y;
+		var xDifference = endPositon.X - startPositon.X;
+		return (float)Math.Atan2(yDifference, xDifference);
+	}
+
+	public static Vector2 GetDirectionTowards(Vector2 startPositon, Vector2 endPositon)
+		=> GetVectorFromAngle(GetAngleTowards(startPositon, endPositon));
+
+	public static Vector2 GetVectorFromAngle(float angle)
+		=> new((float)Math.Cos(angle), (float)Math.Sin(angle));
+
+	public static float DistanceBetween(Vector2 startPositon, Vector2 endPositon)
+		=> MathF.Sqrt(MathF.Pow(endPositon.X - startPositon.X, 2) + MathF.Pow(endPositon.Y - startPositon.Y, 2));
 }

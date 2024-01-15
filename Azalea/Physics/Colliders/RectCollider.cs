@@ -25,4 +25,5 @@ public class RectCollider : Collider
 			new Vector2(-halfWidth, halfHeight)
 		};
 	}
+
 }

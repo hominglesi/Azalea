@@ -17,6 +17,7 @@ public class VisualTests : AzaleaGame
 		//Add(new TestingTestScene());
 		//Add(new FlexTest());
 		//Add(new TextContainerTest());
+		Add(new BilliardTest());
 		//Add(new PhysicsTest());
 		//Add(new SliderTests());
 		//Add(new AutoSizeTest());
@@ -24,7 +25,7 @@ public class VisualTests : AzaleaGame
 		//Add(new PanningTest());
 		//Add(new IWindowTest());
 		//Add(new AudioTest());
-		Add(new BreakoutTest());
+		//Add(new BreakoutTest());
 		//Add(new BoundingBoxTreeTest());
 	}
 

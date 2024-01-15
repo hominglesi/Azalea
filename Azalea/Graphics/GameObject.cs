@@ -393,7 +393,7 @@ public abstract partial class GameObject : Amendable, IGameObject
 		}
 	}
 
-	public Vector2 RelativeOriginPosition => computeAnchorPosition(_origin);
+	public Vector2 RelativeOriginPosition => ComputeAnchorPosition(_origin);
 
 	public Vector2 OriginPosition
 	{
@@ -425,11 +425,11 @@ public abstract partial class GameObject : Amendable, IGameObject
 		}
 	}
 
-	public Vector2 RelativeAnchorPosition => computeAnchorPosition(_anchor);
+	public Vector2 RelativeAnchorPosition => ComputeAnchorPosition(_anchor);
 
 	public Vector2 AnchorPosition => RelativeAnchorPosition * Parent?.ChildSize ?? Vector2.Zero;
 
-	private static Vector2 computeAnchorPosition(Anchor anchor)
+	internal static Vector2 ComputeAnchorPosition(Anchor anchor)
 	{
 		Vector2 result = Vector2.Zero;
 		if (anchor.HasFlagFast(Anchor.x1))

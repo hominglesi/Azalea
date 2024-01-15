@@ -147,7 +147,6 @@ public class PhysicsTest : TestScene
 			Size = new(50, 50),
 			Color = Palette.Yellow,
 			Origin = Graphics.Anchor.Center,
-			Rotation = 35
 		});
 		box1.AddComponent(new RigidBody()
 		{
@@ -156,6 +155,26 @@ public class PhysicsTest : TestScene
 			//AngularAcceleration = 0.0001f
 		});
 		box1.AddComponent(new RectCollider()
+		{
+			SideA = 50,
+			SideB = 50
+		});
+
+		Add(box2 = new Box()
+		{
+			Position = new(790, 356),
+			Size = new(50, 50),
+			Color = Palette.Yellow,
+			Origin = Graphics.Anchor.Center
+		});
+		box2.AddComponent(new RigidBody()
+		{
+			Mass = 10,
+			IsDynamic = false,
+			//	UsesGravity = false,
+			//AngularAcceleration = 0.0001f
+		});
+		box2.AddComponent(new RectCollider()
 		{
 			SideA = 50,
 			SideB = 50
@@ -371,6 +390,7 @@ public class PhysicsTest : TestScene
 		if (Input.GetKey(Keys.W).Pressed)
 		{
 			circle1.Position += new Vector2(0, -2);
+
 		}
 		if (Input.GetKey(Keys.A).Pressed)
 		{
