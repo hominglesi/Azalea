@@ -15,47 +15,22 @@ public class Line : GameObject
 
 	public float Thickness { get; set; } = 3;
 
-	protected override DrawNode CreateDrawNode() => new LineDrawNode(this);
-
-	private class LineDrawNode : DrawNode
+	public override void Draw(IRenderer renderer)
 	{
-		protected new Line Source => (Line)base.Source;
+		base.Draw(renderer);
 
-		private Vector2 StartPoint { get; set; }
-		private Vector2 EndPoint { get; set; }
-		private DrawInfo Info { get; set; }
-		private float Thickness { get; set; }
+		var distance = MathUtils.DistanceBetween(StartPoint, EndPoint);
+		var rectangle = new Rectangle(Vector2.Zero, new(distance, Thickness));
+		rectangle.Y -= Thickness / 2;
+		var rotation = MathUtils.GetAngleTowards(StartPoint, EndPoint);
 
-		public override void ApplyState()
-		{
-			base.ApplyState();
+		var matrix = Matrix3.Identity;//Info.Matrix;
+		MatrixExtentions.TranslateFromLeft(ref matrix, StartPoint);
+		MatrixExtentions.RotateFromLeft(ref matrix, rotation);
 
-			StartPoint = Source.StartPoint;
-			EndPoint = Source.EndPoint;
-			Thickness = Source.Thickness;
-			Info = Source.DrawInfo;
-		}
-
-		public LineDrawNode(Line source)
-			: base(source) { }
-
-		public override void Draw(IRenderer renderer)
-		{
-			base.Draw(renderer);
-
-			var distance = MathUtils.DistanceBetween(StartPoint, EndPoint);
-			var rectangle = new Rectangle(Vector2.Zero, new(distance, Thickness));
-			rectangle.Y -= Thickness / 2;
-			var rotation = MathUtils.GetAngleTowards(StartPoint, EndPoint);
-
-			var matrix = Matrix3.Identity;//Info.Matrix;
-			MatrixExtentions.TranslateFromLeft(ref matrix, StartPoint);
-			MatrixExtentions.RotateFromLeft(ref matrix, rotation);
-
-			renderer.DrawQuad(
-			AzaleaGame.Main.Host.Renderer.WhitePixel,
-			Quad.FromRectangle(rectangle) * matrix, //  quad * Info.Matrix,
-			DrawColorInfo);
-		}
+		renderer.DrawQuad(
+		AzaleaGame.Main.Host.Renderer.WhitePixel,
+		Quad.FromRectangle(rectangle) * matrix, //  quad * Info.Matrix,
+		DrawColorInfo);
 	}
 }

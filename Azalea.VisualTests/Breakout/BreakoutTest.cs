@@ -58,8 +58,8 @@ public class BreakoutTest : TestScene
 		}
 
 		_chunkRoot.SubdivideHorizontaly();
-		//_chunkRoot.SubdivideHorizontaly();
-		//_chunkRoot.Subdivide(5);
+		_chunkRoot.SubdivideHorizontaly();
+		_chunkRoot.Subdivide(5);
 
 		//Create ball
 		var initialBallDirection = Rng.Direction();
@@ -90,7 +90,7 @@ public class BreakoutTest : TestScene
 		{
 			if (_chunkRoot.SubChunks.Count == 0) return;
 
-			if (ball.Direction.Y > 0) continue;
+			//if (ball.Direction.Y > 0) continue;
 
 			Box? collision = null;
 
@@ -119,7 +119,7 @@ public class BreakoutTest : TestScene
 
 				_createdBalls.Add(new BreakoutBall(newDirection)
 				{
-					Position = collision.Position,
+					Position = collision.Position + new Vector2(0, BlockHeight * 1.5f),
 					Size = collision.Size,
 					Color = collision.Color,
 				});

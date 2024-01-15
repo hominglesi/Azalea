@@ -119,8 +119,7 @@ public abstract class GameHost
 		Renderer.BeginFrame();
 		if (Renderer.AutomaticallyClear) Renderer.Clear();
 
-		var node = Root.GenerateDrawNodeSubtree();
-		node?.Draw(Renderer);
+		Root.Draw(Renderer);
 
 		Renderer.FinishFrame();
 	}

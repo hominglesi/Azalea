@@ -74,104 +74,52 @@ public class FlexContainer : FlowContainer
 		}
 	}
 
-	private void orderByDirectionHorizontally(ref Vector2[] positions, ref GameObject[] children)
+	private void orderByDirection(ref Vector2[] positions, ref GameObject[] children)
 	{
 		var offset = 0f;
 		for (int i = 0; i < children.Length; i++)
 		{
-			positions[i].X = offset;
-			offset += children[i].Width;
-			offset += Spacing.X;
+			positions[i] = createMainVector(offset);
+			offset += getMainLength(children[i]);
+			offset += getMainSpacing();
 		}
 	}
 
-	private void orderByDirectionVertically(ref Vector2[] positions, ref GameObject[] children)
-	{
-		var offset = 0f;
-		for (int i = 0; i < children.Length; i++)
-		{
-			positions[i].Y = offset;
-			offset += children[i].Height;
-			offset += Spacing.Y;
-		}
-	}
-
-	private int getNextChunkHorizontally(ref Vector2[] positions, ref GameObject[] children, int startIndex, float maxLength)
+	private int getNextChunk(ref Vector2[] positions, ref GameObject[] children, int startIndex, float maxLength)
 	{
 		var length = 0f;
 		for (int i = startIndex; i < children.Length; i++)
 		{
-			length += children[i].Width;
+			length += getMainLength(children[i]);
 			if (length > maxLength || children[i] is FlowNewLine)
 			{
 				if (i == startIndex) return startIndex;
 				return i - 1;
 			}
-			length += Spacing.X;
+			length += getMainSpacing();
 		}
 
 		return children.Length - 1;
 	}
 
-	private int getNextChunkVertically(ref Vector2[] positions, ref GameObject[] children, int startIndex, float maxLength)
-	{
-		var length = 0f;
-		for (int i = startIndex; i < children.Length; i++)
-		{
-			length += children[i].Width;
-			if (length > maxLength || children[i] is FlowNewLine)
-			{
-				if (i == startIndex) return startIndex;
-				return i - 1;
-			}
-			length += Spacing.X;
-		}
-
-		return children.Length - 1;
-	}
-
-	private float getMaxHeight(ref GameObject[] children, int startIndex, int endIndex)
+	private float getMaxSideLength(ref GameObject[] children, int startIndex, int endIndex)
 	{
 		var max = 0f;
 		for (int i = startIndex; i <= endIndex; i++)
-		{
-			max = MathF.Max(max, children[i].Height);
-		}
+			max = MathF.Max(max, getSideLength(children[i]));
+
 		return max;
 	}
 
-	private float getMaxWidth(ref GameObject[] children, int startIndex, int endIndex)
-	{
-		var max = 0f;
-		for (int i = startIndex; i <= endIndex; i++)
-		{
-			max = MathF.Max(max, children[i].Width);
-		}
-		return max;
-	}
-
-	private float getTotalWidth(ref GameObject[] children, int startIndex, int endIndex)
+	private float getTotalLength(ref GameObject[] children, int startIndex, int endIndex)
 	{
 		var total = 0f;
 		for (int i = startIndex; i <= endIndex; i++)
 		{
-			total += children[i].Width;
-			total += _spacing.X;
+			total += getMainLength(children[i]);
+			total += getMainSpacing();
 		}
-		total -= _spacing.X;
-
-		return total;
-	}
-
-	private float getTotalHeight(ref GameObject[] children, int startIndex, int endIndex)
-	{
-		var total = 0f;
-		for (int i = startIndex; i <= endIndex; i++)
-		{
-			total += children[i].Height;
-			total += _spacing.Y;
-		}
-		total -= _spacing.Y;
+		total -= getMainSpacing();
 
 		return total;
 	}
@@ -193,7 +141,7 @@ public class FlexContainer : FlowContainer
 		for (int i = startIndex; i <= endIndex; i++)
 		{
 			var xOffset = positions[i].X - firstX;
-			positions[i].X = width - children[i].Width - xOffset - x;
+			positions[i].X = width - children[i].LayoutRectangle.Width - xOffset - x;
 			positions[i].Y = y;
 		}
 	}
@@ -215,41 +163,24 @@ public class FlexContainer : FlowContainer
 		for (int i = startIndex; i <= endIndex; i++)
 		{
 			var yOffset = positions[i].Y - firstY;
-			positions[i].Y = height - children[i].Height - yOffset - y;
+			positions[i].Y = height - children[i].LayoutRectangle.Height - yOffset - y;
 			positions[i].X = x;
 		}
 	}
 
-	private void alignRow(ref Vector2[] positions, ref GameObject[] children, int startIndex, int endIndex)
+	private void align(ref Vector2[] positions, ref GameObject[] children, int startIndex, int endIndex)
 	{
 		if (Alignment == FlexAlignment.Start) return;
 
-		var maxHeight = getMaxHeight(ref children, startIndex, endIndex);
+		var maxLength = getMaxSideLength(ref children, startIndex, endIndex);
 
 		for (int i = startIndex; i <= endIndex; i++)
 		{
-			var offset = maxHeight - children[i].Height;
+			var offset = maxLength - children[i].LayoutRectangle.Height;
 			if (Alignment == FlexAlignment.Center)
 				offset /= 2;
-			positions[i].Y += offset;
+			positions[i] += createSideVector(offset);
 		}
-
-	}
-
-	private void alignColumn(ref Vector2[] positions, ref GameObject[] children, int startIndex, int endIndex)
-	{
-		if (Alignment == FlexAlignment.Start) return;
-
-		var maxWidth = getMaxWidth(ref children, startIndex, endIndex);
-
-		for (int i = startIndex; i <= endIndex; i++)
-		{
-			var offset = maxWidth - children[i].Width;
-			if (Alignment == FlexAlignment.Center)
-				offset /= 2;
-			positions[i].X += offset;
-		}
-
 	}
 
 	protected override IEnumerable<Vector2> ComputeLayoutPositions()
@@ -264,7 +195,7 @@ public class FlexContainer : FlowContainer
 
 			if (Direction == FlexDirection.Horizontal || Direction == FlexDirection.HorizontalReverse)
 			{
-				orderByDirectionHorizontally(ref positions, ref children);
+				orderByDirection(ref positions, ref children);
 
 				if (Wrapping == FlexWrapping.NoWrapping)
 				{
@@ -275,11 +206,11 @@ public class FlexContainer : FlowContainer
 						placeRow(ref positions, startIndex, endIndex, 0, 0);
 					else
 					{
-						var totalWidth = getTotalWidth(ref children, startIndex, endIndex);
+						var totalWidth = getTotalLength(ref children, startIndex, endIndex);
 						placeRowReverse(ref positions, ref children, startIndex, endIndex, totalWidth, 0, 0);
 					}
 
-					alignRow(ref positions, ref children, startIndex, endIndex);
+					align(ref positions, ref children, startIndex, endIndex);
 				}
 				else
 				{
@@ -288,8 +219,8 @@ public class FlexContainer : FlowContainer
 
 					while (true)
 					{
-						var endIndex = getNextChunkHorizontally(ref positions, ref children, startIndex, layoutSize.X);
-						var contentWidth = getTotalWidth(ref children, startIndex, endIndex);
+						var endIndex = getNextChunk(ref positions, ref children, startIndex, layoutSize.X);
+						var contentWidth = getTotalLength(ref children, startIndex, endIndex);
 						var xOffset = Justification switch
 						{
 							FlexJustification.End => layoutSize.X - contentWidth,
@@ -301,9 +232,9 @@ public class FlexContainer : FlowContainer
 						else
 							placeRowReverse(ref positions, ref children, startIndex, endIndex, layoutSize.X, xOffset, verticalOffset);
 
-						alignRow(ref positions, ref children, startIndex, endIndex);
+						align(ref positions, ref children, startIndex, endIndex);
 
-						verticalOffset += getMaxHeight(ref children, startIndex, endIndex);
+						verticalOffset += getMaxSideLength(ref children, startIndex, endIndex);
 						verticalOffset += Spacing.Y;
 
 						if (children[endIndex] is FlowNewLine nl)
@@ -318,7 +249,7 @@ public class FlexContainer : FlowContainer
 			}
 			else
 			{
-				orderByDirectionVertically(ref positions, ref children);
+				orderByDirection(ref positions, ref children);
 
 				if (Wrapping == FlexWrapping.NoWrapping)
 				{
@@ -329,11 +260,11 @@ public class FlexContainer : FlowContainer
 						placeColumn(ref positions, startIndex, endIndex, 0, 0);
 					else
 					{
-						var totalHeight = getTotalHeight(ref children, startIndex, endIndex);
+						var totalHeight = getTotalLength(ref children, startIndex, endIndex);
 						placeColumnReverse(ref positions, ref children, startIndex, endIndex, totalHeight, 0, 0);
 					}
 
-					alignColumn(ref positions, ref children, startIndex, endIndex);
+					align(ref positions, ref children, startIndex, endIndex);
 				}
 				else
 				{
@@ -342,8 +273,8 @@ public class FlexContainer : FlowContainer
 
 					while (true)
 					{
-						var endIndex = getNextChunkVertically(ref positions, ref children, startIndex, layoutSize.Y);
-						var contentHeight = getTotalHeight(ref children, startIndex, endIndex);
+						var endIndex = getNextChunk(ref positions, ref children, startIndex, layoutSize.Y);
+						var contentHeight = getTotalLength(ref children, startIndex, endIndex);
 						var yOffset = Justification switch
 						{
 							FlexJustification.End => layoutSize.Y - contentHeight,
@@ -355,9 +286,9 @@ public class FlexContainer : FlowContainer
 						else
 							placeColumnReverse(ref positions, ref children, startIndex, endIndex, layoutSize.Y, horizontalOffset, yOffset);
 
-						alignColumn(ref positions, ref children, startIndex, endIndex);
+						align(ref positions, ref children, startIndex, endIndex);
 
-						horizontalOffset += getMaxWidth(ref children, startIndex, endIndex);
+						horizontalOffset += getMaxSideLength(ref children, startIndex, endIndex);
 						horizontalOffset += Spacing.X;
 
 						if (children[endIndex] is FlowNewLine nl)
@@ -383,7 +314,25 @@ public class FlexContainer : FlowContainer
 			ArrayPool<Vector2>.Shared.Return(positions);
 		}
 	}
+
+	private float getMainLength(GameObject obj)
+		=> isHorizontal() ? obj.BoundingBox.Width : obj.BoundingBox.Height;
+
+	private float getMainSpacing()
+		=> isHorizontal() ? Spacing.X : Spacing.Y;
+
+	private Vector2 createMainVector(float value)
+		=> isHorizontal() ? new(value, 0) : new(0, value);
+
+	private Vector2 createSideVector(float value)
+		=> isHorizontal() ? new(0, value) : new(value, 0);
+
+	private float getSideLength(GameObject obj)
+		=> isHorizontal() ? obj.BoundingBox.Height : obj.BoundingBox.Width;
+
+	private bool isHorizontal() => Direction == FlexDirection.Horizontal || Direction == FlexDirection.HorizontalReverse;
 }
+
 /// <summary>
 /// Represents the direction children of a <see cref="FlexComposition{T}"/> should be filled in.
 /// </summary>

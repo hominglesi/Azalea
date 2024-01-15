@@ -1,5 +1,4 @@
 ﻿using Azalea.Design.Containers;
-using Azalea.Design.Shapes;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
@@ -11,21 +10,10 @@ public class TextContainerTest : TestScene
 	private ScrollableContainer _scrollable;
 	private FlexContainer _flex;
 
-	private Box _box;
-
 	public TextContainerTest()
 	{
 		var x = AzaleaGame.Main.Host.Window;
 		x.ClientSize = new(1680, 960);
-
-		Add(_box = new Box
-		{
-			Width = 100,
-			Height = 100,
-			Origin = Graphics.Anchor.Center,
-			Position = new(900, 400)
-		});
-
 
 		Add(_scrollable = new ScrollableContainer()
 		{
@@ -72,10 +60,9 @@ public class TextContainerTest : TestScene
 
 	protected override void Update()
 	{
-		if (Input.GetMouseButton(0).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
+		if (Input.GetMouseButton(0).Pressed && Input.GetKey(Keys.ShiftLeft).Pressed)
 		{
 			_scrollable.Size = _scrollable.ToLocalSpace(Input.MousePosition);
 		}
-		_box.Rotation += 0.5f;
 	}
 }
