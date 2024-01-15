@@ -5,27 +5,22 @@ using Azalea.Graphics.Colors;
 using Azalea.Inputs.Events;
 using Azalea.Utils;
 using System;
-using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Design.Containers;
-public class ScrollableContainer : Composition
+public class ScrollableContainer : ContentContainer
 {
-	private CompositeGameObject _internalComposition;
-
-	private Slider _slider;
-	public Slider ScrollBar => _slider;
+	public Slider ScrollBar { get; init; }
 
 	public ScrollableContainer()
 	{
 		Masking = true;
-		AddInternal(_internalComposition = new CompositeGameObject()
-		{
-			AutoSizeAxes = Axes.Y
-		});
-		AddInternal(_slider = CreateSlider());
 
-		_slider.OnValueChanged += onSliderMoved;
+		ContentComposition.RelativeSizeAxes = Axes.None;
+		ContentComposition.AutoSizeAxes = Axes.Y;
+		AddInternal(ScrollBar = CreateSlider());
+
+		ScrollBar.OnValueChanged += onSliderMoved;
 	}
 
 	protected Slider CreateSlider()
@@ -41,13 +36,8 @@ public class ScrollableContainer : Composition
 
 	private void onSliderMoved(float newPosition)
 	{
-		ScrollPosition = MathUtils.Map(newPosition, 0, 1, 0, -(_internalComposition.DrawHeight - DrawHeight));
+		ScrollPosition = MathUtils.Map(newPosition, 0, 1, 0, -(ContentComposition.DrawHeight - DrawHeight));
 	}
-
-	protected override IReadOnlyList<GameObject> PublicChildren => _internalComposition.InternalChildren;
-	public override void Add(GameObject gameObject) => _internalComposition.AddInternal(gameObject);
-	public override bool Remove(GameObject gameObject) => _internalComposition.RemoveInternal(gameObject);
-	public override void Clear() => _internalComposition.ClearInternal();
 
 	public float ScrollSpeed { get; set; } = 30;
 
@@ -60,7 +50,7 @@ public class ScrollableContainer : Composition
 			if (_scrollPosition == value) return;
 
 			_scrollPosition = clampWithinBoundaries(value);
-			_internalComposition.Position = new Vector2(0, _scrollPosition);
+			ContentComposition.Position = new Vector2(0, _scrollPosition);
 		}
 	}
 
@@ -70,7 +60,7 @@ public class ScrollableContainer : Composition
 
 		ScrollPosition += e.ScrollDelta * ScrollSpeed;
 
-		_slider.Value = MathUtils.Map(ScrollPosition, _scrollRange.X, _scrollRange.Y, 0, 1);
+		ScrollBar.Value = MathUtils.Map(ScrollPosition, _scrollRange.X, _scrollRange.Y, 0, 1);
 	}
 
 	private float clampWithinBoundaries(float position)
@@ -90,48 +80,33 @@ public class ScrollableContainer : Composition
 		return range;
 	}
 
-	private Vector2 _lastDrawSize;
-	private Vector2 _lastInternalDrawSize;
-
-	protected override void Update()
+	protected override void UpdateContentLayout()
 	{
-		if (_lastDrawSize != DrawSize || _lastInternalDrawSize != _internalComposition.DrawSize)
-		{
-			updateChildLayout();
-		}
-	}
+		updateChildLayout();
 
-	protected override void UpdateAfterChildren()
-	{
-		if (_lastDrawSize != DrawSize || _lastInternalDrawSize != _internalComposition.DrawSize)
-		{
-			_scrollRange = getScrollRange(DrawHeight, _internalComposition.DrawHeight);
-			updateSliderHeight();
-			onSliderMoved(_slider.Value);
-
-			_lastDrawSize = DrawSize;
-			_lastInternalDrawSize = _internalComposition.DrawSize;
-		}
+		_scrollRange = getScrollRange(DrawHeight, ContentComposition.DrawHeight);
+		updateSliderHeight();
+		onSliderMoved(ScrollBar.Value);
 	}
 
 	private void updateSliderHeight()
 	{
 		if (_scrollRange.X == 0 && _scrollRange.Y == 0)
 		{
-			_slider.Alpha = 0;
+			ScrollBar.Alpha = 0;
 		}
 		else
 		{
-			_slider.Alpha = 1;
-			_slider.Head.Height = DrawSize.Y / _internalComposition.DrawSize.Y;
+			ScrollBar.Alpha = 1;
+			ScrollBar.Head.Height = DrawSize.Y / ContentComposition.DrawSize.Y;
 		}
 	}
 
 	private void updateChildLayout()
 	{
-		_internalComposition.Width = DrawSize.X;
-		if (_slider.Alpha > 0)
-			_internalComposition.Width -= _slider.DrawWidth;
+		ContentComposition.Width = DrawSize.X;
+		if (ScrollBar.Alpha > 0)
+			ContentComposition.Width -= ScrollBar.DrawWidth;
 	}
 
 	private class DefaultScrollableSlider : Slider

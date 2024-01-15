@@ -7,7 +7,7 @@ using Azalea.Inputs.Events;
 using System.Numerics;
 
 namespace Azalea.Debugging;
-public class DebuggingOverlay : Composition
+public class DebuggingOverlay : ContentContainer
 {
 	private const float LeftContainerSize = 0.25f;
 	private const float BottomContainerSize = 0.25f;
@@ -19,15 +19,15 @@ public class DebuggingOverlay : Composition
 			initialize();
 			_initialized = true;
 		}
+
+		base.Update();
 	}
 
-	private Composition _gameContainer;
 	private Composition _leftContainer;
 	private Composition _bottomContainer;
 
 	public DebugInspector Inspector;
 	private DebugSceneGraph _sceneGraph;
-	private ColliderDebug _colliderDebug;
 
 	private static SpriteText? _fpsDislpay;
 	public static SpriteText FpsDisplay
@@ -47,23 +47,13 @@ public class DebuggingOverlay : Composition
 	private void initialize()
 	{
 		//We need to initialize this later because the constructor is called before the game has been initialized
-		AddInternal(_gameContainer = new Composition()
-		{
-			Origin = Anchor.TopRight,
-			Anchor = Anchor.TopRight,
-			RelativeSizeAxes = Axes.Both,
-			Size = new(1f, 1f)
-		});
-		//REMOVED WHEN COMPOSITION WAS SIMPLIFIED PROBABLY BROKE SOMETHING
-		//RemoveInternal(InternalComposition);
-		//_gameContainer.Add(InternalComposition);
+		ContentComposition.Origin = Anchor.TopRight;
+		ContentComposition.Anchor = Anchor.TopRight;
 
 		AddInternal(FpsDisplay);
 
 		AddInternal(_leftContainer = new Composition()
 		{
-			RelativeSizeAxes = Axes.Both,
-			Size = new(0, 1),
 			BackgroundColor = new Color(51, 51, 51),
 			Masking = true,
 		});
@@ -72,34 +62,34 @@ public class DebuggingOverlay : Composition
 		{
 			Origin = Anchor.BottomRight,
 			Anchor = Anchor.BottomRight,
-			RelativeSizeAxes = Axes.Both,
-			Size = new(1 - LeftContainerSize, 0),
 			BackgroundColor = new Color(82, 82, 82),
 		});
 
-		AddInternal(_colliderDebug = new ColliderDebug());
+		AddInternal(new ColliderDebug());
+	}
+
+	protected override void UpdateContentLayout()
+	{
+		if (_debuggerExpanded)
+		{
+			if (_debuggerInitialized == false) initializeDebugger();
+
+			ContentComposition.Width = DrawSize.X * (1 - LeftContainerSize);
+			ContentComposition.Height = DrawSize.Y * (1 - BottomContainerSize);
+			_leftContainer.Height = DrawSize.Y;
+			_leftContainer.Width = DrawSize.X * LeftContainerSize;
+			_bottomContainer.Height = DrawSize.Y * BottomContainerSize;
+			_bottomContainer.Width = DrawSize.X * (1 - LeftContainerSize);
+		}
+		else
+		{
+			ContentComposition.Size = DrawSize;
+			_leftContainer.Size = Vector2.Zero;
+			_bottomContainer.Size = Vector2.Zero;
+		}
 	}
 
 	private bool _debuggerExpanded;
-	private void expandDebugger()
-	{
-		_gameContainer.Size = new(1 - LeftContainerSize, 1 - BottomContainerSize);
-		_leftContainer.Width = LeftContainerSize;
-		_bottomContainer.Height = BottomContainerSize;
-
-		if (_debuggerInitialized == false) initializeDebugger();
-
-		_debuggerExpanded = true;
-	}
-
-	private void hideDebugger()
-	{
-		_gameContainer.Size = Vector2.One;
-		_leftContainer.Width = 0;
-		_bottomContainer.Height = 0;
-
-		_debuggerExpanded = false;
-	}
 
 	private bool _debuggerInitialized;
 	private void initializeDebugger()
@@ -140,10 +130,8 @@ public class DebuggingOverlay : Composition
 						RelativeSizeAxes = Axes.Both,
 						Padding = new(5),
 						Child = Inspector = new DebugInspector()
-						{
-							RelativeSizeAxes = Axes.Both,
-						}
 					},
+
 				},
 				new Composition()
 				{
@@ -177,8 +165,8 @@ public class DebuggingOverlay : Composition
 	{
 		if (e.Key == Keys.Q && Input.GetKey(Keys.ControlLeft).Pressed)
 		{
-			if (_debuggerExpanded) hideDebugger();
-			else expandDebugger();
+			_debuggerExpanded = !_debuggerExpanded;
+			UpdateContentLayout();
 		}
 
 		return base.OnKeyDown(e);

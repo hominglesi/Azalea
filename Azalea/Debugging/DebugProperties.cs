@@ -21,6 +21,7 @@ public class DebugProperties : FlexContainer
 	{
 		Direction = FlexDirection.Vertical;
 		Wrapping = FlexWrapping.NoWrapping;
+		AutoSizeAxes = Axes.Y;
 		Spacing = new(0, 5);
 		AddRange(new GameObject[]
 		{
@@ -57,6 +58,7 @@ public class DebugProperties : FlexContainer
 			{
 				RelativeSizeAxes = Axes.X,
 				Width = 1,
+				AutoSizeAxes = Axes.Y,
 				Direction = FlexDirection.Vertical,
 				Wrapping = FlexWrapping.NoWrapping
 			}

@@ -32,7 +32,7 @@ public class DebugSelectPointer : Sprite
 		for (int i = 0; i < hoveredObjects.Count; i++)
 		{
 			var hoveredObject = hoveredObjects[i];
-			if (hoveredObject.Parent is not null && hoveredObject.Parent is not Composition)
+			if (hoveredObject.Parent is not null)
 			{
 				Editor.InspectObject(hoveredObject);
 				Editor.HighlightObject(hoveredObject);

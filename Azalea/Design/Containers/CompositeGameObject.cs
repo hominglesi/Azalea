@@ -1,7 +1,10 @@
 ﻿using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics;
+using Azalea.Graphics.Rendering;
 using Azalea.Layout;
 using Azalea.Lists;
+using Azalea.Numerics;
+using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -14,31 +17,21 @@ public partial class CompositeGameObject : GameObject
 	{
 		var childComparer = new ChildComparer(this);
 
-		internalChildren = new SortedList<GameObject>(childComparer);
+		_internalChildren = new SortedList<GameObject>(childComparer);
 
 		AddLayout(_childrenSizeDependencies);
 	}
 
-	private bool _masking;
-	public bool Masking
-	{
-		get => _masking;
-		set
-		{
-			if (_masking == value) return;
-
-			_masking = value;
-		}
-	}
+	public bool Masking { get; set; }
 
 	internal Boundary MaskingPadding = Boundary.Zero;
 
 	#region Parenting
 
-	private readonly SortedList<GameObject> internalChildren;
-	protected internal IReadOnlyList<GameObject> InternalChildren => internalChildren;
+	private readonly SortedList<GameObject> _internalChildren;
+	protected internal IReadOnlyList<GameObject> InternalChildren => _internalChildren;
 
-	private ulong currentChildID;
+	private ulong _currentChildID;
 
 	internal virtual void AddInternal(GameObject gameObject)
 	{
@@ -51,10 +44,10 @@ public partial class CompositeGameObject : GameObject
 		if (gameObject.ChildID != 0)
 			throw new InvalidOperationException($"Cannot add Game Object to multiple compositions.");
 
-		gameObject.ChildID = ++currentChildID;
+		gameObject.ChildID = ++_currentChildID;
 		gameObject.Parent = this;
 
-		internalChildren.Add(gameObject);
+		_internalChildren.Add(gameObject);
 
 		Invalidate(Invalidation.Presence, InvalidationSource.Child);
 
@@ -73,9 +66,9 @@ public partial class CompositeGameObject : GameObject
 		if (gameObject.Parent != null && gameObject.Parent != this)
 			throw new InvalidOperationException($@"Cannot call {nameof(IndexOfInternal)} for a drawable that already is a child of a different parent");
 
-		int index = internalChildren.IndexOf(gameObject);
+		int index = _internalChildren.IndexOf(gameObject);
 
-		if (index >= 0 && internalChildren[index].ChildID != gameObject.ChildID)
+		if (index >= 0 && _internalChildren[index].ChildID != gameObject.ChildID)
 			throw new InvalidOperationException(@$"A non-matching {nameof(GameObject)} was returned.");
 
 		return index;
@@ -89,7 +82,7 @@ public partial class CompositeGameObject : GameObject
 		if (index < 0)
 			return false;
 
-		internalChildren.RemoveAt(index);
+		_internalChildren.RemoveAt(index);
 
 		gameObject.Parent = null;
 
@@ -102,14 +95,14 @@ public partial class CompositeGameObject : GameObject
 
 	protected internal virtual void ClearInternal(bool disposeChildren = true)
 	{
-		if (internalChildren.Count == 0) return;
+		if (_internalChildren.Count == 0) return;
 
-		foreach (GameObject t in internalChildren)
+		foreach (GameObject t in _internalChildren)
 		{
 			t.Parent = null;
 		}
 
-		internalChildren.Clear();
+		_internalChildren.Clear();
 
 		if (AutoSizeAxes != Axes.None)
 			Invalidate(Invalidation.RequiredParentSizeToFit, InvalidationSource.Child);
@@ -123,42 +116,36 @@ public partial class CompositeGameObject : GameObject
 		if (index < 0)
 			throw new InvalidOperationException($"Can not change depth of an object which is not contained within this {nameof(CompositeGameObject)}.");
 
-		internalChildren.RemoveAt(index);
+		_internalChildren.RemoveAt(index);
 		ulong cId = child.ChildID;
 		child.ChildID = 0;
 		child.Depth = newDepth;
 		child.ChildID = cId;
 
-		internalChildren.Add(child);
+		_internalChildren.Add(child);
 	}
 
 	#endregion
-
-	protected virtual bool RequiresChildrenUpdate => true;
 
 	public override void UpdateSubTree()
 	{
 		base.UpdateSubTree();
 
-		for (int i = 0; i < internalChildren.Count; ++i)
-		{
-			internalChildren[i].UpdateSubTree();
-		}
+		for (int i = 0; i < _internalChildren.Count; ++i)
+			_internalChildren[i].UpdateSubTree();
 
 		UpdateAfterChildren();
 	}
+
+	protected virtual void UpdateAfterChildren() { }
 
 	public override void FixedUpdateSubTree()
 	{
 		base.FixedUpdateSubTree();
 
-		for (int i = 0; i < internalChildren.Count; ++i)
-		{
-			internalChildren[i].FixedUpdateSubTree();
-		}
+		for (int i = 0; i < _internalChildren.Count; ++i)
+			_internalChildren[i].FixedUpdateSubTree();
 	}
-
-	protected virtual void UpdateAfterChildren() { }
 
 	protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
 	{
@@ -171,7 +158,7 @@ public partial class CompositeGameObject : GameObject
 		if (invalidation == Invalidation.None)
 			return anyInvalidated;
 
-		IReadOnlyList<GameObject> targetChildren = internalChildren;
+		IReadOnlyList<GameObject> targetChildren = _internalChildren;
 
 		for (int i = 0; i < targetChildren.Count; ++i)
 		{
@@ -192,44 +179,26 @@ public partial class CompositeGameObject : GameObject
 		return base.OnInvalidate(invalidation, source);
 	}
 
-	protected override DrawNode CreateDrawNode() => new CompositeGameObjectDrawNode(this);
-
-	public override DrawNode? GenerateDrawNodeSubtree()
+	public override void Draw(IRenderer renderer)
 	{
-		var drawNode = base.GenerateDrawNodeSubtree();
-
-		if ((drawNode is ICompositeDrawNode compositeNode) == false)
-			return null;
-
-		compositeNode.Children ??= new List<DrawNode>();
-
-		int j = 0;
-		addFromComposite(ref j, this, compositeNode.Children);
-
-		if (j < compositeNode.Children.Count)
-			compositeNode.Children.RemoveRange(j, compositeNode.Children.Count - j);
-
-		return drawNode;
-	}
-
-	private static void addFromComposite(ref int j, CompositeGameObject parentComposite, List<DrawNode> target)
-	{
-		var children = parentComposite.internalChildren;
-
-		for (int i = 0; i < children.Count; i++)
+		if (Masking)
 		{
-			var drawable = children[i];
-
-			DrawNode? next = drawable.GenerateDrawNodeSubtree();
-			if (next == null) continue;
-
-			if (j < target.Count)
-				target[j] = next;
-			else
-				target.Add(next);
-
-			j++;
+			var newScissor = (RectangleInt)ScreenSpaceDrawQuad;
+			if (MaskingPadding != Boundary.Zero)
+			{
+				newScissor.X -= MathUtils.Ceiling(MaskingPadding.Left);
+				newScissor.Width += MathUtils.Ceiling(MaskingPadding.Horizontal);
+				newScissor.Y -= MathUtils.Ceiling(MaskingPadding.Top);
+				newScissor.Height += MathUtils.Ceiling(MaskingPadding.Vertical);
+			}
+			renderer.PushScissor(newScissor);
 		}
+
+		foreach (var child in _internalChildren)
+			child.Draw(renderer);
+
+		if (Masking)
+			renderer.PopScissor();
 	}
 
 	private Boundary _padding;
@@ -242,7 +211,7 @@ public partial class CompositeGameObject : GameObject
 
 			_padding = value;
 
-			foreach (GameObject c in internalChildren)
+			foreach (GameObject c in _internalChildren)
 				c.Invalidate(c.InvalidationFromParentSize | Invalidation.MiscGeometry);
 		}
 	}
@@ -289,6 +258,7 @@ public partial class CompositeGameObject : GameObject
 		{
 			if (_isComputingChildrenSizeDependencies == false && AutoSizeAxes.HasFlagFast(Axes.X))
 				updateChildrenSizeDependencies();
+
 			return base.Width;
 		}
 		set
@@ -306,6 +276,7 @@ public partial class CompositeGameObject : GameObject
 		{
 			if (_isComputingChildrenSizeDependencies == false && AutoSizeAxes.HasFlagFast(Axes.Y))
 				updateChildrenSizeDependencies();
+
 			return base.Height;
 		}
 		set
@@ -323,6 +294,7 @@ public partial class CompositeGameObject : GameObject
 		{
 			if (_isComputingChildrenSizeDependencies == false && AutoSizeAxes != Axes.None)
 				updateChildrenSizeDependencies();
+
 			return base.Size;
 		}
 		set
@@ -335,7 +307,6 @@ public partial class CompositeGameObject : GameObject
 	}
 
 	private bool _isComputingChildrenSizeDependencies;
-
 	private void updateChildrenSizeDependencies()
 	{
 		_isComputingChildrenSizeDependencies = true;
@@ -414,10 +385,8 @@ public partial class CompositeGameObject : GameObject
 		if (base.BuildNonPositionalInputQueue(queue) == false)
 			return false;
 
-		foreach (var child in internalChildren)
-		{
+		foreach (var child in _internalChildren)
 			child.BuildNonPositionalInputQueue(queue);
-		}
 
 		return true;
 	}
@@ -427,10 +396,8 @@ public partial class CompositeGameObject : GameObject
 		if (base.BuildPositionalInputQueue(screenSpacePos, queue) == false)
 			return false;
 
-		foreach (var child in internalChildren)
-		{
+		foreach (var child in _internalChildren)
 			child.BuildPositionalInputQueue(screenSpacePos, queue);
-		}
 
 		return true;
 	}

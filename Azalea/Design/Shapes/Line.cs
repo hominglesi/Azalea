@@ -15,9 +15,7 @@ public class Line : GameObject
 
 	public float Thickness { get; set; } = 3;
 
-	protected override DrawNode CreateDrawNode() => new LineDrawNode(this);
-
-	private class LineDrawNode : DrawNode
+	public override void Draw(IRenderer renderer)
 	{
 		protected new Line Source => (Line)base.Source;
 

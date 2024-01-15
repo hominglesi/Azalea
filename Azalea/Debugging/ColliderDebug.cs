@@ -14,7 +14,6 @@ public class ColliderDebug : GameObject
 {
 	public bool IsShown { get; set; }
 	private bool _isToggled = false;
-	protected override DrawNode CreateDrawNode() => new ColliderDebugDrawNode(this);
 
 	protected override void Update()
 	{
@@ -22,42 +21,23 @@ public class ColliderDebug : GameObject
 			_isToggled = !_isToggled;
 
 		IsShown = _isToggled || (Input.GetKey(Keys.W).Pressed && Input.GetKey(Keys.ControlLeft).Pressed);
-
 	}
 
-	private class ColliderDebugDrawNode : DrawNode
+	public override void Draw(IRenderer renderer)
 	{
-		protected new ColliderDebug Source => (ColliderDebug)base.Source;
-		public bool IsShown { get; set; }
-
-		public ColliderDebugDrawNode(IGameObject source)
-			: base(source) { }
-
-		public override void ApplyState()
+		if (IsShown)
 		{
-			base.ApplyState();
+			foreach (var collider in ComponentStorage<RectCollider>.GetComponents())
+      {
+        var colliderRect = new Rectangle(Vector2.Zero, new(collider.SideA, collider.SideB));
+        var matrix = collider.Parent.Parent.DrawInfo.Matrix;
+        MatrixExtentions.TranslateFromLeft(ref matrix, collider.Position);
+        float radians = MathUtils.DegreesToRadians(collider.Parent.Rotation);
+        MatrixExtentions.RotateFromLeft(ref matrix, radians);
+        MatrixExtentions.TranslateFromLeft(ref matrix, -(colliderRect.Size * ComputeAnchorPosition(collider.Parent.Origin)));
 
-			IsShown = Source.IsShown;
-		}
-
-		public override void Draw(IRenderer renderer)
-		{
-			base.Draw(renderer);
-
-			if (IsShown)
-			{
-				foreach (var collider in ComponentStorage<RectCollider>.GetComponents())
-				{
-					var colliderRect = new Rectangle(Vector2.Zero, new(collider.SideA, collider.SideB));
-					var matrix = collider.Parent.Parent.DrawInfo.Matrix;
-					MatrixExtentions.TranslateFromLeft(ref matrix, collider.Position);
-					float radians = MathUtils.DegreesToRadians(collider.Parent.Rotation);
-					MatrixExtentions.RotateFromLeft(ref matrix, radians);
-					MatrixExtentions.TranslateFromLeft(ref matrix, -(colliderRect.Size * ComputeAnchorPosition(collider.Parent.Origin)));
-
-					renderer.DrawRectangle(colliderRect, matrix, new Boundary(4), new DrawColorInfo(new Color(20, 255, 20)), false);
-				}
-			}
+        renderer.DrawRectangle(colliderRect, matrix, new Boundary(4), new DrawColorInfo(new Color(20, 255, 20)), false);
+      }
 		}
 	}
 }

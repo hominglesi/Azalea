@@ -6,6 +6,7 @@ using Azalea.Extentions;
 using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Primitives;
+using Azalea.Graphics.Rendering;
 using Azalea.Inputs.Events;
 using Azalea.Layout;
 using Azalea.Numerics;
@@ -21,11 +22,124 @@ public abstract partial class GameObject : Amendable, IGameObject
 	public GameObject()
 	{
 		AddLayout(_drawInfoBacking);
-		addTransform();
 	}
 
 	public event Action<GameObject>? OnUpdate;
 	internal event Action<GameObject, Invalidation>? Invalidated;
+
+	#region Transform
+
+	private float _x;
+	[HideInInspector]
+	public float X
+	{
+		get => _x;
+		set
+		{
+			if (value == _x) return;
+
+			_x = value;
+
+			Invalidate(Invalidation.MiscGeometry);
+		}
+	}
+
+	private float _y;
+	[HideInInspector]
+	public float Y
+	{
+		get => _y;
+		set
+		{
+			if (value == _y) return;
+
+			_y = value;
+
+			Invalidate(Invalidation.MiscGeometry);
+		}
+	}
+
+	public Vector2 Position
+	{
+		get => new(_x, _y);
+		set
+		{
+			if (value == Position) return;
+
+			_x = value.X;
+			_y = value.Y;
+
+			Invalidate(Invalidation.MiscGeometry);
+		}
+	}
+
+	private float _width;
+	[HideInInspector]
+	public virtual float Width
+	{
+		get => _width;
+		set
+		{
+			if (value == _width) return;
+
+			_width = value;
+
+			invalidateParentSizeDependencies(Invalidation.DrawSize, Axes.X);
+		}
+	}
+
+	private float _height;
+	[HideInInspector]
+	public virtual float Height
+	{
+		get => _height;
+		set
+		{
+			if (value == _height) return;
+
+			_height = value;
+
+			invalidateParentSizeDependencies(Invalidation.DrawSize, Axes.Y);
+		}
+	}
+
+	public virtual Vector2 Size
+	{
+		get => new(_width, _height);
+		set
+		{
+			if (value == Size) return;
+
+			var changedAxes = Axes.None;
+
+			if (_width != value.X)
+				changedAxes |= Axes.X;
+
+			if (_height != value.Y)
+				changedAxes |= Axes.Y;
+
+			_width = value.X;
+			_height = value.Y;
+
+			invalidateParentSizeDependencies(Invalidation.DrawSize, changedAxes);
+		}
+	}
+
+	private float _rotation;
+	public float Rotation
+	{
+		get => _rotation;
+		set
+		{
+			if (value == _rotation) return;
+
+			_rotation = value;
+
+			Invalidate(Invalidation.MiscGeometry);
+		}
+	}
+
+	#endregion
 
 	public virtual void UpdateSubTree()
 	{
@@ -441,7 +555,10 @@ public abstract partial class GameObject : Amendable, IGameObject
 		}
 	}
 
-	protected virtual DrawNode CreateDrawNode() => new(this);
+	public virtual void Draw(IRenderer renderer)
+	{
+
+	}
 
 	public DrawInfo DrawInfo
 	{
@@ -770,15 +887,6 @@ public abstract partial class GameObject : Amendable, IGameObject
 		info.Color.ApplyChild(colorInfo);
 
 		return info;
-	}
-
-	private DrawNode? drawNode;
-
-	public virtual DrawNode? GenerateDrawNodeSubtree()
-	{
-		drawNode ??= CreateDrawNode();
-
-		return drawNode;
 	}
 }
 

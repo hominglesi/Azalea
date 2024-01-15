@@ -2,7 +2,7 @@
 using Azalea.Graphics;
 
 namespace Azalea.Debugging;
-public class DebugInspector : Composition
+public class DebugInspector : FlexContainer
 {
 	private GameObject? _observedObject;
 
@@ -11,20 +11,15 @@ public class DebugInspector : Composition
 
 	public DebugInspector()
 	{
-		Padding = new Boundary(5);
+		Wrapping = FlexWrapping.NoWrapping;
+		Direction = FlexDirection.Vertical;
+		RelativeSizeAxes = Axes.X;
+		AutoSizeAxes = Axes.Y;
 		AddRange(new GameObject[]
 		{
 			_properties = new DebugProperties()
 			{
-				RelativeSizeAxes = Axes.Both,
-				Size = new(1, 0.6f)
-			},
-			_console = new DebugConsole()
-			{
-				RelativeSizeAxes = Axes.Both,
-				Size = new(1, 0.4f),
-				RelativePositionAxes = Axes.Both,
-				Position = new(0, 0.6f)
+				RelativeSizeAxes = Axes.X,
 			}
 		});
 	}
