@@ -3,7 +3,7 @@
 namespace Azalea.Platform.Windows;
 
 [Flags]
-internal enum WindowStylesEx : uint
+internal enum ClassStyles : uint
 {
-
+	OwnDC = 0x20,
 }

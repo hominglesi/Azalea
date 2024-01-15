@@ -11,6 +11,13 @@ internal static unsafe class GL
 {
 	private const string LibraryPath = "opengl32.dll";
 
+	[DllImport(LibraryPath, EntryPoint = "wglCreateContext")]
+	public static extern IntPtr CreateContext(IntPtr deviceContext);
+
+	[DllImport(LibraryPath, EntryPoint = "wglMakeCurrent")]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static extern bool MakeCurrent(IntPtr deviceContext, IntPtr glContext);
+
 	[DllImport(LibraryPath, EntryPoint = "glGetString")]
 	private static extern IntPtr getString(GLStringName name);
 	public static string GetString(GLStringName name)

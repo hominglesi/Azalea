@@ -3,7 +3,7 @@
 namespace Azalea.Platform.Windows;
 
 [Flags]
-internal enum ClassStyles : uint
+internal enum WindowStylesEx : uint
 {
-
+	ContextHelp = 0x00000400,
 }
