@@ -26,6 +26,13 @@ public class PhysicsGenerator
 
 	public void Update(IEnumerable<RigidBody> bodies)
 	{
+		if (DebugMode)
+		{
+			foreach (var rb in bodies)
+			{
+				rb.Parent.Color = Palette.Black;
+			}
+		}
 		RigidBodies.Clear();
 		RigidBodies.AddRange(bodies);
 		foreach (var rb in bodies)
@@ -73,6 +80,8 @@ public class PhysicsGenerator
 		//rb.AngularVelocity += rb.AngularAcceleration;
 		//rb.Rotation += rb.AngularVelocity;
 
+
+
 		int numOfAttempts = 1 + (int)MathF.Ceiling(rb.Velocity.Length() / rb.Parent.GetComponent<Collider>().ShortestDistance);
 		for (int i = 0; i < numOfAttempts; i++)
 		{
@@ -86,6 +95,7 @@ public class PhysicsGenerator
 	public bool CheckCollisions(Collider currentCollider, IEnumerable<Collider> colliders, bool shouldResolveCollision = false)
 	{
 		bool isColliding = false;
+
 		foreach (Collider otherCollider in colliders)
 		{
 			bool collided = false;
@@ -183,16 +193,29 @@ public class PhysicsGenerator
 			}
 			return true;
 		}
-		if (DebugMode)
-		{
-			circle.Parent.Color = Palette.Black;
-			rect.Parent.Color = Palette.Black;
-		}
 		return false;
 	}
 
 	private bool CheckRectOnRectCollision(RectCollider rect1, RectCollider rect2, bool shouldResolveCollision)
 	{
+		if (rect1.Position.X - rect1.SideA / 2 <= rect2.Position.X + rect2.SideA / 2 &&
+			rect1.Position.X + rect1.SideA / 2 >= rect2.Position.X - rect2.SideA / 2 &&
+			 rect1.Position.Y - rect1.SideB / 2 <= rect2.Position.Y + rect2.SideB / 2 &&
+			rect1.Position.Y + rect1.SideB / 2 >= rect2.Position.Y - rect2.SideB / 2)
+		{
+			if (DebugMode)
+			{
+				rect1.Parent.Color = Palette.Red;
+				rect2.Parent.Color = Palette.Red;
+			}
+
+			float penetrationX = Math.Abs(rect1.Position.X - rect2.Position.X) - rect1.SideA / 2 - rect2.SideA / 2;
+			float penetrationY = Math.Abs(rect1.Position.Y - rect2.Position.Y) - rect1.SideB / 2 - rect2.SideB / 2;
+
+			if (rect1.IsTrigger == false && rect2.IsTrigger == false && shouldResolveCollision)
+				ResolveRectOnRectCollision(rect1, rect2, penetrationX, penetrationY);
+			return true;
+		}
 		return false;
 	}
 
@@ -275,5 +298,35 @@ public class PhysicsGenerator
 		rbRect.Mome
 		float angularVelocityRect = Vector2Extentions(radiusRect, -collisionNormal * impulse) / rbRect.MomentOfInertia;*/
 
+	}
+	private void ResolveRectOnRectCollision(RectCollider rect1, RectCollider rect2, float penetrationX, float penetrationY)
+	{
+		float displacementX = -penetrationX;
+		float displacementY = -penetrationY;
+		Console.WriteLine($"Displacement: {displacementX}");
+		if (penetrationX > penetrationY)
+		{
+			if (rect1.Position.X <= rect2.Position.X)
+				displacementX *= -1;
+			if (rect1.Parent.GetComponent<RigidBody>().IsDynamic)
+				rect1.Position += new Vector2(displacementX / 2, 0);
+			else
+				displacementX *= 2;
+
+			if (rect2.Parent.GetComponent<RigidBody>().IsDynamic)
+				rect2.Position += new Vector2(-1 * displacementX / 2, 0);
+		}
+		else
+		{
+			if (rect1.Position.Y <= rect2.Position.Y)
+				displacementY *= -1;
+			if (rect1.Parent.GetComponent<RigidBody>().IsDynamic)
+				rect1.Position += new Vector2(0, displacementY / 2);
+			else
+				displacementY *= 2;
+
+			if (rect2.Parent.GetComponent<RigidBody>().IsDynamic)
+				rect2.Position += new Vector2(0, -1 * displacementY / 2);
+		}
 	}
 }
