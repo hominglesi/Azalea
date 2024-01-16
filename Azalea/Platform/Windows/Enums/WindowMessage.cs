@@ -7,7 +7,6 @@ internal enum WindowMessage : uint
 	/// A window receives this message through its <see cref="WindowProcedure"/> function.
 	/// </summary>
 	Size = 5,
-
 	/// <summary>
 	/// The <see cref="Paint"/> message is sent when the system or another application makes a request to
 	/// paint a portion of an application's window. The message is sent when the <see cref="WinAPI.UpdateWindow"/>
@@ -31,7 +30,7 @@ internal enum WindowMessage : uint
 	/// the message is sent to the window beneath the cursor. Otherwise, the message is sent to the window
 	/// that has captured the mouse. A window receives this message through its <see cref="WindowProcedure"/> function.
 	/// </summary>
-	NonclientHittest = 132,
+	NonclientHitTest = 132,
 	/// <summary>
 	/// Posted when the user releases the left mouse button while the cursor is within the nonclient area of a window.
 	/// This message is posted to the window that contains the cursor.
@@ -39,6 +38,18 @@ internal enum WindowMessage : uint
 	/// A window receives this message through its <see cref="WindowProcedure"/> function.
 	/// </summary>
 	NonclientLeftButtonUp = 162,
+	/// <summary>
+	/// Sent to the window that registered to receive raw input.
+	/// Raw input notifications are available only after the application calls
+	/// <see cref="WinAPI.RegisterRawInputDevices"/> with <see cref="RawInputDeviceFlags.DevNotify"/> flag.
+	/// A window receives this message through its WindowProc function.
+	/// </summary>
+	InputDeviceChange = 254,
+	/// <summary>
+	/// Sent to the window that is getting raw input.
+	/// A window receives this message through its <see cref="WindowProcedure"/> function.
+	/// </summary>
+	Input = 255,
 	/// <summary>
 	/// A window receives this message when the user chooses a command from the Window menu
 	/// (formerly known as the system or control menu) or when the user chooses the maximize button, minimize button,

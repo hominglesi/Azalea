@@ -37,12 +37,19 @@ internal static class WinAPI
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool EnableWindow(IntPtr window, bool enable);
 
+	[DllImport(User32Path, EntryPoint = "GetCursorPos")]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static extern bool GetCursorPos(out Vector2Int point);
+
 	[DllImport(User32Path, EntryPoint = "GetDC")]
 	public static extern IntPtr GetDC(IntPtr window);
 
 	[DllImport(User32Path, EntryPoint = "GetMessageW", CharSet = CharSet.Unicode)]
 	private static extern sbyte getMessage(out Message message, IntPtr window, uint wMsgFilterMin, uint wMsgFilterMax);
 	public static sbyte GetMessage(out Message message, IntPtr window) => getMessage(out message, window, 0, 0);
+
+	[DllImport(User32Path, EntryPoint = "GetRawInputData")]
+	public static extern uint GetRawInputData(IntPtr rawInput, uint command, ref RawInput data, ref uint dataSize, uint headerSize);
 
 	[DllImport(User32Path, EntryPoint = "GetWindowRect")]
 	[return: MarshalAs(UnmanagedType.Bool)]
@@ -74,6 +81,13 @@ internal static class WinAPI
 
 	[DllImport(User32Path, EntryPoint = "RegisterClassExW", CharSet = CharSet.Unicode)]
 	public static extern ushort RegisterClass([In] ref WindowClass windowClass);
+
+	[DllImport(User32Path, EntryPoint = "RegisterRawInputDevices", SetLastError = true)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static extern bool RegisterRawInputDevices([In] ref RawInputDevice devices, uint count, uint size);
+
+	[DllImport(User32Path, EntryPoint = "ScreenToClient")]
+	public static extern bool ScreenToClient(IntPtr window, ref Vector2Int point);
 
 	[DllImport(Gdi32Path, EntryPoint = "SetPixelFormat")]
 	[return: MarshalAs(UnmanagedType.Bool)]

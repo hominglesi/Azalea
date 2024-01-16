@@ -68,10 +68,6 @@ internal class Win32Window : PlatformWindow
 
 				_clientSize = size;
 				return IntPtr.Zero;
-			case WindowMessage.MouseMove:
-				Console.WriteLine(BitwiseUtils.SplitValue(lParam));
-				Input.HandleMousePositionChange(BitwiseUtils.SplitValue(lParam));
-				break;
 		}
 
 		return WinAPI.DefWindowProc(window, message, wParam, lParam);
@@ -90,6 +86,8 @@ internal class Win32Window : PlatformWindow
 		return (IntPtr)1;
 	}*/
 
+	private Vector2Int _mousePosition;
+
 	public override void ProcessEvents()
 	{
 		while (WinAPI.PeekMessage(out Message message, _handle) != 0)
@@ -97,6 +95,11 @@ internal class Win32Window : PlatformWindow
 			WinAPI.TranslateMessage(ref message);
 			WinAPI.DispatchMessage(ref message);
 		}
+
+		//Update mouse position
+		WinAPI.GetCursorPos(out _mousePosition);
+		WinAPI.ScreenToClient(_handle, ref _mousePosition);
+		Input.HandleMousePositionChange(_mousePosition);
 	}
 
 	#region Implementations
