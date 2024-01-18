@@ -64,33 +64,54 @@ internal class Win32Window : PlatformWindow
 				Close();
 				return IntPtr.Zero;
 			case WindowMessage.Size:
-				var size = BitwiseUtils.SplitValue(lParam);
+				_clientSize = BitwiseUtils.SplitValue(lParam);
+				break;
+			//Mouse Input
+			case WindowMessage.LeftButtonDown:
+				Input.HandleMouseButtonStateChange(MouseButton.Left, true); break;
+			case WindowMessage.LeftButtonUp:
+				Input.HandleMouseButtonStateChange(MouseButton.Left, false); break;
+			case WindowMessage.RightButtonDown:
+				Input.HandleMouseButtonStateChange(MouseButton.Right, true); break;
+			case WindowMessage.RightButtonUp:
+				Input.HandleMouseButtonStateChange(MouseButton.Right, false); break;
+			case WindowMessage.MiddleButtonDown:
+				Input.HandleMouseButtonStateChange(MouseButton.Middle, true); break;
+			case WindowMessage.MiddleButtonUp:
+				Input.HandleMouseButtonStateChange(MouseButton.Middle, false); break;
+			case WindowMessage.XButtonDown:
+				var xButtonDown = MouseButton.Middle + BitwiseUtils.GetHighOrderValue(wParam);
+				Input.HandleMouseButtonStateChange(xButtonDown, true); break;
+			case WindowMessage.XButtonUp:
+				var xButtonUp = MouseButton.Middle + BitwiseUtils.GetHighOrderValue(wParam);
+				Input.HandleMouseButtonStateChange(xButtonUp, false); break;
+			case WindowMessage.MouseWheel:
+				var delta = BitwiseUtils.GetHighOrderValue(wParam) / 120;
+				Input.HandleScroll(delta); break;
 
-				_clientSize = size;
-				return IntPtr.Zero;
+			//Keyboad Input
+			case WindowMessage.Char:
+				Input.HandleTextInput((char)wParam); break;
+			case WindowMessage.KeyDown:
+				var isRepeat = BitwiseUtils.GetSpecificBit(lParam, 31);
+				var key = WindowsExtentions.KeycodeToKey((int)wParam);
+				if (isRepeat)
+					Input.HandleKeyboardKeyRepeat(key);
+				else
+					Input.HandleKeyboardKeyStateChange(key, true);
+				break;
+			case WindowMessage.KeyUp:
+				Input.HandleKeyboardKeyStateChange(WindowsExtentions.KeycodeToKey((int)wParam), false); break;
 		}
 
 		return WinAPI.DefWindowProc(window, message, wParam, lParam);
 	}
-	/*
-	private IntPtr handleNonclientHitTest(IntPtr window, IntPtr lParam, int titleHeight, int resizeBorderSize)
-	{
-		var rect = WinAPI.GetWindowRect(_handle);
-		var pos = BitwiseUtils.SplitValue(lParam) - rect.Position;
-
-		var titleRect = new RectangleInt(0, 0, rect.Width, titleHeight);
-
-		var left = new RectangleInt(0, titleHeight, resizeBorderSize, rect.Height - titleHeight - resizeBorderSize);
-		if (left.Contains(pos)) return (IntPtr)10;
-
-		return (IntPtr)1;
-	}*/
 
 	private Vector2Int _mousePosition;
 
 	public override void ProcessEvents()
 	{
-		while (WinAPI.PeekMessage(out Message message, _handle) != 0)
+		while (WinAPI.PeekMessage(out Message message, IntPtr.Zero) != 0)
 		{
 			WinAPI.TranslateMessage(ref message);
 			WinAPI.DispatchMessage(ref message);
