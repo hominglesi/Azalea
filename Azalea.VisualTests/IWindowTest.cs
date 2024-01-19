@@ -47,9 +47,6 @@ public class IWindowTest : TestScene
 					"Set Title to ''",
 					() => _window.Title = ""),
 				CreateActionButton(
-					"Attempt to Close Window",
-					() => _window.Close()),
-				CreateActionButton(
 					"Set this test to prevent Closing",
 					() => _preventsClosure = true),
 				CreateActionButton(
@@ -58,6 +55,9 @@ public class IWindowTest : TestScene
 				CreateActionButton(
 					"Set icon to Azalea flower",
 					() => _window.SetIconFromStream(Assets.GetStream("Textures/azalea-icon.png")!)),
+				CreateActionButton(
+					"Set icon to Missing texture",
+					() => _window.SetIconFromStream(Assets.GetStream("Textures/missing-texture.png")!)),
 				CreateActionButton(
 					"Set icon to null",
 					() => _window.SetIconFromStream(null)),

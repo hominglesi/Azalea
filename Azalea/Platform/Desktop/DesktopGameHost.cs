@@ -18,7 +18,14 @@ internal class DesktopGameHost : GameHost
 
 	public DesktopGameHost(HostPreferences preferences)
 	{
-		_window = new Win32Window();
+		_window = new Win32Window(
+			preferences.WindowTitle,
+			preferences.PreferredClientSize,
+			preferences.PreferredWindowState,
+			preferences.WindowVisible,
+			preferences.WindowResizable,
+			preferences.DecoratedWindow,
+			preferences.TransparentFramebuffer);
 		/*
 		_window = new GLFWWindow(
 			preferences.WindowTitle,

@@ -1,7 +1,6 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.OpenGL;
 using Azalea.Inputs;
-using Azalea.Numerics;
 using Azalea.Utils;
 using System;
 using System.Runtime.InteropServices;
@@ -12,9 +11,13 @@ internal class Win32Window : PlatformWindow
 	private readonly IntPtr _handle;
 	private readonly IntPtr _deviceContext;
 
-	public Win32Window()
+	private WindowStyles _style;
+
+	public Win32Window(string title, Vector2Int preferredClientSize, WindowState state,
+		bool visible, bool resizable, bool decorated, bool transparentFramebuffer)
 	{
 		var programHandle = System.Diagnostics.Process.GetCurrentProcess().Handle;
+
 		var cursor = WinAPI.LoadCursor(IntPtr.Zero, 32512);
 		_windowProcedure = windowProcedure;
 		var wndClass = new WindowClass("Azalea Window", programHandle, _windowProcedure)
@@ -23,20 +26,23 @@ internal class Win32Window : PlatformWindow
 			Cursor = cursor
 		};
 
-		WinRectangle clientRectangle = new RectangleInt(0, 0, 1280, 720);
-		WinAPI.AdjustWindowRect(ref clientRectangle, WindowStyles.OverlappedWindow, false, 0);
-		RectangleInt windowRectangle = clientRectangle;
+		WinRectangle windowRect = new(100, 100, preferredClientSize.X, preferredClientSize.Y);
+		_style = WindowStyles.Caption | WindowStyles.SysMenu | WindowStyles.MinimizeBox | WindowStyles.SizeBox;
+
+		if (visible) _style |= WindowStyles.Visible;
+
+		WinAPI.AdjustWindowRect(ref windowRect, _style, false, 0);
 
 		var id = WinAPI.RegisterClass(ref wndClass);
 		_handle = WinAPI.CreateWindow(
 			0,
 			id,
-			"Azalea Window",
-			WindowStyles.Caption | WindowStyles.SysMenu | WindowStyles.MinimizeBox | WindowStyles.SizeBox,
-			0,
-			0,
-			clientRectangle.Width,
-			clientRectangle.Height,
+			title,
+			_style,
+			windowRect.X,
+			windowRect.Y,
+			windowRect.Width,
+			windowRect.Height,
 			IntPtr.Zero,
 			IntPtr.Zero,
 			programHandle,
@@ -48,20 +54,11 @@ internal class Win32Window : PlatformWindow
 			return;
 		}
 
-		Console.WriteLine(WinAPI.GetWindowRect(_handle));
-		Console.WriteLine(WinAPI.GetClientRect(_handle));
-
-		var styles = WindowStyles.Caption | WindowStyles.SysMenu | WindowStyles.MinimizeBox;
-		WinAPI.SetWindowLong(_handle, WindowLongValue.Style, (uint)styles);
-
-		Console.WriteLine(WinAPI.GetWindowRect(_handle));
-		Console.WriteLine(WinAPI.GetClientRect(_handle));
-
-		var styles2 = WindowStyles.Caption | WindowStyles.SysMenu | WindowStyles.MinimizeBox | WindowStyles.SizeBox;
-		WinAPI.SetWindowLong(_handle, WindowLongValue.Style, (uint)styles2);
-
-		Console.WriteLine(WinAPI.GetWindowRect(_handle));
-		Console.WriteLine(WinAPI.GetClientRect(_handle));
+		if (resizable == false)
+		{
+			_style &= ~WindowStyles.SizeBox;
+			WinAPI.SetWindowStyle(_handle, _style);
+		}
 
 		_deviceContext = WinAPI.GetDC(_handle);
 
@@ -72,6 +69,10 @@ internal class Win32Window : PlatformWindow
 
 		var glContext = GL.CreateContext(_deviceContext);
 		GL.MakeCurrent(_deviceContext, glContext);
+
+		_title = title;
+		_visible = visible;
+		_resizable = resizable;
 	}
 
 	private readonly WindowProcedure _windowProcedure;
@@ -157,7 +158,17 @@ internal class Win32Window : PlatformWindow
 	protected override void SetClientSizeImplementation(int width, int height)
 		=> WinAPI.SetWindowPos(_handle, IntPtr.Zero, 0, 0, width, height, (uint)SetWindowPosFlags.NoMove);
 	protected override void SetDecoratedImplementation(bool enabled) { }
-	protected override void SetIconImplementation(Image? data) { }
+	protected override void SetIconImplementation(Image? data)
+	{
+		if (data is null)
+		{
+			WinAPI.SetWindowIcons(_handle, IntPtr.Zero);
+			return;
+		}
+
+		var icon = WinAPI.CreateIconFromImage(_deviceContext, data);
+		WinAPI.SetWindowIcons(_handle, icon);
+	}
 	protected override void SetOpacityImplementation(float opacity) { }
 	protected override void SetPositionImplementation(int x, int y)
 		=> WinAPI.SetWindowPos(_handle, IntPtr.Zero, x, y, 0, 0, (uint)SetWindowPosFlags.NoSize);
@@ -189,7 +200,8 @@ internal class Win32Window : PlatformWindow
 		WinAPI.SetWindowPos(_handle, IntPtr.Zero, rect.X, rect.Y, rect.Width, rect.Height, (uint)setPosFlags);
 	}
 	protected override void SetShouldCloseImplementation(bool shouldClose) { }
-	protected override void SetTitleImplementation(string title) { }
+	protected override void SetTitleImplementation(string title)
+		=> WinAPI.SetWindowText(_handle, title);
 	protected override void SetVisibleImplementation(bool visible)
 		=> WinAPI.ShowWindow(_handle, visible ? ShowWindowCommand.Show : ShowWindowCommand.Hide);
 	protected override void SetVSyncImplementation(bool enabled) { }

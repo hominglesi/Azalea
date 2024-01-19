@@ -35,6 +35,11 @@ internal enum WindowMessage : uint
 	/// </summary>
 	WindowPosChanging = 70,
 	/// <summary>
+	/// Associates a new large or small icon with a window.
+	/// The system displays the large icon in the ALT+TAB dialog box, and the small icon in the window caption.
+	/// </summary>
+	SetIcon = 128,
+	/// <summary>
 	/// Sent when the size and position of a window's client area must be calculated.
 	/// By processing this message, an application can control the content of
 	/// the window's client area when the size or position of the window changes.

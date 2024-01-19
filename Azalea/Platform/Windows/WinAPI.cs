@@ -1,4 +1,5 @@
-﻿using Azalea.Numerics;
+﻿using Azalea.Graphics;
+using Azalea.Numerics;
 using System;
 using System.Runtime.InteropServices;
 
@@ -12,6 +13,61 @@ internal static class WinAPI
 	[DllImport(User32Path, EntryPoint = "AdjustWindowRectEx")]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool AdjustWindowRect(ref WinRectangle rect, WindowStyles style, bool menu, WindowStylesEx exStyle);
+
+	[DllImport(Gdi32Path, EntryPoint = "CreateBitmap")]
+	public static extern IntPtr CreateBitmap(
+		int width,
+		int height,
+		uint planes,
+		uint bitCount,
+		ref byte data);
+
+	[DllImport(Gdi32Path, EntryPoint = "CreateCompatibleBitmap")]
+	public static extern IntPtr CreateCompatibleBitmap(IntPtr deviceContext, int width, int height);
+
+	public static IntPtr CreateIconFromImage(IntPtr deviceContext, Image image)
+	{
+		//Windows expects BGRA pixels so we have to swap them
+		var swappedBuffer = new byte[image.Data.Length];
+
+		for (int i = 0; i < image.Data.Length; i += 4)
+		{
+			swappedBuffer[i] = image.Data[i + 2];
+			swappedBuffer[i + 1] = image.Data[i + 1];
+			swappedBuffer[i + 2] = image.Data[i];
+			swappedBuffer[i + 3] = image.Data[i + 3];
+		}
+
+		IntPtr color = CreateBitmap(image.Width, image.Height, 1, 32, ref swappedBuffer[0]);
+		if (color == IntPtr.Zero)
+		{
+			Console.WriteLine("Failed to create bitmap");
+			return IntPtr.Zero;
+		}
+
+		IntPtr mask = CreateCompatibleBitmap(deviceContext, image.Width, image.Height);
+		if (mask == IntPtr.Zero)
+		{
+			Console.WriteLine("Failed to create mask");
+			DeleteObject(color);
+			return IntPtr.Zero;
+		}
+
+		var iconInfo = new IconInfo(true, mask, color);
+
+		var hIcon = CreateIconIndirect(ref iconInfo);
+		if (mask == IntPtr.Zero)
+		{
+			Console.WriteLine("Failed to create icon");
+		}
+		DeleteObject(color);
+		DeleteObject(mask);
+
+		return hIcon;
+	}
+
+	[DllImport(User32Path, EntryPoint = "CreateIconIndirect")]
+	public static extern IntPtr CreateIconIndirect(ref IconInfo info);
 
 	[DllImport(Gdi32Path, EntryPoint = "ChoosePixelFormat")]
 	public static extern int ChoosePixelFormat(IntPtr deviceContext, [In] ref PixelFormatDescriptor descriptor);
@@ -33,6 +89,10 @@ internal static class WinAPI
 
 	[DllImport(User32Path, EntryPoint = "DefWindowProcW", CharSet = CharSet.Unicode)]
 	public static extern IntPtr DefWindowProc(IntPtr window, uint message, IntPtr wParam, IntPtr lParam);
+
+	[DllImport(Gdi32Path, EntryPoint = "DeleteObject")]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static extern bool DeleteObject(IntPtr obj);
 
 	[DllImport(User32Path, EntryPoint = "DispatchMessageW", CharSet = CharSet.Unicode)]
 	public static extern IntPtr DispatchMessage([In] ref Message message);
@@ -105,6 +165,16 @@ internal static class WinAPI
 	[DllImport(User32Path, EntryPoint = "ScreenToClient")]
 	public static extern bool ScreenToClient(IntPtr window, ref Vector2Int point);
 
+	[DllImport(User32Path, EntryPoint = "SendMessage")]
+	public static extern IntPtr SendMessage(IntPtr window, WindowMessage message, IntPtr wParam, IntPtr lParam);
+
+	public static void SetWindowIcons(IntPtr window, IntPtr icon)
+	{
+		SendMessage(window, WindowMessage.SetIcon, (IntPtr)0, icon);
+		SendMessage(window, WindowMessage.SetIcon, (IntPtr)1, icon);
+		SendMessage(window, WindowMessage.SetIcon, (IntPtr)2, icon);
+	}
+
 	[DllImport(Gdi32Path, EntryPoint = "SetPixelFormat")]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool SetPixelFormat(IntPtr deviceContext, int format, [In] ref PixelFormatDescriptor descriptor);
@@ -122,6 +192,16 @@ internal static class WinAPI
 		int width,
 		int height,
 		uint flags);
+
+	public static void SetWindowStyle(IntPtr window, WindowStyles style)
+	{
+		if (SetWindowLong(window, WindowLongValue.Style, (uint)style) == 0)
+			Console.WriteLine("Couldn't set window style");
+	}
+
+	[DllImport(User32Path, EntryPoint = "SetWindowTextW", CharSet = CharSet.Unicode)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static extern bool SetWindowText(IntPtr window, string text);
 
 	[DllImport(User32Path, EntryPoint = "ShowWindow")]
 	[return: MarshalAs(UnmanagedType.Bool)]
