@@ -57,4 +57,5 @@ public struct RectangleInt : IEquatable<RectangleInt>
 		=> new((int)Math.Round(quad.TopLeft.X), (int)Math.Round(quad.TopLeft.Y),
 			(int)Math.Round(quad.BottomRight.X - quad.TopLeft.X), (int)Math.Round(quad.BottomRight.Y - quad.TopLeft.Y));
 	public override readonly int GetHashCode() => HashCode.Combine(X, Y, Width, Height);
+	public override readonly string ToString() => $"{X}, {Y}, {Width}, {Height}";
 }

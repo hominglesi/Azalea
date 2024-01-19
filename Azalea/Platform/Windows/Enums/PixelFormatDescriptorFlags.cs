@@ -1,6 +1,6 @@
 ﻿namespace Azalea.Platform.Windows;
 
-//Ported from https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-pixelformatdescriptor
+//Mappings from https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-pixelformatdescriptor
 internal enum PixelFormatDescriptorFlags
 {
 	/// <summary> The buffer can draw to a window or device surface. </summary>

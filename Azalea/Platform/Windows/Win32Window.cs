@@ -1,6 +1,7 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.OpenGL;
 using Azalea.Inputs;
+using Azalea.Numerics;
 using Azalea.Utils;
 using System;
 using System.Runtime.InteropServices;
@@ -21,18 +22,21 @@ internal class Win32Window : PlatformWindow
 			Style = ClassStyles.OwnDC,
 			Cursor = cursor
 		};
+
+		WinRectangle clientRectangle = new RectangleInt(0, 0, 1280, 720);
+		WinAPI.AdjustWindowRect(ref clientRectangle, WindowStyles.OverlappedWindow, false, 0);
+		RectangleInt windowRectangle = clientRectangle;
+
 		var id = WinAPI.RegisterClass(ref wndClass);
 		_handle = WinAPI.CreateWindow(
 			0,
 			id,
 			"Azalea Window",
-			WindowStyles.OverlappedWindow,
-			//WindowStyles.Overlapped | WindowStyles.Caption | WindowStyles.SysMenu
-			//| WindowStyles.SizeBox | WindowStyles.MinimizeBox | WindowStyles.MaximizeBox,
-			100,
-			100,
-			1280,
-			720,
+			WindowStyles.Caption | WindowStyles.SysMenu | WindowStyles.MinimizeBox | WindowStyles.SizeBox,
+			0,
+			0,
+			clientRectangle.Width,
+			clientRectangle.Height,
 			IntPtr.Zero,
 			IntPtr.Zero,
 			programHandle,
@@ -43,6 +47,21 @@ internal class Win32Window : PlatformWindow
 			Console.WriteLine($"Could not create Window. (Error {Marshal.GetLastWin32Error()})");
 			return;
 		}
+
+		Console.WriteLine(WinAPI.GetWindowRect(_handle));
+		Console.WriteLine(WinAPI.GetClientRect(_handle));
+
+		var styles = WindowStyles.Caption | WindowStyles.SysMenu | WindowStyles.MinimizeBox;
+		WinAPI.SetWindowLong(_handle, WindowLongValue.Style, (uint)styles);
+
+		Console.WriteLine(WinAPI.GetWindowRect(_handle));
+		Console.WriteLine(WinAPI.GetClientRect(_handle));
+
+		var styles2 = WindowStyles.Caption | WindowStyles.SysMenu | WindowStyles.MinimizeBox | WindowStyles.SizeBox;
+		WinAPI.SetWindowLong(_handle, WindowLongValue.Style, (uint)styles2);
+
+		Console.WriteLine(WinAPI.GetWindowRect(_handle));
+		Console.WriteLine(WinAPI.GetClientRect(_handle));
 
 		_deviceContext = WinAPI.GetDC(_handle);
 
@@ -63,6 +82,9 @@ internal class Win32Window : PlatformWindow
 			case WindowMessage.Close:
 				Close();
 				return IntPtr.Zero;
+			case WindowMessage.Move:
+				_position = BitwiseUtils.SplitValue(lParam);
+				break;
 			case WindowMessage.Size:
 				_clientSize = BitwiseUtils.SplitValue(lParam);
 				break;
@@ -113,7 +135,7 @@ internal class Win32Window : PlatformWindow
 	{
 		while (WinAPI.PeekMessage(out Message message, IntPtr.Zero) != 0)
 		{
-			WinAPI.TranslateMessage(ref message);
+			_ = WinAPI.TranslateMessage(ref message);
 			WinAPI.DispatchMessage(ref message);
 		}
 
@@ -132,12 +154,40 @@ internal class Win32Window : PlatformWindow
 	protected override void MinimizeImplementation() { }
 	protected override void RequestAttentionImplementation() { }
 	protected override void RestoreFullscreenImplementation(int lastX, int lastY, int lastWidth, int lastHeight) { }
-	protected override void SetClientSizeImplementation(int width, int height) { }
+	protected override void SetClientSizeImplementation(int width, int height)
+		=> WinAPI.SetWindowPos(_handle, IntPtr.Zero, 0, 0, width, height, (uint)SetWindowPosFlags.NoMove);
 	protected override void SetDecoratedImplementation(bool enabled) { }
 	protected override void SetIconImplementation(Image? data) { }
 	protected override void SetOpacityImplementation(float opacity) { }
-	protected override void SetPositionImplementation(int x, int y) { }
-	protected override void SetResizableImplementation(bool enabled) { }
+	protected override void SetPositionImplementation(int x, int y)
+		=> WinAPI.SetWindowPos(_handle, IntPtr.Zero, x, y, 0, 0, (uint)SetWindowPosFlags.NoSize);
+	protected override void SetResizableImplementation(bool enabled)
+	{
+		var style = getCurrentStyle();
+		if (enabled)
+		{
+			style |= WindowStyles.SizeBox;
+			style |= WindowStyles.MaximizeBox;
+		}
+		else
+		{
+			style &= ~WindowStyles.SizeBox;
+			style &= ~WindowStyles.MaximizeBox;
+		}
+
+		if (WinAPI.SetWindowLong(_handle, WindowLongValue.Style, (uint)style) == 0)
+			Console.WriteLine("Failed to change resizable property");
+
+		/*var setPosFlags = SetWindowPosFlags.FrameChanged | SetWindowPosFlags.NoMove | SetWindowPosFlags.NoSize
+			| SetWindowPosFlags.NoReposition | SetWindowPosFlags.NoZOrder;
+		WinAPI.SetWindowPos(_handle, IntPtr.Zero, 0, 0, 0, 0, (uint)setPosFlags);*/
+
+		WinRectangle rect = new(_position.X, _position.Y, _clientWidth, _clientHeight);
+		WinAPI.AdjustWindowRect(ref rect, getCurrentStyle(), false, 0);
+		var setPosFlags = SetWindowPosFlags.FrameChanged | SetWindowPosFlags.NoMove | SetWindowPosFlags.NoSize
+			| SetWindowPosFlags.NoReposition | SetWindowPosFlags.NoZOrder;
+		WinAPI.SetWindowPos(_handle, IntPtr.Zero, rect.X, rect.Y, rect.Width, rect.Height, (uint)setPosFlags);
+	}
 	protected override void SetShouldCloseImplementation(bool shouldClose) { }
 	protected override void SetTitleImplementation(string title) { }
 	protected override void SetVisibleImplementation(bool visible)
@@ -146,6 +196,8 @@ internal class Win32Window : PlatformWindow
 	protected override void SwapBuffersImplementation() => WinAPI.SwapBuffers(_deviceContext);
 
 	#endregion
+
+	private WindowStyles getCurrentStyle() => (WindowStyles)WinAPI.GetWindowLong(_handle, (int)WindowLongValue.Style);
 
 	protected override void OnDispose()
 	{

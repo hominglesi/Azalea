@@ -3,6 +3,11 @@
 internal enum WindowMessage : uint
 {
 	/// <summary>
+	/// Sent after a window has been moved.
+	/// A window receives this message through its <see cref="WindowProcedure"/> function.
+	/// </summary>
+	Move = 3,
+	/// <summary>
 	/// Sent to a window after its size has changed.
 	/// A window receives this message through its <see cref="WindowProcedure"/> function.
 	/// </summary>
@@ -24,13 +29,31 @@ internal enum WindowMessage : uint
 	/// </summary>
 	SetCursor = 32,
 	/// <summary>
+	/// Sent to a window whose size, position, or place in the Z order is about to change
+	/// as a result of a call to the <see cref="WinAPI.SetWindowPos"/> function or another window-management function.
+	/// A window receives this message through its <see cref="WindowProcedure"/> function.
+	/// </summary>
+	WindowPosChanging = 70,
+	/// <summary>
+	/// Sent when the size and position of a window's client area must be calculated.
+	/// By processing this message, an application can control the content of
+	/// the window's client area when the size or position of the window changes.
+	/// A window receives this message through its <see cref="WindowProcedure"/> function.
+	/// </summary>
+	NCCalcSize = 131,
+	/// <summary>
 	/// Sent to a window in order to determine what part of the window corresponds to a particular screen coordinate.
 	/// This can happen, for example, when the cursor moves, when a mouse button is pressed or released,
 	/// or in response to a call to a function such as <see cref="WinAPI.WindowFromPoint"/>. If the mouse is not captured,
 	/// the message is sent to the window beneath the cursor. Otherwise, the message is sent to the window
 	/// that has captured the mouse. A window receives this message through its <see cref="WindowProcedure"/> function.
 	/// </summary>
-	NonclientHitTest = 132,
+	NCHitTest = 132,
+	/// <summary>
+	/// The <see cref="SyncPaint"/> message is used to synchronize painting while avoiding linking independent GUI threads.
+	/// A window receives this message through its <see cref="WindowProcedure"/> function.
+	/// </summary>
+	SyncPaint = 136,
 	/// <summary>
 	/// Posted when the user releases the left mouse button while the cursor is within the nonclient area of a window.
 	/// This message is posted to the window that contains the cursor.

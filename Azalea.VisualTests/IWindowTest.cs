@@ -65,6 +65,9 @@ public class IWindowTest : TestScene
 					"Move window by (25, 25)",
 					() => _window.Position += new Vector2Int(25, 25)),
 				CreateActionButton(
+					"Enlarge window by (25, 25)",
+					() => _window.ClientSize += new Vector2Int(25, 25)),
+				CreateActionButton(
 					"Center window",
 					() => _window.Center()),
 				CreateActionButton(

@@ -9,6 +9,10 @@ internal static class WinAPI
 	private const string User32Path = "user32.dll";
 	private const string Gdi32Path = "gdi32.dll";
 
+	[DllImport(User32Path, EntryPoint = "AdjustWindowRectEx")]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static extern bool AdjustWindowRect(ref WinRectangle rect, WindowStyles style, bool menu, WindowStylesEx exStyle);
+
 	[DllImport(Gdi32Path, EntryPoint = "ChoosePixelFormat")]
 	public static extern int ChoosePixelFormat(IntPtr deviceContext, [In] ref PixelFormatDescriptor descriptor);
 
@@ -37,6 +41,15 @@ internal static class WinAPI
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool EnableWindow(IntPtr window, bool enable);
 
+	[DllImport(User32Path, EntryPoint = "GetClientRect")]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	private static extern bool getClientRect(IntPtr window, out WinRectangle rect);
+	public static RectangleInt GetClientRect(IntPtr window)
+	{
+		getClientRect(window, out var rect);
+		return rect;
+	}
+
 	[DllImport(User32Path, EntryPoint = "GetCursorPos")]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool GetCursorPos(out Vector2Int point);
@@ -50,6 +63,9 @@ internal static class WinAPI
 
 	[DllImport(User32Path, EntryPoint = "GetRawInputData")]
 	public static extern uint GetRawInputData(IntPtr rawInput, uint command, ref RawInput data, ref uint dataSize, uint headerSize);
+
+	[DllImport(User32Path, EntryPoint = "GetWindowLongW", CharSet = CharSet.Unicode)]
+	public static extern int GetWindowLong(IntPtr window, int index);
 
 	[DllImport(User32Path, EntryPoint = "GetWindowRect")]
 	[return: MarshalAs(UnmanagedType.Bool)]
@@ -94,7 +110,7 @@ internal static class WinAPI
 	public static extern bool SetPixelFormat(IntPtr deviceContext, int format, [In] ref PixelFormatDescriptor descriptor);
 
 	[DllImport(User32Path, EntryPoint = "SetWindowLongW", CharSet = CharSet.Unicode)]
-	public static extern uint SetWindowLong(IntPtr window, int index, uint newValue);
+	public static extern uint SetWindowLong(IntPtr window, WindowLongValue index, uint newValue);
 
 	[DllImport(User32Path, EntryPoint = "SetWindowPos")]
 	[return: MarshalAs(UnmanagedType.Bool)]

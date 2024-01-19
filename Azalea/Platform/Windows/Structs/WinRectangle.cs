@@ -1,13 +1,33 @@
 ﻿using Azalea.Numerics;
 
 namespace Azalea.Platform.Windows;
-internal struct WinRectangle
+internal readonly struct WinRectangle
 {
-	private int left;
-	private int top;
-	private int right;
-	private int bottom;
+	private readonly int _left;
+	private readonly int _top;
+	private readonly int _right;
+	private readonly int _bottom;
+
+	public WinRectangle(int x, int y, int width, int height)
+	{
+		_left = x;
+		_top = y;
+		_right = x + width;
+		_bottom = y + height;
+	}
+
+	public readonly int Left => _left;
+	public readonly int Top => _top;
+	public readonly int Right => _right;
+	public readonly int Bottom => _bottom;
+	public readonly int X => _left;
+	public readonly int Y => _top;
+	public readonly int Width => _right - _left;
+	public readonly int Height => _bottom - _top;
 
 	public static implicit operator RectangleInt(WinRectangle rect)
-		=> new(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+		=> new(rect._left, rect._top, rect._right - rect._left, rect._bottom - rect._top);
+
+	public static implicit operator WinRectangle(RectangleInt rect)
+		=> new(rect.X, rect.Y, rect.Width, rect.Height);
 }
