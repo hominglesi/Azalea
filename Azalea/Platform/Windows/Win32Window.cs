@@ -160,14 +160,17 @@ internal class Win32Window : PlatformWindow
 	protected override void SetDecoratedImplementation(bool enabled) { }
 	protected override void SetIconImplementation(Image? data)
 	{
-		if (data is null)
+		IntPtr icon = IntPtr.Zero;
+
+		if (data is not null)
 		{
-			WinAPI.SetWindowIcons(_handle, IntPtr.Zero);
-			return;
+			icon = WinAPI.CreateIconFromImage(_deviceContext, data);
 		}
 
-		var icon = WinAPI.CreateIconFromImage(_deviceContext, data);
-		WinAPI.SetWindowIcons(_handle, icon);
+		WinAPI.SendMessage(_handle, WindowMessage.SetIcon, (IntPtr)0, icon);
+		WinAPI.SendMessage(_handle, WindowMessage.SetIcon, (IntPtr)1, icon);
+
+		WinAPI.DeleteObject(icon);
 	}
 	protected override void SetOpacityImplementation(float opacity) { }
 	protected override void SetPositionImplementation(int x, int y)

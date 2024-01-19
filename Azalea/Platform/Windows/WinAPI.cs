@@ -101,6 +101,9 @@ internal static class WinAPI
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool EnableWindow(IntPtr window, bool enable);
 
+	[DllImport(User32Path, EntryPoint = "GetClassLongPtrW", CharSet = CharSet.Unicode)]
+	public static extern IntPtr GetClassLongPtr(IntPtr window, ClassLongValue index);
+
 	[DllImport(User32Path, EntryPoint = "GetClientRect")]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	private static extern bool getClientRect(IntPtr window, out WinRectangle rect);
@@ -123,6 +126,9 @@ internal static class WinAPI
 
 	[DllImport(User32Path, EntryPoint = "GetRawInputData")]
 	public static extern uint GetRawInputData(IntPtr rawInput, uint command, ref RawInput data, ref uint dataSize, uint headerSize);
+
+	[DllImport(User32Path, EntryPoint = "GetWindow")]
+	public static extern IntPtr GetWindow(IntPtr window, uint relation);
 
 	[DllImport(User32Path, EntryPoint = "GetWindowLongW", CharSet = CharSet.Unicode)]
 	public static extern int GetWindowLong(IntPtr window, int index);
@@ -167,13 +173,6 @@ internal static class WinAPI
 
 	[DllImport(User32Path, EntryPoint = "SendMessage")]
 	public static extern IntPtr SendMessage(IntPtr window, WindowMessage message, IntPtr wParam, IntPtr lParam);
-
-	public static void SetWindowIcons(IntPtr window, IntPtr icon)
-	{
-		SendMessage(window, WindowMessage.SetIcon, (IntPtr)0, icon);
-		SendMessage(window, WindowMessage.SetIcon, (IntPtr)1, icon);
-		SendMessage(window, WindowMessage.SetIcon, (IntPtr)2, icon);
-	}
 
 	[DllImport(Gdi32Path, EntryPoint = "SetPixelFormat")]
 	[return: MarshalAs(UnmanagedType.Bool)]
