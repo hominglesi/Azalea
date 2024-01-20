@@ -14,6 +14,10 @@ internal static class WinAPI
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool AdjustWindowRect(ref WinRectangle rect, WindowStyles style, bool menu, WindowStylesEx exStyle);
 
+	[DllImport(User32Path, EntryPoint = "BringWindowToTop")]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static extern bool BringWindowToTop(IntPtr window);
+
 	[DllImport(Gdi32Path, EntryPoint = "CreateBitmap")]
 	public static extern IntPtr CreateBitmap(
 		int width,
@@ -173,6 +177,13 @@ internal static class WinAPI
 
 	[DllImport(User32Path, EntryPoint = "SendMessage")]
 	public static extern IntPtr SendMessage(IntPtr window, WindowMessage message, IntPtr wParam, IntPtr lParam);
+
+	[DllImport(User32Path, EntryPoint = "SetFocus")]
+	public static extern IntPtr SetFocus(IntPtr window);
+
+	[DllImport(User32Path, EntryPoint = "SetForegroundWindow")]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static extern bool SetForegroundWindow(IntPtr window);
 
 	[DllImport(Gdi32Path, EntryPoint = "SetPixelFormat")]
 	[return: MarshalAs(UnmanagedType.Bool)]

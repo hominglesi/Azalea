@@ -83,6 +83,9 @@ public class IWindowTest : TestScene
 					"Set Opacity to 0.3",
 					() => _window.Opacity = 0.3f),
 				CreateActionButton(
+					"Focus in 1.5 seconds",
+					() => _focusTimer = 1.5f),
+				CreateActionButton(
 					"Set Decorated to true",
 					() => _window.Decorated = true),
 				CreateActionButton(
@@ -142,6 +145,20 @@ public class IWindowTest : TestScene
 						() => getField<bool>(_window, "_preMinimizedFullscreen")),*/
 			})
 		});
+	}
+
+	private float _focusTimer = -1f;
+
+	protected override void Update()
+	{
+		if (_focusTimer > 0)
+		{
+			_focusTimer -= Time.DeltaTime;
+			if (_focusTimer <= 0)
+			{
+				_window.Focus();
+			}
+		}
 	}
 
 	private T getField<T>(object? obj, string name)

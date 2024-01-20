@@ -148,7 +148,12 @@ internal class Win32Window : PlatformWindow
 
 	#region Implementations
 
-	protected override void FocusImplementation() { }
+	protected override void FocusImplementation()
+	{
+		WinAPI.BringWindowToTop(_handle);
+		WinAPI.SetForegroundWindow(_handle);
+		WinAPI.SetFocus(_handle);
+	}
 	protected override void FullscreenImplementation() { }
 	protected override Vector2Int GetFullscreenSize() => new(1920, 1080);
 	protected override Vector2Int GetWorkareaSizeImplementation() => new(1920, 1000);
