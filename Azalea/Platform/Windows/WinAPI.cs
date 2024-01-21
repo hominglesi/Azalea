@@ -105,6 +105,10 @@ internal static class WinAPI
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool EnableWindow(IntPtr window, bool enable);
 
+	[DllImport(User32Path, EntryPoint = "FlashWindow")]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static extern bool FlashWindow(IntPtr window, bool invert);
+
 	[DllImport(User32Path, EntryPoint = "GetClassLongPtrW", CharSet = CharSet.Unicode)]
 	public static extern IntPtr GetClassLongPtr(IntPtr window, ClassLongValue index);
 
@@ -124,12 +128,18 @@ internal static class WinAPI
 	[DllImport(User32Path, EntryPoint = "GetDC")]
 	public static extern IntPtr GetDC(IntPtr window);
 
+	[DllImport(User32Path, EntryPoint = "GetDesktopWindow")]
+	public static extern IntPtr GetDesktopWindow();
+
 	[DllImport(User32Path, EntryPoint = "GetMessageW", CharSet = CharSet.Unicode)]
 	private static extern sbyte getMessage(out Message message, IntPtr window, uint wMsgFilterMin, uint wMsgFilterMax);
 	public static sbyte GetMessage(out Message message, IntPtr window) => getMessage(out message, window, 0, 0);
 
 	[DllImport(User32Path, EntryPoint = "GetRawInputData")]
 	public static extern uint GetRawInputData(IntPtr rawInput, uint command, ref RawInput data, ref uint dataSize, uint headerSize);
+
+	[DllImport(User32Path, EntryPoint = "GetSystemMetrics")]
+	public static extern int GetSystemMetrics(SystemMetric metric);
 
 	[DllImport(User32Path, EntryPoint = "GetWindow")]
 	public static extern IntPtr GetWindow(IntPtr window, uint relation);
@@ -220,6 +230,20 @@ internal static class WinAPI
 	[DllImport(Gdi32Path, EntryPoint = "SwapBuffers")]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool SwapBuffers(IntPtr deviceContext);
+
+	[DllImport(User32Path, EntryPoint = "SystemParametersInfoW", CharSet = CharSet.Unicode)]
+	private static extern bool systemParametersInfoRect(
+		uint action,
+		uint param,
+		[Out] out WinRectangle rect,
+		uint winIni);
+
+	public static RectangleInt GetSystemWorkArea()
+	{
+		// 0x0030 = SPI_GETWORKAREA
+		systemParametersInfoRect(0x0030, 0, out WinRectangle rect, 0);
+		return rect;
+	}
 
 	[DllImport(User32Path, EntryPoint = "TranslateMessage")]
 	public static extern bool TranslateMessage([In] ref Message message);

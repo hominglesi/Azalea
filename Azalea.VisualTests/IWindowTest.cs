@@ -20,6 +20,12 @@ public class IWindowTest : TestScene
 			CreateFullscreenVerticalFlex(new GameObject[]
 			{
 				CreateActionButton(
+					"Set size to 700, 700",
+					() => _window.Size = new(700, 700)),
+				CreateActionButton(
+					"Set client size to 700, 700",
+					() => _window.ClientSize = new(700, 700)),
+				CreateActionButton(
 					"Set WindowState to 'Normal'",
 					() => _window.State = WindowState.Normal),
 				CreateActionButton(
@@ -62,6 +68,12 @@ public class IWindowTest : TestScene
 					"Set icon to null",
 					() => _window.SetIconFromStream(null)),
 				CreateActionButton(
+					"Set position to 0",
+					() => _window.Position = Vector2Int.Zero),
+				CreateActionButton(
+					"Set client position to 0",
+					() => _window.ClientPosition = Vector2Int.Zero),
+				CreateActionButton(
 					"Move window by (25, 25)",
 					() => _window.Position += new Vector2Int(25, 25)),
 				CreateActionButton(
@@ -71,17 +83,8 @@ public class IWindowTest : TestScene
 					"Center window",
 					() => _window.Center()),
 				CreateActionButton(
-					"Request Attention",
-					() => {_window.RequestAttention(); Console.WriteLine("The Window has requested attention"); }),
-				CreateActionButton(
-					"Set Opacity to 1",
-					() => _window.Opacity = 1),
-				CreateActionButton(
-					"Set Opacity to 0.6",
-					() => _window.Opacity = 0.6f),
-				CreateActionButton(
-					"Set Opacity to 0.3",
-					() => _window.Opacity = 0.3f),
+					"Request Attention in 1.5 seconds",
+					() => {_attentionTimer = 1.5f; }),
 				CreateActionButton(
 					"Focus in 1.5 seconds",
 					() => _focusTimer = 1.5f),
@@ -116,18 +119,13 @@ public class IWindowTest : TestScene
 					CreateObservedValue("Position",
 						() => _window.Position,
 						(value) => $"Window moved to {value}"),
-					CreateObservedValue("_clientWidth",
-						() => getField<int>(_window, "_clientWidth"),
-						(value) => $"Window width changed to {value}"),
-					CreateObservedValue("_clientHeight",
-						() => getField<int>(_window, "_clientHeight"),
-						(value) => $"Window height changed to {value}"),
+					CreateObservedValue("ClientPosition",
+						() => _window.ClientPosition),
+					CreateObservedValue("Size",
+						() => _window.Size),
 					CreateObservedValue("ClientSize",
 						() => _window.ClientSize,
 						(value) => $"Window resized to {value}"),
-					CreateObservedValue("Opacity",
-						() => _window.Opacity,
-						(value) => $"Window opacity changed to {value}"),
 					/*
 					CreateObservedValue("_fullscreen",
 						() => getField<bool>(_window, "_fullscreen")),
@@ -147,6 +145,7 @@ public class IWindowTest : TestScene
 		});
 	}
 
+	private float _attentionTimer = -1f;
 	private float _focusTimer = -1f;
 
 	protected override void Update()
@@ -157,6 +156,15 @@ public class IWindowTest : TestScene
 			if (_focusTimer <= 0)
 			{
 				_window.Focus();
+			}
+		}
+
+		if (_attentionTimer > 0)
+		{
+			_attentionTimer -= Time.DeltaTime;
+			if (_attentionTimer <= 0)
+			{
+				_window.RequestAttention();
 			}
 		}
 	}

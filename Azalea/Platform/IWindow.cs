@@ -5,26 +5,41 @@ namespace Azalea.Platform;
 
 public interface IWindow : IDisposable
 {
-	internal bool ShouldClose { get; set; }
-
-	internal Action<Vector2Int>? Resized { get; set; }
-
 	/// <summary>
-	/// The window title.
-	/// Default 
+	/// The window title
 	/// </summary>
 	string Title { get; set; }
+
+	/// <summary>
+	/// The size of the window on the users desktop
+	/// </summary>
+	Vector2Int Size { get; set; }
 
 	/// <summary>
 	/// The size of the window, excluding the title bar and border.
 	/// </summary>
 	Vector2Int ClientSize { get; set; }
 
+	internal Action<Vector2Int>? Resized { get; set; }
+
+	/// <summary>
+	/// The position of this window on the users desktop
+	/// </summary>
+	public Vector2Int Position { get; set; }
+
+	/// <summary>
+	/// The position of the window, excluding the title bar and border.
+	/// </summary>
+	Vector2Int ClientPosition { get; set; }
+
 	/// <summary>
 	/// Controls the state of the window.
 	/// For possible states see <seealso cref="WindowState"/>.
 	/// </summary>
 	WindowState State { get; set; }
+
+
+	internal bool ShouldClose { get; set; }
 
 	/// <summary>
 	/// Controls if the window can be resized by the user. (Default: false)
@@ -35,16 +50,6 @@ public interface IWindow : IDisposable
 	/// Controls if the window has its decorations or not
 	/// </summary>
 	public bool Decorated { get; set; }
-
-	/// <summary>
-	/// The position of this window on the users desktop
-	/// </summary>
-	public Vector2Int Position { get; set; }
-
-	/// <summary>
-	/// The opacity of this window and its decoration
-	/// </summary>
-	public float Opacity { get; set; }
 
 	public bool VSync { get; set; }
 

@@ -16,6 +16,9 @@ internal readonly struct WinRectangle
 		_bottom = y + height;
 	}
 
+	public WinRectangle(Vector2Int position, Vector2Int size)
+		: this(position.X, position.Y, size.X, size.Y) { }
+
 	public readonly int Left => _left;
 	public readonly int Top => _top;
 	public readonly int Right => _right;

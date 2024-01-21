@@ -6,15 +6,17 @@ using System;
 using System.Runtime.InteropServices;
 
 namespace Azalea.Platform.Windows;
-internal class Win32Window : PlatformWindow
+internal class Win32Window : PlatformWindowOld
 {
 	private readonly IntPtr _handle;
 	private readonly IntPtr _deviceContext;
 
 	private WindowStyles _style;
+	private WindowStylesEx _styleEx;
 
-	public Win32Window(string title, Vector2Int preferredClientSize, WindowState state,
+	public Win32Window(string title, Vector2Int clientSize, WindowState state,
 		bool visible, bool resizable, bool decorated, bool transparentFramebuffer)
+		: base(title, clientSize, state)
 	{
 		var programHandle = System.Diagnostics.Process.GetCurrentProcess().Handle;
 
@@ -26,8 +28,10 @@ internal class Win32Window : PlatformWindow
 			Cursor = cursor
 		};
 
-		WinRectangle windowRect = new(100, 100, preferredClientSize.X, preferredClientSize.Y);
-		_style = WindowStyles.Caption | WindowStyles.SysMenu | WindowStyles.MinimizeBox | WindowStyles.SizeBox;
+		WinRectangle windowRect = new(100, 100, clientSize.X, clientSize.Y);
+		_style = WindowStyles.Caption | WindowStyles.SysMenu
+			| WindowStyles.MinimizeBox | WindowStyles.MaximizeBox | WindowStyles.SizeBox;
+		_styleEx = 0;
 
 		if (visible) _style |= WindowStyles.Visible;
 
@@ -35,7 +39,7 @@ internal class Win32Window : PlatformWindow
 
 		var id = WinAPI.RegisterClass(ref wndClass);
 		_handle = WinAPI.CreateWindow(
-			0,
+			_styleEx,
 			id,
 			title,
 			_style,
@@ -57,6 +61,7 @@ internal class Win32Window : PlatformWindow
 		if (resizable == false)
 		{
 			_style &= ~WindowStyles.SizeBox;
+			_style &= ~WindowStyles.MaximizeBox;
 			WinAPI.SetWindowStyle(_handle, _style);
 		}
 
@@ -70,7 +75,6 @@ internal class Win32Window : PlatformWindow
 		var glContext = GL.CreateContext(_deviceContext);
 		GL.MakeCurrent(_deviceContext, glContext);
 
-		_title = title;
 		_visible = visible;
 		_resizable = resizable;
 	}
@@ -84,10 +88,25 @@ internal class Win32Window : PlatformWindow
 				Close();
 				return IntPtr.Zero;
 			case WindowMessage.Move:
-				_position = BitwiseUtils.SplitValue(lParam);
+				var windowPosition = WinAPI.GetWindowRect(_handle).Position;
+				var clientPosition = BitwiseUtils.SplitValue(lParam);
+				UpdatePosition(windowPosition, clientPosition);
 				break;
 			case WindowMessage.Size:
-				_clientSize = BitwiseUtils.SplitValue(lParam);
+
+				switch ((ResizeReason)wParam)
+				{
+					case ResizeReason.Minimized:
+						UpdateState(WindowState.Minimized); break;
+					case ResizeReason.Maximized:
+						UpdateState(WindowState.Maximized); break;
+					default:
+						UpdateState(WindowState.Normal); break;
+				}
+
+				var windowSize = WinAPI.GetWindowRect(_handle).Size;
+				var clientSize = BitwiseUtils.SplitValue(lParam);
+				UpdateSize(windowSize, clientSize);
 				break;
 			//Mouse Input
 			case WindowMessage.LeftButtonDown:
@@ -155,13 +174,26 @@ internal class Win32Window : PlatformWindow
 		WinAPI.SetFocus(_handle);
 	}
 	protected override void FullscreenImplementation() { }
-	protected override Vector2Int GetFullscreenSize() => new(1920, 1080);
-	protected override Vector2Int GetWorkareaSizeImplementation() => new(1920, 1000);
-	protected override void MinimizeImplementation() { }
-	protected override void RequestAttentionImplementation() { }
+	protected override Vector2Int GetFullscreenSize() => WinAPI.GetClientRect(WinAPI.GetDesktopWindow()).Size;
+	protected override Vector2Int GetWorkareaSizeImplementation() => WinAPI.GetSystemWorkArea().Size;
+	protected override void MinimizeImplementation()
+		=> WinAPI.ShowWindow(_handle, ShowWindowCommand.Minimize);
+	protected override void MaximizeImplementation()
+		=> WinAPI.ShowWindow(_handle, ShowWindowCommand.Maximize);
+	protected override void RestoreImplementation()
+		=> WinAPI.ShowWindow(_handle, ShowWindowCommand.Restore);
+	protected override void RequestAttentionImplementation() => WinAPI.FlashWindow(_handle, true);
 	protected override void RestoreFullscreenImplementation(int lastX, int lastY, int lastWidth, int lastHeight) { }
-	protected override void SetClientSizeImplementation(int width, int height)
-		=> WinAPI.SetWindowPos(_handle, IntPtr.Zero, 0, 0, width, height, (uint)SetWindowPosFlags.NoMove);
+	protected override void SetClientSizeImplementation(Vector2Int clientSize)
+	{
+		var newSize = new WinRectangle(Vector2Int.Zero, clientSize);
+		WinAPI.AdjustWindowRect(ref newSize, _style, false, _styleEx);
+		WinAPI.SetWindowPos(_handle, IntPtr.Zero, 0, 0, newSize.Width, newSize.Height, (uint)SetWindowPosFlags.NoMove);
+	}
+
+	protected override void SetSizeImplementation(Vector2Int size)
+		=> WinAPI.SetWindowPos(_handle, IntPtr.Zero, 0, 0, size.X, size.Y, (uint)SetWindowPosFlags.NoMove);
+
 	protected override void SetDecoratedImplementation(bool enabled) { }
 	protected override void SetIconImplementation(Image? data)
 	{
@@ -177,9 +209,18 @@ internal class Win32Window : PlatformWindow
 
 		WinAPI.DeleteObject(icon);
 	}
-	protected override void SetOpacityImplementation(float opacity) { }
-	protected override void SetPositionImplementation(int x, int y)
-		=> WinAPI.SetWindowPos(_handle, IntPtr.Zero, x, y, 0, 0, (uint)SetWindowPosFlags.NoSize);
+	protected override void SetPositionImplementation(Vector2Int position)
+	{
+		WinAPI.SetWindowPos(_handle, IntPtr.Zero, position.X, position.Y, 0, 0, (uint)SetWindowPosFlags.NoSize);
+	}
+
+	protected override void SetClientPositionImplementation(Vector2Int clientPosition)
+	{
+		var newPosition = new WinRectangle(clientPosition, Vector2Int.Zero);
+		WinAPI.AdjustWindowRect(ref newPosition, _style, false, _styleEx);
+		WinAPI.SetWindowPos(_handle, IntPtr.Zero, newPosition.X, newPosition.Y, 0, 0, (uint)SetWindowPosFlags.NoSize);
+	}
+
 	protected override void SetResizableImplementation(bool enabled)
 	{
 		var style = getCurrentStyle();
@@ -201,7 +242,7 @@ internal class Win32Window : PlatformWindow
 			| SetWindowPosFlags.NoReposition | SetWindowPosFlags.NoZOrder;
 		WinAPI.SetWindowPos(_handle, IntPtr.Zero, 0, 0, 0, 0, (uint)setPosFlags);*/
 
-		WinRectangle rect = new(_position.X, _position.Y, _clientWidth, _clientHeight);
+		WinRectangle rect = new(Position, ClientSize);
 		WinAPI.AdjustWindowRect(ref rect, getCurrentStyle(), false, 0);
 		var setPosFlags = SetWindowPosFlags.FrameChanged | SetWindowPosFlags.NoMove | SetWindowPosFlags.NoSize
 			| SetWindowPosFlags.NoReposition | SetWindowPosFlags.NoZOrder;

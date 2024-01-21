@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Azalea.Platform.Glfw;
-internal class GLFWWindow : PlatformWindow
+internal class GLFWWindow : PlatformWindowOld
 {
 	public Window Handle { get; init; }
 
@@ -12,22 +12,20 @@ internal class GLFWWindow : PlatformWindow
 	protected VideoMode PrimaryMode => _primaryMode ??= GLFW.GetVideoMode(PrimaryMonitor);
 
 	public GLFWWindow(
-		string title = DEFAULT_TITLE,
-		int width = DEFAULT_CLIENT_WIDTH,
-		int height = DEFAULT_CLIENT_HEIGHT,
-		WindowState state = DEFAULT_STATE,
+		string title,
+		int width,
+		int height,
+		WindowState state,
 		bool visible = DEFAULT_VISIBLE,
 		bool resizable = DEFAULT_RESIZABLE,
 		bool decorated = DEFAULT_DECORATED,
 		bool transparentFramebuffer = DEFAULT_TRANSPARENT_FRAMEBUFFER,
-		bool vSync = DEFAULT_VSYNC)
+		bool vSync = DEFAULT_VSYNC) :
+		base(title, new(width, height), state)
 	{
 		if (GLFW.Initialized == false && GLFW.Init() == false)
 			Console.WriteLine("Could not initialize GLFW");
 
-		_title = title;
-		_clientWidth = width;
-		_clientHeight = height;
 		_state = state;
 		_visible = visible;
 		_resizable = resizable;
@@ -50,9 +48,9 @@ internal class GLFWWindow : PlatformWindow
 		GLFW.WindowHint(WindowHint.RefreshRate, PrimaryMode.RefreshRate);
 
 		if (_state == WindowState.BorderlessFullscreen)
-			Handle = GLFW.CreateWindow(PrimaryMode.Width, PrimaryMode.Height, _title, PrimaryMonitor, null);
+			Handle = GLFW.CreateWindow(PrimaryMode.Width, PrimaryMode.Height, title, PrimaryMonitor, null);
 		else
-			Handle = GLFW.CreateWindow(_clientWidth, _clientHeight, _title, null, null);
+			Handle = GLFW.CreateWindow(width, height, title, null, null);
 
 		GLFW.MakeContextCurrent(Handle);
 		//We need to call this after context is made current
@@ -82,19 +80,19 @@ internal class GLFWWindow : PlatformWindow
 	{
 		//If we are in the process of going full screen or minimizing
 		//we should not save the clientSize
-		if (_targetState == WindowState.BorderlessFullscreen ||
-			width == 0 || height == 0) return;
+		//if (_targetState == WindowState.BorderlessFullscreen ||
+		//width == 0 || height == 0) return;
 
-		_clientSize = new(width, height);
+		UpdateSize(new(width, height), new(width, height));
 	}
 
 	private readonly GLFW.WindowPositionCallback _onMoveCallback;
 	private void onMove(Window _, int x, int y)
 	{
 		//If we are in the process of going full screen we should not save the position
-		if (_targetState == WindowState.BorderlessFullscreen) return;
+		//if (_targetState == WindowState.BorderlessFullscreen) return;
 
-		_position = new(x, y);
+		UpdatePosition(new(x, y), new(x, y));
 	}
 
 	private readonly GLFW.WindowCloseCallback _onCloseCallback;
@@ -126,12 +124,24 @@ internal class GLFWWindow : PlatformWindow
 		=> GLFW.SetWindowAttribute(Handle, WindowAttribute.Resizable, enabled);
 	protected override void SetDecoratedImplementation(bool enabled)
 		=> GLFW.SetWindowAttribute(Handle, WindowAttribute.Decorated, enabled);
-	protected override void SetOpacityImplementation(float opacity)
+	protected void SetOpacityImplementation(float opacity)
 		=> GLFW.SetWindowOpacity(Handle, opacity);
-	protected override void SetPositionImplementation(int x, int y)
-		=> GLFW.SetWindowPos(Handle, x, y);
-	protected override void SetClientSizeImplementation(int width, int height)
-		=> GLFW.SetWindowSize(Handle, width, height);
+	protected override void SetPositionImplementation(Vector2Int position)
+		=> GLFW.SetWindowPos(Handle, position.X, position.Y);
+	protected override void MaximizeImplementation()
+	{
+
+	}
+	protected override void RestoreImplementation()
+	{
+
+	}
+	protected override void SetClientPositionImplementation(Vector2Int clientPosition)
+		=> SetPositionImplementation(clientPosition);
+	protected override void SetClientSizeImplementation(Vector2Int clientSize)
+		=> GLFW.SetWindowSize(Handle, clientSize.X, clientSize.Y);
+	protected override void SetSizeImplementation(Vector2Int size)
+		=> SetClientSizeImplementation(size);
 	protected override Vector2Int GetWorkareaSizeImplementation()
 		=> GLFW.GetMonitorWorkarea(GLFW.GetPrimaryMonitor());
 	protected override void RequestAttentionImplementation()
