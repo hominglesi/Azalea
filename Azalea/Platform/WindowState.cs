@@ -3,7 +3,7 @@
 public enum WindowState
 {
 	Normal,
-	BorderlessFullscreen,
+	Fullscreen,
 	Minimized,
 	Maximized
 }

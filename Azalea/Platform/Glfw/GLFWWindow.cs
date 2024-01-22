@@ -28,16 +28,16 @@ internal class GLFWWindow : PlatformWindowOld
 
 		_state = state;
 		_visible = visible;
-		_resizable = resizable;
-		_decorated = decorated;
+		//_resizable = resizable;
+		//_decorated = decorated;
 
 		GLFW.WindowHint(WindowHint.ContextVersionMajor, 3);
 		GLFW.WindowHint(WindowHint.ContextVersionMinor, 3);
 		GLFW.WindowHint(WindowHint.OpenGLProfile, (int)OpenGLProfile.Core);
 		GLFW.WindowHint(WindowHint.CenterCursor, false);
 		GLFW.WindowHint(WindowHint.Visible, _visible);
-		GLFW.WindowHint(WindowHint.Resizable, _resizable);
-		GLFW.WindowHint(WindowHint.Decorated, _decorated);
+		//GLFW.WindowHint(WindowHint.Resizable, _resizable);
+		//GLFW.WindowHint(WindowHint.Decorated, _decorated);
 		GLFW.WindowHint(WindowHint.TransparentFramebuffer, transparentFramebuffer);
 
 
@@ -47,7 +47,7 @@ internal class GLFWWindow : PlatformWindowOld
 		GLFW.WindowHint(WindowHint.BlueBits, PrimaryMode.BlueBits);
 		GLFW.WindowHint(WindowHint.RefreshRate, PrimaryMode.RefreshRate);
 
-		if (_state == WindowState.BorderlessFullscreen)
+		if (_state == WindowState.Fullscreen)
 			Handle = GLFW.CreateWindow(PrimaryMode.Width, PrimaryMode.Height, title, PrimaryMonitor, null);
 		else
 			Handle = GLFW.CreateWindow(width, height, title, null, null);
@@ -122,8 +122,6 @@ internal class GLFWWindow : PlatformWindowOld
 		=> GLFW.SwapInterval(enabled ? 1 : 0);
 	protected override void SetResizableImplementation(bool enabled)
 		=> GLFW.SetWindowAttribute(Handle, WindowAttribute.Resizable, enabled);
-	protected override void SetDecoratedImplementation(bool enabled)
-		=> GLFW.SetWindowAttribute(Handle, WindowAttribute.Decorated, enabled);
 	protected void SetOpacityImplementation(float opacity)
 		=> GLFW.SetWindowOpacity(Handle, opacity);
 	protected override void SetPositionImplementation(Vector2Int position)
@@ -142,11 +140,13 @@ internal class GLFWWindow : PlatformWindowOld
 		=> GLFW.SetWindowSize(Handle, clientSize.X, clientSize.Y);
 	protected override void SetSizeImplementation(Vector2Int size)
 		=> SetClientSizeImplementation(size);
-	protected override Vector2Int GetWorkareaSizeImplementation()
-		=> GLFW.GetMonitorWorkarea(GLFW.GetPrimaryMonitor());
-	protected override void RequestAttentionImplementation()
+	public override void Center()
+	{
+
+	}
+	public override void RequestAttention()
 		=> GLFW.RequestWindowAttention(Handle);
-	protected override void FocusImplementation()
+	public override void Focus()
 		=> GLFW.FocusWindow(Handle);
 	protected override void SetIconImplementation(Graphics.Image? data)
 		=> GLFW.SetWindowIcon(Handle, data);
@@ -166,11 +166,11 @@ internal class GLFWWindow : PlatformWindowOld
 		GLFW.SetWindowMonitor(Handle, PrimaryMonitor, 0, 0,
 			PrimaryMode.Width, PrimaryMode.Height, PrimaryMode.RefreshRate);
 	}
-	protected override void RestoreFullscreenImplementation(int lastX, int lastY, int lastWidth, int lastHeight)
+	protected override void RestoreFullscreenImplementation(Vector2Int lastPosition, Vector2Int lastSize)
 	{
 		var mode = GLFW.GetVideoMode(GLFW.GetPrimaryMonitor());
 
-		GLFW.SetWindowMonitor(Handle, IntPtr.Zero, lastX, lastY, lastWidth, lastHeight, mode.RefreshRate);
+		GLFW.SetWindowMonitor(Handle, IntPtr.Zero, lastPosition.X, lastPosition.Y, lastSize.X, lastSize.Y, mode.RefreshRate);
 	}
 
 	protected override void MinimizeImplementation()

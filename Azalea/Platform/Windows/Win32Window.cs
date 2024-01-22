@@ -14,8 +14,7 @@ internal class Win32Window : PlatformWindowOld
 	private WindowStyles _style;
 	private WindowStylesEx _styleEx;
 
-	public Win32Window(string title, Vector2Int clientSize, WindowState state,
-		bool visible, bool resizable, bool decorated, bool transparentFramebuffer)
+	public Win32Window(string title, Vector2Int clientSize, WindowState state, bool visible)
 		: base(title, clientSize, state)
 	{
 		var programHandle = System.Diagnostics.Process.GetCurrentProcess().Handle;
@@ -31,7 +30,7 @@ internal class Win32Window : PlatformWindowOld
 		WinRectangle windowRect = new(100, 100, clientSize.X, clientSize.Y);
 		_style = WindowStyles.Caption | WindowStyles.SysMenu
 			| WindowStyles.MinimizeBox | WindowStyles.MaximizeBox | WindowStyles.SizeBox;
-		_styleEx = 0;
+		_styleEx = WindowStylesEx.AppWindow;
 
 		if (visible) _style |= WindowStyles.Visible;
 
@@ -58,13 +57,7 @@ internal class Win32Window : PlatformWindowOld
 			return;
 		}
 
-		if (resizable == false)
-		{
-			_style &= ~WindowStyles.SizeBox;
-			_style &= ~WindowStyles.MaximizeBox;
-			WinAPI.SetWindowStyle(_handle, _style);
-		}
-
+		//Setup OpenGL
 		_deviceContext = WinAPI.GetDC(_handle);
 
 		var pfDescriptor = new PixelFormatDescriptor();
@@ -74,9 +67,13 @@ internal class Win32Window : PlatformWindowOld
 
 		var glContext = GL.CreateContext(_deviceContext);
 		GL.MakeCurrent(_deviceContext, glContext);
+		GL.Import();
+
+		//Sync values with PlatformWindow
+		var windowSize = WinAPI.GetWindowRect(_handle).Size;
+		UpdateSize(windowSize, clientSize);
 
 		_visible = visible;
-		_resizable = resizable;
 	}
 
 	private readonly WindowProcedure _windowProcedure;
@@ -93,6 +90,8 @@ internal class Win32Window : PlatformWindowOld
 				UpdatePosition(windowPosition, clientPosition);
 				break;
 			case WindowMessage.Size:
+				var windowSize = WinAPI.GetWindowRect(_handle).Size;
+				var clientSize = BitwiseUtils.SplitValue(lParam);
 
 				switch ((ResizeReason)wParam)
 				{
@@ -101,11 +100,13 @@ internal class Win32Window : PlatformWindowOld
 					case ResizeReason.Maximized:
 						UpdateState(WindowState.Maximized); break;
 					default:
-						UpdateState(WindowState.Normal); break;
+						var monitorSize = getCurrentMonitorInfo().Monitor.Size;
+						if (monitorSize == windowSize)
+							UpdateState(WindowState.Fullscreen);
+						else
+							UpdateState(WindowState.Normal); break;
 				}
 
-				var windowSize = WinAPI.GetWindowRect(_handle).Size;
-				var clientSize = BitwiseUtils.SplitValue(lParam);
 				UpdateSize(windowSize, clientSize);
 				break;
 			//Mouse Input
@@ -167,34 +168,74 @@ internal class Win32Window : PlatformWindowOld
 
 	#region Implementations
 
-	protected override void FocusImplementation()
+	protected override void SetSizeImplementation(Vector2Int size)
+		=> WinAPI.SetWindowPos(_handle, IntPtr.Zero, 0, 0, size.X, size.Y, SetWindowPosFlags.NoMove);
+
+	protected override void SetClientSizeImplementation(Vector2Int clientSize)
+	{
+		var newSize = new WinRectangle(Vector2Int.Zero, clientSize);
+		WinAPI.AdjustWindowRect(ref newSize, _style, false, _styleEx);
+		WinAPI.SetWindowPos(_handle, IntPtr.Zero, 0, 0, newSize.Width, newSize.Height, SetWindowPosFlags.NoMove);
+	}
+
+	protected override void SetPositionImplementation(Vector2Int position)
+	{
+		WinAPI.SetWindowPos(_handle, IntPtr.Zero, position.X, position.Y, 0, 0, SetWindowPosFlags.NoSize);
+	}
+
+	protected override void SetClientPositionImplementation(Vector2Int clientPosition)
+	{
+		var newPosition = new WinRectangle(clientPosition, Vector2Int.Zero);
+		WinAPI.AdjustWindowRect(ref newPosition, _style, false, _styleEx);
+		WinAPI.SetWindowPos(_handle, IntPtr.Zero, newPosition.X, newPosition.Y, 0, 0, SetWindowPosFlags.NoSize);
+	}
+
+	protected override void MinimizeImplementation()
+		=> WinAPI.ShowWindow(_handle, ShowWindowCommand.Minimize);
+
+	protected override void MaximizeImplementation()
+		=> WinAPI.ShowWindow(_handle, ShowWindowCommand.Maximize);
+
+	protected override void RestoreImplementation()
+		=> WinAPI.ShowWindow(_handle, ShowWindowCommand.Restore);
+
+	protected override void FullscreenImplementation()
+	{
+		var info = getCurrentMonitorInfo().Monitor;
+		_style = getCurrentStyle() & ~(WindowStyles.Caption | WindowStyles.SizeBox);
+		WinAPI.SetWindowStyle(_handle, _style);
+		WinAPI.SetWindowPos(_handle, IntPtr.Zero, info.X, info.Y, info.Width, info.Height,
+			SetWindowPosFlags.NoZOrder | SetWindowPosFlags.NoActivate | SetWindowPosFlags.FrameChanged);
+	}
+
+	protected override void RestoreFullscreenImplementation(Vector2Int lastPosition, Vector2Int lastSize)
+	{
+		_style = getCurrentStyle() | WindowStyles.Caption | WindowStyles.SizeBox;
+		WinAPI.SetWindowStyle(_handle, _style);
+		WinAPI.SetWindowPos(_handle, IntPtr.Zero, lastPosition.X, lastPosition.Y, lastSize.X, lastSize.Y,
+			SetWindowPosFlags.NoZOrder | SetWindowPosFlags.NoActivate | SetWindowPosFlags.FrameChanged);
+	}
+
+	public override void Center()
+	{
+		var workAreaInfo = getCurrentMonitorInfo().WorkArea;
+		Position = workAreaInfo.Position + (workAreaInfo.Size / 2 - Size / 2);
+	}
+
+	public override void Focus()
 	{
 		WinAPI.BringWindowToTop(_handle);
 		WinAPI.SetForegroundWindow(_handle);
 		WinAPI.SetFocus(_handle);
 	}
-	protected override void FullscreenImplementation() { }
-	protected override Vector2Int GetFullscreenSize() => WinAPI.GetClientRect(WinAPI.GetDesktopWindow()).Size;
-	protected override Vector2Int GetWorkareaSizeImplementation() => WinAPI.GetSystemWorkArea().Size;
-	protected override void MinimizeImplementation()
-		=> WinAPI.ShowWindow(_handle, ShowWindowCommand.Minimize);
-	protected override void MaximizeImplementation()
-		=> WinAPI.ShowWindow(_handle, ShowWindowCommand.Maximize);
-	protected override void RestoreImplementation()
-		=> WinAPI.ShowWindow(_handle, ShowWindowCommand.Restore);
-	protected override void RequestAttentionImplementation() => WinAPI.FlashWindow(_handle, true);
-	protected override void RestoreFullscreenImplementation(int lastX, int lastY, int lastWidth, int lastHeight) { }
-	protected override void SetClientSizeImplementation(Vector2Int clientSize)
-	{
-		var newSize = new WinRectangle(Vector2Int.Zero, clientSize);
-		WinAPI.AdjustWindowRect(ref newSize, _style, false, _styleEx);
-		WinAPI.SetWindowPos(_handle, IntPtr.Zero, 0, 0, newSize.Width, newSize.Height, (uint)SetWindowPosFlags.NoMove);
-	}
 
-	protected override void SetSizeImplementation(Vector2Int size)
-		=> WinAPI.SetWindowPos(_handle, IntPtr.Zero, 0, 0, size.X, size.Y, (uint)SetWindowPosFlags.NoMove);
+	public override void RequestAttention()
+		=> WinAPI.FlashWindow(_handle, true);
 
-	protected override void SetDecoratedImplementation(bool enabled) { }
+
+
+	protected override Vector2Int GetFullscreenSize() => getCurrentMonitorInfo().Monitor.Size;
+
 	protected override void SetIconImplementation(Image? data)
 	{
 		IntPtr icon = IntPtr.Zero;
@@ -209,56 +250,32 @@ internal class Win32Window : PlatformWindowOld
 
 		WinAPI.DeleteObject(icon);
 	}
-	protected override void SetPositionImplementation(Vector2Int position)
-	{
-		WinAPI.SetWindowPos(_handle, IntPtr.Zero, position.X, position.Y, 0, 0, (uint)SetWindowPosFlags.NoSize);
-	}
 
-	protected override void SetClientPositionImplementation(Vector2Int clientPosition)
-	{
-		var newPosition = new WinRectangle(clientPosition, Vector2Int.Zero);
-		WinAPI.AdjustWindowRect(ref newPosition, _style, false, _styleEx);
-		WinAPI.SetWindowPos(_handle, IntPtr.Zero, newPosition.X, newPosition.Y, 0, 0, (uint)SetWindowPosFlags.NoSize);
-	}
 
 	protected override void SetResizableImplementation(bool enabled)
 	{
 		var style = getCurrentStyle();
 		if (enabled)
-		{
-			style |= WindowStyles.SizeBox;
-			style |= WindowStyles.MaximizeBox;
-		}
+			style |= WindowStyles.SizeBox | WindowStyles.MaximizeBox;
 		else
-		{
-			style &= ~WindowStyles.SizeBox;
-			style &= ~WindowStyles.MaximizeBox;
-		}
+			style &= ~(WindowStyles.SizeBox | WindowStyles.MaximizeBox);
 
-		if (WinAPI.SetWindowLong(_handle, WindowLongValue.Style, (uint)style) == 0)
-			Console.WriteLine("Failed to change resizable property");
-
-		/*var setPosFlags = SetWindowPosFlags.FrameChanged | SetWindowPosFlags.NoMove | SetWindowPosFlags.NoSize
-			| SetWindowPosFlags.NoReposition | SetWindowPosFlags.NoZOrder;
-		WinAPI.SetWindowPos(_handle, IntPtr.Zero, 0, 0, 0, 0, (uint)setPosFlags);*/
-
-		WinRectangle rect = new(Position, ClientSize);
-		WinAPI.AdjustWindowRect(ref rect, getCurrentStyle(), false, 0);
-		var setPosFlags = SetWindowPosFlags.FrameChanged | SetWindowPosFlags.NoMove | SetWindowPosFlags.NoSize
-			| SetWindowPosFlags.NoReposition | SetWindowPosFlags.NoZOrder;
-		WinAPI.SetWindowPos(_handle, IntPtr.Zero, rect.X, rect.Y, rect.Width, rect.Height, (uint)setPosFlags);
+		WinAPI.SetWindowStyle(_handle, style);
 	}
 	protected override void SetShouldCloseImplementation(bool shouldClose) { }
 	protected override void SetTitleImplementation(string title)
 		=> WinAPI.SetWindowText(_handle, title);
 	protected override void SetVisibleImplementation(bool visible)
 		=> WinAPI.ShowWindow(_handle, visible ? ShowWindowCommand.Show : ShowWindowCommand.Hide);
-	protected override void SetVSyncImplementation(bool enabled) { }
+	protected override void SetVSyncImplementation(bool enabled)
+		=> GL.SwapInterval(enabled ? 1 : 0);
 	protected override void SwapBuffersImplementation() => WinAPI.SwapBuffers(_deviceContext);
 
 	#endregion
 
 	private WindowStyles getCurrentStyle() => (WindowStyles)WinAPI.GetWindowLong(_handle, (int)WindowLongValue.Style);
+	private IntPtr getCurrentMonitor() => WinAPI.MonitorFromWindow(_handle, MonitorFromFlags.DefaultToNearest);
+	private MonitorInfo getCurrentMonitorInfo() => WinAPI.GetMonitorInfo(getCurrentMonitor());
 
 	protected override void OnDispose()
 	{

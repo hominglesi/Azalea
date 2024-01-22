@@ -36,7 +36,7 @@ public class IWindowTest : TestScene
 					() => _window.State = WindowState.Maximized),
 				CreateActionButton(
 					"Set WindowState to 'Fullscreen'",
-					() => _window.State = WindowState.BorderlessFullscreen),
+					() => _window.State = WindowState.Fullscreen),
 				CreateActionButton(
 					"Set Resizable to 'true'",
 					() => _window.Resizable = true),
@@ -68,6 +68,12 @@ public class IWindowTest : TestScene
 					"Set icon to null",
 					() => _window.SetIconFromStream(null)),
 				CreateActionButton(
+					"Turn vsync on",
+					() => _window.VSync = true),
+				CreateActionButton(
+					"Turn vsync off",
+					() => _window.VSync = false),
+				CreateActionButton(
 					"Set position to 0",
 					() => _window.Position = Vector2Int.Zero),
 				CreateActionButton(
@@ -89,12 +95,6 @@ public class IWindowTest : TestScene
 					"Focus in 1.5 seconds",
 					() => _focusTimer = 1.5f),
 				CreateActionButton(
-					"Set Decorated to true",
-					() => _window.Decorated = true),
-				CreateActionButton(
-					"Set Decorated to false",
-					() => _window.Decorated = false),
-				CreateActionButton(
 					"Close window",
 					() => _window.Close())
 			}),
@@ -110,9 +110,6 @@ public class IWindowTest : TestScene
 					CreateObservedValue("Resizable",
 						() => _window.Resizable,
 						(value) => $"Window resizable changed to {value}"),
-					CreateObservedValue("Decorated",
-						() => _window.Decorated,
-						(value) => $"Window decorated changed to {value}"),
 					CreateObservedValue("Prevents Closure",
 						() => _preventsClosure,
 						(value) => value ? $"Test now prevents closure attempts" : $"Test no longer prevents closure attempts"),

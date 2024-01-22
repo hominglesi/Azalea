@@ -6,11 +6,6 @@ namespace Azalea.Platform;
 public interface IWindow : IDisposable
 {
 	/// <summary>
-	/// The window title
-	/// </summary>
-	string Title { get; set; }
-
-	/// <summary>
 	/// The size of the window on the users desktop
 	/// </summary>
 	Vector2Int Size { get; set; }
@@ -20,7 +15,7 @@ public interface IWindow : IDisposable
 	/// </summary>
 	Vector2Int ClientSize { get; set; }
 
-	internal Action<Vector2Int>? Resized { get; set; }
+	internal Action<Vector2Int>? OnClientResized { get; set; }
 
 	/// <summary>
 	/// The position of this window on the users desktop
@@ -38,18 +33,15 @@ public interface IWindow : IDisposable
 	/// </summary>
 	WindowState State { get; set; }
 
-
-	internal bool ShouldClose { get; set; }
+	/// <summary>
+	/// The window title
+	/// </summary>
+	string Title { get; set; }
 
 	/// <summary>
-	/// Controls if the window can be resized by the user. (Default: false)
+	/// Controls if the window can be resized by the user.
 	/// </summary>
 	public bool Resizable { get; set; }
-
-	/// <summary>
-	/// Controls if the window has its decorations or not
-	/// </summary>
-	public bool Decorated { get; set; }
 
 	public bool VSync { get; set; }
 
@@ -72,6 +64,11 @@ public interface IWindow : IDisposable
 	/// Sets the window icon.
 	/// </summary>
 	public void SetIconFromStream(Stream? imageStream);
+
+
+
+
+	internal bool ShouldClose { get; set; }
 
 	/// <summary>
 	/// Called when the window is being closed. Can be used to prevent closure.

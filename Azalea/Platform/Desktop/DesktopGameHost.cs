@@ -18,29 +18,17 @@ internal class DesktopGameHost : GameHost
 
 	public DesktopGameHost(HostPreferences preferences)
 	{
-		_window = new Win32Window(
-			preferences.WindowTitle,
-			preferences.PreferredClientSize,
-			preferences.PreferredWindowState,
-			preferences.WindowVisible,
-			preferences.WindowResizable,
-			preferences.DecoratedWindow,
-			preferences.TransparentFramebuffer);
-		/*
-		_window = new GLFWWindow(
-			preferences.WindowTitle,
-			preferences.PreferredClientSize.X, preferences.PreferredClientSize.Y,
-			preferences.PreferredWindowState,
-			preferences.WindowVisible,
-			preferences.WindowResizable,
-			preferences.DecoratedWindow,
-			preferences.TransparentFramebuffer);
-		_window.VSync = preferences.VSync;*/
+		_window = new Win32Window(preferences.WindowTitle, preferences.PreferredClientSize,
+			preferences.PreferredWindowState, preferences.WindowVisible)
+		{
+			//These are fine just being set normaly
+			VSync = preferences.VSync,
+			Resizable = preferences.WindowResizable
+		};
 	}
 
 	public override void CallInitialized()
 	{
-		GL.Import();
 		GL.Enable(GLCapability.Blend);
 		GL.BlendFunc(GLBlendFunction.SrcAlpha, GLBlendFunction.OneMinusSrcAlpha);
 

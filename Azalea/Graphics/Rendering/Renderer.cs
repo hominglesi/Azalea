@@ -36,7 +36,7 @@ internal abstract class Renderer : IRenderer
 	{
 		Window = window;
 
-		Window.Resized += SetViewport;
+		Window.OnClientResized += SetViewport;
 	}
 
 	protected internal virtual void Initialize()

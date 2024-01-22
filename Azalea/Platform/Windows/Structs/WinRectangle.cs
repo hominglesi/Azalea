@@ -27,6 +27,8 @@ internal readonly struct WinRectangle
 	public readonly int Y => _top;
 	public readonly int Width => _right - _left;
 	public readonly int Height => _bottom - _top;
+	public readonly Vector2Int Position => new(X, Y);
+	public readonly Vector2Int Size => new(Width, Height);
 
 	public static implicit operator RectangleInt(WinRectangle rect)
 		=> new(rect._left, rect._top, rect._right - rect._left, rect._bottom - rect._top);

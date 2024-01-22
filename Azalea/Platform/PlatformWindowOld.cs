@@ -1,6 +1,4 @@
-﻿using Azalea.Graphics;
-using System;
-using System.IO;
+﻿using System;
 
 namespace Azalea.Platform;
 internal abstract class PlatformWindowOld : PlatformWindow, IWindow
@@ -75,45 +73,6 @@ internal abstract class PlatformWindowOld : PlatformWindow, IWindow
 		}
 	}
 
-	protected abstract void SetVSyncImplementation(bool enabled);
-	private bool _vSync = DEFAULT_VSYNC;
-	public bool VSync
-	{
-		get => _vSync;
-		set
-		{
-			if (value == _vSync) return;
-			_vSync = value;
-			SetVSyncImplementation(value);
-		}
-	}
-
-	protected abstract void SetResizableImplementation(bool enabled);
-	protected bool _resizable = DEFAULT_RESIZABLE;
-	public bool Resizable
-	{
-		get => _resizable;
-		set
-		{
-			if (value == _resizable) return;
-			_resizable = value;
-			SetResizableImplementation(value);
-		}
-	}
-
-	protected abstract void SetDecoratedImplementation(bool enabled);
-	protected bool _decorated = DEFAULT_DECORATED;
-	public bool Decorated
-	{
-		get => _decorated;
-		set
-		{
-			if (value == _decorated) return;
-			_decorated = value;
-			SetDecoratedImplementation(value);
-		}
-	}
-
 	/*
 	public WindowState State
 	{
@@ -146,29 +105,14 @@ internal abstract class PlatformWindowOld : PlatformWindow, IWindow
 			_state = value;
 		}
 	}*/
-	protected abstract void FullscreenImplementation();
-	protected abstract void RestoreFullscreenImplementation(int lastX, int lastY, int lastWidth, int lastHeight);
 
-
+	/*
 	protected abstract Vector2Int GetWorkareaSizeImplementation();
 	public void Center()
 	{
 		var workareaSize = GetWorkareaSizeImplementation();
-		Position = workareaSize / 2 - ClientSize / 2;
-	}
-
-	protected abstract void RequestAttentionImplementation();
-	public void RequestAttention() => RequestAttentionImplementation();
-
-	protected abstract void FocusImplementation();
-	public void Focus() => FocusImplementation();
-
-	protected abstract void SetIconImplementation(Image? data);
-	public void SetIconFromStream(Stream? imageStream)
-	{
-		var data = imageStream is null ? null : Image.FromStream(imageStream);
-		SetIconImplementation(data);
-	}
+		Position = workareaSize / 2 - Size / 2;
+	}*/
 
 	protected abstract void SwapBuffersImplementation();
 	public void SwapBuffers() => SwapBuffersImplementation();

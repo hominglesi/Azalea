@@ -135,6 +135,19 @@ internal static class WinAPI
 	private static extern sbyte getMessage(out Message message, IntPtr window, uint wMsgFilterMin, uint wMsgFilterMax);
 	public static sbyte GetMessage(out Message message, IntPtr window) => getMessage(out message, window, 0, 0);
 
+	[DllImport(User32Path, EntryPoint = "GetMonitorInfoW", CharSet = CharSet.Unicode)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	private static extern bool getMonitorInfo(IntPtr monitor, ref MonitorInfo info);
+	public static MonitorInfo GetMonitorInfo(IntPtr monitor)
+	{
+		var info = new MonitorInfo();
+		if (getMonitorInfo(monitor, ref info) == false)
+			Console.WriteLine("GetMonitorInfo failed");
+
+		return info;
+	}
+
+
 	[DllImport(User32Path, EntryPoint = "GetRawInputData")]
 	public static extern uint GetRawInputData(IntPtr rawInput, uint command, ref RawInput data, ref uint dataSize, uint headerSize);
 
@@ -162,6 +175,9 @@ internal static class WinAPI
 
 	[DllImport(User32Path, EntryPoint = "LoadCursorW", CharSet = CharSet.Unicode)]
 	public static extern IntPtr LoadCursor(IntPtr instance, uint cursorValue);
+
+	[DllImport(User32Path, EntryPoint = "MonitorFromWindow")]
+	public static extern IntPtr MonitorFromWindow(IntPtr window, MonitorFromFlags flags);
 
 	[DllImport(User32Path, EntryPoint = "PeekMessageW", CharSet = CharSet.Unicode)]
 	private static extern sbyte peekMessage(out Message message, IntPtr window, uint minFilter, uint maxFilter, uint remove);
@@ -211,7 +227,7 @@ internal static class WinAPI
 		int y,
 		int width,
 		int height,
-		uint flags);
+		SetWindowPosFlags flags);
 
 	public static void SetWindowStyle(IntPtr window, WindowStyles style)
 	{
