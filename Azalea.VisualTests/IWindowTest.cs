@@ -47,9 +47,6 @@ public class IWindowTest : TestScene
 					"Set Title to ''",
 					() => _window.Title = ""),
 				CreateActionButton(
-					"Attempt to Close Window",
-					() => _window.Close()),
-				CreateActionButton(
 					"Set this test to prevent Closing",
 					() => _preventsClosure = true),
 				CreateActionButton(
@@ -59,11 +56,17 @@ public class IWindowTest : TestScene
 					"Set icon to Azalea flower",
 					() => _window.SetIconFromStream(Assets.GetStream("Textures/azalea-icon.png")!)),
 				CreateActionButton(
+					"Set icon to Missing texture",
+					() => _window.SetIconFromStream(Assets.GetStream("Textures/missing-texture.png")!)),
+				CreateActionButton(
 					"Set icon to null",
 					() => _window.SetIconFromStream(null)),
 				CreateActionButton(
 					"Move window by (25, 25)",
 					() => _window.Position += new Vector2Int(25, 25)),
+				CreateActionButton(
+					"Enlarge window by (25, 25)",
+					() => _window.ClientSize += new Vector2Int(25, 25)),
 				CreateActionButton(
 					"Center window",
 					() => _window.Center()),
@@ -79,6 +82,9 @@ public class IWindowTest : TestScene
 				CreateActionButton(
 					"Set Opacity to 0.3",
 					() => _window.Opacity = 0.3f),
+				CreateActionButton(
+					"Focus in 1.5 seconds",
+					() => _focusTimer = 1.5f),
 				CreateActionButton(
 					"Set Decorated to true",
 					() => _window.Decorated = true),
@@ -139,6 +145,20 @@ public class IWindowTest : TestScene
 						() => getField<bool>(_window, "_preMinimizedFullscreen")),*/
 			})
 		});
+	}
+
+	private float _focusTimer = -1f;
+
+	protected override void Update()
+	{
+		if (_focusTimer > 0)
+		{
+			_focusTimer -= Time.DeltaTime;
+			if (_focusTimer <= 0)
+			{
+				_window.Focus();
+			}
+		}
 	}
 
 	private T getField<T>(object? obj, string name)

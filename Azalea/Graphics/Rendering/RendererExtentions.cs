@@ -8,8 +8,21 @@ namespace Azalea.Graphics.Rendering;
 
 public static class RendererExtentions
 {
+	internal static bool ClientContainsQuad(Quad quad)
+	{
+		var clientSize = AzaleaGame.Main.Host.Window.ClientSize;
+
+		if (quad.TopLeft.X < clientSize.X && quad.BottomRight.X > 0 && quad.TopLeft.Y < clientSize.Y)
+			return quad.BottomRight.Y > 0;
+
+		return false;
+	}
+
 	internal static void DrawQuad(this IRenderer renderer, Texture texture, Quad vertexQuad, DrawColorInfo drawColorInfo)
 	{
+		if (ClientContainsQuad(vertexQuad) == false)
+			return;
+
 		renderer.BindTexture(texture);
 
 		var vertexAction = renderer.DefaultQuadBatch.AddAction;
@@ -47,6 +60,7 @@ public static class RendererExtentions
 
 	internal static void DrawRectangle(this IRenderer renderer, Rectangle rect, Matrix3 drawMatrix, Boundary thickness, DrawColorInfo color, bool towardsOutside)
 	{
+
 		var texture = renderer.WhitePixel;
 
 		var topRect = towardsOutside ?
