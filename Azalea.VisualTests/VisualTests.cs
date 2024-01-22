@@ -1,7 +1,6 @@
 ﻿//using Azalea.Audios;
 using Azalea.Graphics.Colors;
 using Azalea.IO.Resources;
-using Azalea.VisualTests.Breakout;
 
 namespace Azalea.VisualTests;
 
@@ -19,6 +18,7 @@ public class VisualTests : AzaleaGame
 		//Add(new TextContainerTest());
 		Add(new BilliardTest());
 		//Add(new PhysicsTest());
+		//Add(new TriggerTest());
 		//Add(new SliderTests());
 		//Add(new AutoSizeTest());
 		//Add(new InputTest());
