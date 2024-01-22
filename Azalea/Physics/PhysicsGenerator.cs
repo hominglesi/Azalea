@@ -41,6 +41,18 @@ public class PhysicsGenerator
 			if (IsTopDown && rb.UsesFriction) applyTopDownFriction(rb);
 			applyForces(rb, bodies);
 		}
+
+		foreach (var collider in RigidBodies.Select(x => x.Parent.GetComponent<Collider>()))
+		{
+			collider.CheckColliders();
+		}
+
+		foreach (var collider in RigidBodies.Select(x => x.Parent.GetComponent<Collider>()))
+		{
+			collider.CollidedWith.Clear();
+			collider.CollidedWith.AddRange(collider.CollidingWith);
+			collider.CollidingWith.Clear();
+		}
 	}
 
 	private void applyGravity(RigidBody rb)
@@ -159,21 +171,20 @@ public class PhysicsGenerator
 		float distanceX = rotatedCircleX - closestX;
 		float distanceY = rotatedCircleY - closestY;
 
-		if (distanceX == 0 && distanceY == 0)
+		//TODO fix so this can work with triggers p1
+
+		if (distanceX == 0 && distanceY == 0 && rect.IsTrigger == false && circle.IsTrigger == false)
 			return false;
 
-		Vector2 collisionNormal = Vector2.Normalize(new Vector2(distanceX, distanceY));
-		if (float.IsNaN(collisionNormal.X) || float.IsNaN(collisionNormal.Y))
-			Console.WriteLine("Collision Normal is NAN");
-		collisionNormal = collisionNormal.Rotate(rectAngle, false);
+
 
 		//x2 = cosβx1 − sinβy1
 		//y2 = sinβx1 + cosβy1
 
 		double distance = Math.Sqrt(Math.Pow(distanceX, 2) + Math.Pow(distanceY, 2));
 
-
-		if (distance < circle.Radius)
+		//TODO fix so this can work with triggers p2
+		if (distance < circle.Radius || (circle.Position - rect.Position).Length() <= circle.Radius)
 		{
 			float unrotatedRectPositionX = (float)((closestX - rect.Position.X) * Math.Cos(rectAngle) + (closestY - rect.Position.Y) * Math.Sin(rectAngle) + rect.Position.X);
 			float unrotatedRectPositionY = (float)(-(closestX - rect.Position.X) * Math.Sin(rectAngle) + (closestY - rect.Position.Y) * Math.Cos(rectAngle) + rect.Position.Y);
@@ -181,8 +192,13 @@ public class PhysicsGenerator
 			Vector2 rotatedRectPosition = new Vector2(unrotatedRectPositionX, unrotatedRectPositionY);
 			float penetration = (float)(circle.Radius - distance);
 			if (circle.IsTrigger == false && rect.IsTrigger == false && shouldResolveCollision)
+			{
+				Vector2 collisionNormal = Vector2.Normalize(new Vector2(distanceX, distanceY));
+				if (float.IsNaN(collisionNormal.X) || float.IsNaN(collisionNormal.Y))
+					Console.WriteLine("Collision Normal is NAN");
+				collisionNormal = collisionNormal.Rotate(rectAngle, false);
 				ResolveCircleOnRectCollision(circle, rect, penetration, collisionNormal, rotatedRectPosition);
-
+			}
 			circle.OnCollide(rect);
 			rect.OnCollide(circle);
 
