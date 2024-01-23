@@ -1,8 +1,7 @@
-﻿using Azalea.Graphics;
+using Azalea.Graphics;
 using Azalea.IO.Resources;
 using Azalea.Platform;
 using System;
-using System.Reflection;
 
 namespace Azalea.VisualTests;
 public class IWindowTest : TestScene
@@ -102,42 +101,27 @@ public class IWindowTest : TestScene
 			CreateObservedContainer(new GameObject[]
 			{
 				CreateObservedValue("WindowState",
-						() => _window.State,
-						(value) => $"Window state changed to {value}"),
-					CreateObservedValue("Title",
-						() => _window.Title,
-						(value) => $"Window title changed to {value}"),
-					CreateObservedValue("Resizable",
-						() => _window.Resizable,
-						(value) => $"Window resizable changed to {value}"),
-					CreateObservedValue("Prevents Closure",
-						() => _preventsClosure,
-						(value) => value ? $"Test now prevents closure attempts" : $"Test no longer prevents closure attempts"),
-					CreateObservedValue("Position",
-						() => _window.Position,
-						(value) => $"Window moved to {value}"),
-					CreateObservedValue("ClientPosition",
-						() => _window.ClientPosition),
-					CreateObservedValue("Size",
-						() => _window.Size),
-					CreateObservedValue("ClientSize",
-						() => _window.ClientSize,
-						(value) => $"Window resized to {value}"),
-					/*
-					CreateObservedValue("_fullscreen",
-						() => getField<bool>(_window, "_fullscreen")),
-					CreateObservedValue("_maximized",
-						() => getField<bool>(_window, "_maximized")),
-					CreateObservedValue("_minimized",
-						() => getField<bool>(_window, "_minimized")),
-					CreateObservedValue("_lastPosition",
-						() => getField<Vector2Int>(_window, "_lastPosition")),
-					CreateObservedValue("_lastSize",
-						() => getField<Vector2Int>(_window, "_lastSize")),
-					CreateObservedValue("_preMinimizedMaximized",
-						() => getField<bool>(_window, "_preMinimizedMaximized")),
-					CreateObservedValue("_preMinimizedFullscreen",
-						() => getField<bool>(_window, "_preMinimizedFullscreen")),*/
+					() => _window.State,
+					(value) => $"Window state changed to {value}"),
+				CreateObservedValue("Title",
+					() => _window.Title,
+					(value) => $"Window title changed to {value}"),
+				CreateObservedValue("Resizable",
+					() => _window.Resizable,
+					(value) => $"Window resizable changed to {value}"),
+				CreateObservedValue("Prevents Closure",
+					() => _preventsClosure,
+					(value) => value ? $"Test now prevents closure attempts" : $"Test no longer prevents closure attempts"),
+				CreateObservedValue("Position",
+					() => _window.Position,
+					(value) => $"Window moved to {value}"),
+				CreateObservedValue("ClientPosition",
+					() => _window.ClientPosition),
+				CreateObservedValue("Size",
+					() => _window.Size),
+				CreateObservedValue("ClientSize",
+					() => _window.ClientSize,
+					(value) => $"Window resized to {value}"),
 			})
 		});
 	}
@@ -164,12 +148,6 @@ public class IWindowTest : TestScene
 				_window.RequestAttention();
 			}
 		}
-	}
-
-	private T getField<T>(object? obj, string name)
-	{
-		var type = typeof(AzaleaGame).Assembly.GetType("Azalea.Platform.Glfw.GLFWWindow")!;
-		return (T)type.GetField(name, BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(obj)!;
 	}
 
 	private void onWindowClosing()

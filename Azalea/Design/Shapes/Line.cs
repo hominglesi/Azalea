@@ -1,6 +1,9 @@
-﻿using Azalea.Graphics;
+﻿using Azalea.Extentions.MatrixExtentions;
+using Azalea.Graphics;
 using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering;
+using Azalea.Numerics;
+using Azalea.Utils;
 using System.Numerics;
 
 namespace Azalea.Design.Shapes;
@@ -14,17 +17,20 @@ public class Line : GameObject
 
 	public override void Draw(IRenderer renderer)
 	{
-		var halfLine = new Vector2(0, Thickness / 2);
+		base.Draw(renderer);
 
-		var quad = new Quad(
-			StartPoint + halfLine,
-			StartPoint - halfLine,
-			EndPoint - halfLine,
-			EndPoint + halfLine);
+		var distance = MathUtils.DistanceBetween(StartPoint, EndPoint);
+		var rectangle = new Rectangle(Vector2.Zero, new(distance, Thickness));
+		rectangle.Y -= Thickness / 2;
+		var rotation = MathUtils.GetAngleTowards(StartPoint, EndPoint);
+
+		var matrix = Matrix3.Identity;//Info.Matrix;
+		MatrixExtentions.TranslateFromLeft(ref matrix, StartPoint);
+		MatrixExtentions.RotateFromLeft(ref matrix, rotation);
 
 		renderer.DrawQuad(
 		AzaleaGame.Main.Host.Renderer.WhitePixel,
-		quad * DrawInfo.Matrix,
+		Quad.FromRectangle(rectangle) * matrix, //  quad * Info.Matrix,
 		DrawColorInfo);
 	}
 }
