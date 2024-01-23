@@ -23,10 +23,11 @@ public class VisualTests : AzaleaGame
 		//Add(new AutoSizeTest());
 		//Add(new InputTest());
 		//Add(new PanningTest());
-		Add(new IWindowTest());
+		//Add(new IWindowTest());
 		//Add(new AudioTest());
 		//Add(new BreakoutTest());
 		//Add(new BoundingBoxTreeTest());
+		Add(new CameraTest());
 	}
 
 	protected override void Update()
