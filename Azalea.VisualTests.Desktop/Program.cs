@@ -10,7 +10,7 @@ var host = Host.CreateHost(new HostPreferences
 	WindowResizable = true,
 	WindowTitle = "Azalea Visual Tests",
 	PreferredWindowState = WindowState.Normal,
-	VSync = true
+	VSync = true,
 });
 
 host.Run(new VisualTests());

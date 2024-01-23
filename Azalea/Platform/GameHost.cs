@@ -77,7 +77,7 @@ public abstract class GameHost
 
 			if (firstWindowShow == false)
 			{
-				Window.Visible = true;
+				Window.Show(true);
 				firstWindowShow = true;
 			}
 
@@ -86,6 +86,7 @@ public abstract class GameHost
 
 			EndFrame();
 		}
+		Window.Hide();
 
 		PerformanceTrace.SaveEventsTo("C:\\Programming\\trace.txt");
 

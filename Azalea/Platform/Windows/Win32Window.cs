@@ -6,17 +6,16 @@ using System;
 using System.Runtime.InteropServices;
 
 namespace Azalea.Platform.Windows;
-internal class Win32Window : PlatformWindowOld
+internal class Win32Window : PlatformWindow
 {
 	private readonly IntPtr _handle;
 	private readonly IntPtr _deviceContext;
-
-	private WindowStyles _style;
-	private WindowStylesEx _styleEx;
+	private readonly WindowState _prefferedFirstShowState;
 
 	public Win32Window(string title, Vector2Int clientSize, WindowState state, bool visible)
 		: base(title, clientSize, state)
 	{
+		_prefferedFirstShowState = state;
 		var programHandle = System.Diagnostics.Process.GetCurrentProcess().Handle;
 
 		var cursor = WinAPI.LoadCursor(IntPtr.Zero, 32512);
@@ -28,20 +27,21 @@ internal class Win32Window : PlatformWindowOld
 		};
 
 		WinRectangle windowRect = new(100, 100, clientSize.X, clientSize.Y);
-		_style = WindowStyles.Caption | WindowStyles.SysMenu
+		var style = WindowStyles.Caption | WindowStyles.SysMenu
 			| WindowStyles.MinimizeBox | WindowStyles.MaximizeBox | WindowStyles.SizeBox;
-		_styleEx = WindowStylesEx.AppWindow;
+		var styleEx = WindowStylesEx.AppWindow;
 
-		if (visible) _style |= WindowStyles.Visible;
+		if (visible)
+			style |= WindowStyles.Visible;
 
-		WinAPI.AdjustWindowRect(ref windowRect, _style, false, 0);
+		WinAPI.AdjustWindowRect(ref windowRect, style, false, 0);
 
 		var id = WinAPI.RegisterClass(ref wndClass);
 		_handle = WinAPI.CreateWindow(
-			_styleEx,
+			styleEx,
 			id,
 			title,
-			_style,
+			style,
 			windowRect.X,
 			windowRect.Y,
 			windowRect.Width,
@@ -72,8 +72,6 @@ internal class Win32Window : PlatformWindowOld
 		//Sync values with PlatformWindow
 		var windowSize = WinAPI.GetWindowRect(_handle).Size;
 		UpdateSize(windowSize, clientSize);
-
-		_visible = visible;
 	}
 
 	private readonly WindowProcedure _windowProcedure;
@@ -150,22 +148,6 @@ internal class Win32Window : PlatformWindowOld
 		return WinAPI.DefWindowProc(window, message, wParam, lParam);
 	}
 
-	private Vector2Int _mousePosition;
-
-	public override void ProcessEvents()
-	{
-		while (WinAPI.PeekMessage(out Message message, IntPtr.Zero) != 0)
-		{
-			_ = WinAPI.TranslateMessage(ref message);
-			WinAPI.DispatchMessage(ref message);
-		}
-
-		//Update mouse position
-		WinAPI.GetCursorPos(out _mousePosition);
-		WinAPI.ScreenToClient(_handle, ref _mousePosition);
-		Input.HandleMousePositionChange(_mousePosition);
-	}
-
 	#region Implementations
 
 	protected override void SetSizeImplementation(Vector2Int size)
@@ -174,7 +156,7 @@ internal class Win32Window : PlatformWindowOld
 	protected override void SetClientSizeImplementation(Vector2Int clientSize)
 	{
 		var newSize = new WinRectangle(Vector2Int.Zero, clientSize);
-		WinAPI.AdjustWindowRect(ref newSize, _style, false, _styleEx);
+		WinAPI.AdjustWindowRect(ref newSize, getCurrentStyle(), false, getCurrentStyleEx());
 		WinAPI.SetWindowPos(_handle, IntPtr.Zero, 0, 0, newSize.Width, newSize.Height, SetWindowPosFlags.NoMove);
 	}
 
@@ -186,7 +168,7 @@ internal class Win32Window : PlatformWindowOld
 	protected override void SetClientPositionImplementation(Vector2Int clientPosition)
 	{
 		var newPosition = new WinRectangle(clientPosition, Vector2Int.Zero);
-		WinAPI.AdjustWindowRect(ref newPosition, _style, false, _styleEx);
+		WinAPI.AdjustWindowRect(ref newPosition, getCurrentStyle(), false, getCurrentStyleEx());
 		WinAPI.SetWindowPos(_handle, IntPtr.Zero, newPosition.X, newPosition.Y, 0, 0, SetWindowPosFlags.NoSize);
 	}
 
@@ -202,19 +184,36 @@ internal class Win32Window : PlatformWindowOld
 	protected override void FullscreenImplementation()
 	{
 		var info = getCurrentMonitorInfo().Monitor;
-		_style = getCurrentStyle() & ~(WindowStyles.Caption | WindowStyles.SizeBox);
-		WinAPI.SetWindowStyle(_handle, _style);
+		var style = getCurrentStyle() & ~(WindowStyles.Caption | WindowStyles.SizeBox);
+		WinAPI.SetWindowStyle(_handle, style);
 		WinAPI.SetWindowPos(_handle, IntPtr.Zero, info.X, info.Y, info.Width, info.Height,
 			SetWindowPosFlags.NoZOrder | SetWindowPosFlags.NoActivate | SetWindowPosFlags.FrameChanged);
 	}
 
 	protected override void RestoreFullscreenImplementation(Vector2Int lastPosition, Vector2Int lastSize)
 	{
-		_style = getCurrentStyle() | WindowStyles.Caption | WindowStyles.SizeBox;
-		WinAPI.SetWindowStyle(_handle, _style);
+		var style = getCurrentStyle() | WindowStyles.Caption | WindowStyles.SizeBox;
+		WinAPI.SetWindowStyle(_handle, style);
 		WinAPI.SetWindowPos(_handle, IntPtr.Zero, lastPosition.X, lastPosition.Y, lastSize.X, lastSize.Y,
 			SetWindowPosFlags.NoZOrder | SetWindowPosFlags.NoActivate | SetWindowPosFlags.FrameChanged);
 	}
+
+	protected override void SetTitleImplementation(string title)
+		=> WinAPI.SetWindowText(_handle, title);
+
+	protected override void SetResizableImplementation(bool enabled)
+	{
+		var style = getCurrentStyle();
+		if (enabled)
+			style |= WindowStyles.SizeBox | WindowStyles.MaximizeBox;
+		else
+			style &= ~(WindowStyles.SizeBox | WindowStyles.MaximizeBox);
+
+		WinAPI.SetWindowStyle(_handle, style);
+	}
+
+	protected override void SetVSyncImplementation(bool enabled)
+		=> GL.SwapInterval(enabled ? 1 : 0);
 
 	public override void Center()
 	{
@@ -232,10 +231,6 @@ internal class Win32Window : PlatformWindowOld
 	public override void RequestAttention()
 		=> WinAPI.FlashWindow(_handle, true);
 
-
-
-	protected override Vector2Int GetFullscreenSize() => getCurrentMonitorInfo().Monitor.Size;
-
 	protected override void SetIconImplementation(Image? data)
 	{
 		IntPtr icon = IntPtr.Zero;
@@ -251,31 +246,55 @@ internal class Win32Window : PlatformWindowOld
 		WinAPI.DeleteObject(icon);
 	}
 
+	public override void SwapBuffers() => WinAPI.SwapBuffers(_deviceContext);
 
-	protected override void SetResizableImplementation(bool enabled)
+	public override void Show(bool firstTime)
 	{
-		var style = getCurrentStyle();
-		if (enabled)
-			style |= WindowStyles.SizeBox | WindowStyles.MaximizeBox;
+		if (firstTime == false)
+			WinAPI.ShowWindow(_handle, ShowWindowCommand.Show);
 		else
-			style &= ~(WindowStyles.SizeBox | WindowStyles.MaximizeBox);
-
-		WinAPI.SetWindowStyle(_handle, style);
+			handleFirstShow(_prefferedFirstShowState);
 	}
-	protected override void SetShouldCloseImplementation(bool shouldClose) { }
-	protected override void SetTitleImplementation(string title)
-		=> WinAPI.SetWindowText(_handle, title);
-	protected override void SetVisibleImplementation(bool visible)
-		=> WinAPI.ShowWindow(_handle, visible ? ShowWindowCommand.Show : ShowWindowCommand.Hide);
-	protected override void SetVSyncImplementation(bool enabled)
-		=> GL.SwapInterval(enabled ? 1 : 0);
-	protected override void SwapBuffersImplementation() => WinAPI.SwapBuffers(_deviceContext);
+
+	public override void Hide()
+		=> WinAPI.ShowWindow(_handle, ShowWindowCommand.Hide);
+
+	private Vector2Int _mousePosition;
+	public override void ProcessEvents()
+	{
+		while (WinAPI.PeekMessage(out Message message, IntPtr.Zero) != 0)
+		{
+			_ = WinAPI.TranslateMessage(ref message);
+			WinAPI.DispatchMessage(ref message);
+		}
+
+		//Update mouse position
+		WinAPI.GetCursorPos(out _mousePosition);
+		WinAPI.ScreenToClient(_handle, ref _mousePosition);
+		Input.HandleMousePositionChange(_mousePosition);
+	}
 
 	#endregion
 
 	private WindowStyles getCurrentStyle() => (WindowStyles)WinAPI.GetWindowLong(_handle, (int)WindowLongValue.Style);
+	private WindowStylesEx getCurrentStyleEx() => (WindowStylesEx)WinAPI.GetWindowLong(_handle, (int)WindowLongValue.ExStyle);
 	private IntPtr getCurrentMonitor() => WinAPI.MonitorFromWindow(_handle, MonitorFromFlags.DefaultToNearest);
 	private MonitorInfo getCurrentMonitorInfo() => WinAPI.GetMonitorInfo(getCurrentMonitor());
+	private void handleFirstShow(WindowState state)
+	{
+		switch (state)
+		{
+			case WindowState.Normal:
+				WinAPI.ShowWindow(_handle, ShowWindowCommand.ShowNormal); return;
+			case WindowState.Maximized:
+				WinAPI.ShowWindow(_handle, ShowWindowCommand.ShowMaximized); return;
+			case WindowState.Minimized:
+				WinAPI.ShowWindow(_handle, ShowWindowCommand.ShowMinimized); return;
+			case WindowState.Fullscreen:
+				WinAPI.ShowWindow(_handle, ShowWindowCommand.ShowNormal);
+				State = WindowState.Fullscreen; return;
+		}
+	}
 
 	protected override void OnDispose()
 	{

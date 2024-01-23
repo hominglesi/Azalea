@@ -4,7 +4,7 @@ using System;
 using System.IO;
 
 namespace Azalea.Platform;
-internal abstract class PlatformWindow : Disposable
+internal abstract class PlatformWindow : Disposable, IWindow
 {
 	public PlatformWindow(string title, Vector2Int clientSize, WindowState state)
 	{
@@ -212,6 +212,40 @@ internal abstract class PlatformWindow : Disposable
 		var data = imageStream is null ? null : Image.FromStream(imageStream);
 		SetIconImplementation(data);
 	}
+
+	public abstract void SwapBuffers();
+
+	public abstract void Show(bool firstTime);
+
+	public abstract void Hide();
+
+	public abstract void ProcessEvents();
+
+	#endregion
+
+	#region Closing
+
+	private bool _shouldClose;
+	public bool ShouldClose
+	{
+		get => _shouldClose;
+		set
+		{
+			if (value == _shouldClose) return;
+			_shouldClose = value;
+		}
+	}
+
+	public Action? Closing { get; set; }
+
+	public void Close()
+	{
+		ShouldClose = true;
+		Closing?.Invoke();
+	}
+
+	public void PreventClosure()
+		=> ShouldClose = false;
 
 	#endregion
 }
