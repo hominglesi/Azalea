@@ -343,7 +343,7 @@ internal static unsafe class GL
 		_glDeleteVertexArrays!(1, &vertexArray);
 	}
 
-	public static void Import()
+	public static void ImportFunctions()
 	{
 		_wglSwapInterval = Marshal.GetDelegateForFunctionPointer<SwapIntervalDelegate>(wglGetProcAddress("wglSwapIntervalEXT"));
 		_glCreateBuffers = Marshal.GetDelegateForFunctionPointer<CreateBuffersDelegate>(wglGetProcAddress("glCreateBuffers"));

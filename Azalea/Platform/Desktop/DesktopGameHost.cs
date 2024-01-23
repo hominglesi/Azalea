@@ -16,14 +16,13 @@ internal class DesktopGameHost : GameHost
 	internal override IInputManager InputManager => _input ?? throw new Exception("Cannot use InputManager before it is initialized");
 	private GLFWInput? _input;
 
-	public DesktopGameHost(HostPreferences preferences)
+	public DesktopGameHost(HostPreferences prefs)
 	{
-		_window = new Win32Window(preferences.WindowTitle, preferences.PreferredClientSize,
-			preferences.PreferredWindowState, preferences.WindowVisible)
+		_window = new Win32Window(prefs.WindowTitle, prefs.ClientSize, prefs.WindowState, prefs.WindowVisible)
 		{
 			//These are fine just being set normaly
-			VSync = preferences.VSync,
-			Resizable = preferences.WindowResizable
+			VSync = prefs.VSync,
+			Resizable = prefs.WindowResizable
 		};
 	}
 

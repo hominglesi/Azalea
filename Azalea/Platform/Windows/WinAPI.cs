@@ -80,7 +80,7 @@ internal static class WinAPI
 	public static extern IntPtr CreateWindow(
 		WindowStylesEx stylesEx,
 		ushort classAtom,
-		string name,
+		string title,
 		WindowStyles styles,
 		int x,
 		int y,
@@ -262,6 +262,7 @@ internal static class WinAPI
 	}
 
 	[DllImport(User32Path, EntryPoint = "TranslateMessage")]
+	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool TranslateMessage([In] ref Message message);
 
 	[DllImport(User32Path, EntryPoint = "UpdateWindow")]

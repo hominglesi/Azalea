@@ -6,57 +6,66 @@ namespace Azalea.Platform;
 public interface IWindow : IDisposable
 {
 	/// <summary>
-	/// The size of the window on the users desktop
+	/// The size of the window on the users desktop.
+	/// This includes all the active windows features, like the caption, and the resize border.
+	/// Even if the window is not resizable this will include the area around the window used for resizing.
 	/// </summary>
 	Vector2Int Size { get; set; }
 
 	/// <summary>
-	/// The size of the window, excluding the title bar and border.
+	/// The size of the window client on the users desktop.
+	/// This does not include the caption and the resize border.
 	/// </summary>
 	Vector2Int ClientSize { get; set; }
 
 	internal Action<Vector2Int>? OnClientResized { get; set; }
 
 	/// <summary>
-	/// The position of this window on the users desktop
+	/// The position of the window on the users desktop
+	/// This position is the top-left point of the window including all the active windows features,
+	/// like the caption, and the resize border.
+	/// Even if the window is not resizable this will account for the area around the window used for resizing.
 	/// </summary>
 	Vector2Int Position { get; set; }
 
 	/// <summary>
-	/// The position of the window, excluding the title bar and border.
+	/// The position of the window client on the users desktop.
+	/// This position is the top-left point of the window client.
 	/// </summary>
 	Vector2Int ClientPosition { get; set; }
 
 	/// <summary>
-	/// Controls the state of the window.
-	/// For possible states see <seealso cref="WindowState"/>.
+	/// The current state of the window.
 	/// </summary>
 	WindowState State { get; set; }
 
 	/// <summary>
-	/// The window title
+	/// The title of the window.
 	/// </summary>
 	string Title { get; set; }
 
 	/// <summary>
-	/// Controls if the window can be resized by the user.
+	/// Whether the window can be resized using the resize border.
 	/// </summary>
 	bool Resizable { get; set; }
 
+	/// <summary>
+	/// Whether V-Sync is enabled
+	/// </summary>
 	bool VSync { get; set; }
 
 	/// <summary>
-	/// Centers the window on the users screen
+	/// Centers the window on the users most overlapped monitor.
 	/// </summary>
 	void Center();
 
 	/// <summary>
-	/// Focuses the window for input
+	/// Focuses the window on the users desktop.
 	/// </summary>
 	void Focus();
 
 	/// <summary>
-	/// Requests the users attention by highlighting the window
+	/// Highlights the window icon in the taskbar.
 	/// </summary>
 	void RequestAttention();
 
@@ -81,7 +90,7 @@ public interface IWindow : IDisposable
 	Action? Closing { get; set; }
 
 	/// <summary>
-	/// Closes the window
+	/// Closes the window.
 	/// </summary>
 	void Close();
 
