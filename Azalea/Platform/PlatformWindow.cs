@@ -6,212 +6,205 @@ using System.IO;
 namespace Azalea.Platform;
 internal abstract class PlatformWindow : Disposable, IWindow
 {
-	internal const string DEFAULT_TITLE = "Azalea Window";
-	internal const int DEFAULT_CLIENT_WIDTH = 1280;
-	internal const int DEFAULT_CLIENT_HEIGHT = 720;
-	internal const WindowState DEFAULT_STATE = WindowState.Normal;
-	internal const int DEFAULT_POSITION_X = 100;
-	internal const int DEFAULT_POSITION_Y = 100;
-	internal const bool DEFAULT_VISIBLE = true;
-	internal const bool DEFAULT_RESIZABLE = false;
-	internal const bool DEFAULT_DECORATED = true;
-	internal const bool DEFAULT_TRANSPARENT_FRAMEBUFFER = false;
-	internal const bool DEFAULT_VSYNC = false;
-	internal const float DEFAULT_OPACITY = 1f;
-
-	protected abstract void SetTitleImplementation(string title);
-	protected string _title = DEFAULT_TITLE;
-	public string Title
+	public PlatformWindow(string title, Vector2Int clientSize, WindowState state)
 	{
-		get => _title;
+		_title = title;
+		_clientSize = clientSize;
+		_state = state;
+	}
+
+	#region Size
+
+	private Vector2Int _size;
+	protected abstract void SetSizeImplementation(Vector2Int size);
+	public Vector2Int Size
+	{
+		get => _size;
 		set
 		{
-			if (value == _title) return;
-			_title = value;
-			SetTitleImplementation(value);
+			if (State == WindowState.Fullscreen || State == WindowState.Minimized)
+			{
+				Console.WriteLine($"Cannot change size while state is {State}");
+				return;
+			}
+
+			if (_size == value) return;
+			SetSizeImplementation(value);
 		}
 	}
 
-	public Action<Vector2Int>? Resized { get; set; }
-
-	protected abstract void SetClientSizeImplementation(int width, int height);
-	protected abstract Vector2Int GetFullscreenSize();
-	protected int _clientWidth = DEFAULT_CLIENT_WIDTH;
-	protected int _clientHeight = DEFAULT_CLIENT_HEIGHT;
-	protected Vector2Int _clientSize
-	{
-		get => new(_clientWidth, _clientHeight);
-		set
-		{
-			if (value.X == _clientWidth && value.Y == _clientHeight) return;
-
-			_clientWidth = value.X;
-			_clientHeight = value.Y;
-
-			Resized?.Invoke(_clientSize);
-		}
-	}
-
+	private Vector2Int _clientSize;
+	protected abstract void SetClientSizeImplementation(Vector2Int clientSize);
 	public Vector2Int ClientSize
 	{
-		get
-		{
-			if (_state == WindowState.BorderlessFullscreen) return GetFullscreenSize();
-			else if (_state == WindowState.Minimized) return Vector2Int.Zero;
-			else return new(_clientWidth, _clientHeight);
-		}
+		get => _clientSize;
 		set
 		{
-			if (value == _clientSize) return;
+			if (State == WindowState.Fullscreen || State == WindowState.Minimized)
+			{
+				Console.WriteLine($"Cannot change client size while state is {State}");
+				return;
+			}
 
-			_clientSize = value;
-
-			//Updating client size while fullscreen should only save it so we have it when leaving fullscreen
-			if (_state == WindowState.BorderlessFullscreen) return;
-
-			//GLFW has an onResize callback which will get called anyway so we don't need to update it manually
-			//_clientSize = value;
-
-			SetClientSizeImplementation(_clientWidth, _clientHeight);
+			if (_clientSize == value) return;
+			SetClientSizeImplementation(value);
 		}
 	}
 
-	protected abstract void SetPositionImplementation(int x, int y);
-	protected Vector2Int _position = new(DEFAULT_POSITION_X, DEFAULT_POSITION_Y);
+	public Action<Vector2Int>? OnClientResized { get; set; }
+
+	protected void UpdateSize(Vector2Int size, Vector2Int clientSize)
+	{
+		_size = size;
+		_clientSize = clientSize;
+		OnClientResized?.Invoke(clientSize);
+	}
+
+	#endregion Size
+
+	#region Position
+
+	private Vector2Int _position;
+	protected abstract void SetPositionImplementation(Vector2Int position);
 	public Vector2Int Position
 	{
-		get
-		{
-			if (_state == WindowState.BorderlessFullscreen) return Vector2Int.Zero;
-			else return _position;
-		}
+		get => _position;
 		set
 		{
-			if (value == _position) return;
+			if (State == WindowState.Fullscreen || State == WindowState.Minimized)
+			{
+				Console.WriteLine($"Cannot change position while state is {State}");
+				return;
+			}
 
-			//GLFW has an onMove callback which will get called anyway so we don't need to update it manually
-			//_position = value;
-
-			SetPositionImplementation(value.X, value.Y);
+			if (_position == value) return;
+			SetPositionImplementation(value);
 		}
 	}
 
-	protected abstract void SetVisibleImplementation(bool visible);
-	protected bool _visible = DEFAULT_VISIBLE;
-	public bool Visible
+	private Vector2Int _clientPosition = Vector2Int.One;
+	protected abstract void SetClientPositionImplementation(Vector2Int clientPosition);
+	public Vector2Int ClientPosition
 	{
-		get => _visible;
+		get => _clientPosition;
 		set
 		{
-			if (value == _visible) return;
-			_visible = value;
-			SetVisibleImplementation(value);
+			if (State == WindowState.Fullscreen || State == WindowState.Minimized)
+			{
+				Console.WriteLine($"Cannot change client position while state is {State}");
+				return;
+			}
+
+			if (_clientPosition == value) return;
+			SetClientPositionImplementation(value);
 		}
 	}
 
-	protected abstract void SetVSyncImplementation(bool enabled);
-	private bool _vSync = DEFAULT_VSYNC;
-	public bool VSync
+	protected void UpdatePosition(Vector2Int position, Vector2Int clientPosition)
 	{
-		get => _vSync;
-		set
-		{
-			if (value == _vSync) return;
-			_vSync = value;
-			SetVSyncImplementation(value);
-		}
+		_position = position;
+		_clientPosition = clientPosition;
 	}
 
-	protected abstract void SetResizableImplementation(bool enabled);
-	protected bool _resizable = DEFAULT_RESIZABLE;
-	public bool Resizable
-	{
-		get => _resizable;
-		set
-		{
-			if (value == _resizable) return;
-			_resizable = value;
-			SetResizableImplementation(value);
-		}
-	}
+	#endregion Position
 
-	protected abstract void SetDecoratedImplementation(bool enabled);
-	protected bool _decorated = DEFAULT_DECORATED;
-	public bool Decorated
-	{
-		get => _decorated;
-		set
-		{
-			if (value == _decorated) return;
-			_decorated = value;
-			SetDecoratedImplementation(value);
-		}
-	}
+	#region State
 
-	protected abstract void SetOpacityImplementation(float opacity);
-	protected float _opacity = DEFAULT_OPACITY;
-	public float Opacity
-	{
-		get => _opacity;
-		set
-		{
-			var clampedValue = Math.Clamp(value, 0, 1);
-
-			if (clampedValue == _opacity) return;
-			_opacity = clampedValue;
-			SetOpacityImplementation(clampedValue);
-		}
-	}
-
-	protected WindowState _state = DEFAULT_STATE;
-	protected WindowState? _targetState;
+	protected WindowState _state;
+	private Vector2Int _preFullscreenPosition;
+	private Vector2Int _preFullscreenSize;
+	protected abstract void MinimizeImplementation();
+	protected abstract void MaximizeImplementation();
+	protected abstract void RestoreImplementation();
+	protected abstract void FullscreenImplementation();
+	protected abstract void RestoreFullscreenImplementation(Vector2Int lastPosition, Vector2Int lastSize);
 	public WindowState State
 	{
 		get => _state;
 		set
 		{
-			if (value == _state) return;
+			if (_state == value) return;
 
-			_targetState = value;
+			if (_state == WindowState.Fullscreen && value != WindowState.Minimized)
+				RestoreFullscreenImplementation(_preFullscreenPosition, _preFullscreenSize);
 
-			if (value == WindowState.BorderlessFullscreen)
+			switch (value)
 			{
-				FullscreenImplementation();
-				Resized?.Invoke(GetFullscreenSize());
+				case WindowState.Minimized:
+					MinimizeImplementation();
+					break;
+				case WindowState.Maximized:
+					MaximizeImplementation();
+					break;
+				case WindowState.Fullscreen:
+					_preFullscreenPosition = Position;
+					_preFullscreenSize = Size;
+					FullscreenImplementation();
+					break;
+				default:
+					RestoreImplementation();
+					break;
 			}
-			else if (value == WindowState.Minimized)
-			{
-				MinimizeImplementation();
-			}
-			else if (value == WindowState.Normal)
-			{
-				if (_state == WindowState.BorderlessFullscreen)
-				{
-					RestoreFullscreenImplementation(_position.X, _position.Y, _clientWidth, _clientHeight);
-					Resized?.Invoke(_clientSize);
-				}
-			}
-
-			_targetState = null;
-			_state = value;
 		}
 	}
-	protected abstract void FullscreenImplementation();
-	protected abstract void RestoreFullscreenImplementation(int lastX, int lastY, int lastWidth, int lastHeight);
-	protected abstract void MinimizeImplementation();
 
-	protected abstract Vector2Int GetWorkareaSizeImplementation();
-	public void Center()
+	protected void UpdateState(WindowState state)
 	{
-		var workareaSize = GetWorkareaSizeImplementation();
-		Position = workareaSize / 2 - ClientSize / 2;
+		_state = state;
 	}
 
-	protected abstract void RequestAttentionImplementation();
-	public void RequestAttention() => RequestAttentionImplementation();
+	#endregion State
 
-	protected abstract void FocusImplementation();
-	public void Focus() => FocusImplementation();
+	#region OtherProperties
+
+	private string _title;
+	protected abstract void SetTitleImplementation(string title);
+	public string Title
+	{
+		get => _title;
+		set
+		{
+			if (_title == value) return;
+			SetTitleImplementation(value);
+			_title = value;
+		}
+	}
+
+	private bool _resizable = true;
+	protected abstract void SetResizableImplementation(bool enabled);
+	public bool Resizable
+	{
+		get => _resizable;
+		set
+		{
+			if (_resizable == value) return;
+			SetResizableImplementation(value);
+			_resizable = value;
+		}
+	}
+
+	private bool _vSync = false;
+	protected abstract void SetVSyncImplementation(bool enabled);
+	public bool VSync
+	{
+		get => _vSync;
+		set
+		{
+			if (_vSync == value) return;
+			SetVSyncImplementation(value);
+			_vSync = value;
+		}
+	}
+
+	#endregion
+
+	#region Methods
+
+	public abstract void Center();
+
+	public abstract void Focus();
+
+	public abstract void RequestAttention();
 
 	protected abstract void SetIconImplementation(Image? data);
 	public void SetIconFromStream(Stream? imageStream)
@@ -220,13 +213,19 @@ internal abstract class PlatformWindow : Disposable, IWindow
 		SetIconImplementation(data);
 	}
 
-	protected abstract void SwapBuffersImplementation();
-	public void SwapBuffers() => SwapBuffersImplementation();
+	public abstract void SwapBuffers();
 
-	public Action? Closing { get; set; }
+	public abstract void Show(bool firstTime);
 
-	protected abstract void SetShouldCloseImplementation(bool shouldClose);
-	protected bool _shouldClose;
+	public abstract void Hide();
+
+	public abstract void ProcessEvents();
+
+	#endregion
+
+	#region Closing
+
+	private bool _shouldClose;
 	public bool ShouldClose
 	{
 		get => _shouldClose;
@@ -234,14 +233,19 @@ internal abstract class PlatformWindow : Disposable, IWindow
 		{
 			if (value == _shouldClose) return;
 			_shouldClose = value;
-			SetShouldCloseImplementation(value);
 		}
 	}
+
+	public Action? Closing { get; set; }
+
 	public void Close()
 	{
 		ShouldClose = true;
 		Closing?.Invoke();
 	}
+
 	public void PreventClosure()
 		=> ShouldClose = false;
+
+	#endregion
 }

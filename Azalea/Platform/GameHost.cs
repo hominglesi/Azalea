@@ -15,7 +15,6 @@ public abstract class GameHost
 {
 	public abstract IWindow Window { get; }
 	public abstract IRenderer Renderer { get; }
-	internal abstract IInputManager InputManager { get; }
 
 	public IClipboard Clipboard => _clipboard ?? throw new Exception("This GameHost does not support using the clipboard.");
 	private IClipboard? _clipboard;
@@ -77,14 +76,16 @@ public abstract class GameHost
 
 			if (firstWindowShow == false)
 			{
-				Window.Visible = true;
+				Window.Show(true);
 				firstWindowShow = true;
 			}
 
-			PerformanceTrace.RunAndTrace(InputManager.ProcessInputs, "Input");
+			Window.ProcessEvents();
+			//PerformanceTrace.RunAndTrace(InputManager.ProcessInputs, "Input");
 
 			EndFrame();
 		}
+		Window.Hide();
 
 		PerformanceTrace.SaveEventsTo("C:\\Programming\\trace.txt");
 

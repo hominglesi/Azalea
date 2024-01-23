@@ -1,8 +1,7 @@
-﻿using Azalea.Graphics;
+using Azalea.Graphics;
 using Azalea.IO.Resources;
 using Azalea.Platform;
 using System;
-using System.Reflection;
 
 namespace Azalea.VisualTests;
 public class IWindowTest : TestScene
@@ -20,6 +19,12 @@ public class IWindowTest : TestScene
 			CreateFullscreenVerticalFlex(new GameObject[]
 			{
 				CreateActionButton(
+					"Set size to 700, 700",
+					() => _window.Size = new(700, 700)),
+				CreateActionButton(
+					"Set client size to 700, 700",
+					() => _window.ClientSize = new(700, 700)),
+				CreateActionButton(
 					"Set WindowState to 'Normal'",
 					() => _window.State = WindowState.Normal),
 				CreateActionButton(
@@ -30,7 +35,7 @@ public class IWindowTest : TestScene
 					() => _window.State = WindowState.Maximized),
 				CreateActionButton(
 					"Set WindowState to 'Fullscreen'",
-					() => _window.State = WindowState.BorderlessFullscreen),
+					() => _window.State = WindowState.Fullscreen),
 				CreateActionButton(
 					"Set Resizable to 'true'",
 					() => _window.Resizable = true),
@@ -62,6 +67,18 @@ public class IWindowTest : TestScene
 					"Set icon to null",
 					() => _window.SetIconFromStream(null)),
 				CreateActionButton(
+					"Turn vsync on",
+					() => _window.VSync = true),
+				CreateActionButton(
+					"Turn vsync off",
+					() => _window.VSync = false),
+				CreateActionButton(
+					"Set position to 0",
+					() => _window.Position = Vector2Int.Zero),
+				CreateActionButton(
+					"Set client position to 0",
+					() => _window.ClientPosition = Vector2Int.Zero),
+				CreateActionButton(
 					"Move window by (25, 25)",
 					() => _window.Position += new Vector2Int(25, 25)),
 				CreateActionButton(
@@ -71,26 +88,11 @@ public class IWindowTest : TestScene
 					"Center window",
 					() => _window.Center()),
 				CreateActionButton(
-					"Request Attention",
-					() => {_window.RequestAttention(); Console.WriteLine("The Window has requested attention"); }),
-				CreateActionButton(
-					"Set Opacity to 1",
-					() => _window.Opacity = 1),
-				CreateActionButton(
-					"Set Opacity to 0.6",
-					() => _window.Opacity = 0.6f),
-				CreateActionButton(
-					"Set Opacity to 0.3",
-					() => _window.Opacity = 0.3f),
+					"Request Attention in 1.5 seconds",
+					() => {_attentionTimer = 1.5f; }),
 				CreateActionButton(
 					"Focus in 1.5 seconds",
 					() => _focusTimer = 1.5f),
-				CreateActionButton(
-					"Set Decorated to true",
-					() => _window.Decorated = true),
-				CreateActionButton(
-					"Set Decorated to false",
-					() => _window.Decorated = false),
 				CreateActionButton(
 					"Close window",
 					() => _window.Close())
@@ -99,54 +101,32 @@ public class IWindowTest : TestScene
 			CreateObservedContainer(new GameObject[]
 			{
 				CreateObservedValue("WindowState",
-						() => _window.State,
-						(value) => $"Window state changed to {value}"),
-					CreateObservedValue("Title",
-						() => _window.Title,
-						(value) => $"Window title changed to {value}"),
-					CreateObservedValue("Resizable",
-						() => _window.Resizable,
-						(value) => $"Window resizable changed to {value}"),
-					CreateObservedValue("Decorated",
-						() => _window.Decorated,
-						(value) => $"Window decorated changed to {value}"),
-					CreateObservedValue("Prevents Closure",
-						() => _preventsClosure,
-						(value) => value ? $"Test now prevents closure attempts" : $"Test no longer prevents closure attempts"),
-					CreateObservedValue("Position",
-						() => _window.Position,
-						(value) => $"Window moved to {value}"),
-					CreateObservedValue("_clientWidth",
-						() => getField<int>(_window, "_clientWidth"),
-						(value) => $"Window width changed to {value}"),
-					CreateObservedValue("_clientHeight",
-						() => getField<int>(_window, "_clientHeight"),
-						(value) => $"Window height changed to {value}"),
-					CreateObservedValue("ClientSize",
-						() => _window.ClientSize,
-						(value) => $"Window resized to {value}"),
-					CreateObservedValue("Opacity",
-						() => _window.Opacity,
-						(value) => $"Window opacity changed to {value}"),
-					/*
-					CreateObservedValue("_fullscreen",
-						() => getField<bool>(_window, "_fullscreen")),
-					CreateObservedValue("_maximized",
-						() => getField<bool>(_window, "_maximized")),
-					CreateObservedValue("_minimized",
-						() => getField<bool>(_window, "_minimized")),
-					CreateObservedValue("_lastPosition",
-						() => getField<Vector2Int>(_window, "_lastPosition")),
-					CreateObservedValue("_lastSize",
-						() => getField<Vector2Int>(_window, "_lastSize")),
-					CreateObservedValue("_preMinimizedMaximized",
-						() => getField<bool>(_window, "_preMinimizedMaximized")),
-					CreateObservedValue("_preMinimizedFullscreen",
-						() => getField<bool>(_window, "_preMinimizedFullscreen")),*/
+					() => _window.State,
+					(value) => $"Window state changed to {value}"),
+				CreateObservedValue("Title",
+					() => _window.Title,
+					(value) => $"Window title changed to {value}"),
+				CreateObservedValue("Resizable",
+					() => _window.Resizable,
+					(value) => $"Window resizable changed to {value}"),
+				CreateObservedValue("Prevents Closure",
+					() => _preventsClosure,
+					(value) => value ? $"Test now prevents closure attempts" : $"Test no longer prevents closure attempts"),
+				CreateObservedValue("Position",
+					() => _window.Position,
+					(value) => $"Window moved to {value}"),
+				CreateObservedValue("ClientPosition",
+					() => _window.ClientPosition),
+				CreateObservedValue("Size",
+					() => _window.Size),
+				CreateObservedValue("ClientSize",
+					() => _window.ClientSize,
+					(value) => $"Window resized to {value}"),
 			})
 		});
 	}
 
+	private float _attentionTimer = -1f;
 	private float _focusTimer = -1f;
 
 	protected override void Update()
@@ -159,12 +139,15 @@ public class IWindowTest : TestScene
 				_window.Focus();
 			}
 		}
-	}
 
-	private T getField<T>(object? obj, string name)
-	{
-		var type = typeof(AzaleaGame).Assembly.GetType("Azalea.Platform.Glfw.GLFWWindow")!;
-		return (T)type.GetField(name, BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(obj)!;
+		if (_attentionTimer > 0)
+		{
+			_attentionTimer -= Time.DeltaTime;
+			if (_attentionTimer <= 0)
+			{
+				_window.RequestAttention();
+			}
+		}
 	}
 
 	private void onWindowClosing()

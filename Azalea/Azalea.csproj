@@ -41,10 +41,5 @@
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <Visible>false</Visible>
     </Content>
-    <Content Include="..\build\Native\glfw3.dll" Pack="true" PackagePath="native">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-      <Visible>false</Visible>
-    </Content>
   </ItemGroup>
 </Project>

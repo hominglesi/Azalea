@@ -11,6 +11,17 @@ internal static unsafe class GL
 {
 	private const string LibraryPath = "opengl32.dll";
 
+	[DllImport(LibraryPath, EntryPoint = "wglCreateContext")]
+	public static extern IntPtr CreateContext(IntPtr deviceContext);
+
+	[DllImport(LibraryPath, EntryPoint = "wglMakeCurrent")]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static extern bool MakeCurrent(IntPtr deviceContext, IntPtr glContext);
+
+	private delegate void SwapIntervalDelegate(int interval);
+	private static SwapIntervalDelegate? _wglSwapInterval;
+	public static void SwapInterval(int interval) => _wglSwapInterval!(interval);
+
 	[DllImport(LibraryPath, EntryPoint = "glGetString")]
 	private static extern IntPtr getString(GLStringName name);
 	public static string GetString(GLStringName name)
@@ -332,8 +343,9 @@ internal static unsafe class GL
 		_glDeleteVertexArrays!(1, &vertexArray);
 	}
 
-	public static void Import()
+	public static void ImportFunctions()
 	{
+		_wglSwapInterval = Marshal.GetDelegateForFunctionPointer<SwapIntervalDelegate>(wglGetProcAddress("wglSwapIntervalEXT"));
 		_glCreateBuffers = Marshal.GetDelegateForFunctionPointer<CreateBuffersDelegate>(wglGetProcAddress("glCreateBuffers"));
 		_glGenBuffers = Marshal.GetDelegateForFunctionPointer<GenBuffersDelegate>(wglGetProcAddress("glGenBuffers"));
 		_glGenVertexArrays = Marshal.GetDelegateForFunctionPointer<GenVertexArraysDelegate>(wglGetProcAddress("glGenVertexArrays"));

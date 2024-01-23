@@ -5,85 +5,97 @@ namespace Azalea.Platform;
 
 public interface IWindow : IDisposable
 {
-	internal bool ShouldClose { get; set; }
-
-	internal Action<Vector2Int>? Resized { get; set; }
-
 	/// <summary>
-	/// The window title.
-	/// Default 
+	/// The size of the window on the users desktop.
+	/// This includes all the active windows features, like the caption, and the resize border.
+	/// Even if the window is not resizable this will include the area around the window used for resizing.
 	/// </summary>
-	string Title { get; set; }
+	Vector2Int Size { get; set; }
 
 	/// <summary>
-	/// The size of the window, excluding the title bar and border.
+	/// The size of the window client on the users desktop.
+	/// This does not include the caption and the resize border.
 	/// </summary>
 	Vector2Int ClientSize { get; set; }
 
+	internal Action<Vector2Int>? OnClientResized { get; set; }
+
 	/// <summary>
-	/// Controls the state of the window.
-	/// For possible states see <seealso cref="WindowState"/>.
+	/// The position of the window on the users desktop
+	/// This position is the top-left point of the window including all the active windows features,
+	/// like the caption, and the resize border.
+	/// Even if the window is not resizable this will account for the area around the window used for resizing.
+	/// </summary>
+	Vector2Int Position { get; set; }
+
+	/// <summary>
+	/// The position of the window client on the users desktop.
+	/// This position is the top-left point of the window client.
+	/// </summary>
+	Vector2Int ClientPosition { get; set; }
+
+	/// <summary>
+	/// The current state of the window.
 	/// </summary>
 	WindowState State { get; set; }
 
 	/// <summary>
-	/// Controls if the window can be resized by the user. (Default: false)
+	/// The title of the window.
 	/// </summary>
-	public bool Resizable { get; set; }
+	string Title { get; set; }
 
 	/// <summary>
-	/// Controls if the window has its decorations or not
+	/// Whether the window can be resized using the resize border.
 	/// </summary>
-	public bool Decorated { get; set; }
+	bool Resizable { get; set; }
 
 	/// <summary>
-	/// The position of this window on the users desktop
+	/// Whether V-Sync is enabled
 	/// </summary>
-	public Vector2Int Position { get; set; }
+	bool VSync { get; set; }
 
 	/// <summary>
-	/// The opacity of this window and its decoration
+	/// Centers the window on the users most overlapped monitor.
 	/// </summary>
-	public float Opacity { get; set; }
-
-	public bool VSync { get; set; }
+	void Center();
 
 	/// <summary>
-	/// Centers the window on the users screen
+	/// Focuses the window on the users desktop.
 	/// </summary>
-	public void Center();
+	void Focus();
 
 	/// <summary>
-	/// Focuses the window for input
+	/// Highlights the window icon in the taskbar.
 	/// </summary>
-	public void Focus();
-
-	/// <summary>
-	/// Requests the users attention by highlighting the window
-	/// </summary>
-	public void RequestAttention();
+	void RequestAttention();
 
 	/// <summary>
 	/// Sets the window icon.
 	/// </summary>
-	public void SetIconFromStream(Stream? imageStream);
+	void SetIconFromStream(Stream? imageStream);
+
+	internal void SwapBuffers();
+
+	internal void Show(bool firstTime = false);
+
+	internal void Hide();
+
+	internal void ProcessEvents();
+
+	internal bool ShouldClose { get; }
 
 	/// <summary>
 	/// Called when the window is being closed. Can be used to prevent closure.
 	/// </summary>
-	public Action? Closing { get; set; }
+	Action? Closing { get; set; }
 
 	/// <summary>
-	/// Closes the window
+	/// Closes the window.
 	/// </summary>
-	public void Close();
-
-	public bool Visible { get; set; }
+	void Close();
 
 	/// <summary>
 	/// Prevents the window closure attempt. This method is only valid within the <see cref="Closing"/> event.
 	/// </summary>
-	public void PreventClosure();
-
-	internal void SwapBuffers();
+	void PreventClosure();
 }
