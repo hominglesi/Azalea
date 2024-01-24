@@ -3,7 +3,7 @@ using Azalea.Numerics;
 using System.Numerics;
 
 namespace Azalea.Design.Containers;
-public class PannableContainer : Composition
+public class CameraContainer : Composition
 {
 	private Vector2 _windowSize => AzaleaGame.Main.Host.Window.ClientSize;
 
@@ -52,9 +52,7 @@ public class PannableContainer : Composition
 
 	private Rectangle? _boundaries;
 	public void SetBoundaries(Rectangle boundaries)
-	{
-		_boundaries = boundaries;
-	}
+		=> _boundaries = boundaries;
 
 	private void cointainWithinBoundaries()
 	{

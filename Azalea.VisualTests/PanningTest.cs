@@ -7,11 +7,11 @@ using System.Numerics;
 namespace Azalea.VisualTests;
 public class PanningTest : TestScene
 {
-	private PannableContainer _container;
+	private CameraContainer _container;
 
 	public PanningTest()
 	{
-		Add(_container = new PannableContainer()
+		Add(_container = new CameraContainer()
 		{
 			RelativeSizeAxes = Graphics.Axes.Both,
 			Origin = Graphics.Anchor.Center,
