@@ -4,6 +4,7 @@ using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.IO.Resources;
 using Azalea.Platform;
+using System.Numerics;
 
 namespace Azalea.VisualTests;
 internal class CameraTest : TestScene
@@ -26,11 +27,12 @@ internal class CameraTest : TestScene
 		{
 			Texture = Assets.GetTexture("Textures/azalea-icon.png"),
 			Position = new(770, 525),
-			Size = new(64, 64)
+			Size = new(64, 64),
 		});
 
-		_worldContainer.CameraZoom = new(2f);
+		_worldContainer.Scale = new(2f);
 
+		_worldContainer.SetBoundaries(new(Vector2.Zero, tilemap.PixelSize));
 		_worldContainer.CenterOnObject(_player);
 		_worldContainer.SetFollowedObject(_player);
 	}

@@ -1,54 +1,21 @@
-﻿using Azalea.Debugging;
-using Azalea.Graphics;
-using System;
+﻿using Azalea.Graphics;
+using Azalea.Numerics;
 using System.Numerics;
 
 namespace Azalea.Design.Containers;
 public class PannableContainer : Composition
 {
-	public Vector2 CameraPosition
-	{
-		get => base.Position;
-		set
-		{
-			base.Position = value;
-		}
-	}
-
-	public void MoveCameraBy(Vector2 change) { CameraPosition += change; }
-
-	[HideInInspector]
-	public new Vector2 Position
-	{
-		get => base.Position;
-		set => throw new InvalidOperationException($"Do not change {nameof(Position)} directly, insted use {nameof(CameraPosition)}");
-	}
-
-	public Vector2 CameraZoom
-	{
-		get => Scale;
-		set
-		{
-			base.Scale = value;
-		}
-	}
-
-	public void ZoomCameraBy(Vector2 zoom) { CameraZoom += zoom; }
-
-	[HideInInspector]
-	public new Vector2 Scale
-	{
-		get => base.Scale;
-		set => throw new InvalidOperationException($"Do not change {nameof(Scale)} directly, insted use {nameof(CameraZoom)}");
-	}
-
 	private Vector2 _windowSize => AzaleaGame.Main.Host.Window.ClientSize;
 
 	public void CenterOnObject(GameObject obj)
 	{
-		CameraPosition = -obj.Position * CameraZoom;
-		CameraPosition += _windowSize / 2;
-		CameraPosition -= obj.Size / 2 * CameraZoom;
+		Position = -obj.Position;
+		Position -= obj.Size / 2;
+		Position += obj.OriginPosition;
+		Position *= Scale;
+		Position += _windowSize / 2;
+
+		cointainWithinBoundaries();
 	}
 
 	private GameObject? _followedObject;
@@ -70,16 +37,38 @@ public class PannableContainer : Composition
 		if (_lastWindowSize != _windowSize)
 		{
 			var movement = (_windowSize - _lastWindowSize) / 2;
-			CameraPosition += movement;
+			Position += movement;
+			cointainWithinBoundaries();
 			_lastWindowSize = _windowSize;
 		}
 
-		if (_followedObject is not null)
+		if (_followedObject is not null && _followedObject.Position != _lastFollowedObjectPosition)
 		{
-			var cameraMovement = _lastFollowedObjectPosition - _followedObject.Position;
+			CenterOnObject(_followedObject);
 
-			CameraPosition += cameraMovement * CameraZoom;
 			_lastFollowedObjectPosition = _followedObject.Position;
 		}
+	}
+
+	private Rectangle? _boundaries;
+	public void SetBoundaries(Rectangle boundaries)
+	{
+		_boundaries = boundaries;
+	}
+
+	private void cointainWithinBoundaries()
+	{
+		if (_boundaries is null) return;
+		Rectangle boundaries = _boundaries.Value;
+
+		if (Position.Y > boundaries.Y)
+			Y = boundaries.Y;
+		else if (Position.Y < -boundaries.Bottom * Scale.Y + _windowSize.Y)
+			Y = -boundaries.Bottom * Scale.Y + _windowSize.Y;
+
+		if (Position.X > boundaries.X)
+			X = boundaries.X;
+		else if (Position.X < -boundaries.Right * Scale.X + _windowSize.X)
+			X = -boundaries.Right * Scale.X + _windowSize.X;
 	}
 }
