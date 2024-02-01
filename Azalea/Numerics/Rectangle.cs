@@ -76,4 +76,5 @@ public struct Rectangle : IEquatable<Rectangle>
 	public static bool operator ==(Rectangle left, Rectangle right) => left.Equals(right);
 	public static bool operator !=(Rectangle left, Rectangle right) => !left.Equals(right);
 	public override readonly int GetHashCode() => HashCode.Combine(X, Y, Width, Height);
+	public override readonly string ToString() => $"({X}:{Y}, {Width}:{Height})";
 }

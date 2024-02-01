@@ -109,9 +109,13 @@ internal class Win32Window : PlatformWindow
 
 			//Mouse Input
 			case WindowMessage.LeftButtonDown:
-				Input.HandleMouseButtonStateChange(MouseButton.Left, true); break;
+				Input.HandleMouseButtonStateChange(MouseButton.Left, true);
+				WinAPI.SetCapture(_window);
+				break;
 			case WindowMessage.LeftButtonUp:
-				Input.HandleMouseButtonStateChange(MouseButton.Left, false); break;
+				Input.HandleMouseButtonStateChange(MouseButton.Left, false);
+				WinAPI.ReleaseCapture();
+				break;
 			case WindowMessage.RightButtonDown:
 				Input.HandleMouseButtonStateChange(MouseButton.Right, true); break;
 			case WindowMessage.RightButtonUp:
