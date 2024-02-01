@@ -14,9 +14,11 @@ public readonly struct Tilemap
 	public string RenderOrder { get; init; }
 	public int Width { get; init; }
 	public int Height { get; init; }
+	public Vector2 Size { get; init; }
 	public int TileWidth { get; init; }
 	public int TileHeight { get; init; }
-	public Vector2 TileSize => new(TileWidth, TileHeight);
+	public Vector2 TileSize { get; init; }
+	public Vector2 PixelSize { get; init; }
 	public TilemapSource[] Tilesets { get; init; }
 	public TileObject[] Objects { get; init; }
 	public TilemapLayer[] Layers { get; init; }
@@ -103,8 +105,11 @@ public readonly struct Tilemap
 			RenderOrder = renderOrder,
 			Width = width,
 			Height = height,
+			Size = new(width, height),
 			TileWidth = tileWidth,
 			TileHeight = tileHeight,
+			TileSize = new(tileWidth, tileHeight),
+			PixelSize = new(width * tileWidth, height * tileHeight),
 			Tilesets = tilesets.ToArray(),
 			Objects = objs.ToArray(),
 			Layers = layers.ToArray()

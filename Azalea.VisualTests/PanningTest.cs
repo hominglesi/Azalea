@@ -7,11 +7,11 @@ using System.Numerics;
 namespace Azalea.VisualTests;
 public class PanningTest : TestScene
 {
-	private PannableContainer _container;
+	private CameraContainer _container;
 
 	public PanningTest()
 	{
-		Add(_container = new PannableContainer()
+		Add(_container = new CameraContainer()
 		{
 			RelativeSizeAxes = Graphics.Axes.Both,
 			Origin = Graphics.Anchor.Center,
@@ -52,12 +52,9 @@ public class PanningTest : TestScene
 	protected override void Update()
 	{
 		var panSpeed = 0.5f * Time.DeltaTimeMs;
-		if (Input.GetKey(Keys.Up).Pressed) _container.MoveCameraBy(new Vector2(0, panSpeed));
-		if (Input.GetKey(Keys.Right).Pressed) _container.MoveCameraBy(new Vector2(-panSpeed, 0));
-		if (Input.GetKey(Keys.Down).Pressed) _container.MoveCameraBy(new Vector2(0, -panSpeed));
-		if (Input.GetKey(Keys.Left).Pressed) _container.MoveCameraBy(new Vector2(panSpeed, 0));
+		_container.Position += Input.GetDirectionalMovement() * panSpeed;
 
-		if (Input.GetKey(Keys.KeypadPlus).Down) _container.ZoomCameraBy(new Vector2(0.15f, 0.15f));
-		if (Input.GetKey(Keys.KeypadMinus).Down) _container.ZoomCameraBy(new Vector2(-0.15f, -0.15f));
+		if (Input.GetKey(Keys.KeypadPlus).Down) _container.Scale += new Vector2(0.15f, 0.15f);
+		if (Input.GetKey(Keys.KeypadMinus).Down) _container.Scale += new Vector2(-0.15f, -0.15f);
 	}
 }

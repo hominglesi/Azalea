@@ -35,7 +35,25 @@ public struct Rectangle : IEquatable<Rectangle>
 	public readonly Vector2 BottomLeft => new(Left, Bottom);
 	public readonly Vector2 BottomRight => new(Right, Bottom);
 
-	public readonly Vector2 Size => new(Width, Height);
+	public Vector2 Position
+	{
+		readonly get => new(X, Y);
+		set
+		{
+			X = value.X;
+			Y = value.Y;
+		}
+	}
+
+	public Vector2 Size
+	{
+		readonly get => new(Width, Height);
+		set
+		{
+			Width = value.X;
+			Height = value.Y;
+		}
+	}
 
 	public readonly Rectangle Offset(Vector2 pos) => Offset(pos.X, pos.Y);
 	public readonly Rectangle Offset(float x, float y) => new Rectangle(X + x, Y + y, Width, Height);
