@@ -198,11 +198,18 @@ internal static class WinAPI
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool RegisterRawInputDevices([In] ref RawInputDevice devices, uint count, uint size);
 
+	[DllImport(User32Path, EntryPoint = "ReleaseCapture")]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static extern bool ReleaseCapture();
+
 	[DllImport(User32Path, EntryPoint = "ScreenToClient")]
 	public static extern bool ScreenToClient(IntPtr window, ref Vector2Int point);
 
 	[DllImport(User32Path, EntryPoint = "SendMessage")]
 	public static extern IntPtr SendMessage(IntPtr window, WindowMessage message, IntPtr wParam, IntPtr lParam);
+
+	[DllImport(User32Path, EntryPoint = "SetCapture")]
+	public static extern IntPtr SetCapture(IntPtr window);
 
 	[DllImport(User32Path, EntryPoint = "SetFocus")]
 	public static extern IntPtr SetFocus(IntPtr window);

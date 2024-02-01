@@ -16,7 +16,7 @@ public class VisualTests : AzaleaGame
 		//Add(new TestingTestScene());
 		//Add(new FlexTest());
 		//Add(new TextContainerTest());
-		//Add(new BilliardTest());
+		Add(new BilliardTest());
 		//Add(new PhysicsTest());
 		//Add(new TriggerTest());
 		//Add(new SliderTests());
@@ -27,7 +27,7 @@ public class VisualTests : AzaleaGame
 		//Add(new AudioTest());
 		//Add(new BreakoutTest());
 		//Add(new BoundingBoxTreeTest());
-		Add(new CameraTest());
+		//Add(new CameraTest());
 	}
 
 	protected override void Update()
