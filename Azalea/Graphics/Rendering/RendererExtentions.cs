@@ -3,6 +3,7 @@ using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Graphics.Textures;
 using Azalea.Numerics;
+using System;
 
 namespace Azalea.Graphics.Rendering;
 
@@ -12,8 +13,13 @@ public static class RendererExtentions
 	{
 		var clientSize = AzaleaGame.Main.Host.Window.ClientSize;
 
-		if (quad.TopLeft.X < clientSize.X && quad.BottomRight.X > 0 && quad.TopLeft.Y < clientSize.Y)
-			return quad.BottomRight.Y > 0;
+		var mostLeft = MathF.Min(quad.TopLeft.X, MathF.Min(quad.TopRight.X, MathF.Min(quad.BottomLeft.X, quad.BottomRight.X)));
+		var mostTop = MathF.Min(quad.TopLeft.Y, MathF.Min(quad.TopRight.Y, MathF.Min(quad.BottomLeft.Y, quad.BottomRight.Y)));
+		var mostRight = MathF.Max(quad.TopLeft.X, MathF.Max(quad.TopRight.X, MathF.Max(quad.BottomLeft.X, quad.BottomRight.X)));
+		var mostBottom = MathF.Max(quad.TopLeft.Y, MathF.Max(quad.TopRight.Y, MathF.Max(quad.BottomLeft.Y, quad.BottomRight.Y)));
+
+		if (mostLeft < clientSize.X && mostRight > 0 && mostTop < clientSize.Y)
+			return mostBottom > 0;
 
 		return false;
 	}
