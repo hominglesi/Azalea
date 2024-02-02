@@ -6,6 +6,14 @@ namespace Azalea.Extentions;
 
 public static class Vector2Extentions
 {
+	public static Vector2 Parse(string value)
+	{
+		var args = value.Split(':');
+		var x = float.Parse(args[0]);
+		var y = float.Parse(args[1]);
+		return new Vector2(x, y);
+	}
+
 	public static Vector2 ComponentMax(Vector2 a, Vector2 b)
 	{
 		a.X = a.X > b.X ? a.X : b.X;
