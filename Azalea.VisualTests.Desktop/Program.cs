@@ -1,8 +1,11 @@
 ﻿using Azalea;
+using Azalea.IO.Resources;
 using Azalea.Platform;
 using Azalea.VisualTests;
 
 //PerformanceTrace.Enabled = true;
+
+Assets.SetupPersistentStore("Azalea.VisualTests");
 
 var host = Host.CreateHost(new HostPreferences
 {
