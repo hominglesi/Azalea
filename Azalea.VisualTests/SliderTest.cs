@@ -4,9 +4,9 @@ using Azalea.Design.UserInterface.Basic;
 using Azalea.Graphics.Colors;
 
 namespace Azalea.VisualTests;
-internal class SliderTests : TestScene
+internal class SliderTest : TestScene
 {
-	public SliderTests()
+	public SliderTest()
 	{
 		Add(new Composition()
 		{

@@ -20,9 +20,6 @@ public static partial class Assets
 
 	public static Action? OnDispose;
 
-	public static TextureFiltering DefaultMinFiltering = TextureFiltering.Nearest;
-	public static TextureFiltering DefaultMagFiltering = TextureFiltering.Nearest;
-
 	static Assets()
 	{
 		_mainStore = new ResourceStoreContainer();

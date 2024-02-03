@@ -1,7 +1,6 @@
 ﻿using Azalea.Audio;
 using Azalea.Design.UserInterface;
 using Azalea.Graphics;
-using Azalea.Inputs;
 using Azalea.IO.Resources;
 using System;
 
@@ -16,8 +15,8 @@ internal class AudioTest : TestScene
 
 	public AudioTest()
 	{
-		_goodkid = Assets.GetSound("Resources/Audio/goodkid.wav");
-		_hitnormal = Assets.GetSound("Resources/Audio/hitnormal.wav");
+		_goodkid = Assets.GetSound("Audio/goodkid.wav");
+		_hitnormal = Assets.GetSound("Audio/hitnormal.wav");
 
 		AddRange(new GameObject[] {
 			CreateFullscreenVerticalFlex(new GameObject[]
@@ -55,20 +54,5 @@ internal class AudioTest : TestScene
 					() => _instance is not null && _instance.Playing ? _instance.Gain : -1)
 			})
 		});
-	}
-
-	protected override void Update()
-	{
-		/*
-		foreach (var key in Enum.GetValues<Keys>())
-		{
-			if (Input.GetKey(key).Down)
-				_hitnormalButton.SimulateClick();
-		}
-
-		if (Input.GetMouseButton(MouseButton.Left).Down)
-			_hitnormalButton.SimulateClick();*/
-
-		Console.WriteLine(Input.MousePosition);
 	}
 }
