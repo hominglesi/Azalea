@@ -17,7 +17,7 @@ public class Storage : IResourceStore
 
 	public Stream? GetStream(string path)
 	{
-		if (File.Exists(_path + path) == false)
+		if (Exists(path) == false)
 			return null;
 
 		return File.OpenRead(_path + path);
@@ -28,9 +28,15 @@ public class Storage : IResourceStore
 		return File.OpenWrite(_path + path);
 	}
 
-	public bool Exsists(string path)
+	public bool Exists(string path)
 	{
 		return File.Exists(_path + path);
+	}
+
+	public void Delete(string path)
+	{
+		if (Exists(path))
+			File.Delete(_path + path);
 	}
 
 	public IEnumerable<string> GetAvalibleResources()

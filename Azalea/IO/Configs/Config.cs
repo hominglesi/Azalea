@@ -15,7 +15,7 @@ public static class Config
 
 	public static void Load()
 	{
-		if (Assets.PersistentStore.Exsists(configName) == false)
+		if (Assets.PersistentStore.Exists(configName) == false)
 		{
 			_dictionary = new Dictionary<string, string>();
 			return;
@@ -27,6 +27,7 @@ public static class Config
 
 	public static void Save()
 	{
+		Assets.PersistentStore.Delete(configName);
 		var stream = Assets.PersistentStore.GetOrCreateStream(configName);
 		var writer = new StreamWriter(stream);
 		writer.Write(ConfigParser.Format(_dictionary));
