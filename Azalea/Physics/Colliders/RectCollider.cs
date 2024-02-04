@@ -5,10 +5,32 @@ public class RectCollider : Collider
 {
 	//TODO: Rework with Quad
 
+	public float HalfA { get; private set; }
+	public float HalfB { get; private set; }
+
 	//Upper and Bottom side
-	public float SideA { get; set; }
+	private float _sideA;
+	public float SideA
+	{
+		get => _sideA;
+		set
+		{
+			_sideA = value;
+			HalfA = _sideA / 2;
+		}
+	}
+
 	//Left And Right side
-	public float SideB { get; set; }
+	private float _sideB;
+	public float SideB
+	{
+		get => _sideB;
+		set
+		{
+			_sideB = value;
+			HalfB = _sideB / 2;
+		}
+	}
 
 	public override float ShortestDistance => SideA < SideB ? SideA : SideB;
 	public override Vector2[] GetVertices()

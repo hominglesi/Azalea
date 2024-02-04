@@ -54,8 +54,8 @@ internal static class CollisionLogic
 			+ (circle.Position.Y - rect.Position.Y) * Math.Cos(-rectAngle) + rect.Position.Y);
 
 		// Find closest point on the rotated rectangle
-		float closestX = Math.Clamp(rotatedCircleX, rect.Position.X - rect.SideA / 2, rect.Position.X + rect.SideA / 2);
-		float closestY = Math.Clamp(rotatedCircleY, rect.Position.Y - rect.SideB / 2, rect.Position.Y + rect.SideB / 2);
+		float closestX = Math.Clamp(rotatedCircleX, rect.Position.X - rect.HalfA, rect.Position.X + rect.HalfA);
+		float closestY = Math.Clamp(rotatedCircleY, rect.Position.Y - rect.HalfB, rect.Position.Y + rect.HalfB);
 
 		// Calculate distance
 		float distanceX = rotatedCircleX - closestX;
@@ -139,57 +139,54 @@ internal static class CollisionLogic
 
 	public static bool RectRectCollision(RectCollider rect1, RectCollider rect2, bool resolveCollision)
 	{
+		if (rect1.Position.X - rect1.HalfA > rect2.Position.X + rect2.HalfA ||
+		   rect1.Position.X + rect1.HalfA < rect2.Position.X - rect2.HalfA ||
+		   rect1.Position.Y - rect1.HalfB > rect2.Position.Y + rect2.HalfB ||
+		   rect1.Position.Y + rect1.HalfB < rect2.Position.Y - rect2.HalfB)
+			return false;
 
-		if (rect1.Position.X - rect1.SideA / 2 <= rect2.Position.X + rect2.SideA / 2 &&
-			rect1.Position.X + rect1.SideA / 2 >= rect2.Position.X - rect2.SideA / 2 &&
-			rect1.Position.Y - rect1.SideB / 2 <= rect2.Position.Y + rect2.SideB / 2 &&
-			rect1.Position.Y + rect1.SideB / 2 >= rect2.Position.Y - rect2.SideB / 2)
+		float penetrationX = Math.Abs(rect1.Position.X - rect2.Position.X) - rect1.HalfA - rect2.HalfA;
+		float penetrationY = Math.Abs(rect1.Position.Y - rect2.Position.Y) - rect1.HalfB - rect2.HalfB;
+
+		if (resolveCollision)
 		{
+			RigidBody rigidBody1 = rect1.Parent!.GetComponent<RigidBody>()!;
+			RigidBody rigidBody2 = rect2.Parent!.GetComponent<RigidBody>()!;
+			float displacementX = -penetrationX;
+			float displacementY = -penetrationY;
+			Console.WriteLine($"Displacement: {displacementX}");
 
-			float penetrationX = Math.Abs(rect1.Position.X - rect2.Position.X) - rect1.SideA / 2 - rect2.SideA / 2;
-			float penetrationY = Math.Abs(rect1.Position.Y - rect2.Position.Y) - rect1.SideB / 2 - rect2.SideB / 2;
-
-			if (resolveCollision)
+			if (penetrationX > penetrationY)
 			{
-				RigidBody rigidBody1 = rect1.Parent!.GetComponent<RigidBody>()!;
-				RigidBody rigidBody2 = rect2.Parent!.GetComponent<RigidBody>()!;
-				float displacementX = -penetrationX;
-				float displacementY = -penetrationY;
-				Console.WriteLine($"Displacement: {displacementX}");
+				if (rect1.Position.X <= rect2.Position.X)
+					displacementX *= -1;
 
-
-				if (penetrationX > penetrationY)
-				{
-					if (rect1.Position.X <= rect2.Position.X)
-						displacementX *= -1;
-					if (rigidBody1.IsDynamic)
-						rect1.Position += new Vector2(displacementX / 2, 0);
-					else
-						displacementX *= 2;
-
-					if (rigidBody2.IsDynamic)
-						rect2.Position += new Vector2(-1 * displacementX / 2, 0);
-				}
+				if (rigidBody1.IsDynamic)
+					rect1.Position += new Vector2(displacementX / 2, 0);
 				else
-				{
-					if (rect1.Position.Y <= rect2.Position.Y)
-						displacementY *= -1;
-					if (rigidBody1.IsDynamic)
-						rect1.Position += new Vector2(0, displacementY / 2);
-					else
-						displacementY *= 2;
+					displacementX *= 2;
 
-					if (rigidBody2.IsDynamic)
-						rect2.Position += new Vector2(0, -1 * displacementY / 2);
-				}
+				if (rigidBody2.IsDynamic)
+					rect2.Position += new Vector2(-1 * displacementX / 2, 0);
 			}
+			else
+			{
+				if (rect1.Position.Y <= rect2.Position.Y)
+					displacementY *= -1;
 
-			rect1.OnCollide(rect2);
-			rect2.OnCollide(rect1);
+				if (rigidBody1.IsDynamic)
+					rect1.Position += new Vector2(0, displacementY / 2);
+				else
+					displacementY *= 2;
 
-			return true;
+				if (rigidBody2.IsDynamic)
+					rect2.Position += new Vector2(0, -1 * displacementY / 2);
+			}
 		}
 
-		return false;
+		rect1.OnCollide(rect2);
+		rect2.OnCollide(rect1);
+
+		return true;
 	}
 }
