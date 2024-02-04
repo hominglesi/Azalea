@@ -78,7 +78,8 @@ public class VisualTests : AzaleaGame
 
 	private void goToSceneSelect()
 	{
-		if (Child != _testSelectScene)
+
+		if (Children.Count == 0 || Child != _testSelectScene)
 		{
 			Child = _testSelectScene;
 			Main.Host.Renderer.ClearColor = new Color(40, 51, 60);
