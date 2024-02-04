@@ -62,4 +62,8 @@ public abstract class Collider : Component
 
 	}
 	public abstract Vector2[] GetVertices();
+
+	public abstract bool ProcessCollision(Collider other, bool resolveCollision);
+	public abstract bool ProcessCollision(CircleCollider other, bool resolveCollision);
+	public abstract bool ProcessCollision(RectCollider other, bool resolveCollision);
 }
