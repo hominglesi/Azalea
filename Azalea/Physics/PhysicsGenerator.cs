@@ -1,4 +1,5 @@
-﻿using Azalea.Extentions;
+﻿using Azalea.Design.Components;
+using Azalea.Extentions;
 using Azalea.Graphics.Colors;
 using Azalea.Physics.Colliders;
 using System;
@@ -9,46 +10,31 @@ using System.Numerics;
 namespace Azalea.Physics;
 public class PhysicsGenerator
 {
-	//u slucaju da ima potrebe za neki tip gravity manipulationa, stavio sam ovo da moze da se menja
+	public const int UpdateRate = 60;
+
+	private const float _velocityStopThreshold = 0.1f;
+
 	public Vector2 GravityConstant { get; set; } = new(0, 9.81f);
-	public static int UpdateRate => 60;
 	public bool IsTopDown { get; set; }
 	public float StaticFriction { get; set; } = 0.15f;
 	public float DynamicFriction { get; set; } = 0.1f;
 	public bool DebugMode { get; set; }
 	public bool UsesGravity { get; set; } = true;
 	public bool UsesFriction { get; set; } = true;
-	public bool UsesAirResistance { get; set; } = true;
+	public IEnumerable<RigidBody> RigidBodies => ComponentStorage<RigidBody>.GetComponents();
 
-	private float VelocityStopThreshold = 0.1f;
-
-	public List<RigidBody> RigidBodies { get; set; } = new List<RigidBody>();
-
-	public void Update(IEnumerable<RigidBody> bodies)
+	public void Update()
 	{
-		if (DebugMode)
-		{
-			foreach (var rb in bodies)
-			{
-				rb.Parent.Color = Palette.Black;
-			}
-		}
-		RigidBodies.Clear();
-		RigidBodies.AddRange(bodies);
-		foreach (var rb in bodies)
+		foreach (var rb in RigidBodies)
 		{
 			if (UsesGravity && rb.UsesGravity) applyGravity(rb);
-			if (IsTopDown && rb.UsesFriction) applyTopDownFriction(rb);
-			applyForces(rb, bodies);
+			if (IsTopDown && UsesFriction && rb.UsesFriction) applyTopDownFriction(rb);
+			applyForces(rb, RigidBodies);
 		}
 
-		foreach (var collider in RigidBodies.Select(x => x.Parent.GetComponent<Collider>()))
+		foreach (var collider in RigidBodies.Select<RigidBody, Collider>(x => x.Parent!.GetComponent<Collider>()!))
 		{
 			collider.CheckColliders();
-		}
-
-		foreach (var collider in RigidBodies.Select(x => x.Parent.GetComponent<Collider>()))
-		{
 			collider.CollidedWith.Clear();
 			collider.CollidedWith.AddRange(collider.CollidingWith);
 			collider.CollidingWith.Clear();
@@ -62,15 +48,17 @@ public class PhysicsGenerator
 
 	private void applyTopDownFriction(RigidBody rb)
 	{
-		if (rb.Velocity.Length() > 0)
-			if (rb.Velocity == new Vector2(0, 0))
-			{
-				rb.Force += -(Vector2.Normalize(rb.Velocity) * rb.Mass * GravityConstant.Y / UpdateRate) * StaticFriction;
-			}
-			else
-			{
-				rb.Force += -(Vector2.Normalize(rb.Velocity) * rb.Mass * GravityConstant.Y / UpdateRate) * DynamicFriction;
-			}
+		if (rb.Velocity.Length() <= 0)
+			return;
+
+		if (rb.Velocity == new Vector2(0, 0))
+		{
+			rb.Force += -(Vector2.Normalize(rb.Velocity) * rb.Mass * GravityConstant.Y / UpdateRate) * StaticFriction;
+		}
+		else
+		{
+			rb.Force += -(Vector2.Normalize(rb.Velocity) * rb.Mass * GravityConstant.Y / UpdateRate) * DynamicFriction;
+		}
 	}
 
 	private void applyForces(RigidBody rb, IEnumerable<RigidBody> others)
@@ -80,7 +68,7 @@ public class PhysicsGenerator
 
 		rb.Acceleration = rb.Force / rb.Mass;
 		rb.Velocity += rb.Acceleration;
-		if (rb.Velocity.Length() < VelocityStopThreshold)
+		if (rb.Velocity.Length() < _velocityStopThreshold)
 			rb.Velocity = new(0, 0);
 
 

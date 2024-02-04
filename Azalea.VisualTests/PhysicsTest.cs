@@ -1,5 +1,4 @@
-﻿using Azalea.Design.Components;
-using Azalea.Design.Shapes;
+﻿using Azalea.Design.Shapes;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
@@ -442,7 +441,7 @@ public class PhysicsTest : TestScene
 	protected override void FixedUpdate()
 	{
 
-		PGen.Update(ComponentStorage<RigidBody>.GetComponents());
+		PGen.Update();
 		/*
 		//Fake Floor
 		if (box1.Y>600)

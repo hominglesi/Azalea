@@ -183,7 +183,7 @@ public class BilliardTest : TestScene
 		infoContainer.Add(new Sprite
 		{
 			RelativeSizeAxes = Graphics.Axes.Both,
-			Texture= Assets.GetTexture("Textures/OpisRada.png")
+			Texture = Assets.GetTexture("Textures/OpisRada.png")
 
 		});
 	}
@@ -568,7 +568,7 @@ public class BilliardTest : TestScene
 	}
 	protected override void FixedUpdate()
 	{
-		PGen.Update(ComponentStorage<RigidBody>.GetComponents());
+		PGen.Update();
 
 		if (waitingForBalls)
 		{
@@ -597,7 +597,7 @@ public class BilliardTest : TestScene
 			ball.Alpha = 0.3f;
 
 			//if not foul	if()
-		//	currentPlayer.Score += ball.PointValue;
+			//	currentPlayer.Score += ball.PointValue;
 			ball.GetComponent<RigidBody>().Velocity = new Vector2(0, 0);
 			ball.Position = new(-500, -500);
 			player1Text.Text = player1.ToString();
@@ -646,44 +646,44 @@ public class BilliardTest : TestScene
 				fouled = true;
 				Foul(currentPlayer);
 				currentPlayer = currentPlayer != player1 ? player1 : player2;
-                if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
-                    targetBallType = BallType.Red;
-                else
-                {
-                    targetBallType = BallType.Color;
-                }
-            }
+				if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
+					targetBallType = BallType.Red;
+				else
+				{
+					targetBallType = BallType.Color;
+				}
+			}
 			else if (scoredBallsThisTurn.Where(x => x.Type == targetBallType).Count() > 0)
 			{
 				if (firstHitBallType == targetBallType)
 				{
-					if(AllBalls.Where(x => x.Alpha>0.5 && x.Type==BallType.Red).Count()>0)
+					if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
 						targetBallType = targetBallType != BallType.Red ? BallType.Red : BallType.Color;
-                    else
-                    {
-                        targetBallType = BallType.Color;
-                    }
+					else
+					{
+						targetBallType = BallType.Color;
+					}
 					currentPlayer.Score += scoredBallsThisTurn.Sum(x => x.PointValue);
-                    player1Text.Text = player1.ToString();
-                    player2Text.Text = player2.ToString();
+					player1Text.Text = player1.ToString();
+					player2Text.Text = player2.ToString();
 
-                    foreach(var ball in scoredBallsThisTurn.Where(x => x.Type == BallType.Color))
-                    {
-                        resetBall(ball);
-                    }
-                }
+					foreach (var ball in scoredBallsThisTurn.Where(x => x.Type == BallType.Color))
+					{
+						resetBall(ball);
+					}
+				}
 				else
 				{
 					fouled = true;
 					Foul(currentPlayer);
 					currentPlayer = currentPlayer != player1 ? player1 : player2;
-                    if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
-                        targetBallType = BallType.Red;
-                    else
-                    {
-                        targetBallType = BallType.Color;
-                    }
-                }
+					if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
+						targetBallType = BallType.Red;
+					else
+					{
+						targetBallType = BallType.Color;
+					}
+				}
 			}
 		}
 		else
@@ -691,25 +691,25 @@ public class BilliardTest : TestScene
 			if (firstHitBallType == targetBallType)
 			{
 				currentPlayer = currentPlayer != player1 ? player1 : player2;
-                if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
-                    targetBallType = BallType.Red;
-                else
-                {
-                    targetBallType = BallType.Color;
-                }
-            }
+				if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
+					targetBallType = BallType.Red;
+				else
+				{
+					targetBallType = BallType.Color;
+				}
+			}
 			else
 			{
 				fouled = true;
 				Foul(currentPlayer);
 				currentPlayer = currentPlayer != player1 ? player1 : player2;
-                if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
-                    targetBallType = BallType.Red;
-                else
-                {
-                    targetBallType = BallType.Color;
-                }
-            }
+				if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
+					targetBallType = BallType.Red;
+				else
+				{
+					targetBallType = BallType.Color;
+				}
+			}
 
 		}
 
@@ -756,25 +756,25 @@ public class BilliardTest : TestScene
 
 	private void resetBall(SnookerBall ball)
 	{
-        if (ball.Type == BallType.Color)
-        {
-            if (AllBalls.Where(x => x.Alpha > 0.5f && x.Type == BallType.Red).ToList().Count() > 0)
-            {
-                ball.Alpha = 1;
-                if (greenBall == ball)
-                    ball.Position = greenPosition;
-                if (brownBall == ball)
-                    ball.Position = brownPosition;
-                if (yellowBall == ball)
-                    ball.Position = yellowPosition;
-                if (blackBall == ball)
-                    ball.Position = blackPosition;
-                if (blueBall == ball)
-                    ball.Position = bluePosition;
-                if (pinkBall == ball)
-                    ball.Position = pinkPosition;
-            }
-        }
+		if (ball.Type == BallType.Color)
+		{
+			if (AllBalls.Where(x => x.Alpha > 0.5f && x.Type == BallType.Red).ToList().Count() > 0)
+			{
+				ball.Alpha = 1;
+				if (greenBall == ball)
+					ball.Position = greenPosition;
+				if (brownBall == ball)
+					ball.Position = brownPosition;
+				if (yellowBall == ball)
+					ball.Position = yellowPosition;
+				if (blackBall == ball)
+					ball.Position = blackPosition;
+				if (blueBall == ball)
+					ball.Position = bluePosition;
+				if (pinkBall == ball)
+					ball.Position = pinkPosition;
+			}
+		}
 	}
 
 	private enum BallType { None, White, Color, Red };
