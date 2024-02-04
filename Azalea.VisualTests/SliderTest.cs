@@ -1,37 +1,25 @@
-﻿using Azalea.Design.Containers;
-using Azalea.Design.UserInterface;
+﻿using Azalea.Design.UserInterface;
 using Azalea.Design.UserInterface.Basic;
-using Azalea.Graphics.Colors;
+using Azalea.Graphics;
 
 namespace Azalea.VisualTests;
 internal class SliderTest : TestScene
 {
 	public SliderTest()
 	{
-		Add(new Composition()
+		AddRange(new GameObject[]
 		{
-			Position = new(500, 600),
-			Size = new(400, 300),
-			BorderThickness = new(2),
-			Child = new BasicSlider()
+			new BasicSlider()
 			{
-				Origin = Graphics.Anchor.TopRight,
-				Anchor = Graphics.Anchor.TopRight,
-				Position = new(200, 100),
-				Size = new(300, 40),
-				BorderColor = Palette.Teal,
-				BorderThickness = new(1)
+				Position = new(200, 200),
+				Size = new(300, 40)
+			},
+			new BasicSlider()
+			{
+				Position = new(500, 300),
+				Size = new(40, 300),
+				Direction = SliderDirection.Vertical
 			}
-		});
-
-
-		Add(new BasicSlider()
-		{
-			Position = new(500, 200),
-			Size = new(40, 300),
-			Direction = SliderDirection.Vertical,
-			BorderColor = Palette.Teal,
-			BorderThickness = new(1)
 		});
 	}
 }

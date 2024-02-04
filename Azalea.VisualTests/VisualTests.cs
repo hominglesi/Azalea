@@ -39,7 +39,6 @@ public class VisualTests : AzaleaGame
 			Direction = FlexDirection.Vertical,
 			Spacing = new(10),
 			Wrapping = FlexWrapping.Wrap,
-			BackgroundColor = new Color(40, 51, 60)
 		};
 
 		foreach (var test in _tests)
@@ -80,7 +79,13 @@ public class VisualTests : AzaleaGame
 	private void goToSceneSelect()
 	{
 		if (Child != _testSelectScene)
+		{
 			Child = _testSelectScene;
+			Main.Host.Renderer.ClearColor = new Color(40, 51, 60);
+			Main.Host.Window.ClientSize = new(1280, 720);
+			Main.Host.Window.Center();
+		}
+
 	}
 
 	private class TestButton : Button
