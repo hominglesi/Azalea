@@ -1,6 +1,7 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Design.UserInterface;
 using Azalea.Graphics;
+using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ public class TestScene : Composition
 	public TestScene()
 	{
 		RelativeSizeAxes = Axes.Both;
+		AzaleaGame.Main.Host.Renderer.ClearColor = Palette.Flowers.Azalea;
 	}
 
 	protected FlexContainer CreateFullscreenVerticalFlex(GameObject[] children)

@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.Colors;
+﻿using Azalea.Graphics;
+using Azalea.Graphics.Colors;
 using System;
 using System.Numerics;
 
@@ -68,6 +69,20 @@ public static class AmendableExtentions
 		return amendable;
 	}
 
+	public static T ChangeBoundaryPropertyTo<T>(this T amendable, string propertyName, Boundary newValue, float duration)
+		where T : Amendable
+	{
+		amendable.AddAmend(new BoundaryAmend<T>(amendable, propertyName, newValue, duration, relative: false));
+		return amendable;
+	}
+
+	public static T ChangeBoundaryPropertyBy<T>(this T amendable, string propertyName, Boundary change, float duration)
+		where T : Amendable
+	{
+		amendable.AddAmend(new BoundaryAmend<T>(amendable, propertyName, change, duration, relative: false));
+		return amendable;
+	}
+
 	public static T ChangeColorQuadPropertyTo<T>(this T amendable, string propertyName, ColorQuad newValue, float duration)
 		where T : Amendable
 	{
@@ -134,7 +149,7 @@ public static class AmendableExtentions
 
 	public static T ChangeAlphaTo<T>(this T amendable, float newAlpha, float duration)
 		where T : Amendable
-		=> amendable.ChangeFloatPropertyBy("Alpha", newAlpha, duration);
+		=> amendable.ChangeFloatPropertyTo("Alpha", newAlpha, duration);
 
 	#endregion
 }

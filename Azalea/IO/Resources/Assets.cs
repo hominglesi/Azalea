@@ -1,5 +1,6 @@
 ﻿using Azalea.Audio;
 using Azalea.Graphics.Textures;
+using Azalea.Utils;
 using System;
 using System.IO;
 
@@ -13,10 +14,11 @@ public static partial class Assets
 	public static IResourceStore FileSystem => _fileSystemStore;
 	private static FileSystemStore _fileSystemStore;
 
-	public static Action? OnDispose;
+	public static Storage PersistentStore => _persistentStore
+		?? throw new Exception("A persistent store has not been set up. Please use Assets.SetupPersistentStore before trying to use it");
+	private static Storage? _persistentStore;
 
-	public static TextureFiltering DefaultMinFiltering = TextureFiltering.Nearest;
-	public static TextureFiltering DefaultMagFiltering = TextureFiltering.Nearest;
+	public static Action? OnDispose;
 
 	static Assets()
 	{
@@ -25,6 +27,13 @@ public static partial class Assets
 			new AssemblyResourceStore(typeof(AzaleaGame).Assembly), "Resources"));
 
 		_fileSystemStore = new FileSystemStore();
+	}
+
+	public static void SetupPersistentStore(string folderName)
+	{
+		var path = FileSystemUtils.CombinePaths(
+			Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), folderName);
+		_persistentStore = new Storage(path);
 	}
 
 	public static void AddToMainStore(IResourceStore store) => _mainStore.AddStore(store);

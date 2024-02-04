@@ -2,7 +2,6 @@
 using Azalea.Graphics.Colors;
 using Azalea.Inputs;
 using Azalea.Utils;
-using System;
 using System.Numerics;
 
 namespace Azalea.VisualTests;
@@ -22,39 +21,35 @@ public class AutoSizeTest : TestScene
 			Child = _flex = new FlexContainer()
 			{
 				Direction = FlexDirection.Vertical,
-				Width = 200,
+				Size = new(200),
 				AutoSizeAxes = Graphics.Axes.Y,
 				BorderColor = Palette.Green
 			}
 		});
-	}
 
-	private Vector2 _drawSize;
+		regenerateText();
+	}
 
 	protected override void Update()
 	{
 		_flex.Position = Input.MousePosition - new Vector2(100);
 
-		if (_drawSize != _composition.DrawSize)
+		if (Input.GetKey(Keys.Space).DownOrRepeat)
+			regenerateText();
+	}
+
+	private void regenerateText()
+	{
+		_flex.Clear();
+
+		for (int i = 0; i < 2; i++)
 		{
-			Console.WriteLine(_composition.DrawSize);
-
-			_drawSize = _composition.DrawSize;
-		}
-
-		if (Input.GetKey(Keys.KeypadPlus).Down)
-		{
-			_flex.Clear();
-
-			for (int i = 0; i < 5; i++)
+			_flex.Add(new TextContainer()
 			{
-				_flex.Add(new TextContainer()
-				{
-					RelativeSizeAxes = Graphics.Axes.X,
-					AutoSizeAxes = Graphics.Axes.Y,
-					Text = TextUtils.GenerateLoremIpsum(20)
-				});
-			}
+				RelativeSizeAxes = Graphics.Axes.X,
+				AutoSizeAxes = Graphics.Axes.Y,
+				Text = TextUtils.GenerateLoremIpsum(20)
+			});
 		}
 	}
 }

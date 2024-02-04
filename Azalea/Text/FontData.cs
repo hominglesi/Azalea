@@ -27,7 +27,7 @@ public class FontData
 
 	public bool HasGlyph(char c) => _font.Characters.ContainsKey(c);
 	public int GetKerning(char left, char right) => _font.GetKerningAmount(left, right);
-	public Texture GetPageImage(int page) => _store.GetTexture(getFilenameForPage(page));
+	public Texture GetPageImage(int page) => _store.GetTexture(getFilenameForPage(page), TextureFiltering.Linear);
 
 	private string getFilenameForPage(int page)
 		=> $@"{_path}_{page.ToString().PadLeft((_font.Pages.Count - 1).ToString().Length, '0')}.png";

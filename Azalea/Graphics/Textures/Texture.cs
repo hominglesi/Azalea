@@ -21,9 +21,10 @@ public class Texture : Disposable
 	}
 
 	internal void SetData(Image upload)
-	{
-		NativeTexture.SetData(upload);
-	}
+		=> NativeTexture.SetData(upload);
+
+	internal void SetFiltering(TextureFiltering minFilter, TextureFiltering magFilter)
+		=> NativeTexture.SetFiltering(minFilter, magFilter);
 
 	internal virtual Rect GetUVCoordinates() => Rect.One;
 

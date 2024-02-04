@@ -12,8 +12,8 @@ public class TextContainerTest : TestScene
 
 	public TextContainerTest()
 	{
-		var x = AzaleaGame.Main.Host.Window;
-		x.ClientSize = new(1680, 960);
+		AzaleaGame.Main.Host.Window.ClientSize = new(1680, 960);
+		AzaleaGame.Main.Host.Window.Center();
 
 		Add(_scrollable = new ScrollableContainer()
 		{
@@ -60,7 +60,7 @@ public class TextContainerTest : TestScene
 
 	protected override void Update()
 	{
-		if (Input.GetMouseButton(0).Pressed && Input.GetKey(Keys.ShiftLeft).Pressed)
+		if (Input.GetKey(Keys.Space).Down)
 		{
 			_scrollable.Size = _scrollable.ToLocalSpace(Input.MousePosition);
 		}

@@ -31,6 +31,7 @@ public class BreakoutTest : TestScene
 		var window = AzaleaGame.Main.Host.Window;
 		window.ClientSize = new(GameWidth, GameHeight);
 		window.Resizable = false;
+		window.Center();
 
 		_chunkRoot = new BreakoutChunk(new Rectangle(Vector2.Zero,
 									   new Vector2(GameWidth, BlocksHeight)));

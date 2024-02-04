@@ -36,4 +36,12 @@ public struct Vector2Int : IEquatable<Vector2Int>
 	public static Vector2Int operator /(Vector2Int left, int right) => new(left.X / right, left.Y / right);
 
 	public static implicit operator Vector2(Vector2Int other) => new(other.X, other.Y);
+
+	public static Vector2Int Parse(string value)
+	{
+		var args = value.Split(':');
+		var x = int.Parse(args[0]);
+		var y = int.Parse(args[1]);
+		return new Vector2Int(x, y);
+	}
 }
