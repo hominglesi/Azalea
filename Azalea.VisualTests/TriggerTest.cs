@@ -1,5 +1,4 @@
-﻿using Azalea.Design.Components;
-using Azalea.Design.Shapes;
+﻿using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
@@ -151,7 +150,7 @@ public class TriggerTest : TestScene
 	protected override void FixedUpdate()
 	{
 
-		PGen.Update(ComponentStorage<RigidBody>.GetComponents());
+		PGen.Update();
 
 
 	}
