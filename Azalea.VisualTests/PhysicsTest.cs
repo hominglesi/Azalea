@@ -1,4 +1,5 @@
-﻿using Azalea.Design.Shapes;
+﻿using Azalea.Design.Containers;
+using Azalea.Design.Shapes;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
@@ -141,12 +142,16 @@ public class PhysicsTest : TestScene
 			Radius = 15
 		});
 		*/
-		Add(box1 = new Box()
+
+		Add(new Composition()
 		{
 			Position = new(690, 356),
-			Size = new(50, 50),
-			Color = Palette.Yellow,
-			Origin = Graphics.Anchor.Center,
+			Child = box1 = new Box()
+			{
+				Size = new(50, 50),
+				Color = Palette.Yellow,
+				Origin = Graphics.Anchor.CenterRight,
+			}
 		});
 		box1.AddComponent(new RigidBody()
 		{
@@ -154,11 +159,9 @@ public class PhysicsTest : TestScene
 			//	UsesGravity = false,
 			//AngularAcceleration = 0.0001f
 		});
-		box1.AddComponent(new RectCollider()
-		{
-			SideA = 50,
-			SideB = 50
-		});
+		box1.AddComponent(new RectCollider());
+
+
 
 		Add(box2 = new Box()
 		{
@@ -174,11 +177,7 @@ public class PhysicsTest : TestScene
 			//	UsesGravity = false,
 			//AngularAcceleration = 0.0001f
 		});
-		box2.AddComponent(new RectCollider()
-		{
-			SideA = 50,
-			SideB = 50
-		});
+		box2.AddComponent(new RectCollider());
 
 		Add(platform = new Box()
 		{
@@ -195,11 +194,7 @@ public class PhysicsTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		platform.AddComponent(new RectCollider()
-		{
-			SideA = 1500,
-			SideB = 100
-		});
+		platform.AddComponent(new RectCollider());
 
 		Add(ceiling = new Box()
 		{
@@ -216,11 +211,7 @@ public class PhysicsTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		ceiling.AddComponent(new RectCollider()
-		{
-			SideA = 1500,
-			SideB = 100
-		});
+		ceiling.AddComponent(new RectCollider());
 
 		Add(platform2 = new Box()
 		{
@@ -237,11 +228,7 @@ public class PhysicsTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		platform2.AddComponent(new RectCollider()
-		{
-			SideA = 200,
-			SideB = 60
-		});
+		platform2.AddComponent(new RectCollider());
 
 		Add(platform3 = new Box()
 		{
@@ -258,11 +245,7 @@ public class PhysicsTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		platform3.AddComponent(new RectCollider()
-		{
-			SideA = 200,
-			SideB = 60
-		});
+		platform3.AddComponent(new RectCollider());
 
 		Add(platform4 = new Box()
 		{
@@ -279,11 +262,7 @@ public class PhysicsTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		platform4.AddComponent(new RectCollider()
-		{
-			SideA = 400,
-			SideB = 60
-		});
+		platform4.AddComponent(new RectCollider());
 
 		Add(wallL = new Box()
 		{
@@ -300,11 +279,7 @@ public class PhysicsTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		wallL.AddComponent(new RectCollider()
-		{
-			SideA = 50,
-			SideB = 900
-		});
+		wallL.AddComponent(new RectCollider());
 
 		Add(wallR = new Box()
 		{
@@ -321,11 +296,7 @@ public class PhysicsTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		wallR.AddComponent(new RectCollider()
-		{
-			SideA = 50,
-			SideB = 900
-		});
+		wallR.AddComponent(new RectCollider());
 
 	}
 

@@ -576,6 +576,7 @@ public abstract partial class GameObject : Amendable, IGameObject
 			{
 				_drawInfo = computeDrawInfo();
 				_drawInfoBacking.Validate();
+				OnDrawInfoInvalidated?.Invoke();
 			}
 
 			return _drawInfo;
@@ -597,6 +598,8 @@ public abstract partial class GameObject : Amendable, IGameObject
 
 		return di;
 	}
+
+	internal Action? OnDrawInfoInvalidated;
 
 	#region Components
 

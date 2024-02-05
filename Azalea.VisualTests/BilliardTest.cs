@@ -239,11 +239,7 @@ public class BilliardTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		topLeftEdge.AddComponent(new RectCollider()
-		{
-			SideA = tableWidth / 2 - 3 * holeRadius - holeOffset - middleOffset + 3,
-			SideB = edgeThickness
-		});
+		topLeftEdge.AddComponent(new RectCollider());
 
 		Add(topRightEdge = new Box()
 		{
@@ -261,11 +257,7 @@ public class BilliardTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		topRightEdge.AddComponent(new RectCollider()
-		{
-			SideA = tableWidth / 2 - 3 * holeRadius - holeOffset - middleOffset + 3,
-			SideB = edgeThickness
-		});
+		topRightEdge.AddComponent(new RectCollider());
 
 		Add(bottomLeftEdge = new Box()
 		{
@@ -283,11 +275,7 @@ public class BilliardTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		bottomLeftEdge.AddComponent(new RectCollider()
-		{
-			SideA = tableWidth / 2 - 3 * holeRadius - holeOffset - middleOffset + 3,
-			SideB = edgeThickness
-		});
+		bottomLeftEdge.AddComponent(new RectCollider());
 
 		Add(bottomRightEdge = new Box()
 		{
@@ -305,11 +293,7 @@ public class BilliardTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		bottomRightEdge.AddComponent(new RectCollider()
-		{
-			SideA = tableWidth / 2 - 3 * holeRadius - holeOffset - middleOffset + 3,
-			SideB = edgeThickness
-		});
+		bottomRightEdge.AddComponent(new RectCollider());
 
 		Add(leftEdge = new Box()
 		{
@@ -327,11 +311,7 @@ public class BilliardTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		leftEdge.AddComponent(new RectCollider()
-		{
-			SideA = edgeThickness,
-			SideB = tableHeight - holeRadius * 3 - holeOffset - middleOffset - holeOffset - 10
-		});
+		leftEdge.AddComponent(new RectCollider());
 
 		Add(rightEdge = new Box()
 		{
@@ -349,11 +329,7 @@ public class BilliardTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		rightEdge.AddComponent(new RectCollider()
-		{
-			SideA = edgeThickness,
-			SideB = tableHeight - holeRadius * 3 - holeOffset - holeOffset - 10 - middleOffset,
-		});
+		rightEdge.AddComponent(new RectCollider());
 	}
 	private void GenerateHoleCorners()
 	{
@@ -395,11 +371,7 @@ public class BilliardTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		topLeftEdge.AddComponent(new RectCollider()
-		{
-			SideA = size.X,
-			SideB = size.Y,
-		});
+		topLeftEdge.AddComponent(new RectCollider());
 		return box;
 	}
 

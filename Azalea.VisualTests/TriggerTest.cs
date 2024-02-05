@@ -72,11 +72,7 @@ public class TriggerTest : TestScene
 			//	UsesGravity = false,
 			//AngularAcceleration = 0.0001f
 		});
-		box1.AddComponent(new RectCollider()
-		{
-			SideA = 50,
-			SideB = 50
-		});
+		box1.AddComponent(new RectCollider());
 
 
 	}
