@@ -13,7 +13,7 @@ public abstract class Component
 		_parent = parent;
 		OnAttached();
 
-		ComponentStorage.Add(this);
+		AddToScene();
 	}
 
 	internal void DetachParent()
@@ -21,7 +21,25 @@ public abstract class Component
 		_parent = null;
 		OnDetached();
 
+		RemoveFromScene();
+	}
+
+	private bool _inScene;
+
+	internal void AddToScene()
+	{
+		if (_inScene) return;
+
+		ComponentStorage.Add(this);
+		_inScene = true;
+	}
+
+	internal void RemoveFromScene()
+	{
+		if (_inScene == false) return;
+
 		ComponentStorage.Remove(this);
+		_inScene = false;
 	}
 
 	public virtual void Update() { }

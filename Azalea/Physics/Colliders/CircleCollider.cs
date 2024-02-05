@@ -11,4 +11,13 @@ public class CircleCollider : Collider
 	{
 		throw new NotImplementedException();
 	}
+
+	public override bool ProcessCollision(Collider other, bool resolveCollision)
+		=> other.ProcessCollision(this, resolveCollision);
+
+	public override bool ProcessCollision(CircleCollider other, bool resolveCollision)
+		=> CollisionLogic.CircleCircleCollision(this, other, resolveCollision);
+
+	public override bool ProcessCollision(RectCollider other, bool resolveCollision)
+		=> CollisionLogic.CircleRectCollision(this, other, resolveCollision);
 }

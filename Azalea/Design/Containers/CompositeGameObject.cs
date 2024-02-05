@@ -179,6 +179,22 @@ public partial class CompositeGameObject : GameObject
 		return base.OnInvalidate(invalidation, source);
 	}
 
+	internal override void AddComponentTreeToScene()
+	{
+		base.AddComponentTreeToScene();
+
+		foreach (var child in InternalChildren)
+			child.AddComponentTreeToScene();
+	}
+
+	internal override void RemoveComponentTreeFromScene()
+	{
+		base.RemoveComponentTreeFromScene();
+
+		foreach (var child in InternalChildren)
+			child.RemoveComponentTreeFromScene();
+	}
+
 	public override void Draw(IRenderer renderer)
 	{
 		if (Masking)

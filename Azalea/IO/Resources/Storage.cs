@@ -25,7 +25,10 @@ public class Storage : IResourceStore
 
 	public Stream GetOrCreateStream(string path)
 	{
-		return File.OpenWrite(_path + path);
+		var fullPath = _path + path;
+		var directoryPath = Path.GetDirectoryName(fullPath)!;
+		Directory.CreateDirectory(directoryPath);
+		return File.OpenWrite(fullPath);
 	}
 
 	public bool Exists(string path)

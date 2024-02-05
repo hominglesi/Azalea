@@ -6,7 +6,10 @@ using System.Numerics;
 namespace Azalea.Physics.Colliders;
 public abstract class Collider : Component
 {
-	public Vector2 Position { get => Parent.Position; set => Parent.Position = value; }
+	public Vector2 Position { get => GetPosition(); set => SetPosition(value); }
+	internal virtual Vector2 GetPosition() => Parent.Position;
+	internal virtual void SetPosition(Vector2 pos) => Parent.Position = pos;
+
 	public Vector2 Scale { get => Parent.Scale; set => Parent.Scale = value; }
 	public float Rotation { get => Parent.Rotation; set => Parent.Rotation = value; }
 	public bool IsTrigger { get; set; }
@@ -62,4 +65,8 @@ public abstract class Collider : Component
 
 	}
 	public abstract Vector2[] GetVertices();
+
+	public abstract bool ProcessCollision(Collider other, bool resolveCollision);
+	public abstract bool ProcessCollision(CircleCollider other, bool resolveCollision);
+	public abstract bool ProcessCollision(RectCollider other, bool resolveCollision);
 }

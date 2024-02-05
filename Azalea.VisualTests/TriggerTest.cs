@@ -1,5 +1,4 @@
-﻿using Azalea.Design.Components;
-using Azalea.Design.Shapes;
+﻿using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
@@ -12,18 +11,18 @@ using System.Numerics;
 namespace Azalea.VisualTests;
 public class TriggerTest : TestScene
 {
-	PhysicsGenerator PGen = new PhysicsGenerator();
 	public Box box1;
-
 
 	Sprite circle1;
 
 	Line line;
 	bool charging = false;
+	private PhysicsGenerator _physics;
 	public TriggerTest()
 	{
-		PGen.DebugMode = false;
-		PGen.UsesGravity = false;
+		_physics = AzaleaGame.Main.Host.Physics;
+		_physics.DebugMode = false;
+		_physics.UsesGravity = false;
 		Add(line = new Line()
 		{
 			StartPoint = new(500, 40),
@@ -73,11 +72,7 @@ public class TriggerTest : TestScene
 			//	UsesGravity = false,
 			//AngularAcceleration = 0.0001f
 		});
-		box1.AddComponent(new RectCollider()
-		{
-			SideA = 50,
-			SideB = 50
-		});
+		box1.AddComponent(new RectCollider());
 
 
 	}
@@ -92,7 +87,7 @@ public class TriggerTest : TestScene
 
 		if (Input.GetKey(Keys.Space).Down)
 		{
-			PGen.UsesGravity = true;
+			_physics.UsesGravity = true;
 		}
 
 
@@ -147,12 +142,5 @@ public class TriggerTest : TestScene
 			power *= 1 + distance / 10;
 			circle1.GetComponent<RigidBody>().ApplyForce(directionVector, power);
 		}*/
-	}
-	protected override void FixedUpdate()
-	{
-
-		PGen.Update(ComponentStorage<RigidBody>.GetComponents());
-
-
 	}
 }

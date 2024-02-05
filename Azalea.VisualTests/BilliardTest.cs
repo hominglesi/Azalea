@@ -17,7 +17,6 @@ using System.Numerics;
 namespace Azalea.VisualTests;
 public class BilliardTest : TestScene
 {
-	PhysicsGenerator PGen = new PhysicsGenerator();
 	public Box box1;
 	public Box box2;
 	public Box box3;
@@ -127,8 +126,9 @@ public class BilliardTest : TestScene
 		_window.ClientSize = new(panelWidth, panelHeight);
 		_window.Center();
 		this.BackgroundColor = new Graphics.Colors.Color(48, 23, 8);
-		PGen.UsesGravity = false;
-		PGen.IsTopDown = true;
+		var physics = AzaleaGame.Main.Host.Physics;
+		physics.UsesGravity = false;
+		physics.IsTopDown = true;
 		Add(line = new Line()
 		{
 			StartPoint = new(500, 40),
@@ -183,7 +183,7 @@ public class BilliardTest : TestScene
 		infoContainer.Add(new Sprite
 		{
 			RelativeSizeAxes = Graphics.Axes.Both,
-			Texture= Assets.GetTexture("Textures/OpisRada.png")
+			Texture = Assets.GetTexture("Textures/OpisRada.png")
 
 		});
 	}
@@ -239,11 +239,7 @@ public class BilliardTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		topLeftEdge.AddComponent(new RectCollider()
-		{
-			SideA = tableWidth / 2 - 3 * holeRadius - holeOffset - middleOffset + 3,
-			SideB = edgeThickness
-		});
+		topLeftEdge.AddComponent(new RectCollider());
 
 		Add(topRightEdge = new Box()
 		{
@@ -261,11 +257,7 @@ public class BilliardTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		topRightEdge.AddComponent(new RectCollider()
-		{
-			SideA = tableWidth / 2 - 3 * holeRadius - holeOffset - middleOffset + 3,
-			SideB = edgeThickness
-		});
+		topRightEdge.AddComponent(new RectCollider());
 
 		Add(bottomLeftEdge = new Box()
 		{
@@ -283,11 +275,7 @@ public class BilliardTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		bottomLeftEdge.AddComponent(new RectCollider()
-		{
-			SideA = tableWidth / 2 - 3 * holeRadius - holeOffset - middleOffset + 3,
-			SideB = edgeThickness
-		});
+		bottomLeftEdge.AddComponent(new RectCollider());
 
 		Add(bottomRightEdge = new Box()
 		{
@@ -305,11 +293,7 @@ public class BilliardTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		bottomRightEdge.AddComponent(new RectCollider()
-		{
-			SideA = tableWidth / 2 - 3 * holeRadius - holeOffset - middleOffset + 3,
-			SideB = edgeThickness
-		});
+		bottomRightEdge.AddComponent(new RectCollider());
 
 		Add(leftEdge = new Box()
 		{
@@ -327,11 +311,7 @@ public class BilliardTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		leftEdge.AddComponent(new RectCollider()
-		{
-			SideA = edgeThickness,
-			SideB = tableHeight - holeRadius * 3 - holeOffset - middleOffset - holeOffset - 10
-		});
+		leftEdge.AddComponent(new RectCollider());
 
 		Add(rightEdge = new Box()
 		{
@@ -349,11 +329,7 @@ public class BilliardTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		rightEdge.AddComponent(new RectCollider()
-		{
-			SideA = edgeThickness,
-			SideB = tableHeight - holeRadius * 3 - holeOffset - holeOffset - 10 - middleOffset,
-		});
+		rightEdge.AddComponent(new RectCollider());
 	}
 	private void GenerateHoleCorners()
 	{
@@ -395,11 +371,7 @@ public class BilliardTest : TestScene
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		topLeftEdge.AddComponent(new RectCollider()
-		{
-			SideA = size.X,
-			SideB = size.Y,
-		});
+		topLeftEdge.AddComponent(new RectCollider());
 		return box;
 	}
 
@@ -553,7 +525,7 @@ public class BilliardTest : TestScene
 			aimLine.Alpha = 1;
 			float angle = MathF.Atan2(directionVector.Y, directionVector.X);
 			//	Console.WriteLine($"Angle: {angle}");
-			Ray ray = new Ray(PGen, whiteBall.Position, angle, 1500)
+			Ray ray = new Ray(whiteBall.Position, angle, 1500)
 			{
 				MinimumRange = 13,
 			};
@@ -568,8 +540,6 @@ public class BilliardTest : TestScene
 	}
 	protected override void FixedUpdate()
 	{
-		PGen.Update(ComponentStorage<RigidBody>.GetComponents());
-
 		if (waitingForBalls)
 		{
 			bool allStopped = true;
@@ -597,7 +567,7 @@ public class BilliardTest : TestScene
 			ball.Alpha = 0.3f;
 
 			//if not foul	if()
-		//	currentPlayer.Score += ball.PointValue;
+			//	currentPlayer.Score += ball.PointValue;
 			ball.GetComponent<RigidBody>().Velocity = new Vector2(0, 0);
 			ball.Position = new(-500, -500);
 			player1Text.Text = player1.ToString();
@@ -646,44 +616,44 @@ public class BilliardTest : TestScene
 				fouled = true;
 				Foul(currentPlayer);
 				currentPlayer = currentPlayer != player1 ? player1 : player2;
-                if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
-                    targetBallType = BallType.Red;
-                else
-                {
-                    targetBallType = BallType.Color;
-                }
-            }
+				if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
+					targetBallType = BallType.Red;
+				else
+				{
+					targetBallType = BallType.Color;
+				}
+			}
 			else if (scoredBallsThisTurn.Where(x => x.Type == targetBallType).Count() > 0)
 			{
 				if (firstHitBallType == targetBallType)
 				{
-					if(AllBalls.Where(x => x.Alpha>0.5 && x.Type==BallType.Red).Count()>0)
+					if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
 						targetBallType = targetBallType != BallType.Red ? BallType.Red : BallType.Color;
-                    else
-                    {
-                        targetBallType = BallType.Color;
-                    }
+					else
+					{
+						targetBallType = BallType.Color;
+					}
 					currentPlayer.Score += scoredBallsThisTurn.Sum(x => x.PointValue);
-                    player1Text.Text = player1.ToString();
-                    player2Text.Text = player2.ToString();
+					player1Text.Text = player1.ToString();
+					player2Text.Text = player2.ToString();
 
-                    foreach(var ball in scoredBallsThisTurn.Where(x => x.Type == BallType.Color))
-                    {
-                        resetBall(ball);
-                    }
-                }
+					foreach (var ball in scoredBallsThisTurn.Where(x => x.Type == BallType.Color))
+					{
+						resetBall(ball);
+					}
+				}
 				else
 				{
 					fouled = true;
 					Foul(currentPlayer);
 					currentPlayer = currentPlayer != player1 ? player1 : player2;
-                    if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
-                        targetBallType = BallType.Red;
-                    else
-                    {
-                        targetBallType = BallType.Color;
-                    }
-                }
+					if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
+						targetBallType = BallType.Red;
+					else
+					{
+						targetBallType = BallType.Color;
+					}
+				}
 			}
 		}
 		else
@@ -691,25 +661,25 @@ public class BilliardTest : TestScene
 			if (firstHitBallType == targetBallType)
 			{
 				currentPlayer = currentPlayer != player1 ? player1 : player2;
-                if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
-                    targetBallType = BallType.Red;
-                else
-                {
-                    targetBallType = BallType.Color;
-                }
-            }
+				if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
+					targetBallType = BallType.Red;
+				else
+				{
+					targetBallType = BallType.Color;
+				}
+			}
 			else
 			{
 				fouled = true;
 				Foul(currentPlayer);
 				currentPlayer = currentPlayer != player1 ? player1 : player2;
-                if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
-                    targetBallType = BallType.Red;
-                else
-                {
-                    targetBallType = BallType.Color;
-                }
-            }
+				if (AllBalls.Where(x => x.Alpha > 0.5 && x.Type == BallType.Red).Count() > 0)
+					targetBallType = BallType.Red;
+				else
+				{
+					targetBallType = BallType.Color;
+				}
+			}
 
 		}
 
@@ -756,25 +726,25 @@ public class BilliardTest : TestScene
 
 	private void resetBall(SnookerBall ball)
 	{
-        if (ball.Type == BallType.Color)
-        {
-            if (AllBalls.Where(x => x.Alpha > 0.5f && x.Type == BallType.Red).ToList().Count() > 0)
-            {
-                ball.Alpha = 1;
-                if (greenBall == ball)
-                    ball.Position = greenPosition;
-                if (brownBall == ball)
-                    ball.Position = brownPosition;
-                if (yellowBall == ball)
-                    ball.Position = yellowPosition;
-                if (blackBall == ball)
-                    ball.Position = blackPosition;
-                if (blueBall == ball)
-                    ball.Position = bluePosition;
-                if (pinkBall == ball)
-                    ball.Position = pinkPosition;
-            }
-        }
+		if (ball.Type == BallType.Color)
+		{
+			if (AllBalls.Where(x => x.Alpha > 0.5f && x.Type == BallType.Red).ToList().Count() > 0)
+			{
+				ball.Alpha = 1;
+				if (greenBall == ball)
+					ball.Position = greenPosition;
+				if (brownBall == ball)
+					ball.Position = brownPosition;
+				if (yellowBall == ball)
+					ball.Position = yellowPosition;
+				if (blackBall == ball)
+					ball.Position = blackPosition;
+				if (blueBall == ball)
+					ball.Position = bluePosition;
+				if (pinkBall == ball)
+					ball.Position = pinkPosition;
+			}
+		}
 	}
 
 	private enum BallType { None, White, Color, Red };

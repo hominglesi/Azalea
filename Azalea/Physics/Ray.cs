@@ -4,9 +4,8 @@ using System.Numerics;
 namespace Azalea.Physics;
 public class Ray
 {
-	public Ray(PhysicsGenerator pgen, Vector2 startPosition, float angle, int range)
+	public Ray(Vector2 startPosition, float angle, int range)
 	{
-		PGen = pgen;
 		Angle = angle;
 		Range = range;
 		StartPosition = startPosition;

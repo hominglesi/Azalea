@@ -5,6 +5,7 @@ using Azalea.Extentions;
 using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
 using Azalea.IO.Resources;
+using Azalea.Physics;
 using System;
 using System.Diagnostics;
 using System.Numerics;
@@ -20,6 +21,9 @@ public abstract class GameHost
 	private IClipboard? _clipboard;
 
 	public event Action? Initialized;
+
+	public PhysicsGenerator Physics => _physics ?? throw new Exception("Game has not been started yet");
+	private PhysicsGenerator? _physics;
 
 	public Composition Root => _root ?? throw new Exception("Cannot use root before the game has started.");
 
@@ -41,6 +45,7 @@ public abstract class GameHost
 		game.SetHost(this);
 
 		_clipboard = CreateClipboard();
+		_physics = new PhysicsGenerator();
 
 		float accumulator = 0;
 		float targetFrameTime = 1 / (float)60;
@@ -138,6 +143,8 @@ public abstract class GameHost
 	public virtual void CallOnFixedUpdate()
 	{
 		Root.FixedUpdateSubTree();
+
+		Physics.Update();
 	}
 
 	protected virtual IClipboard? CreateClipboard() => null;
