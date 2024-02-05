@@ -11,6 +11,7 @@ public class RayCast
 {
 	public static Ray Cast(Ray ray)
 	{
+		var physics = AzaleaGame.Main.Host.Physics;
 		Collider collider;
 		GameObject ob = new Box();
 		collider = new CircleCollider()
@@ -25,7 +26,7 @@ public class RayCast
 		collider.Position += direction * ray.MinimumRange;
 		for (int i = ray.MinimumRange; i < ray.Range; i++)
 		{
-			bool isColliding = ray.PGen.CheckCollisions(collider, ComponentStorage<RigidBody>.GetComponents().Select(x => x.Parent.GetComponent<Collider>()));
+			bool isColliding = physics.CheckCollisions(collider, ComponentStorage<RigidBody>.GetComponents().Select(x => x.Parent.GetComponent<Collider>()));
 			if (isColliding)
 			{
 				ray.Hit = true;

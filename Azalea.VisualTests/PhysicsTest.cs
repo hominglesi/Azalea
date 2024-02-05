@@ -11,7 +11,6 @@ using System.Numerics;
 namespace Azalea.VisualTests;
 public class PhysicsTest : TestScene
 {
-	PhysicsGenerator PGen = new PhysicsGenerator();
 	public Box box1;
 	public Box box2;
 	public Box box3;
@@ -35,10 +34,12 @@ public class PhysicsTest : TestScene
 
 	Line line;
 	bool charging = false;
+	private PhysicsGenerator _physics;
 	public PhysicsTest()
 	{
-		PGen.DebugMode = true;
-		PGen.UsesGravity = false;
+		_physics = AzaleaGame.Main.Host.Physics;
+		_physics.DebugMode = true;
+		_physics.UsesGravity = false;
 		Add(line = new Line()
 		{
 			StartPoint = new(500, 40),
@@ -333,7 +334,7 @@ public class PhysicsTest : TestScene
 
 		if (Input.GetKey(Keys.Space).Down)
 		{
-			PGen.UsesGravity = true;
+			_physics.UsesGravity = true;
 		}
 
 		if (Input.GetKey(Keys.O).Down)
@@ -440,8 +441,6 @@ public class PhysicsTest : TestScene
 	}
 	protected override void FixedUpdate()
 	{
-
-		PGen.Update();
 		/*
 		//Fake Floor
 		if (box1.Y>600)

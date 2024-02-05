@@ -17,7 +17,6 @@ using System.Numerics;
 namespace Azalea.VisualTests;
 public class BilliardTest : TestScene
 {
-	PhysicsGenerator PGen = new PhysicsGenerator();
 	public Box box1;
 	public Box box2;
 	public Box box3;
@@ -127,8 +126,9 @@ public class BilliardTest : TestScene
 		_window.ClientSize = new(panelWidth, panelHeight);
 		_window.Center();
 		this.BackgroundColor = new Graphics.Colors.Color(48, 23, 8);
-		PGen.UsesGravity = false;
-		PGen.IsTopDown = true;
+		var physics = AzaleaGame.Main.Host.Physics;
+		physics.UsesGravity = false;
+		physics.IsTopDown = true;
 		Add(line = new Line()
 		{
 			StartPoint = new(500, 40),
@@ -553,7 +553,7 @@ public class BilliardTest : TestScene
 			aimLine.Alpha = 1;
 			float angle = MathF.Atan2(directionVector.Y, directionVector.X);
 			//	Console.WriteLine($"Angle: {angle}");
-			Ray ray = new Ray(PGen, whiteBall.Position, angle, 1500)
+			Ray ray = new Ray(whiteBall.Position, angle, 1500)
 			{
 				MinimumRange = 13,
 			};
@@ -568,8 +568,6 @@ public class BilliardTest : TestScene
 	}
 	protected override void FixedUpdate()
 	{
-		PGen.Update();
-
 		if (waitingForBalls)
 		{
 			bool allStopped = true;
