@@ -514,6 +514,11 @@ public abstract partial class GameObject : Amendable, IGameObject
 
 			parent = value;
 
+			if (parent == null)
+				RemoveComponentTreeFromScene();
+			else
+				AddComponentTreeToScene();
+
 			//Invalidate(Invalidation.Presence);
 		}
 	}
@@ -602,12 +607,15 @@ public abstract partial class GameObject : Amendable, IGameObject
 		_components.Add(component);
 		component.AttachParent(this);
 	}
+
 	public void RemoveComponent(Component component)
 	{
 		_components.Remove(component);
 		component.DetachParent();
 	}
+
 	private void updateComponents() { foreach (var c in _components) c.Update(); }
+
 	public T? GetComponent<T>()
 		where T : class
 	{
@@ -632,6 +640,18 @@ public abstract partial class GameObject : Amendable, IGameObject
 			if (comp is T castComp)
 				yield return castComp;
 		}
+	}
+
+	internal virtual void AddComponentTreeToScene()
+	{
+		foreach (var component in _components)
+			component.AddToScene();
+	}
+
+	internal virtual void RemoveComponentTreeFromScene()
+	{
+		foreach (var component in _components)
+			component.RemoveFromScene();
 	}
 
 	#endregion
