@@ -395,17 +395,31 @@ public abstract partial class GameObject : Amendable, IGameObject
 
 	public Vector2 RelativeOriginPosition => ComputeAnchorPosition(_origin);
 
+	private Vector2 _customOrigin;
+
 	public Vector2 OriginPosition
 	{
 		get
 		{
 			Vector2 result;
-			if (Origin == Anchor.TopLeft)
+			if (Origin == Anchor.Custom)
+				result = _customOrigin;
+			else if (Origin == Anchor.TopLeft)
 				result = Vector2.Zero;
 			else
 				result = DrawSize * RelativeOriginPosition;
 
 			return result - new Vector2(Margin.Left, Margin.Top);
+		}
+		set
+		{
+			if (_customOrigin == value && Origin == Anchor.Custom)
+				return;
+
+			_customOrigin = value;
+			Origin = Anchor.Custom;
+
+			Invalidate(Invalidation.MiscGeometry);
 		}
 	}
 
@@ -953,6 +967,8 @@ public enum Anchor
 	x0 = 1 << 3,
 	x1 = 1 << 4,
 	x2 = 1 << 5,
+
+	Custom = 1 << 6,
 }
 
 [Flags]

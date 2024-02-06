@@ -37,10 +37,13 @@ public static class MathUtils
 	}
 
 	public static Vector2 GetDirectionTowards(Vector2 startPositon, Vector2 endPositon)
-		=> GetVectorFromAngle(GetAngleTowards(startPositon, endPositon));
+		=> GetDirectionFromAngle(GetAngleTowards(startPositon, endPositon));
 
-	public static Vector2 GetVectorFromAngle(float angle)
+	public static Vector2 GetDirectionFromAngle(float angle)
 		=> new((float)Math.Cos(angle), (float)Math.Sin(angle));
+
+	public static float GetAngleFromDirection(Vector2 direction)
+		=> MathF.Atan2(direction.Y, direction.X);
 
 	public static float DistanceBetween(Vector2 startPositon, Vector2 endPositon)
 		=> MathF.Sqrt(MathF.Pow(endPositon.X - startPositon.X, 2) + MathF.Pow(endPositon.Y - startPositon.Y, 2));

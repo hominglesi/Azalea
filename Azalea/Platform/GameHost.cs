@@ -45,7 +45,9 @@ public abstract class GameHost
 		game.SetHost(this);
 
 		_clipboard = CreateClipboard();
+
 		_physics = new PhysicsGenerator();
+		_physics.UsesGravity = false;
 
 		float accumulator = 0;
 		float targetFrameTime = 1 / (float)60;

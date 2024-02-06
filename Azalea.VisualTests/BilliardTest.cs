@@ -533,7 +533,7 @@ public class BilliardTest : TestScene
 			//		if (ray.Hit)
 			//			Console.WriteLine("HIT");
 			aimLine.StartPoint = whiteBall.Position;
-			aimLine.EndPoint = aimLine.StartPoint + MathUtils.GetVectorFromAngle(angle) * ray.Distance;
+			aimLine.EndPoint = aimLine.StartPoint + MathUtils.GetDirectionFromAngle(angle) * ray.Distance;
 		}
 		else
 			aimLine.Alpha = 0;
