@@ -2,5 +2,6 @@
 public enum GLBufferType
 {
 	Array = 0x8892,
-	ElementArray = 0x8893
+	ElementArray = 0x8893,
+	FrameBuffer = 0x8D40
 }

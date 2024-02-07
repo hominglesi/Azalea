@@ -117,13 +117,19 @@ internal static unsafe class GL
 
 	[DllImport(LibraryPath, EntryPoint = "glTexImage2D")]
 	private static extern void texImage2D(GLTextureType type, int level, GLColorFormat internalFormat,
-		int width, int height, int border, GLColorFormat format, GLDataType dataType, void* pixels);
+		int width, int height, int border, GLColorFormat format, GLDataType dataType, IntPtr pixels);
 
 	public static void TexImage2D(GLTextureType type, int level, GLColorFormat internalFormat,
-		int width, int height, int border, GLColorFormat format, GLDataType dataType, byte[] pixels)
+		int width, int height, int border, GLColorFormat format, GLDataType dataType, byte[]? pixels)
 	{
-		fixed (void* p = &pixels[0])
-			texImage2D(type, level, internalFormat, width, height, border, format, dataType, p);
+		if (pixels is null)
+			texImage2D(type, level, internalFormat, width, height, border, format, dataType, IntPtr.Zero);
+		else
+		{
+			fixed (void* p = &pixels[0])
+				texImage2D(type, level, internalFormat, width, height, border, format, dataType, (IntPtr)p);
+		}
+
 	}
 
 	private delegate void GLTextureSlotDelegate(GLTextureSlot slot);
@@ -175,6 +181,15 @@ internal static unsafe class GL
 		return vao;
 	}
 
+	private delegate void GenFramebuffersDelegate(int count, uint* buffers);
+	private static GenFramebuffersDelegate? _glGenFramebuffers;
+	public static uint GenFramebuffer()
+	{
+		uint buffer;
+		_glGenFramebuffers!(1, &buffer);
+		return buffer;
+	}
+
 	private delegate void BindBufferDelegate(GLBufferType type, uint buffer);
 	private static BindBufferDelegate? _glBindBuffer;
 	public static void BindBuffer(GLBufferType type, uint buffer) => _glBindBuffer!(type, buffer);
@@ -183,6 +198,9 @@ internal static unsafe class GL
 	private static BindVertexArrayDelegate? _glBindVertexArray;
 	public static void BindVertexArray(uint buffer) => _glBindVertexArray!(buffer);
 
+	private delegate void BindFramebufferDelegate(GLBufferType type, uint buffer);
+	private static BindFramebufferDelegate? _glBindFramebuffer;
+	public static void BindFramebuffer(GLBufferType type, uint buffer) => _glBindFramebuffer!(type, buffer);
 
 	private delegate void BufferDataDelegate(GLBufferType type, IntPtr size, void* data, GLUsageHint hint);
 	private static BufferDataDelegate? _glBufferData;
@@ -211,6 +229,20 @@ internal static unsafe class GL
 
 	private static VoidUIntDelegate? _glEnableVertexAttribArray;
 	public static void EnableVertexAttribArray(uint index) => _glEnableVertexAttribArray!(index);
+
+	private delegate GLFramebufferStatus CheckFramebufferStatusDelegate(GLBufferType type);
+	private static CheckFramebufferStatusDelegate? _glCheckFramebufferStatus;
+	public static GLFramebufferStatus CheckFramebufferStatus(GLBufferType type)
+	{
+		return _glCheckFramebufferStatus!(type);
+	}
+
+	private delegate void FramebufferTexture2DDelegate(GLBufferType type, GLAttachment attachment, GLTextureType textureType, uint texture, int level);
+	private static FramebufferTexture2DDelegate? _glFramebufferTexture2D;
+	public static void FramebufferTexture2D(GLBufferType type, GLAttachment attachment, GLTextureType textureType, uint texture, int level)
+	{
+		_glFramebufferTexture2D!(type, attachment, textureType, texture, level);
+	}
 
 
 	private static UIntDelegate? _glCreateProgram;
@@ -343,17 +375,28 @@ internal static unsafe class GL
 		_glDeleteVertexArrays!(1, &vertexArray);
 	}
 
+	private delegate void DeleteFramebuffersDelegate(int size, uint* buffers);
+	private static DeleteFramebuffersDelegate? _glDeleteFramebuffers;
+	public static void DeleteFramebuffer(uint buffer)
+	{
+		_glDeleteFramebuffers!(1, &buffer);
+	}
+
 	public static void ImportFunctions()
 	{
 		_wglSwapInterval = Marshal.GetDelegateForFunctionPointer<SwapIntervalDelegate>(wglGetProcAddress("wglSwapIntervalEXT"));
 		_glCreateBuffers = Marshal.GetDelegateForFunctionPointer<CreateBuffersDelegate>(wglGetProcAddress("glCreateBuffers"));
 		_glGenBuffers = Marshal.GetDelegateForFunctionPointer<GenBuffersDelegate>(wglGetProcAddress("glGenBuffers"));
 		_glGenVertexArrays = Marshal.GetDelegateForFunctionPointer<GenVertexArraysDelegate>(wglGetProcAddress("glGenVertexArrays"));
+		_glGenFramebuffers = Marshal.GetDelegateForFunctionPointer<GenFramebuffersDelegate>(wglGetProcAddress("glGenFramebuffers"));
 		_glBindBuffer = Marshal.GetDelegateForFunctionPointer<BindBufferDelegate>(wglGetProcAddress("glBindBuffer"));
 		_glBindVertexArray = Marshal.GetDelegateForFunctionPointer<BindVertexArrayDelegate>(wglGetProcAddress("glBindVertexArray"));
+		_glBindFramebuffer = Marshal.GetDelegateForFunctionPointer<BindFramebufferDelegate>(wglGetProcAddress("glBindFramebuffer"));
 		_glBufferData = Marshal.GetDelegateForFunctionPointer<BufferDataDelegate>(wglGetProcAddress("glBufferData"));
 		_glVertexAttribPointer = Marshal.GetDelegateForFunctionPointer<VertexAttribPointerDelegate>(wglGetProcAddress("glVertexAttribPointer"));
 		_glEnableVertexAttribArray = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glEnableVertexAttribArray"));
+		_glCheckFramebufferStatus = Marshal.GetDelegateForFunctionPointer<CheckFramebufferStatusDelegate>(wglGetProcAddress("glCheckFramebufferStatus"));
+		_glFramebufferTexture2D = Marshal.GetDelegateForFunctionPointer<FramebufferTexture2DDelegate>(wglGetProcAddress("glFramebufferTexture2D"));
 		_glCreateProgram = Marshal.GetDelegateForFunctionPointer<UIntDelegate>(wglGetProcAddress("glCreateProgram"));
 		_glCreateShader = Marshal.GetDelegateForFunctionPointer<CreateShaderDelegate>(wglGetProcAddress("glCreateShader"));
 		_glShaderSource = Marshal.GetDelegateForFunctionPointer<ShaderSourceDelegate>(wglGetProcAddress("glShaderSource"));
@@ -373,6 +416,7 @@ internal static unsafe class GL
 		_glUniformMatrix4fv = Marshal.GetDelegateForFunctionPointer<UniformMatrix4fvDelegate>(wglGetProcAddress("glUniformMatrix4fv"));
 		_glDeleteBuffers = Marshal.GetDelegateForFunctionPointer<DeleteBuffersDelegate>(wglGetProcAddress("glDeleteBuffers"));
 		_glDeleteVertexArrays = Marshal.GetDelegateForFunctionPointer<DeleteVertexArrays>(wglGetProcAddress("glDeleteVertexArrays"));
+		_glDeleteFramebuffers = Marshal.GetDelegateForFunctionPointer<DeleteFramebuffersDelegate>(wglGetProcAddress("glDeleteFramebuffers"));
 		_glActiveTexture = Marshal.GetDelegateForFunctionPointer<GLTextureSlotDelegate>(wglGetProcAddress("glActiveTexture"));
 		_glGenerateMipmap = Marshal.GetDelegateForFunctionPointer<GLTextureTypeDelegate>(wglGetProcAddress("glGenerateMipmap"));
 	}

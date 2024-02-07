@@ -18,6 +18,7 @@ internal class GLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 	private GLVertexBuffer _vertexBuffer;
 	private GLVertexArray _vertexArray;
 	private GLShader _shader;
+	private GLFrameBuffer _frameBuffer;
 
 	private float[] _vertices;
 	private int _vertexCount;
@@ -56,6 +57,20 @@ internal class GLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 		var vertexShaderSource = Assets.GetText("Shaders/vertex_shader.glsl")!;
 		var fragmentShaderSource = Assets.GetText("Shaders/fragment_shader.glsl")!;
 		_shader = new GLShader(vertexShaderSource, fragmentShaderSource);
+
+		_frameBuffer = new GLFrameBuffer();
+		_frameBuffer.Bind();
+		var frameBufferTexture = GL.GenTexture();
+		GL.BindTexture(GLTextureType.Texture2D, frameBufferTexture);
+		GL.TexImage2D(GLTextureType.Texture2D, 0, GLColorFormat.RGBA, 1280, 720, 0, GLColorFormat.RGBA, GLDataType.UnsignedByte, null);
+		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MinFilter, (int)GLFunction.Linear);
+		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MagFilter, (int)GLFunction.Linear);
+
+		GL.FramebufferTexture2D(GLBufferType.FrameBuffer, GLAttachment.Color0, GLTextureType.Texture2D, frameBufferTexture, 0);
+
+		Console.WriteLine(GL.CheckFramebufferStatus(GLBufferType.FrameBuffer));
+
+		_frameBuffer.Unbind();
 	}
 
 	public int Draw()
