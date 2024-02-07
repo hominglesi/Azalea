@@ -42,7 +42,7 @@ public class DebugSceneGraph : FlexContainer
 			{
 				if (invalidation.HasFlagFast(Invalidation.Presence))
 				{
-					if (_childCount != comp.Children.Count)
+					if (_childCount != comp.InternalChildren.Count)
 						toggleChildren(_checkbox.Checked);
 				}
 			};
@@ -58,9 +58,9 @@ public class DebugSceneGraph : FlexContainer
 
 		if (shown)
 		{
-			if (_rootObject is Composition comp)
+			if (_rootObject is CompositeGameObject comp)
 			{
-				foreach (var child in comp.Children)
+				foreach (var child in comp.InternalChildren)
 				{
 					var childGraph = new DebugSceneGraph(child);
 					childGraph.ObjectSelected += ObjectSelected!.Invoke;
@@ -71,7 +71,7 @@ public class DebugSceneGraph : FlexContainer
 
 		if (_rootObject is Composition composition)
 		{
-			_childCount = composition.Children.Count;
+			_childCount = composition.InternalChildren.Count;
 		}
 	}
 

@@ -51,8 +51,5 @@ internal class OriginTest : TestScene
 			_arm.Position = _leftHandPosition;
 			_arm.Scale = new(1, -1);
 		}
-
-
-
 	}
 }

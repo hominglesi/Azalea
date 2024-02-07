@@ -1,6 +1,7 @@
 ﻿//using Azalea.Audios;
 using Azalea.Amends;
 using Azalea.Design.Containers;
+using Azalea.Design.Scenes;
 using Azalea.Design.Shapes;
 using Azalea.Design.UserInterface;
 using Azalea.Graphics;
@@ -24,7 +25,7 @@ public class VisualTests : AzaleaGame
 
 #pragma warning disable CS8618
 	private List<string> _tests;
-	private FlexContainer _testSelectScene;
+	private TestSelectScene _testSelectScene;
 #pragma warning restore CS8618
 
 	protected override void OnInitialize()
@@ -33,33 +34,13 @@ public class VisualTests : AzaleaGame
 		Assets.AddFont("Fonts/TitanOne-Regular.fnt", "TitanOne");
 		_tests = ReflectionUtils.GetAllChildrenOf(typeof(TestScene)).Select(x => x.FullName).ToList()!;
 
-		_testSelectScene = new FlexContainer()
-		{
-			RelativeSizeAxes = Axes.Both,
-			Direction = FlexDirection.Vertical,
-			Spacing = new(10),
-			Wrapping = FlexWrapping.Wrap,
-		};
-
-		foreach (var test in _tests)
-		{
-			var lastDot = test.LastIndexOf('.') + 1;
-			var text = test[lastDot..];
-			if (text.EndsWith("Test"))
-				text = text[..^4];
-
-			_testSelectScene.Add(new TestButton()
-			{
-				Text = text,
-				Action = () => { changeTest(test); }
-			});
-		}
+		_testSelectScene = new TestSelectScene(_tests);
 
 		var selectedTest = Config.GetValue(currentSceneKey);
 		if (selectedTest is null || _tests.Contains(selectedTest) == false)
 			goToSceneSelect();
 		else
-			changeTest(selectedTest);
+			_testSelectScene.ChangeTest(selectedTest);
 	}
 
 	protected override void Update()
@@ -68,25 +49,57 @@ public class VisualTests : AzaleaGame
 			goToSceneSelect();
 	}
 
-	private void changeTest(string testName)
-	{
-		var test = Activator.CreateInstance(Assembly.GetAssembly(typeof(VisualTests))!.FullName!, testName)!.Unwrap()
-			as TestScene;
-		Child = test!;
-		Config.SetValue(currentSceneKey, testName);
-	}
-
 	private void goToSceneSelect()
 	{
+		var currentScene = Main.SceneManager.CurrentScene;
 
-		if (Children.Count == 0 || Child != _testSelectScene)
+		if (currentScene == null || currentScene != _testSelectScene)
 		{
-			Child = _testSelectScene;
+			Main.SceneManager.ChangeScene(_testSelectScene);
 			Main.Host.Renderer.ClearColor = new Color(40, 51, 60);
 			Main.Host.Window.ClientSize = new(1280, 720);
 			Main.Host.Window.Center();
 		}
 
+	}
+
+	private class TestSelectScene : Scene
+	{
+		private FlexContainer _testContainer;
+
+		public TestSelectScene(IEnumerable<string> tests)
+		{
+			Add(_testContainer = new FlexContainer()
+			{
+				RelativeSizeAxes = Axes.Both,
+				Direction = FlexDirection.Vertical,
+				Spacing = new(10),
+				Wrapping = FlexWrapping.Wrap,
+			});
+
+			foreach (var test in tests)
+			{
+				var lastDot = test.LastIndexOf('.') + 1;
+				var text = test[lastDot..];
+				if (text.EndsWith("Test"))
+					text = text[..^4];
+
+				_testContainer.Add(new TestButton()
+				{
+					Text = text,
+					Action = () => { ChangeTest(test); }
+				});
+			}
+		}
+
+		public void ChangeTest(string testName)
+		{
+			var test = Activator.CreateInstance(Assembly.GetAssembly(typeof(VisualTests))!.FullName!, testName)!.Unwrap()
+			as TestScene;
+
+			Main.SceneManager.ChangeScene(test!);
+			Config.SetValue(currentSceneKey, testName);
+		}
 	}
 
 	private class TestButton : Button

@@ -1,4 +1,5 @@
 ﻿using Azalea.Design.Containers;
+using Azalea.Design.Scenes;
 using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
@@ -8,11 +9,10 @@ using System.Collections.Generic;
 
 namespace Azalea.VisualTests;
 
-public class TestScene : Composition
+public class TestScene : Scene
 {
 	public TestScene()
 	{
-		RelativeSizeAxes = Axes.Both;
 		AzaleaGame.Main.Host.Renderer.ClearColor = Palette.Flowers.Azalea;
 	}
 
