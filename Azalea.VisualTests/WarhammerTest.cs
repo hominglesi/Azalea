@@ -1,18 +1,21 @@
-﻿using Azalea.Graphics.Sprites;
+﻿using Azalea.Design.Containers;
+using Azalea.Design.Shapes;
+using Azalea.Graphics;
+using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.IO.Resources;
 using Azalea.Utils;
 using System.Numerics;
 
 namespace Azalea.VisualTests;
-internal class OriginTest : TestScene
+internal class WarhammerTest : TestScene
 {
 	private Sprite _player;
 	private Sprite _arm;
 	private Vector2 _windowCenter => AzaleaGame.Main.Host.Window.ClientSize / 2;
 	private Vector2 _leftHandPosition => _windowCenter - new Vector2(22, 5);
 	private Vector2 _rightHandPosition => _windowCenter + new Vector2(22, -5);
-	public OriginTest()
+	public WarhammerTest()
 	{
 		Add(_player = new Sprite()
 		{
@@ -30,6 +33,25 @@ internal class OriginTest : TestScene
 			Position = _rightHandPosition,
 			Texture = Assets.GetTexture("Textures/Bolter.png"),
 
+		});
+
+		Add(new Composition()
+		{
+			Position = new(40),
+			Rotation = 5,
+			Children = new GameObject[]
+			{
+				new Box()
+				{
+					Size = new(400, 20)
+				},
+				new Sprite()
+				{
+					Position = new(0, 30),
+					Size = new(48, 48),
+					Texture = Assets.GetTexture("Textures/FireRate1.png")
+				}
+			}
 		});
 	}
 
