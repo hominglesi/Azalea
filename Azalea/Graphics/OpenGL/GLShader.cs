@@ -33,27 +33,15 @@ public class GLShader : Disposable
 		GL.ShaderSource(id, source);
 		GL.CompileShader(id);
 
-		/*
-		Error Checking
-		int result;
-		GL.GetShaderiv(id, GLParameterName.CompileStatus, &result);
+		int result = GL.GetShaderiv(id, GLParameterName.CompileStatus);
 		if (result == 0)
 		{
+			var info = GL.GetShaderInfoLog(id);
+			Console.WriteLine(info);
 
-			int length;
-			GL.GetShaderiv(id, GLParameterName.InfoLogLength, &length);
-			Console.WriteLine(length);
-			
-			var str = new StringBuilder(length);
-			for(int i = 0; i < length; i++)
-			{
-				str.Append((char)Marshal.ReadByte(result, i));
-			}	
-			Console.WriteLine("THERE IS AN ERROR!!!!");
 			GL.DeleteShader(id);
 			return 0;
 		}
-		*/
 
 		return id;
 	}

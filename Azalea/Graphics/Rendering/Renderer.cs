@@ -11,7 +11,7 @@ namespace Azalea.Graphics.Rendering;
 internal abstract class Renderer : IRenderer
 {
 	private IVertexBatch<TexturedVertex2D>? defaultQuadBatch;
-	private IVertexBatch? currentActiveBatch;
+	protected IVertexBatch? CurrentActiveBatch;
 
 	private readonly INativeTexture[] lastBoundTexture = new INativeTexture[16];
 	private int lastActiveTextureUnit = -1;
@@ -42,7 +42,7 @@ internal abstract class Renderer : IRenderer
 	protected internal virtual void Initialize()
 	{
 		defaultQuadBatch = CreateQuadBatch(17000);
-		currentActiveBatch = defaultQuadBatch;
+		CurrentActiveBatch = defaultQuadBatch;
 	}
 
 	private Texture? _whitePixel;
@@ -76,7 +76,7 @@ internal abstract class Renderer : IRenderer
 
 	internal virtual void BeginFrame()
 	{
-
+		if (AutomaticallyClear) Clear();
 	}
 	internal virtual void FinishFrame()
 	{
@@ -94,7 +94,7 @@ internal abstract class Renderer : IRenderer
 
 	protected internal void FlushCurrentBatch()
 	{
-		currentActiveBatch?.Draw();
+		CurrentActiveBatch?.Draw();
 
 	}
 

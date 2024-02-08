@@ -190,6 +190,15 @@ internal static unsafe class GL
 		return buffer;
 	}
 
+	private delegate void GenRenderbuffersDelegate(int count, uint* buffers);
+	private static GenRenderbuffersDelegate? _glGenRenderbuffers;
+	public static uint GenRenderbuffer()
+	{
+		uint buffer;
+		_glGenRenderbuffers!(1, &buffer);
+		return buffer;
+	}
+
 	private delegate void BindBufferDelegate(GLBufferType type, uint buffer);
 	private static BindBufferDelegate? _glBindBuffer;
 	public static void BindBuffer(GLBufferType type, uint buffer) => _glBindBuffer!(type, buffer);
@@ -201,6 +210,10 @@ internal static unsafe class GL
 	private delegate void BindFramebufferDelegate(GLBufferType type, uint buffer);
 	private static BindFramebufferDelegate? _glBindFramebuffer;
 	public static void BindFramebuffer(GLBufferType type, uint buffer) => _glBindFramebuffer!(type, buffer);
+
+	private delegate void BindRenderbufferDelegate(GLBufferType type, uint buffer);
+	private static BindRenderbufferDelegate? _glBindRenderbuffer;
+	public static void BindRenderbuffer(GLBufferType type, uint buffer) => _glBindRenderbuffer!(type, buffer);
 
 	private delegate void BufferDataDelegate(GLBufferType type, IntPtr size, void* data, GLUsageHint hint);
 	private static BufferDataDelegate? _glBufferData;
@@ -244,6 +257,33 @@ internal static unsafe class GL
 		_glFramebufferTexture2D!(type, attachment, textureType, texture, level);
 	}
 
+	private delegate void TexImage2DMultisampleDelegate(GLTextureType target, int samples, GLColorFormat internalFormat, int width, int height, bool fixedSampleLocations);
+	private static TexImage2DMultisampleDelegate? _glTexImage2DMultisample;
+	public static void TexImage2DMultisample(GLTextureType target, int samples, GLColorFormat internalFormat, int width, int height, bool fixedSampleLocations)
+	{
+		_glTexImage2DMultisample!(target, samples, internalFormat, width, height, fixedSampleLocations);
+	}
+
+	private delegate void RenderbufferStorageMultisampleDelegate(GLBufferType target, int samples, GLColorFormat internalFormat, int width, int height);
+	private static RenderbufferStorageMultisampleDelegate? _glRenderbufferStorageMultisample;
+	public static void RenderbufferStorageMultisample(GLBufferType target, int samples, GLColorFormat internalFormat, int width, int height)
+	{
+		_glRenderbufferStorageMultisample!(target, samples, internalFormat, width, height);
+	}
+
+	private delegate void FramebufferRenderbufferDelegate(GLBufferType target, GLAttachment attachment, GLBufferType renderBufferTarget, uint renderBuffer);
+	private static FramebufferRenderbufferDelegate? _glFramebufferRenderbuffer;
+	public static void FramebufferRenderbuffer(GLBufferType target, GLAttachment attachment, GLBufferType renderBufferTarget, uint renderBuffer)
+	{
+		_glFramebufferRenderbuffer!(target, attachment, renderBufferTarget, renderBuffer);
+	}
+
+	private delegate void BlitFramebufferDelegate(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, GLBufferBit mask, GLFunction filter);
+	private static BlitFramebufferDelegate? _glBlitFramebuffer;
+	public static void BlitFramebuffer(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, GLBufferBit mask, GLFunction filter)
+	{
+		_glBlitFramebuffer!(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+	}
 
 	private static UIntDelegate? _glCreateProgram;
 	public static uint CreateProgram() => _glCreateProgram!();
@@ -278,6 +318,23 @@ internal static unsafe class GL
 	private static AttachShaderDelegate? _glAttachShader;
 	public static void AttachShader(uint program, uint shader) => _glAttachShader!(program, shader);
 
+	private delegate void GetShaderInfoLogDelegate(uint shader, int maxLength, int* length, char* infoLog);
+	private static GetShaderInfoLogDelegate? _glGetShaderInfoLog;
+	public static string GetShaderInfoLog(uint shader)
+	{
+		var bufferSize = 1024;
+		var buffer = Marshal.AllocHGlobal(bufferSize);
+		int length;
+		var source = (char*)buffer;
+		_glGetShaderInfoLog!(shader, bufferSize, &length, source);
+
+		var info = new byte[length];
+		Marshal.Copy(buffer, info, 0, length);
+
+		Marshal.FreeHGlobal(buffer);
+
+		return Encoding.UTF8.GetString(info);
+	}
 
 	private static VoidUIntDelegate? _glLinkProgram;
 	public static void LinkProgram(uint program) => _glLinkProgram!(program);
@@ -300,7 +357,12 @@ internal static unsafe class GL
 
 	private delegate void GetShaderivDelegate(uint shader, GLParameterName name, int* args);
 	private static GetShaderivDelegate? _glGetShaderiv;
-	public static void GetShaderiv(uint shader, GLParameterName name, int* args) => _glGetShaderiv!(shader, name, args);
+	public static int GetShaderiv(uint shader, GLParameterName name)
+	{
+		int args;
+		_glGetShaderiv!(shader, name, &args);
+		return args;
+	}
 
 
 	private delegate void GetProgramivDelegate(uint program, GLParameterName name, int* args);
@@ -389,20 +451,27 @@ internal static unsafe class GL
 		_glGenBuffers = Marshal.GetDelegateForFunctionPointer<GenBuffersDelegate>(wglGetProcAddress("glGenBuffers"));
 		_glGenVertexArrays = Marshal.GetDelegateForFunctionPointer<GenVertexArraysDelegate>(wglGetProcAddress("glGenVertexArrays"));
 		_glGenFramebuffers = Marshal.GetDelegateForFunctionPointer<GenFramebuffersDelegate>(wglGetProcAddress("glGenFramebuffers"));
+		_glGenRenderbuffers = Marshal.GetDelegateForFunctionPointer<GenRenderbuffersDelegate>(wglGetProcAddress("glGenRenderbuffers"));
 		_glBindBuffer = Marshal.GetDelegateForFunctionPointer<BindBufferDelegate>(wglGetProcAddress("glBindBuffer"));
 		_glBindVertexArray = Marshal.GetDelegateForFunctionPointer<BindVertexArrayDelegate>(wglGetProcAddress("glBindVertexArray"));
 		_glBindFramebuffer = Marshal.GetDelegateForFunctionPointer<BindFramebufferDelegate>(wglGetProcAddress("glBindFramebuffer"));
+		_glBindRenderbuffer = Marshal.GetDelegateForFunctionPointer<BindRenderbufferDelegate>(wglGetProcAddress("glBindRenderbuffer"));
 		_glBufferData = Marshal.GetDelegateForFunctionPointer<BufferDataDelegate>(wglGetProcAddress("glBufferData"));
 		_glVertexAttribPointer = Marshal.GetDelegateForFunctionPointer<VertexAttribPointerDelegate>(wglGetProcAddress("glVertexAttribPointer"));
 		_glEnableVertexAttribArray = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glEnableVertexAttribArray"));
 		_glCheckFramebufferStatus = Marshal.GetDelegateForFunctionPointer<CheckFramebufferStatusDelegate>(wglGetProcAddress("glCheckFramebufferStatus"));
 		_glFramebufferTexture2D = Marshal.GetDelegateForFunctionPointer<FramebufferTexture2DDelegate>(wglGetProcAddress("glFramebufferTexture2D"));
+		_glTexImage2DMultisample = Marshal.GetDelegateForFunctionPointer<TexImage2DMultisampleDelegate>(wglGetProcAddress("glTexImage2DMultisample"));
+		_glRenderbufferStorageMultisample = Marshal.GetDelegateForFunctionPointer<RenderbufferStorageMultisampleDelegate>(wglGetProcAddress("glRenderbufferStorageMultisample"));
+		_glFramebufferRenderbuffer = Marshal.GetDelegateForFunctionPointer<FramebufferRenderbufferDelegate>(wglGetProcAddress("glFramebufferRenderbuffer"));
+		_glBlitFramebuffer = Marshal.GetDelegateForFunctionPointer<BlitFramebufferDelegate>(wglGetProcAddress("glBlitFramebuffer"));
 		_glCreateProgram = Marshal.GetDelegateForFunctionPointer<UIntDelegate>(wglGetProcAddress("glCreateProgram"));
 		_glCreateShader = Marshal.GetDelegateForFunctionPointer<CreateShaderDelegate>(wglGetProcAddress("glCreateShader"));
 		_glShaderSource = Marshal.GetDelegateForFunctionPointer<ShaderSourceDelegate>(wglGetProcAddress("glShaderSource"));
 		_glCompileShader = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glCompileShader"));
 		_glAttachShader = Marshal.GetDelegateForFunctionPointer<AttachShaderDelegate>(wglGetProcAddress("glAttachShader"));
 		_glLinkProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glLinkProgram"));
+		_glGetShaderInfoLog = Marshal.GetDelegateForFunctionPointer<GetShaderInfoLogDelegate>(wglGetProcAddress("glGetShaderInfoLog"));
 		_glValidateProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glValidateProgram"));
 		_glDeleteShader = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glDeleteShader"));
 		_glDeleteProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glDeleteProgram"));

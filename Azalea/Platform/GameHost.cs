@@ -125,7 +125,6 @@ public abstract class GameHost
 	public virtual void CallOnRender()
 	{
 		Renderer.BeginFrame();
-		if (Renderer.AutomaticallyClear) Renderer.Clear();
 
 		Root.Draw(Renderer);
 

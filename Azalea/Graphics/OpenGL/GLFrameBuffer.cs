@@ -2,20 +2,20 @@
 using Azalea.Utils;
 
 namespace Azalea.Graphics.OpenGL;
-public class GLFrameBuffer : Disposable
+public class GLFramebuffer : Disposable
 {
-	private uint _handle;
+	public uint Handle { get; init; }
 
-	public GLFrameBuffer()
+	public GLFramebuffer()
 	{
-		_handle = GL.GenFramebuffer();
+		Handle = GL.GenFramebuffer();
 	}
 
-	public void Bind() => GL.BindFramebuffer(GLBufferType.FrameBuffer, _handle);
-	public void Unbind() => GL.BindFramebuffer(GLBufferType.FrameBuffer, 0);
+	public void Bind() => GL.BindFramebuffer(GLBufferType.Framebuffer, Handle);
+	public void Unbind() => GL.BindFramebuffer(GLBufferType.Framebuffer, 0);
 
 	protected override void OnDispose()
 	{
-		GL.DeleteFramebuffer(_handle);
+		GL.DeleteFramebuffer(Handle);
 	}
 }
