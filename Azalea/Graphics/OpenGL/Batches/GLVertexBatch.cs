@@ -1,11 +1,9 @@
 ﻿using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
-using Azalea.IO.Resources;
 using Azalea.Platform;
 using Azalea.Utils;
 using System;
-using System.Numerics;
 
 namespace Azalea.Graphics.OpenGL.Batches;
 internal class GLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
@@ -17,13 +15,10 @@ internal class GLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 	private GLIndexBuffer _indexBuffer;
 	private GLVertexBuffer _vertexBuffer;
 	private GLVertexArray _vertexArray;
-	private GLShader _shader;
 
 	private float[] _vertices;
 	private int _vertexCount;
 	private readonly int _stride;
-
-	public GLShader Shader => _shader;
 
 	public GLVertexBatch(IWindow window, int size)
 	{
@@ -54,10 +49,6 @@ internal class GLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 		_vertexArray = new GLVertexArray();
 		_vertexArray.AddBuffer(_vertexBuffer, vbLayout);
 		_vertices = new float[size * IRenderer.VERTICES_PER_QUAD * _stride];
-
-		var vertexShaderSource = Assets.GetText("Shaders/vertex_shader.glsl")!;
-		var fragmentShaderSource = Assets.GetText("Shaders/fragment_shader.glsl")!;
-		_shader = new GLShader(vertexShaderSource, fragmentShaderSource);
 	}
 
 	public int Draw()
@@ -67,14 +58,8 @@ internal class GLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 
 		_vertexArray.Bind();
 		_indexBuffer.Bind();
-		_shader.Bind();
 
 		_vertexBuffer.SetData(_vertices, _vertexCount * _stride, GLUsageHint.DynamicDraw);
-
-		var clientSize = _window.ClientSize;
-		var projectionMatrix = Matrix4x4.CreateOrthographicOffCenter(0, clientSize.X, clientSize.Y, 0, 0.1f, 100);
-		_shader.SetUniform("u_Projection", projectionMatrix);
-		_shader.SetUniform("u_Texture", 0);
 
 		var drawnVertices = (_vertexCount / 4) * 6;
 		GL.DrawElements(GLBeginMode.Triangles, drawnVertices, GLDataType.UnsignedInt, 0);
@@ -111,6 +96,5 @@ internal class GLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 		_vertexArray.Dispose();
 		_indexBuffer.Dispose();
 		_vertexBuffer.Dispose();
-		_shader.Dispose();
 	}
 }

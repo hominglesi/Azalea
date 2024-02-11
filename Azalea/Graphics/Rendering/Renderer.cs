@@ -1,9 +1,13 @@
-﻿using Azalea.Graphics.Rendering.Vertices;
+﻿using Azalea.Graphics.OpenGL;
+using Azalea.Graphics.Rendering.Vertices;
+using Azalea.Graphics.Shaders;
 using Azalea.Graphics.Textures;
+using Azalea.IO.Resources;
 using Azalea.Numerics;
 using Azalea.Platform;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using AzaleaColor = Azalea.Graphics.Colors.Color;
 
 namespace Azalea.Graphics.Rendering;
@@ -41,6 +45,14 @@ internal abstract class Renderer : IRenderer
 
 	protected internal virtual void Initialize()
 	{
+		var defaultVertexShader = Assets.GetText("Shaders/quad_vertexShader.glsl")!;
+		var defaultFragmentShader = Assets.GetText("Shaders/quad_fragmentShader.glsl")!;
+		_defaultShader = new GLShader(defaultVertexShader, defaultFragmentShader);
+
+		var screenVertexShader = Assets.GetText("Shaders/screen_vertex_shader.glsl")!;
+		var screenFragmentShader = Assets.GetText("Shaders/screen_fragment_shader.glsl")!;
+		_screenShader = new GLShader(screenVertexShader, screenFragmentShader);
+
 		defaultQuadBatch = CreateQuadBatch(17000);
 		CurrentActiveBatch = defaultQuadBatch;
 	}
@@ -77,10 +89,19 @@ internal abstract class Renderer : IRenderer
 	internal virtual void BeginFrame()
 	{
 		if (AutomaticallyClear) Clear();
+
+		BindShader(_defaultShader);
+
+		var clientSize = Window.ClientSize;
+		var projectionMatrix = Matrix4x4.CreateOrthographicOffCenter(0, clientSize.X, clientSize.Y, 0, 0.1f, 100);
+		_defaultShader.SetUniform("u_Projection", projectionMatrix);
+		_defaultShader.SetUniform("u_Texture", 0);
 	}
 	internal virtual void FinishFrame()
 	{
 		FlushCurrentBatch();
+
+		BindShader(_screenShader);
 	}
 
 	protected internal virtual void SetClearColor(AzaleaColor value) { }
@@ -117,6 +138,37 @@ internal abstract class Renderer : IRenderer
 
 		return true;
 	}
+
+	#region Shaders
+
+	private IShader? _boundShader;
+	private IShader _defaultShader;
+	private IShader _screenShader;
+
+	public void BindShader(IShader shader)
+	{
+		if (_boundShader == shader)
+			return;
+
+		if (_boundShader != null)
+			FlushCurrentBatch();
+
+		shader.Bind();
+		_boundShader = shader;
+	}
+
+	public void UnbindCurrentShader()
+	{
+		if (_boundShader == null)
+			return;
+
+		FlushCurrentBatch();
+
+		_boundShader.Unbind();
+		_boundShader = null;
+	}
+
+	#endregion
 
 	#region Scissor test
 

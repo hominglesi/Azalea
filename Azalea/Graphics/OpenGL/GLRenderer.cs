@@ -5,7 +5,6 @@ using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.OpenGL.Textures;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
-using Azalea.IO.Resources;
 using Azalea.Numerics;
 using Azalea.Platform;
 using System;
@@ -17,7 +16,6 @@ internal class GLRenderer : Renderer
 	private GLFramebuffer _intermediateFramebuffer;
 	private uint _screenTexture;
 	private uint _screenVertexArray;
-	private GLShader _screenShader;
 
 	private float[] quadVertices = new float[] {
 		-1.0f,  1.0f,  0.0f, 1.0f,
@@ -38,10 +36,6 @@ internal class GLRenderer : Renderer
 
 		var screenWidth = Window.ClientSize.X;
 		var screenHeight = Window.ClientSize.Y;
-
-		var vertexShaderSource = Assets.GetText("Shaders/screen_vertex_shader.glsl")!;
-		var fragmentShaderSource = Assets.GetText("Shaders/screen_fragment_shader.glsl")!;
-		_screenShader = new GLShader(vertexShaderSource, fragmentShaderSource);
 
 		_screenVertexArray = GL.GenVertexArray();
 		var screenVertexBuffer = GL.GenBuffer();
@@ -94,8 +88,6 @@ internal class GLRenderer : Renderer
 		GL.ClearColor(ClearColor);
 		GL.Clear(GLBufferBit.Color | GLBufferBit.Depth);
 		GL.Enable(GLCapability.Blend);
-
-		((GLVertexBatch<TexturedVertex2D>)CurrentActiveBatch!).Shader.Bind();
 	}
 
 	internal override void FinishFrame()
@@ -114,7 +106,6 @@ internal class GLRenderer : Renderer
 		GL.Clear(GLBufferBit.Color);
 		GL.Disable(GLCapability.Depth);
 
-		_screenShader.Bind();
 		GL.BindVertexArray(_screenVertexArray);
 		GL.ActiveTexture(0);
 		GL.BindTexture(GLTextureType.Texture2D, _screenTexture);
@@ -162,6 +153,8 @@ internal class GLRenderer : Renderer
 		return true;
 	}
 
+	#region Scissor test
+
 	protected override void SetScissorTestRectangle(RectangleInt scissorRectangle)
 	{
 		if (scissorRectangle.Width < 0) scissorRectangle.Width = 0;
@@ -179,4 +172,6 @@ internal class GLRenderer : Renderer
 		else
 			GL.Disable(GLCapability.ScissorTest);
 	}
+
+	#endregion
 }

@@ -1,12 +1,13 @@
 ﻿using Azalea.Graphics.Colors;
 using Azalea.Graphics.OpenGL.Enums;
+using Azalea.Graphics.Shaders;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Graphics.OpenGL;
-public class GLShader : Disposable
+public class GLShader : Disposable, IShader
 {
 	private uint _handle;
 
@@ -61,10 +62,10 @@ public class GLShader : Disposable
 		GL.Uniform1iv(getUniformLocation(name), array);
 	}
 
-	public void SetUniform(string name, float f0, float f1, float f2, float f3)
+	public void SetUniform(string name, Vector4 vec4)
 	{
 		Bind();
-		GL.Uniform4f(getUniformLocation(name), f0, f1, f2, f3);
+		GL.Uniform4f(getUniformLocation(name), vec4.X, vec4.Y, vec4.Z, vec4.W);
 	}
 
 	public void SetUniform(string name, Color color)
