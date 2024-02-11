@@ -20,6 +20,8 @@ public partial class HollowBox : GameObject
 
 	public override void Draw(IRenderer renderer)
 	{
+		renderer.BindShader(renderer.QuadShader);
+
 		renderer.DrawRectangle(DrawRectangle, DrawInfo.Matrix, Thickness, DrawColorInfo, OutsideContent);
 	}
 }

@@ -166,6 +166,8 @@ public partial class SpriteText : GameObject
 
 		Debug.Assert(_parts is not null);
 
+		renderer.BindShader(renderer.QuadShader);
+
 		for (int i = 0; i < _parts.Count; i++)
 		{
 			renderer.DrawQuad(_parts[i].Texture, _parts[i].DrawQuad, DrawColorInfo);

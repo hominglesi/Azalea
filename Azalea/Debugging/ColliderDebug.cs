@@ -1,4 +1,5 @@
 ﻿using Azalea.Design.Components;
+using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Primitives;
@@ -28,6 +29,8 @@ public class ColliderDebug : GameObject
 			var color = new DrawColorInfo(new Color(45, 75, 23, 80));
 			var color2 = new DrawColorInfo(new Color(84, 42, 86, 140));
 
+			renderer.BindShader(renderer.QuadShader);
+
 			foreach (var collider in ComponentStorage<RectCollider>.GetComponents())
 			{
 				renderer.DrawQuad(renderer.WhitePixel, collider.Quad, color);
@@ -35,6 +38,16 @@ public class ColliderDebug : GameObject
 				var centerQuad = new Quad(collider.Position - new Vector2(5), new(10));
 
 				renderer.DrawQuad(renderer.WhitePixel, centerQuad, color2);
+			}
+
+			renderer.BindShader(Circle.CircleShader);
+			Circle.SetupShader();
+
+			foreach (var collider in ComponentStorage<CircleCollider>.GetComponents())
+			{
+				var quad = new Quad(collider.Position - new Vector2(collider.Radius), new Vector2(collider.Radius * 2));
+
+				renderer.DrawQuad(renderer.WhitePixel, quad, color);
 			}
 		}
 	}

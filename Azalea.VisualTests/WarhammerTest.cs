@@ -45,7 +45,7 @@ internal class WarhammerTest : TestScene
 				{
 					Size = new(400, 20)
 				},
-				new Sprite()
+				new Circle()
 				{
 					Position = new(0, 30),
 					Size = new(48, 48),

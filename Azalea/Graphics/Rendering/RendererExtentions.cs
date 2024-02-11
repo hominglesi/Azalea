@@ -66,7 +66,6 @@ public static class RendererExtentions
 
 	internal static void DrawRectangle(this IRenderer renderer, Rectangle rect, Matrix3 drawMatrix, Boundary thickness, DrawColorInfo color, bool towardsOutside)
 	{
-
 		var texture = renderer.WhitePixel;
 
 		var topRect = towardsOutside ?

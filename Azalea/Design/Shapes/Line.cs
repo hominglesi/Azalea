@@ -28,6 +28,8 @@ public class Line : GameObject
 		MatrixExtentions.TranslateFromLeft(ref matrix, StartPoint);
 		MatrixExtentions.RotateFromLeft(ref matrix, rotation);
 
+		renderer.BindShader(renderer.QuadShader);
+
 		renderer.DrawQuad(
 		AzaleaGame.Main.Host.Renderer.WhitePixel,
 		Quad.FromRectangle(rectangle) * matrix, //  quad * Info.Matrix,

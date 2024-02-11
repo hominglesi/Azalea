@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics.Rendering;
+using Azalea.Graphics.Shaders;
 using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
 using System;
@@ -21,6 +22,13 @@ public class Sprite : GameObject
 			if (Size == Vector2.Zero)
 				Size = new Vector2(_texture?.Width ?? 0, _texture?.Height ?? 0);
 		}
+	}
+
+	internal IShader Shader;
+
+	public Sprite()
+	{
+		Shader = AzaleaGame.Main.Host.Renderer.QuadShader;
 	}
 
 	private float _time = 0;
@@ -48,6 +56,8 @@ public class Sprite : GameObject
 		{
 			texture = anim.GetTextureAtTime(Time);
 		}
+
+		renderer.BindShader(Shader);
 
 		renderer.DrawQuad(
 			texture,

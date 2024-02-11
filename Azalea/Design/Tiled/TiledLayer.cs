@@ -28,6 +28,8 @@ public class TiledLayer : GameObject
 		var startPosition = ScreenSpaceDrawQuad.TopLeft;
 		var tileSize = ScreenSpaceDrawQuad.Size / new Vector2(Tilemap.Width, Tilemap.Height);
 
+		renderer.BindShader(renderer.QuadShader);
+
 		for (int i = 0; i < Tilemap.Height; i++)
 		{
 			for (int j = 0; j < Tilemap.Width; j++)

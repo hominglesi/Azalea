@@ -47,10 +47,10 @@ internal abstract class Renderer : IRenderer
 	{
 		var defaultVertexShader = Assets.GetText("Shaders/quad_vertexShader.glsl")!;
 		var defaultFragmentShader = Assets.GetText("Shaders/quad_fragmentShader.glsl")!;
-		_defaultShader = new GLShader(defaultVertexShader, defaultFragmentShader);
+		_quadShader = new GLShader(defaultVertexShader, defaultFragmentShader);
 
-		var screenVertexShader = Assets.GetText("Shaders/screen_vertex_shader.glsl")!;
-		var screenFragmentShader = Assets.GetText("Shaders/screen_fragment_shader.glsl")!;
+		var screenVertexShader = Assets.GetText("Shaders/screen_vertexShader.glsl")!;
+		var screenFragmentShader = Assets.GetText("Shaders/screen_fragmentShader.glsl")!;
 		_screenShader = new GLShader(screenVertexShader, screenFragmentShader);
 
 		defaultQuadBatch = CreateQuadBatch(17000);
@@ -90,12 +90,10 @@ internal abstract class Renderer : IRenderer
 	{
 		if (AutomaticallyClear) Clear();
 
-		BindShader(_defaultShader);
-
 		var clientSize = Window.ClientSize;
 		var projectionMatrix = Matrix4x4.CreateOrthographicOffCenter(0, clientSize.X, clientSize.Y, 0, 0.1f, 100);
-		_defaultShader.SetUniform("u_Projection", projectionMatrix);
-		_defaultShader.SetUniform("u_Texture", 0);
+		_quadShader.SetUniform("u_Projection", projectionMatrix);
+		_quadShader.SetUniform("u_Texture", 0);
 	}
 	internal virtual void FinishFrame()
 	{
@@ -116,7 +114,6 @@ internal abstract class Renderer : IRenderer
 	protected internal void FlushCurrentBatch()
 	{
 		CurrentActiveBatch?.Draw();
-
 	}
 
 	internal bool BindTexture(Texture texture, int unit = 0)
@@ -142,8 +139,11 @@ internal abstract class Renderer : IRenderer
 	#region Shaders
 
 	private IShader? _boundShader;
-	private IShader _defaultShader;
+	private IShader _quadShader;
 	private IShader _screenShader;
+
+	public IShader? BoundShader => _boundShader;
+	public IShader QuadShader => _quadShader;
 
 	public void BindShader(IShader shader)
 	{
