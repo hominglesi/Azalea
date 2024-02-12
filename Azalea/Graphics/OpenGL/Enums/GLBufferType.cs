@@ -3,8 +3,9 @@ public enum GLBufferType
 {
 	Array = 0x8892,
 	ElementArray = 0x8893,
-	Framebuffer = 0x8D40,
-	ReadFramebuffer = 0x8ca8,
-	DrawFramebuffer = 0x8ca9,
-	Renderbuffer = 0x8d41,
+	Frame = 0x8D40,
+	ReadFrame = 0x8ca8,
+	DrawFrame = 0x8ca9,
+	Render = 0x8d41,
+	Uniform = 0x8a11
 }

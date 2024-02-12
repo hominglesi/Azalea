@@ -41,7 +41,6 @@ public class ColliderDebug : GameObject
 			}
 
 			renderer.BindShader(Circle.CircleShader);
-			Circle.SetupShader();
 
 			foreach (var collider in ComponentStorage<CircleCollider>.GetComponents())
 			{

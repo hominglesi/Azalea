@@ -203,6 +203,11 @@ internal static unsafe class GL
 	private static BindBufferDelegate? _glBindBuffer;
 	public static void BindBuffer(GLBufferType type, uint buffer) => _glBindBuffer!(type, buffer);
 
+	private delegate void BindBufferBaseDelegate(GLBufferType type, uint index, uint buffer);
+	private static BindBufferBaseDelegate? _glBindBufferBase;
+	public static void BindBufferBase(GLBufferType type, uint index, uint buffer)
+		=> _glBindBufferBase!(type, index, buffer);
+
 	private delegate void BindVertexArrayDelegate(uint vertexArray);
 	private static BindVertexArrayDelegate? _glBindVertexArray;
 	public static void BindVertexArray(uint buffer) => _glBindVertexArray!(buffer);
@@ -215,9 +220,9 @@ internal static unsafe class GL
 	private static BindRenderbufferDelegate? _glBindRenderbuffer;
 	public static void BindRenderbuffer(GLBufferType type, uint buffer) => _glBindRenderbuffer!(type, buffer);
 
-	private delegate void BufferDataDelegate(GLBufferType type, IntPtr size, void* data, GLUsageHint hint);
+	private delegate void BufferDataDelegate(GLBufferType type, IntPtr size, IntPtr data, GLUsageHint hint);
 	private static BufferDataDelegate? _glBufferData;
-	public static void BufferData(GLBufferType type, IntPtr size, void* data, GLUsageHint hint) => _glBufferData!(type, size, data, hint);
+	public static void BufferData(GLBufferType type, IntPtr size, IntPtr data, GLUsageHint hint) => _glBufferData!(type, size, data, hint);
 	public static void BufferData<T>(GLBufferType type, T[] data, GLUsageHint hint)
 		where T : unmanaged
 		=> BufferData(type, data, data.Length, hint);
@@ -225,8 +230,15 @@ internal static unsafe class GL
 	public static void BufferData<T>(GLBufferType type, T[] data, int size, GLUsageHint hint)
 		where T : unmanaged
 	{
-		fixed (void* ptr = &data[0])
-			BufferData(type, new IntPtr(size * sizeof(T)), ptr, hint);
+		fixed (T* ptr = &data[0])
+			BufferData(type, new IntPtr(size * sizeof(T)), (IntPtr)ptr, hint);
+	}
+
+	private delegate void BufferSubDataDelegate(GLBufferType target, IntPtr offset, IntPtr size, IntPtr data);
+	private static BufferSubDataDelegate? _glBufferSubData;
+	public static void BufferSubData(GLBufferType target, IntPtr offset, IntPtr size, IntPtr data)
+	{
+		_glBufferSubData!(target, offset, size, data);
 	}
 
 	private delegate void VertexAttribPointerDelegate(uint index, int size, GLDataType type, bool normalized, int stride, void* pointer);
@@ -388,6 +400,22 @@ internal static unsafe class GL
 			return _glGetUniformLocation!(program, ptr);
 	}
 
+	private delegate uint GetUniformBlockIndexDelegate(uint program, byte* name);
+	private static GetUniformBlockIndexDelegate? _glGetUniformBlockIndex;
+	public static uint GetUniformBlockIndex(uint program, string name)
+	{
+		var bytes = Encoding.UTF8.GetBytes(name);
+		fixed (byte* ptr = &bytes[0])
+			return _glGetUniformBlockIndex!(program, ptr);
+	}
+
+	private delegate void UniformBlockBindingDelegate(uint program, uint index, uint binding);
+	private static UniformBlockBindingDelegate? _glUniformBlockBinding;
+	public static void UniformBlockBinding(uint program, uint index, uint binding)
+	{
+		_glUniformBlockBinding!(program, index, binding);
+	}
+
 	private delegate void Uniform1iDelegate(int location, int v);
 	private static Uniform1iDelegate? _glUniform1i;
 	public static void Uniform1i(int location, int v)
@@ -453,10 +481,12 @@ internal static unsafe class GL
 		_glGenFramebuffers = Marshal.GetDelegateForFunctionPointer<GenFramebuffersDelegate>(wglGetProcAddress("glGenFramebuffers"));
 		_glGenRenderbuffers = Marshal.GetDelegateForFunctionPointer<GenRenderbuffersDelegate>(wglGetProcAddress("glGenRenderbuffers"));
 		_glBindBuffer = Marshal.GetDelegateForFunctionPointer<BindBufferDelegate>(wglGetProcAddress("glBindBuffer"));
+		_glBindBufferBase = Marshal.GetDelegateForFunctionPointer<BindBufferBaseDelegate>(wglGetProcAddress("glBindBufferBase"));
 		_glBindVertexArray = Marshal.GetDelegateForFunctionPointer<BindVertexArrayDelegate>(wglGetProcAddress("glBindVertexArray"));
 		_glBindFramebuffer = Marshal.GetDelegateForFunctionPointer<BindFramebufferDelegate>(wglGetProcAddress("glBindFramebuffer"));
 		_glBindRenderbuffer = Marshal.GetDelegateForFunctionPointer<BindRenderbufferDelegate>(wglGetProcAddress("glBindRenderbuffer"));
 		_glBufferData = Marshal.GetDelegateForFunctionPointer<BufferDataDelegate>(wglGetProcAddress("glBufferData"));
+		_glBufferSubData = Marshal.GetDelegateForFunctionPointer<BufferSubDataDelegate>(wglGetProcAddress("glBufferSubData"));
 		_glVertexAttribPointer = Marshal.GetDelegateForFunctionPointer<VertexAttribPointerDelegate>(wglGetProcAddress("glVertexAttribPointer"));
 		_glEnableVertexAttribArray = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glEnableVertexAttribArray"));
 		_glCheckFramebufferStatus = Marshal.GetDelegateForFunctionPointer<CheckFramebufferStatusDelegate>(wglGetProcAddress("glCheckFramebufferStatus"));
@@ -479,6 +509,8 @@ internal static unsafe class GL
 		_glGetProgramiv = Marshal.GetDelegateForFunctionPointer<GetProgramivDelegate>(wglGetProcAddress("glGetProgramiv"));
 		_glUseProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glUseProgram"));
 		_glGetUniformLocation = Marshal.GetDelegateForFunctionPointer<GetUniformLocationDelegate>(wglGetProcAddress("glGetUniformLocation"));
+		_glGetUniformBlockIndex = Marshal.GetDelegateForFunctionPointer<GetUniformBlockIndexDelegate>(wglGetProcAddress("glGetUniformBlockIndex"));
+		_glUniformBlockBinding = Marshal.GetDelegateForFunctionPointer<UniformBlockBindingDelegate>(wglGetProcAddress("glUniformBlockBinding"));
 		_glUniform1i = Marshal.GetDelegateForFunctionPointer<Uniform1iDelegate>(wglGetProcAddress("glUniform1i"));
 		_glUniform1iv = Marshal.GetDelegateForFunctionPointer<Uniform1ivDelegate>(wglGetProcAddress("glUniform1iv"));
 		_glUniform4f = Marshal.GetDelegateForFunctionPointer<Uniform4fDelegate>(wglGetProcAddress("glUniform4f"));

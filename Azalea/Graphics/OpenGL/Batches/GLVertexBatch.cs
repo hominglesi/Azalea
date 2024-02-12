@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.OpenGL.Enums;
+﻿using Azalea.Graphics.OpenGL.Buffers;
+using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Platform;
@@ -37,7 +38,7 @@ internal class GLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 		}
 
 		_indexBuffer = new GLIndexBuffer();
-		_indexBuffer.SetData(_indices, GLUsageHint.StaticDraw);
+		_indexBuffer.BufferData(_indices, GLUsageHint.StaticDraw);
 		_vertexBuffer = new GLVertexBuffer();
 
 		var vbLayout = new GLVertexBufferLayout();
@@ -59,7 +60,7 @@ internal class GLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 		_vertexArray.Bind();
 		_indexBuffer.Bind();
 
-		_vertexBuffer.SetData(_vertices, _vertexCount * _stride, GLUsageHint.DynamicDraw);
+		_vertexBuffer.BufferData(_vertices, _vertexCount * _stride, GLUsageHint.DynamicDraw);
 
 		var drawnVertices = (_vertexCount / 4) * 6;
 		GL.DrawElements(GLBeginMode.Triangles, drawnVertices, GLDataType.UnsignedInt, 0);

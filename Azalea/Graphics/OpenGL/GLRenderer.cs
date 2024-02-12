@@ -1,10 +1,12 @@
 ﻿using Azalea.Debugging;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.OpenGL.Batches;
+using Azalea.Graphics.OpenGL.Buffers;
 using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.OpenGL.Textures;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
+using Azalea.Graphics.Shaders;
 using Azalea.Numerics;
 using Azalea.Platform;
 using System;
@@ -54,15 +56,15 @@ internal class GLRenderer : Renderer
 		GL.BindTexture(GLTextureType.Texture2DMultisample, framebufferTexture);
 		GL.TexImage2DMultisample(GLTextureType.Texture2DMultisample, 4, GLColorFormat.RGB, screenWidth, screenHeight, true);
 		GL.BindTexture(GLTextureType.Texture2DMultisample, 0);
-		GL.FramebufferTexture2D(GLBufferType.Framebuffer, GLAttachment.Color0, GLTextureType.Texture2DMultisample, framebufferTexture, 0);
+		GL.FramebufferTexture2D(GLBufferType.Frame, GLAttachment.Color0, GLTextureType.Texture2DMultisample, framebufferTexture, 0);
 
 		var renderBuffer = GL.GenRenderbuffer();
-		GL.BindRenderbuffer(GLBufferType.Renderbuffer, renderBuffer);
-		GL.RenderbufferStorageMultisample(GLBufferType.Renderbuffer, 4, GLColorFormat.Depth24Stencil8, screenWidth, screenHeight);
-		GL.BindRenderbuffer(GLBufferType.Renderbuffer, 0);
-		GL.FramebufferRenderbuffer(GLBufferType.Framebuffer, GLAttachment.DepthStencil, GLBufferType.Renderbuffer, renderBuffer);
+		GL.BindRenderbuffer(GLBufferType.Render, renderBuffer);
+		GL.RenderbufferStorageMultisample(GLBufferType.Render, 4, GLColorFormat.Depth24Stencil8, screenWidth, screenHeight);
+		GL.BindRenderbuffer(GLBufferType.Render, 0);
+		GL.FramebufferRenderbuffer(GLBufferType.Frame, GLAttachment.DepthStencil, GLBufferType.Render, renderBuffer);
 
-		if (GL.CheckFramebufferStatus(GLBufferType.Framebuffer) != GLFramebufferStatus.Complete)
+		if (GL.CheckFramebufferStatus(GLBufferType.Frame) != GLFramebufferStatus.Complete)
 			Console.WriteLine("Couldn't create framebuffer.");
 
 		_framebuffer.Unbind();
@@ -75,7 +77,7 @@ internal class GLRenderer : Renderer
 		GL.TexImage2D(GLTextureType.Texture2D, 0, GLColorFormat.RGB, screenWidth, screenHeight, 0, GLColorFormat.RGB, GLDataType.UnsignedByte, null);
 		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MinFilter, (int)GLFunction.Linear);
 		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MagFilter, (int)GLFunction.Linear);
-		GL.FramebufferTexture2D(GLBufferType.Framebuffer, GLAttachment.Color0, GLTextureType.Texture2D, _screenTexture, 0);
+		GL.FramebufferTexture2D(GLBufferType.Frame, GLAttachment.Color0, GLTextureType.Texture2D, _screenTexture, 0);
 
 		_intermediateFramebuffer.Unbind();
 	}
@@ -97,11 +99,11 @@ internal class GLRenderer : Renderer
 		var screenWidth = Window.ClientSize.X;
 		var screenHeight = Window.ClientSize.Y;
 
-		GL.BindFramebuffer(GLBufferType.ReadFramebuffer, _framebuffer.Handle);
-		GL.BindFramebuffer(GLBufferType.DrawFramebuffer, _intermediateFramebuffer.Handle);
+		GL.BindFramebuffer(GLBufferType.ReadFrame, _framebuffer.Handle);
+		GL.BindFramebuffer(GLBufferType.DrawFrame, _intermediateFramebuffer.Handle);
 		GL.BlitFramebuffer(0, 0, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight, GLBufferBit.Color, GLFunction.Nearest);
 
-		GL.BindFramebuffer(GLBufferType.Framebuffer, 0);
+		GL.BindFramebuffer(GLBufferType.Frame, 0);
 		GL.ClearColor(ClearColor);
 		GL.Clear(GLBufferBit.Color);
 		GL.Disable(GLCapability.Depth);
@@ -152,6 +154,9 @@ internal class GLRenderer : Renderer
 
 		return true;
 	}
+
+	public override IShader CreateShaderImplementation(string vertexShaderCode, string fragmentShaderCode)
+		=> new GLShader(vertexShaderCode, fragmentShaderCode);
 
 	#region Scissor test
 

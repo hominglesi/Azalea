@@ -2,10 +2,11 @@
 using System.Numerics;
 
 namespace Azalea.Graphics.Shaders;
-internal interface IShader
+public interface IShader
 {
-	void Bind();
+	public uint Handle { get; }
 
+	void Bind();
 	void Unbind();
 
 	void SetUniform(string name, int i);

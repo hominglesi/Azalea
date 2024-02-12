@@ -9,19 +9,19 @@ using System.Numerics;
 namespace Azalea.Graphics.OpenGL;
 public class GLShader : Disposable, IShader
 {
-	private uint _handle;
+	public uint Handle { get; init; }
 
 	public GLShader(string vertexShaderSource, string fragmentShaderSource)
 	{
-		_handle = GL.CreateProgram();
+		Handle = GL.CreateProgram();
 		var vertexShader = compileShader(GLShaderType.Vertex, vertexShaderSource);
 		var fragmentShader = compileShader(GLShaderType.Fragment, fragmentShaderSource);
 
-		GL.AttachShader(_handle, vertexShader);
-		GL.AttachShader(_handle, fragmentShader);
+		GL.AttachShader(Handle, vertexShader);
+		GL.AttachShader(Handle, fragmentShader);
 
-		GL.LinkProgram(_handle);
-		GL.ValidateProgram(_handle);
+		GL.LinkProgram(Handle);
+		GL.ValidateProgram(Handle);
 
 		GL.DeleteShader(vertexShader);
 		GL.DeleteShader(fragmentShader);
@@ -47,7 +47,7 @@ public class GLShader : Disposable, IShader
 		return id;
 	}
 
-	public void Bind() => GL.UseProgram(_handle);
+	public void Bind() => GL.UseProgram(Handle);
 	public void Unbind() => GL.UseProgram(0);
 
 	public void SetUniform(string name, int i)
@@ -87,7 +87,7 @@ public class GLShader : Disposable, IShader
 		if (_uniformLocations.ContainsKey(name)) return _uniformLocations[name];
 
 		Bind();
-		var location = GL.GetUniformLocation(_handle, name);
+		var location = GL.GetUniformLocation(Handle, name);
 		if (location == -1) Console.WriteLine($"Uniform with name '{name}' was not found.");
 
 		_uniformLocations.Add(name, location);
@@ -96,6 +96,6 @@ public class GLShader : Disposable, IShader
 
 	protected override void OnDispose()
 	{
-		GL.DeleteProgram(_handle);
+		GL.DeleteProgram(Handle);
 	}
 }

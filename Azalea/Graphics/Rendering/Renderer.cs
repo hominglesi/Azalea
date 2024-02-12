@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.OpenGL;
+﻿using Azalea.Graphics.OpenGL.Buffers;
+using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Graphics.Shaders;
 using Azalea.Graphics.Textures;
@@ -45,13 +46,17 @@ internal abstract class Renderer : IRenderer
 
 	protected internal virtual void Initialize()
 	{
+		_uniformBuffer = new GLUniformBuffer();
+		_uniformBuffer.BufferData((IntPtr)128, IntPtr.Zero, GLUsageHint.StaticDraw);
+		_uniformBuffer.BindBufferBase(0);
+
 		var defaultVertexShader = Assets.GetText("Shaders/quad_vertexShader.glsl")!;
 		var defaultFragmentShader = Assets.GetText("Shaders/quad_fragmentShader.glsl")!;
-		_quadShader = new GLShader(defaultVertexShader, defaultFragmentShader);
+		_quadShader = CreateShader(defaultVertexShader, defaultFragmentShader);
 
 		var screenVertexShader = Assets.GetText("Shaders/screen_vertexShader.glsl")!;
 		var screenFragmentShader = Assets.GetText("Shaders/screen_fragmentShader.glsl")!;
-		_screenShader = new GLShader(screenVertexShader, screenFragmentShader);
+		_screenShader = CreateShader(screenVertexShader, screenFragmentShader);
 
 		defaultQuadBatch = CreateQuadBatch(17000);
 		CurrentActiveBatch = defaultQuadBatch;
@@ -92,8 +97,11 @@ internal abstract class Renderer : IRenderer
 
 		var clientSize = Window.ClientSize;
 		var projectionMatrix = Matrix4x4.CreateOrthographicOffCenter(0, clientSize.X, clientSize.Y, 0, 0.1f, 100);
-		_quadShader.SetUniform("u_Projection", projectionMatrix);
-		_quadShader.SetUniform("u_Texture", 0);
+
+		unsafe
+		{
+			_uniformBuffer.BufferData((IntPtr)64, (IntPtr)(float*)&projectionMatrix, GLUsageHint.StaticDraw);
+		}
 	}
 	internal virtual void FinishFrame()
 	{
@@ -145,6 +153,8 @@ internal abstract class Renderer : IRenderer
 	public IShader? BoundShader => _boundShader;
 	public IShader QuadShader => _quadShader;
 
+	private GLUniformBuffer _uniformBuffer;
+
 	public void BindShader(IShader shader)
 	{
 		if (_boundShader == shader)
@@ -167,6 +177,17 @@ internal abstract class Renderer : IRenderer
 		_boundShader.Unbind();
 		_boundShader = null;
 	}
+
+	public IShader CreateShader(string vertexShaderCode, string fragmentShaderCode)
+	{
+		var shader = CreateShaderImplementation(vertexShaderCode, fragmentShaderCode);
+
+		_uniformBuffer.SetShaderBinding(shader, "Matrices", 0);
+
+		return shader;
+	}
+
+	public abstract IShader CreateShaderImplementation(string vertexShaderCode, string fragmentShaderCode);
 
 	#endregion
 

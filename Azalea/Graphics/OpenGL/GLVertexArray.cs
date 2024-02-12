@@ -1,17 +1,20 @@
-﻿using Azalea.Utils;
+﻿using Azalea.Graphics.OpenGL.Buffers;
+using Azalea.Utils;
 
 namespace Azalea.Graphics.OpenGL;
 public class GLVertexArray : Disposable
 {
-	private uint _handle;
+	public uint Handle { get; init; }
 
 	public GLVertexArray()
 	{
-		_handle = GL.GenVertexArray();
+		Handle = GL.GenVertexArray();
 	}
 
-	public void Bind() => GL.BindVertexArray(_handle);
-	public void Unbind() => GL.BindVertexArray(0);
+	public void Bind()
+		=> GL.BindVertexArray(Handle);
+	public void Unbind()
+		=> GL.BindVertexArray(0);
 
 	public void AddBuffer(GLVertexBuffer buffer, GLVertexBufferLayout layout)
 	{
@@ -31,6 +34,6 @@ public class GLVertexArray : Disposable
 
 	protected override void OnDispose()
 	{
-		GL.DeleteVertexArray(_handle);
+		GL.DeleteVertexArray(Handle);
 	}
 }
