@@ -7,6 +7,7 @@ using Azalea.Graphics.OpenGL.Textures;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Graphics.Shaders;
+using Azalea.Graphics.Textures;
 using Azalea.Numerics;
 using Azalea.Platform;
 using System;
@@ -16,7 +17,7 @@ internal class GLRenderer : Renderer
 {
 	private GLFramebuffer _framebuffer;
 	private GLFramebuffer _intermediateFramebuffer;
-	private uint _screenTexture;
+	private Texture _screenTexture;
 	private uint _screenVertexArray;
 
 	private float[] quadVertices = new float[] {
@@ -60,12 +61,12 @@ internal class GLRenderer : Renderer
 		_intermediateFramebuffer = new GLFramebuffer();
 		_intermediateFramebuffer.Bind();
 
-		_screenTexture = GL.GenTexture();
-		GL.BindTexture(GLTextureType.Texture2D, _screenTexture);
+		_screenTexture = CreateTexture(new Image(screenWidth, screenHeight));
+		GL.BindTexture(GLTextureType.Texture2D, _screenTexture.NativeTexture.Handle);
 		GL.TexImage2D(GLTextureType.Texture2D, 0, GLColorFormat.RGB, screenWidth, screenHeight, 0, GLColorFormat.RGB, GLDataType.UnsignedByte, null);
 		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MinFilter, (int)GLFunction.Linear);
 		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MagFilter, (int)GLFunction.Linear);
-		GL.FramebufferTexture2D(GLBufferType.Frame, GLAttachment.Color0, GLTextureType.Texture2D, _screenTexture, 0);
+		GL.FramebufferTexture2D(GLBufferType.Frame, GLAttachment.Color0, GLTextureType.Texture2D, _screenTexture.NativeTexture.Handle, 0);
 
 		_intermediateFramebuffer.Unbind();
 	}
@@ -76,7 +77,7 @@ internal class GLRenderer : Renderer
 
 		_framebuffer.UpdateTexture(4, GLColorFormat.RGB, size, true);
 
-		GL.BindTexture(GLTextureType.Texture2D, _screenTexture);
+		GL.BindTexture(GLTextureType.Texture2D, _screenTexture.NativeTexture.Handle);
 		GL.TexImage2D(GLTextureType.Texture2D, 0, GLColorFormat.RGB, size.X, size.Y, 0, GLColorFormat.RGB, GLDataType.UnsignedByte, null);
 	}
 
@@ -102,14 +103,14 @@ internal class GLRenderer : Renderer
 		GL.BlitFramebuffer(0, 0, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight, GLBufferBit.Color, GLFunction.Nearest);
 
 		GL.BindFramebuffer(GLBufferType.Frame, 0);
+		GL.Disable(GLCapability.Depth);
 		GL.ClearColor(ClearColor);
 		GL.Clear(GLBufferBit.Color);
-		GL.Disable(GLCapability.Depth);
+
 
 		BindShader(ScreenShader);
+		BindTexture(_screenTexture);
 		GL.BindVertexArray(_screenVertexArray);
-		GL.ActiveTexture(0);
-		GL.BindTexture(GLTextureType.Texture2D, _screenTexture);
 		GL.DrawArrays(GLBeginMode.Triangles, 0, 6);
 
 		PerformanceTrace.RunAndTrace(Window.SwapBuffers, "Window.SwapBuffers");
@@ -147,7 +148,8 @@ internal class GLRenderer : Renderer
 		switch (texture)
 		{
 			case GLTexture glTexture:
-				glTexture.Bind((uint)unit);
+				GL.ActiveTexture((uint)unit);
+				GL.BindTexture(GLTextureType.Texture2D, glTexture.Handle);
 				break;
 		}
 
@@ -155,7 +157,13 @@ internal class GLRenderer : Renderer
 	}
 
 	public override IShader CreateShaderImplementation(string vertexShaderCode, string fragmentShaderCode)
-		=> new GLShader(vertexShaderCode, fragmentShaderCode);
+		=> new GLShader(this, vertexShaderCode, fragmentShaderCode);
+
+	public override void BindShaderImplementation(IShader shader)
+		=> GL.UseProgram(shader.Handle);
+
+	public override void UnbindCurrentShaderImplementation()
+		=> GL.UseProgram(0);
 
 	#region Scissor test
 

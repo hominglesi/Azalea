@@ -6,6 +6,7 @@ namespace Azalea.Graphics.Rendering;
 internal interface INativeTexture : IDisposable
 {
 	IRenderer Renderer { get; }
+	uint Handle { get; }
 	int Width { get; }
 	int Height { get; }
 

@@ -1,5 +1,6 @@
 ﻿using Azalea.Graphics.Colors;
 using Azalea.Graphics.OpenGL.Enums;
+using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Shaders;
 using Azalea.Utils;
 using System;
@@ -7,12 +8,15 @@ using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Graphics.OpenGL;
-public class GLShader : Disposable, IShader
+internal class GLShader : Disposable, IShader
 {
 	public uint Handle { get; init; }
 
-	public GLShader(string vertexShaderSource, string fragmentShaderSource)
+	private readonly Renderer _renderer;
+
+	public GLShader(Renderer renderer, string vertexShaderSource, string fragmentShaderSource)
 	{
+		_renderer = renderer;
 		Handle = GL.CreateProgram();
 		var vertexShader = compileShader(GLShaderType.Vertex, vertexShaderSource);
 		var fragmentShader = compileShader(GLShaderType.Fragment, fragmentShaderSource);
@@ -47,8 +51,7 @@ public class GLShader : Disposable, IShader
 		return id;
 	}
 
-	public void Bind() => GL.UseProgram(Handle);
-	public void Unbind() => GL.UseProgram(0);
+	public void Bind() => _renderer.BindShader(this);
 
 	public void SetUniform(string name, int i)
 	{

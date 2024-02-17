@@ -167,7 +167,7 @@ internal abstract class Renderer : IRenderer
 		if (_boundShader != null)
 			FlushCurrentBatch();
 
-		shader.Bind();
+		BindShaderImplementation(shader);
 		_boundShader = shader;
 	}
 
@@ -178,7 +178,7 @@ internal abstract class Renderer : IRenderer
 
 		FlushCurrentBatch();
 
-		_boundShader.Unbind();
+		UnbindCurrentShaderImplementation();
 		_boundShader = null;
 	}
 
@@ -192,6 +192,8 @@ internal abstract class Renderer : IRenderer
 	}
 
 	public abstract IShader CreateShaderImplementation(string vertexShaderCode, string fragmentShaderCode);
+	public abstract void BindShaderImplementation(IShader shader);
+	public abstract void UnbindCurrentShaderImplementation();
 
 	#endregion
 

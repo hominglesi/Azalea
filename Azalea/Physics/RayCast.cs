@@ -36,6 +36,7 @@ public class RayCast
 
 			collider.Position += direction;
 		}
+		ob.RemoveComponent(collider);
 		return ray;
 	}
 

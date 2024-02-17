@@ -7,24 +7,26 @@ using System;
 namespace Azalea.Graphics.OpenGL.Textures;
 internal class GLTexture : Disposable, INativeTexture
 {
-	private uint _handle;
+	public uint Handle { get; init; }
+	public int Width { get; init; }
+	public int Height { get; init; }
+	public IRenderer Renderer => _renderer;
 
-	private int _width;
-	private int _height;
-	private GLRenderer _renderer;
+	private readonly GLRenderer _renderer;
+
 
 	public GLTexture(GLRenderer renderer, int width, int height)
 	{
 		_renderer = renderer;
-		_width = width;
-		_height = height;
+		Width = width;
+		Height = height;
 
-		_handle = GL.GenTexture();
+		Handle = GL.GenTexture();
 	}
 
 	internal void SetData(Image image)
 	{
-		if (image.Width != _width || image.Height != _height)
+		if (image.Width != Width || image.Height != Height)
 		{
 			Console.WriteLine("Provided image was not the correct size");
 			return;
@@ -37,7 +39,7 @@ internal class GLTexture : Disposable, INativeTexture
 		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.WrapT, (int)GLWrapFunction.ClampToEdge);
 
 		GL.TexImage2D(GLTextureType.Texture2D, 0, GLColorFormat.RGBA,
-			_width, _height, 0, GLColorFormat.RGBA, GLDataType.UnsignedByte, image.Data);
+			Width, Height, 0, GLColorFormat.RGBA, GLDataType.UnsignedByte, image.Data);
 
 		GL.GenerateMipmap(GLTextureType.Texture2D);
 	}
@@ -51,23 +53,10 @@ internal class GLTexture : Disposable, INativeTexture
 			magFilter == TextureFiltering.Nearest ? (int)GLFunction.Nearest : (int)GLFunction.Linear);
 	}
 
-	public void Bind(uint slot = 0)
-	{
-		GL.ActiveTexture(slot);
-		GL.BindTexture(GLTextureType.Texture2D, _handle);
-	}
-
-	public void Unbind() => GL.BindTexture(GLTextureType.Texture2D, 0);
-
-	public IRenderer Renderer => _renderer;
-	public int Width => _width;
-	public int Height => _height;
-
-
 	void INativeTexture.SetData(Image upload) => SetData(upload);
 
 	protected override void OnDispose()
 	{
-		GL.DeleteTexture(_handle);
+		GL.DeleteTexture(Handle);
 	}
 }

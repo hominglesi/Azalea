@@ -7,7 +7,6 @@ public interface IShader
 	public uint Handle { get; }
 
 	void Bind();
-	void Unbind();
 
 	void SetUniform(string name, int i);
 	void SetUniform(string name, int[] array);
