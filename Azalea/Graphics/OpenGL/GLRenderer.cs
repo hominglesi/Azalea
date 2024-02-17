@@ -50,21 +50,9 @@ internal class GLRenderer : Renderer
 		GL.VertexAttribPointer(1, 2, GLDataType.Float, false, 4 * sizeof(float), 2 * sizeof(float));
 
 		_framebuffer = new GLFramebuffer();
-		_framebuffer.Bind();
+		_framebuffer.UpdateTexture(4, GLColorFormat.RGB, Window.ClientSize, true);
 
-		var framebufferTexture = GL.GenTexture();
-		GL.BindTexture(GLTextureType.Texture2DMultisample, framebufferTexture);
-		GL.TexImage2DMultisample(GLTextureType.Texture2DMultisample, 4, GLColorFormat.RGB, screenWidth, screenHeight, true);
-		GL.BindTexture(GLTextureType.Texture2DMultisample, 0);
-		GL.FramebufferTexture2D(GLBufferType.Frame, GLAttachment.Color0, GLTextureType.Texture2DMultisample, framebufferTexture, 0);
-
-		var renderBuffer = GL.GenRenderbuffer();
-		GL.BindRenderbuffer(GLBufferType.Render, renderBuffer);
-		GL.RenderbufferStorageMultisample(GLBufferType.Render, 4, GLColorFormat.Depth24Stencil8, screenWidth, screenHeight);
-		GL.BindRenderbuffer(GLBufferType.Render, 0);
-		GL.FramebufferRenderbuffer(GLBufferType.Frame, GLAttachment.DepthStencil, GLBufferType.Render, renderBuffer);
-
-		if (GL.CheckFramebufferStatus(GLBufferType.Frame) != GLFramebufferStatus.Complete)
+		if (_framebuffer.IsComplete() == false)
 			Console.WriteLine("Couldn't create framebuffer.");
 
 		_framebuffer.Unbind();
@@ -80,6 +68,16 @@ internal class GLRenderer : Renderer
 		GL.FramebufferTexture2D(GLBufferType.Frame, GLAttachment.Color0, GLTextureType.Texture2D, _screenTexture, 0);
 
 		_intermediateFramebuffer.Unbind();
+	}
+
+	protected override void UpdateViewport(Vector2Int size)
+	{
+		base.UpdateViewport(size);
+
+		_framebuffer.UpdateTexture(4, GLColorFormat.RGB, size, true);
+
+		GL.BindTexture(GLTextureType.Texture2D, _screenTexture);
+		GL.TexImage2D(GLTextureType.Texture2D, 0, GLColorFormat.RGB, size.X, size.Y, 0, GLColorFormat.RGB, GLDataType.UnsignedByte, null);
 	}
 
 	internal override void BeginFrame()
@@ -108,6 +106,7 @@ internal class GLRenderer : Renderer
 		GL.Clear(GLBufferBit.Color);
 		GL.Disable(GLCapability.Depth);
 
+		BindShader(ScreenShader);
 		GL.BindVertexArray(_screenVertexArray);
 		GL.ActiveTexture(0);
 		GL.BindTexture(GLTextureType.Texture2D, _screenTexture);

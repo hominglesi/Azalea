@@ -5,6 +5,7 @@ using Azalea.Platform;
 using Azalea.VisualTests;
 
 //PerformanceTrace.Enabled = true;
+AzaleaSettings.IgnoreGLError = false;
 
 Assets.SetupPersistentStore("Azalea.VisualTests");
 

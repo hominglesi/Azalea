@@ -41,7 +41,7 @@ internal abstract class Renderer : IRenderer
 	{
 		Window = window;
 
-		Window.OnClientResized += SetViewport;
+		Window.OnClientResized += UpdateViewport;
 	}
 
 	protected internal virtual void Initialize()
@@ -79,6 +79,11 @@ internal abstract class Renderer : IRenderer
 		SetViewportImplementation(size);
 	}
 
+	protected virtual void UpdateViewport(Vector2Int size)
+	{
+		SetViewport(size);
+	}
+
 	protected abstract void SetViewportImplementation(Vector2Int size);
 
 	protected abstract IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size);
@@ -106,8 +111,6 @@ internal abstract class Renderer : IRenderer
 	internal virtual void FinishFrame()
 	{
 		FlushCurrentBatch();
-
-		BindShader(_screenShader);
 	}
 
 	protected internal virtual void SetClearColor(AzaleaColor value) { }
@@ -152,6 +155,7 @@ internal abstract class Renderer : IRenderer
 
 	public IShader? BoundShader => _boundShader;
 	public IShader QuadShader => _quadShader;
+	protected IShader ScreenShader => _screenShader;
 
 	private GLUniformBuffer _uniformBuffer;
 

@@ -10,7 +10,8 @@ public class GLUniformBuffer : GLBuffer
 	public void SetShaderBinding(IShader shader, string name, uint binding)
 	{
 		var index = GL.GetUniformBlockIndex(shader.Handle, name);
-		GL.UniformBlockBinding(shader.Handle, index, binding);
+		if (index != uint.MaxValue)
+			GL.UniformBlockBinding(shader.Handle, index, binding);
 	}
 
 	public void BindBufferBase(uint index)
