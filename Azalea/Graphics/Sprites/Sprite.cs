@@ -26,6 +26,13 @@ public class Sprite : GameObject
 
 	internal IShader Shader;
 
+	private Axes _flippedAxes = Axes.None;
+	public Axes FlippedAxes
+	{
+		get => _flippedAxes;
+		set => _flippedAxes = value;
+	}
+
 	public Sprite()
 	{
 		Shader = AzaleaGame.Main.Host.Renderer.QuadShader;
@@ -62,6 +69,7 @@ public class Sprite : GameObject
 		renderer.DrawQuad(
 			texture,
 			ScreenSpaceDrawQuad,
-			DrawColorInfo);
+			DrawColorInfo,
+			_flippedAxes);
 	}
 }

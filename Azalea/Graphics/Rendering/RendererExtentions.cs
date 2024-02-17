@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.Colors;
+﻿using Azalea.Extentions.EnumExtentions;
+using Azalea.Graphics.Colors;
 using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Graphics.Textures;
@@ -24,7 +25,7 @@ public static class RendererExtentions
 		return false;
 	}
 
-	internal static void DrawQuad(this IRenderer renderer, Texture texture, Quad vertexQuad, DrawColorInfo drawColorInfo)
+	internal static void DrawQuad(this IRenderer renderer, Texture texture, Quad vertexQuad, DrawColorInfo drawColorInfo, Axes flippedAxes = Axes.None)
 	{
 		if (ClientContainsQuad(vertexQuad) == false)
 			return;
@@ -33,7 +34,7 @@ public static class RendererExtentions
 
 		var vertexAction = renderer.DefaultQuadBatch.AddAction;
 
-		var textureRegion = texture.GetUVCoordinates();
+		var textureRegion = getTextureRegionQuad(texture, flippedAxes);
 
 		vertexAction(new TexturedVertex2D
 		{
@@ -112,5 +113,29 @@ public static class RendererExtentions
 		renderer.DrawQuad(texture, Quad.FromRectangle(rightRect) * drawMatrix, new DrawColorInfo(rightColor));
 		renderer.DrawQuad(texture, Quad.FromRectangle(bottomRect) * drawMatrix, new DrawColorInfo(bottomColor));
 		renderer.DrawQuad(texture, Quad.FromRectangle(leftRect) * drawMatrix, new DrawColorInfo(leftColor));
+	}
+
+	private static Quad getTextureRegionQuad(Texture texture, Axes flippedAxes)
+	{
+		var rectangle = texture.GetUVCoordinates();
+
+		var topLeft = rectangle.TopLeft;
+		var topRight = rectangle.TopRight;
+		var bottomLeft = rectangle.BottomLeft;
+		var bottomRight = rectangle.BottomRight;
+
+		if (flippedAxes.HasFlagFast(Axes.X))
+		{
+			(topRight, topLeft) = (topLeft, topRight);
+			(bottomRight, bottomLeft) = (bottomLeft, bottomRight);
+		}
+
+		if (flippedAxes.HasFlagFast(Axes.Y))
+		{
+			(bottomLeft, topLeft) = (topLeft, bottomLeft);
+			(bottomRight, topRight) = (topRight, bottomRight);
+		}
+
+		return new Quad(topLeft, bottomLeft, bottomRight, topRight);
 	}
 }
