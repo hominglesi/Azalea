@@ -1,6 +1,7 @@
 ﻿using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.Rendering;
+using Azalea.Graphics.Vulkan;
 using Azalea.Platform.Windows;
 using System;
 
@@ -11,7 +12,7 @@ internal class DesktopGameHost : GameHost
 	private Win32Window _window;
 
 	public override IRenderer Renderer => _renderer ?? throw new Exception("Cannot use Renderer before it is initialized");
-	private GLRenderer? _renderer;
+	private IRenderer? _renderer;
 
 	public DesktopGameHost(HostPreferences prefs)
 	{
@@ -28,7 +29,10 @@ internal class DesktopGameHost : GameHost
 		GL.Enable(GLCapability.Blend);
 		GL.BlendFunc(GLBlendFunction.SrcAlpha, GLBlendFunction.OneMinusSrcAlpha);
 
-		_renderer = new GLRenderer(_window);
+		if (AzaleaSettings.UseVulkan == true)
+			_renderer = new VulkanRenderer(_window);
+		else
+			_renderer = new GLRenderer(_window);
 
 		base.CallInitialized();
 	}
