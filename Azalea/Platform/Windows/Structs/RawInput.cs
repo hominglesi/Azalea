@@ -6,5 +6,6 @@ namespace Azalea.Platform.Windows;
 internal readonly struct RawInput
 {
 	public readonly RawInputHeader Header;
-	public readonly RawMouse Mouse;
+	public readonly RawHID HID;
+	//public readonly RawMouse Mouse;
 }

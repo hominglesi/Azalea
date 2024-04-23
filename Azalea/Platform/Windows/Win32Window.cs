@@ -57,6 +57,10 @@ internal class Win32Window : PlatformWindow
 			return;
 		}
 
+		//Setup Raw Input
+		var rawInputDevice = new RawInputDevice(1, 5, 0, _window);
+		WinAPI.RegisterRawInputDevices(ref rawInputDevice, 1, (uint)Marshal.SizeOf<RawInputDevice>());
+
 		//Setup OpenGL
 		_deviceContext = WinAPI.GetDC(_window);
 
@@ -147,6 +151,25 @@ internal class Win32Window : PlatformWindow
 				break;
 			case WindowMessage.KeyUp:
 				Input.HandleKeyboardKeyStateChange(WindowsExtentions.KeycodeToKey((int)wParam), false); break;
+
+			//Raw Input
+			case WindowMessage.Input:
+
+				uint bufferSize = 0;
+				RawInput rawInput = new();
+				Console.WriteLine(bufferSize);
+
+				WinAPI.GetRawInputData(lParam, 0x10000003, IntPtr.Zero, ref bufferSize, (uint)Marshal.SizeOf<RawInputHeader>());
+				WinAPI.GetRawInputData(lParam, 0x10000003, ref rawInput, ref bufferSize, (uint)Marshal.SizeOf<RawInputHeader>());
+
+				WinAPI.GetRawInputDeviceInfo(rawInput.Header.Device, 0x20000005, IntPtr.Zero, ref bufferSize);
+
+				var data = new byte[bufferSize];
+				WinAPI.GetRawInputDeviceInfo(rawInput.Header.Device, 0x20000005, ref data[0], ref bufferSize);
+
+				Console.WriteLine("adwdaw");
+
+				break;
 		}
 
 		return WinAPI.DefWindowProc(window, message, wParam, lParam);
