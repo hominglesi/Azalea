@@ -157,7 +157,8 @@ internal class Win32Window : PlatformWindow
 
 				uint bufferSize = 0;
 				RawInput rawInput = new();
-				Console.WriteLine(bufferSize);
+
+				var rawInputBytes = new byte[2000];
 
 				WinAPI.GetRawInputData(lParam, 0x10000003, IntPtr.Zero, ref bufferSize, (uint)Marshal.SizeOf<RawInputHeader>());
 				WinAPI.GetRawInputData(lParam, 0x10000003, ref rawInput, ref bufferSize, (uint)Marshal.SizeOf<RawInputHeader>());
@@ -167,8 +168,43 @@ internal class Win32Window : PlatformWindow
 				var data = new byte[bufferSize];
 				WinAPI.GetRawInputDeviceInfo(rawInput.Header.Device, 0x20000005, ref data[0], ref bufferSize);
 
-				Console.WriteLine("adwdaw");
+				WinAPI.HidP_GetCaps(ref data[0], out HidPCaps capabilities);
 
+				var buttonCaps = new HidPButtonCaps[capabilities.NumberInputButtonCaps];
+				var capsLength = capabilities.NumberInputButtonCaps;
+
+				WinAPI.HidP_GetButtonCaps(HidPReportType.Input, ref buttonCaps[0], ref capsLength, ref data[0]);
+
+				var numberOfButtons = buttonCaps[0].Range.UsageMax - buttonCaps[0].Range.UsageMin + 1;
+
+				var valueCaps = new HidPValueCaps[capabilities.NumberInputValueCaps];
+				capsLength = capabilities.NumberInputValueCaps;
+
+				WinAPI.HidP_GetValueCaps(HidPReportType.Input, valueCaps, ref capsLength, ref data[0]);
+
+				var x = new ushort[1000];
+				uint length = 8;
+
+				WinAPI.HidP_GetUsages(HidPReportType.Input, capabilities.UsagePage, 0, x, ref length, ref data[0],
+					ref rawInput.HID.RawData, rawInput.HID.SizeHid);
+
+				string str = "";
+
+				for (int i = 0; i < capabilities.NumberInputValueCaps; i++)
+				{
+					WinAPI.HidP_GetUsageValue(HidPReportType.Input, valueCaps[i].UsagePage, 0,
+					valueCaps[i].Range.UsageMin, out var usageValue, ref data[0],
+					ref rawInput.HID.RawData, rawInput.HID.SizeHid);
+
+					str += usageValue;
+					str += " : ";
+				}
+
+				Console.WriteLine(str);
+
+				//Console.WriteLine(length);
+
+				//Console.WriteLine("adwdaw");
 				break;
 		}
 

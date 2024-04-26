@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace Azalea.Platform.Windows;
 
-internal static class WinAPI
+internal static partial class WinAPI
 {
 	private const string User32Path = "user32.dll";
 	private const string Gdi32Path = "gdi32.dll";
@@ -146,7 +146,6 @@ internal static class WinAPI
 
 		return info;
 	}
-
 
 	[DllImport(User32Path, EntryPoint = "GetRawInputData")]
 	public static extern uint GetRawInputData(IntPtr rawInput, uint command, ref RawInput data, ref uint dataSize, uint headerSize);
