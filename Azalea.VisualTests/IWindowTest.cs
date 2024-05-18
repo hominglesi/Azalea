@@ -73,6 +73,12 @@ public class IWindowTest : TestScene
 					"Turn vsync off",
 					() => _window.VSync = false),
 				CreateActionButton(
+					"Show cursor",
+					() => _window.CursorVisible = true),
+				CreateActionButton(
+					"Hide cursor",
+					() => _window.CursorVisible = false),
+				CreateActionButton(
 					"Set position to 0",
 					() => _window.Position = Vector2Int.Zero),
 				CreateActionButton(
@@ -122,6 +128,10 @@ public class IWindowTest : TestScene
 				CreateObservedValue("ClientSize",
 					() => _window.ClientSize,
 					(value) => $"Window resized to {value}"),
+				CreateObservedValue("VSync",
+					() => _window.VSync),
+				CreateObservedValue("Cursor Visible",
+					() => _window.CursorVisible)
 			})
 		});
 	}

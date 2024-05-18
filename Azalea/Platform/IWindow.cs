@@ -55,6 +55,11 @@ public interface IWindow : IDisposable
 	bool VSync { get; set; }
 
 	/// <summary>
+	/// Whether Cursor is shown
+	/// </summary>
+	bool CursorVisible { get; set; }
+
+	/// <summary>
 	/// Centers the window on the users most overlapped monitor.
 	/// </summary>
 	void Center();
