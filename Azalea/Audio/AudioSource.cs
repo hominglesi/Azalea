@@ -11,23 +11,35 @@ internal abstract class AudioSource : Disposable
 		set
 		{
 			if (_gain == value) return;
-
 			SetGainImplementation(value);
-
 			_gain = value;
 		}
 	}
 
 	protected abstract void SetGainImplementation(float gain);
 
+	private bool _looping = false;
+	public bool Looping
+	{
+		get => _looping;
+		set
+		{
+			if (_looping == value) return;
+			SetLoopingImplementation(value);
+			_looping = value;
+		}
+	}
+	protected abstract void SetLoopingImplementation(bool looping);
+
 	private AudioInstance? _currentInstance;
 
-	public AudioInstance Play(Sound sound, float gain = 1)
+	public AudioInstance Play(Sound sound, float gain = 1, bool looping = false)
 	{
 		Stop();
 
 		BindBufferImplementation(sound.Buffer);
 		Gain = gain;
+		Looping = looping;
 
 		PlayImplementation();
 

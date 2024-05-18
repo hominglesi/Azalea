@@ -133,6 +133,12 @@ internal unsafe static class ALC
 		sourcef(source, 0x100A, gain);
 	}
 
+	public static void SetSourceLooping(uint source, bool looping)
+	{
+		//0x1007 = AL_LOOPING
+		sourcei(source, 0x1007, looping ? 1 : 0);
+	}
+
 	#endregion
 
 	#region Listeners

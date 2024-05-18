@@ -37,7 +37,7 @@ public static class AudioManager
 		}
 	}
 
-	private static AudioInstance playOnChannel(int channel, Sound sound, float gain)
+	private static AudioInstance playOnChannel(int channel, Sound sound, float gain, bool looping)
 	{
 		if (sound is null)
 		{
@@ -45,19 +45,19 @@ public static class AudioManager
 			return null;
 		}
 
-		return _sources[channel].Play(sound, gain);
+		return _sources[channel].Play(sound, gain, looping);
 	}
 
-	internal static AudioInstance PlayInternal(Sound sound, float gain = 1)
+	internal static AudioInstance PlayInternal(Sound sound, float gain = 1, bool looping = false)
 	{
-		return playOnChannel(31, sound, gain);
+		return playOnChannel(31, sound, gain, looping);
 	}
 
 	private const int _vitalChannels = 4;
 	private static int _currentVitalChannel = 0;
-	public static AudioInstance PlayVital(Sound sound, float gain = 1)
+	public static AudioInstance PlayVital(Sound sound, float gain = 1, bool looping = false)
 	{
-		var played = playOnChannel(_currentVitalChannel, sound, gain);
+		var played = playOnChannel(_currentVitalChannel, sound, gain, looping);
 
 		_currentVitalChannel += 1;
 		if (_currentVitalChannel >= _vitalChannels)
@@ -68,9 +68,9 @@ public static class AudioManager
 
 	private const int _audioChannels = SourceCount - _vitalChannels - 1;
 	private static int _currentAudioChannel = _vitalChannels;
-	public static AudioInstance Play(Sound sound, float gain = 1)
+	public static AudioInstance Play(Sound sound, float gain = 1, bool looping = false)
 	{
-		var played = playOnChannel(_currentAudioChannel, sound, gain);
+		var played = playOnChannel(_currentAudioChannel, sound, gain, looping);
 
 		_currentAudioChannel += 1;
 		if (_currentAudioChannel >= _audioChannels)

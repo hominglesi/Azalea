@@ -28,6 +28,9 @@ internal class AudioTest : TestScene
 					"Play 'hitnormal.wav' at 0.1f",
 					() => _instance = AudioManager.Play(_hitnormal, 0.1f)),
 				CreateActionButton(
+					"Play looping 'hitnormal.wav' at 0.1f",
+					() => _instance = AudioManager.PlayVital(_hitnormal, 0.1f, true)),
+				CreateActionButton(
 					"Set _instance gain to 0.1f",
 					() => { if (_instance is not null) _instance.Gain = 0.1f; }),
 				CreateActionButton(

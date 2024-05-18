@@ -11,6 +11,9 @@ internal class ALSource : AudioSource
 	protected override void SetGainImplementation(float gain)
 		=> ALC.SetSourceGain(Handle, gain);
 
+	protected override void SetLoopingImplementation(bool looping)
+		=> ALC.SetSourceLooping(Handle, looping);
+
 	protected override void PlayImplementation()
 		=> ALC.SourcePlay(Handle);
 
