@@ -196,6 +196,19 @@ internal abstract class PlatformWindow : Disposable, IWindow
 		}
 	}
 
+	private bool _cursorVisible = true;
+	protected abstract void SetCursorVisible(bool show);
+	public bool CursorVisible
+	{
+		get => _cursorVisible;
+		set
+		{
+			if (_cursorVisible == value) return;
+			SetCursorVisible(value);
+			_cursorVisible = value;
+		}
+	}
+
 	#endregion
 
 	#region Methods

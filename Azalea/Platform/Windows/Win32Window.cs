@@ -217,6 +217,11 @@ internal class Win32Window : PlatformWindow
 	protected override void SetVSyncImplementation(bool enabled)
 		=> GL.SwapInterval(enabled ? 1 : 0);
 
+	protected override void SetCursorVisible(bool show)
+	{
+		WinAPI.ShowCursor(show);
+	}
+
 	public override void Center()
 	{
 		var workArea = getCurrentMonitorInfo().WorkArea;

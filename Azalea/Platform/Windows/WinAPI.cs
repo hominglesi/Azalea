@@ -246,6 +246,9 @@ internal static class WinAPI
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool SetWindowText(IntPtr window, string text);
 
+	[DllImport(User32Path, EntryPoint = "ShowCursor")]
+	public static extern int ShowCursor(bool show);
+
 	[DllImport(User32Path, EntryPoint = "ShowWindow")]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool ShowWindow(IntPtr window, ShowWindowCommand showCommand);
