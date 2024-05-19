@@ -127,10 +127,10 @@ public abstract class Slider : Composition
 		if (_lastDrawSize != DrawSize || _lastSliderLength != _headLength)
 		{
 			var drawLength = Direction == SliderDirection.Horizontal ? DrawSize.X : DrawSize.Y;
-			var newRange = calculateSliderRange(drawLength);
-			SliderPosition = MathUtils.Map(SliderPosition, _sliderRange.X, _sliderRange.Y, newRange.X, newRange.Y);
+			var oldRange = _sliderRange;
+			_sliderRange = calculateSliderRange(drawLength);
 
-			_sliderRange = newRange;
+			SliderPosition = MathUtils.Map(SliderPosition, oldRange.X, oldRange.Y, _sliderRange.X, _sliderRange.Y);
 
 			_lastDrawSize = DrawSize;
 			_lastSliderLength = _headLength;
