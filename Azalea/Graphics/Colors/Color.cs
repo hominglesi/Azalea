@@ -51,6 +51,12 @@ public partial struct Color
 	/// <param name="b">The blue component of the new Color</param>
 	public Color(byte r, byte g, byte b) : this(r, g, b, byte.MaxValue) { }
 
+	/// <summary>
+	/// Constructs a new Color from the specified component
+	/// </summary>
+	/// <param name="value">The red, green and blue component of the new Color</param>
+	public Color(byte value) : this(value, value, value, byte.MaxValue) { }
+
 	public Color(float r, float g, float b, float a)
 		: this((byte)(r * byte.MaxValue),
 			(byte)(g * byte.MaxValue),
