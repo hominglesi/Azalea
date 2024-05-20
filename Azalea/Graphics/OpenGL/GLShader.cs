@@ -65,6 +65,11 @@ internal class GLShader : Disposable, IShader
 		GL.Uniform1iv(getUniformLocation(name), array);
 	}
 
+	public void SetUniform(string name, Vector2 vec2)
+	{
+		GL.Uniform2f(getUniformLocation(name), vec2.X, vec2.Y);
+	}
+
 	public void SetUniform(string name, Vector4 vec4)
 	{
 		Bind();
@@ -81,6 +86,13 @@ internal class GLShader : Disposable, IShader
 	{
 		Bind();
 		GL.UniformMatrix4(getUniformLocation(name), 1, false, matrix);
+	}
+
+	public void BindUniformBlock(string name, uint binding)
+	{
+		var index = GL.GetUniformBlockIndex(Handle, name);
+		if (index != uint.MaxValue)
+			GL.UniformBlockBinding(Handle, index, binding);
 	}
 
 	private Dictionary<string, int> _uniformLocations = new();

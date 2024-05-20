@@ -46,9 +46,13 @@ internal abstract class Renderer : IRenderer
 
 	protected internal virtual void Initialize()
 	{
-		_uniformBuffer = new GLUniformBuffer();
-		_uniformBuffer.BufferData((IntPtr)128, IntPtr.Zero, GLUsageHint.StaticDraw);
-		_uniformBuffer.BindBufferBase(0);
+		_universalUniformBuffer = new GLUniformBuffer();
+		var uniformBufferSize = 0;
+		uniformBufferSize += 64; // mat4 Matrices
+		uniformBufferSize += 4; //float Time
+
+		_universalUniformBuffer.BufferData(uniformBufferSize, IntPtr.Zero, GLUsageHint.DynamicDraw);
+		_universalUniformBuffer.BindBufferRange(0, 0, uniformBufferSize);
 
 		var defaultVertexShader = Assets.GetText("Shaders/quad_vertexShader.glsl")!;
 		var defaultFragmentShader = Assets.GetText("Shaders/quad_fragmentShader.glsl")!;
@@ -101,11 +105,14 @@ internal abstract class Renderer : IRenderer
 		if (AutomaticallyClear) Clear();
 
 		var clientSize = Window.ClientSize;
-		var projectionMatrix = Matrix4x4.CreateOrthographicOffCenter(0, clientSize.X, clientSize.Y, 0, 0.1f, 100);
+		Matrix4x4 projectionMatrix = Matrix4x4.CreateOrthographicOffCenter(0, clientSize.X, clientSize.Y, 0, 0.1f, 100);
+		float time = Time.TimeSinceStart;
+		Vector2 resolution = Window.ClientSize;
 
 		unsafe
 		{
-			_uniformBuffer.BufferData((IntPtr)64, (IntPtr)(float*)&projectionMatrix, GLUsageHint.StaticDraw);
+			_universalUniformBuffer.BufferSubData(0, 64, (IntPtr)(float*)&projectionMatrix);
+			_universalUniformBuffer.BufferSubData(64, 4, (IntPtr)(&time));
 		}
 	}
 	internal virtual void FinishFrame()
@@ -157,7 +164,7 @@ internal abstract class Renderer : IRenderer
 	public IShader QuadShader => _quadShader;
 	protected IShader ScreenShader => _screenShader;
 
-	private GLUniformBuffer _uniformBuffer;
+	private GLUniformBuffer _universalUniformBuffer;
 
 	public void BindShader(IShader shader)
 	{
@@ -186,7 +193,7 @@ internal abstract class Renderer : IRenderer
 	{
 		var shader = CreateShaderImplementation(vertexShaderCode, fragmentShaderCode);
 
-		_uniformBuffer.SetShaderBinding(shader, "Matrices", 0);
+		shader.BindUniformBlock("Matrices", 0);
 
 		return shader;
 	}

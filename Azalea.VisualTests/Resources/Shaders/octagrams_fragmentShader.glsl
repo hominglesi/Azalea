@@ -1,12 +1,12 @@
 #version 330 core
 in vec4 oCol;
 in vec2 oTex;
+in float iTime;
 float gTime = 0;
 const float REPEAT = 5.0;
-const float iTime = 1080.0;
-const vec2 iResolution = vec2(800, 450);
 
 uniform sampler2D u_Texture;
+uniform vec2 iResolution;
 
 out vec4 FragColor;
 

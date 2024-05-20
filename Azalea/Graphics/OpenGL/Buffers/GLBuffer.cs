@@ -23,10 +23,16 @@ public class GLBuffer : Disposable
 	public virtual void Bind() => GL.BindBuffer(Type, Handle);
 	public virtual void Unbind() => GL.BindBuffer(Type, Handle);
 
-	public void BufferData(IntPtr size, IntPtr data, GLUsageHint hint)
+	public void BufferData(int size, IntPtr data, GLUsageHint hint)
 	{
 		Bind();
-		GL.BufferData(Type, size, data, hint);
+		GL.BufferData(Type, (IntPtr)size, data, hint);
+	}
+
+	public void BufferSubData(int offset, int size, IntPtr data)
+	{
+		Bind();
+		GL.NamedBufferSubData(Handle, (IntPtr)offset, (IntPtr)size, data);
 	}
 
 	public void BufferData<T>(T[] data, GLUsageHint hint)

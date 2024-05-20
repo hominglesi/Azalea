@@ -10,8 +10,11 @@ public interface IShader
 
 	void SetUniform(string name, int i);
 	void SetUniform(string name, int[] array);
+	void SetUniform(string name, Vector2 vec2);
 	void SetUniform(string name, Vector4 vec4);
 	void SetUniform(string name, Color color);
 	void SetUniform(string name, Matrix4x4 matrix);
+
+	void BindUniformBlock(string name, uint binding);
 
 }
