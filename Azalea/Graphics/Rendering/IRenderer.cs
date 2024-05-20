@@ -32,7 +32,7 @@ public interface IRenderer
 	internal IShader QuadShader { get; }
 	internal void BindShader(IShader shader);
 	internal void UnbindCurrentShader();
-	internal IShader CreateShader(string vertexShaderCode, string fragmentShaderCode);
+	public IShader CreateShader(string vertexShaderCode, string fragmentShaderCode);
 
 	internal void PushScissor(RectangleInt scissorRect);
 	internal void PopScissor();

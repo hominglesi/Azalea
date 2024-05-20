@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.Rendering;
+﻿using Azalea.Graphics.OpenGL;
+using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Shaders;
 using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
@@ -24,7 +25,16 @@ public class Sprite : GameObject
 		}
 	}
 
-	internal IShader Shader;
+	private IShader _shader;
+	public IShader Shader
+	{
+		get => _shader;
+		set
+		{
+			if (_shader == value) return;
+			_shader = value;
+		}
+	}
 
 	private Axes _flippedAxes = Axes.None;
 	public Axes FlippedAxes
@@ -35,7 +45,7 @@ public class Sprite : GameObject
 
 	public Sprite()
 	{
-		Shader = AzaleaGame.Main.Host.Renderer.QuadShader;
+		_shader = AzaleaGame.Main.Host.Renderer.QuadShader;
 	}
 
 	private float _time = 0;
@@ -65,6 +75,8 @@ public class Sprite : GameObject
 		}
 
 		renderer.BindShader(Shader);
+
+		GL.PrintErrors();
 
 		renderer.DrawQuad(
 			texture,
