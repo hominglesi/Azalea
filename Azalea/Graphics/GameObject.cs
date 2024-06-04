@@ -141,8 +141,12 @@ public abstract partial class GameObject : Amendable, IGameObject
 
 	#endregion
 
+	public bool Active { get; set; } = true;
+
 	public virtual void UpdateSubTree()
 	{
+		if (Active == false) return;
+
 		UpdateAmends();
 		Update();
 		updateComponents();
@@ -151,6 +155,8 @@ public abstract partial class GameObject : Amendable, IGameObject
 
 	public virtual void FixedUpdateSubTree()
 	{
+		if (Active == false) return;
+
 		FixedUpdate();
 	}
 

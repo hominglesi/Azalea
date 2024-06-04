@@ -129,6 +129,8 @@ public partial class CompositeGameObject : GameObject
 
 	public override void UpdateSubTree()
 	{
+		if (Active == false) return;
+
 		base.UpdateSubTree();
 
 		for (int i = 0; i < _internalChildren.Count; ++i)
@@ -141,6 +143,8 @@ public partial class CompositeGameObject : GameObject
 
 	public override void FixedUpdateSubTree()
 	{
+		if (Active == false) return;
+
 		base.FixedUpdateSubTree();
 
 		for (int i = 0; i < _internalChildren.Count; ++i)
