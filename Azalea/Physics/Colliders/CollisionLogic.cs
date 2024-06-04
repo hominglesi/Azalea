@@ -92,7 +92,6 @@ internal static class CollisionLogic
 			collisionNormal = collisionNormal.Rotate(rectAngle, false);
 
 			float displacement = penetration;
-			Console.WriteLine($"Displacement: {displacement}");
 			if (float.IsNaN(collisionNormal.X) || float.IsNaN(collisionNormal.Y))
 				collisionNormal = new(1, 1);
 
@@ -124,9 +123,6 @@ internal static class CollisionLogic
 			rigidBodyCircle.Velocity += impulseNormal / rigidBodyCircle.Mass;
 			rigidBodyCircle.Velocity += impulseTangential / rigidBodyCircle.Mass;
 			rigidBodyRect.Velocity -= impulse / rigidBodyRect.Mass * collisionNormal;
-
-			Console.WriteLine($"Impact: Circle Velocity: {rigidBodyCircle.Velocity}");
-			Console.WriteLine($"Impact: Rect Velocity: {rigidBodyRect.Velocity}");
 
 			//float angularVelocityRect = Vector2Extentions(radiusRect, -collisionNormal * impulse) / rbRect.MomentOfInertia;
 		}

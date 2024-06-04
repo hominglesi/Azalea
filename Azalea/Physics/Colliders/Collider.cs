@@ -28,14 +28,12 @@ public abstract class Collider : Component
 
 	public void OnExitingCollider(Collider other)
 	{
-		Console.WriteLine("Left trigger");
 		OnCollisionExit?.Invoke(other);
 		other.OnCollisionExit?.Invoke(this);
 	}
 
 	public void OnEnteringCollider(Collider other)
 	{
-		Console.WriteLine("Entered trigger");
 		OnCollisionEnter?.Invoke(other);
 		other.OnCollisionEnter?.Invoke(this);
 	}
