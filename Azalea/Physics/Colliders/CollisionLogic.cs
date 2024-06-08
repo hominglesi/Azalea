@@ -150,7 +150,6 @@ internal static class CollisionLogic
 			RigidBody rigidBody2 = rect2.Parent!.GetComponent<RigidBody>()!;
 			float displacementX = -penetrationX;
 			float displacementY = -penetrationY;
-			Console.WriteLine($"Displacement: {displacementX}");
 
 			if (penetrationX > penetrationY)
 			{
