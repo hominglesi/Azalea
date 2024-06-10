@@ -33,7 +33,7 @@ public partial class CompositeGameObject : GameObject
 
 	private ulong _currentChildID;
 
-	internal virtual void AddInternal(GameObject gameObject)
+	public virtual void AddInternal(GameObject gameObject)
 	{
 		if (gameObject == null)
 			throw new ArgumentNullException(nameof(gameObject), $"Cannot add null {nameof(gameObject)} to {nameof(CompositeGameObject)}.");
