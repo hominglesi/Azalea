@@ -35,6 +35,8 @@ public struct Boundary : IEquatable<Boundary>
 	public static bool operator ==(Boundary left, Boundary right) => left.Equals(right);
 	public static bool operator !=(Boundary left, Boundary right) => left.Equals(right) == false;
 
+	public static implicit operator Boundary(float value) => new(value);
+
 	public static Boundary operator +(Boundary left, Boundary right)
 		=> new(left.Top + right.Top, left.Right + right.Right, left.Bottom + right.Bottom, left.Left + right.Left);
 }
