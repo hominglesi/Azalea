@@ -1,5 +1,5 @@
 ﻿namespace Azalea.Design.UserInterface;
-public class BasicIntTextBox : BasicTextBox
+public class BasicIntTextBox : BasicTextBoxOld
 {
 	public int DisplayedInt
 	{
