@@ -377,7 +377,7 @@ public abstract partial class GameObject : Amendable, IGameObject
 
 			_fillMode = value;
 
-			//Invalidate(Invalidation.DrawSize);
+			Invalidate(Invalidation.DrawSize);
 		}
 	}
 
@@ -539,7 +539,7 @@ public abstract partial class GameObject : Amendable, IGameObject
 			else
 				AddComponentTreeToScene();
 
-			//Invalidate(Invalidation.Presence);
+			Invalidate(Invalidation.Presence);
 		}
 	}
 
@@ -574,9 +574,8 @@ public abstract partial class GameObject : Amendable, IGameObject
 
 			_alwaysPresent = value;
 
-			/*
-            if (IsPresent != wasPresent)
-                Invalidate(Invalidation.Presence)*/
+			if (IsPresent != wasPresent)
+				Invalidate(Invalidation.Presence);
 		}
 	}
 
@@ -589,10 +588,7 @@ public abstract partial class GameObject : Amendable, IGameObject
 	{
 		get
 		{
-			if (AzaleaSettings.DontCacheDrawInfo == true)
-				return computeDrawInfo();
-
-			if (_drawInfoBacking.IsValid == false)
+			if (_drawInfoBacking.IsValid == false || AzaleaSettings.DontCacheDrawInfo == true)
 			{
 				_drawInfo = computeDrawInfo();
 				_drawInfoBacking.Validate();
