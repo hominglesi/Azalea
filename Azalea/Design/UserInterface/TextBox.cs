@@ -14,10 +14,15 @@ public abstract class TextBox : TextContainer
 		Input.OnTextInput += onTextInput;
 	}
 
+	public string DisplayedText => _text;
+	public override bool AcceptsFocus => true;
+
 	#region Input
 
 	protected override bool OnKeyDown(KeyDownEvent e)
 	{
+		if (HasFocus == false) return false;
+
 		if (e.Key == Keys.Backspace && _text.Length > 0) removeCharacterAtCarat();
 		if (e.Key == Keys.Enter) addCharacterAtCarat('\n');
 		if (e.Key == Keys.Left) moveCarat(-1);
@@ -28,19 +33,29 @@ public abstract class TextBox : TextContainer
 
 	private void onTextInput(char chr)
 	{
+		if (HasFocus == false) return;
+
 		if (char.IsControl(chr))
 			return;
 
 		addCharacterAtCarat(chr);
 	}
 
+	#endregion
+
+	#region Character Manipulation
+
 	private void addCharacterAtCarat(char chr)
 	{
+		if (IsCharacterAllowed(chr) == false) return;
+
 		var newText = _text.Insert(_caratPosition, chr.ToString());
 		_caratPosition++;
 
 		updateText(newText);
 	}
+
+	protected virtual bool IsCharacterAllowed(char chr) => true;
 
 	private void removeCharacterAtCarat()
 	{
