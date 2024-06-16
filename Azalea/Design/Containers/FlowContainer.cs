@@ -111,9 +111,14 @@ public abstract class FlowContainer : Composition
 
 		if (_layout.IsValid == false)
 		{
-			performLayout();
-			_layout.Validate();
+			PerformLayout();
 		}
+	}
+
+	public void PerformLayout()
+	{
+		performLayout();
+		_layout.Validate();
 	}
 
 	public void AddNewLine(float newLineSize = 0)
