@@ -1,6 +1,7 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Design.Shapes;
 using Azalea.Design.UserInterface;
+using Azalea.Design.UserInterface.Basic;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using System;
@@ -11,6 +12,7 @@ public class DefaultUserInputTest : TestScene
 {
 	private Composition _buttonComposition;
 	private Composition _childButtonComposition;
+	private BasicTextBox _textBox;
 
 	public DefaultUserInputTest()
 	{
@@ -82,6 +84,12 @@ public class DefaultUserInputTest : TestScene
 					Size = new(100, 100)
 				},
 			}
+		});
+
+		Add(_textBox = new BasicTextBox()
+		{
+			RelativePositionAxes = Axes.Both,
+			Position = new(0.5f, 0)
 		});
 	}
 

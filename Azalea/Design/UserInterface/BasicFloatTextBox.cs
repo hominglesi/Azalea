@@ -1,5 +1,5 @@
 ﻿namespace Azalea.Design.UserInterface;
-public class BasicFloatTextBox : BasicTextBox
+public class BasicFloatTextBox : BasicTextBoxOld
 {
 	public float DisplayedFloat
 	{

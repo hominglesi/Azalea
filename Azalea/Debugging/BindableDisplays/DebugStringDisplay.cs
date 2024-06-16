@@ -5,12 +5,12 @@ using Azalea.Graphics.Colors;
 namespace Azalea.Debugging.BindableDisplays;
 public class DebugStringDisplay : DebugBindableDisplay<string>
 {
-	private TextBox _textbox;
+	private TextBoxOld _textbox;
 
 	public DebugStringDisplay(object obj, string propertyName)
 		: base(obj, propertyName)
 	{
-		AddElement(_textbox = new BasicTextBox()
+		AddElement(_textbox = new BasicTextBoxOld()
 		{
 			RelativeSizeAxes = Axes.X,
 			Size = new(1, 24),

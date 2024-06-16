@@ -5,9 +5,9 @@ using System.Numerics;
 
 namespace Azalea.Design.UserInterface;
 
-public class BasicTextBox : TextBox
+public class BasicTextBoxOld : TextBoxOld
 {
-	public BasicTextBox()
+	public BasicTextBoxOld()
 	{
 		Width = 500;
 		Height = 30;
