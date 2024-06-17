@@ -1,4 +1,5 @@
-﻿using Azalea.Design.Containers;
+﻿using Azalea.Amends;
+using Azalea.Design.Containers;
 using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
@@ -8,12 +9,13 @@ using Azalea.Text;
 using System;
 using System.Collections.Generic;
 
-namespace Azalea.VisualTests;
+namespace Azalea.VisualTests.TextRendering;
 public class TextRenderingTest : TestScene
 {
 	private ItemBox _fontsItemBox;
 	private SpriteText _numTablesText;
 	private TextContainer _tablesContainer;
+	private GlyphDisplay _characterDisplay;
 
 	private List<string> _avalibleFonts = new();
 
@@ -38,6 +40,11 @@ public class TextRenderingTest : TestScene
 			Size = new(400, 700)
 		});
 
+		Add(_characterDisplay = new()
+		{
+			Position = new(650, 550)
+		});
+
 		_avalibleFonts = getAllAssetsInDirectory("Fonts/ttf/");
 		foreach (var file in _avalibleFonts)
 			_fontsItemBox.Add(file);
@@ -47,7 +54,7 @@ public class TextRenderingTest : TestScene
 	{
 		var fontStream = Assets.GetStream(font)!;
 
-		using FontReader reader = new(fontStream);
+		FontReader reader = new(fontStream);
 
 		reader.SkipBytes(4);
 		var numTables = reader.ReadUInt16();
@@ -57,15 +64,82 @@ public class TextRenderingTest : TestScene
 
 		_tablesContainer.Clear();
 
-		for (int i = 0; i < numTables; i++)
-		{
-			var tag = reader.ReadTag();
-			var checksum = reader.ReadUInt32();
-			var offset = reader.ReadUInt32();
-			var length = reader.ReadUInt32();
+		var tableOffsets = reader.ReadFontTableOffsets(numTables);
 
-			_tablesContainer.AddText($"Tag: {tag}, Offset: {offset} \n");
+		foreach (var table in tableOffsets)
+		{
+			_tablesContainer.AddText($"Tag: {table.Key}, Offset: {table.Value} \n");
 		}
+
+		reader.GoTo(tableOffsets["glyf"]);
+		_glyphLocations = getAllGlyphLocations(reader, tableOffsets);
+
+		var unitsPerEm = getUnitsPerEm(reader, tableOffsets);
+		_characterDisplay.GlyphScale = 450.0f / unitsPerEm;
+
+		_reader = reader;
+
+		RemoveAmends();
+		_nextGlyph = 0;
+		this.Loop(x => showNextGlyph(), 0.3f);
+	}
+
+	private FontReader _reader;
+	private uint[] _glyphLocations;
+	private int _nextGlyph = 0;
+
+	private void showNextGlyph()
+	{
+		_reader.GoTo(_glyphLocations[_nextGlyph]);
+		if (_reader.ReadInt16() > 0)
+		{
+			_reader.GoTo(_glyphLocations[_nextGlyph]);
+			var firstGlyph = _reader.ReadSimpleGlyph();
+			_characterDisplay.Display(firstGlyph);
+		}
+		else
+		{
+			_nextGlyph++;
+			if (_nextGlyph > _glyphLocations.Length)
+				_nextGlyph = 0;
+			showNextGlyph();
+		}
+
+		_nextGlyph++;
+		if (_nextGlyph > _glyphLocations.Length)
+			_nextGlyph = 0;
+	}
+
+	private uint[] getAllGlyphLocations(FontReader reader, Dictionary<string, uint> fontTable)
+	{
+		reader.GoTo(fontTable["maxp"] + 4);
+		int numGlyphs = reader.ReadUInt16();
+
+		reader.GoTo(fontTable["head"]);
+		reader.SkipBytes(50);
+
+		bool isTwoByteEntry = reader.ReadInt16() == 0;
+
+		uint locationTableStart = fontTable["loca"];
+		uint glyphTableStart = fontTable["glyf"];
+		uint[] allGlyphLocations = new uint[numGlyphs];
+
+		for (int i = 0; i < numGlyphs; i++)
+		{
+			reader.GoTo(locationTableStart + i * (isTwoByteEntry ? 2 : 4));
+			uint glyphDataOffset = isTwoByteEntry ? reader.ReadUInt16() * 2u : reader.ReadUInt32();
+			allGlyphLocations[i] = glyphTableStart + glyphDataOffset;
+		}
+
+		return allGlyphLocations;
+	}
+
+	private int getUnitsPerEm(FontReader reader, Dictionary<string, uint> fontTable)
+	{
+		reader.GoTo(fontTable["head"]);
+		reader.SkipBytes(18);
+
+		return reader.ReadUInt16();
 	}
 
 	private List<string> getAllAssetsInDirectory(string directory)

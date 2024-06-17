@@ -9,4 +9,6 @@ public static class BitwiseUtils
 		=> new(GetLowOrderValue(value), GetHighOrderValue(value));
 
 	public static bool GetSpecificBit(IntPtr value, int bitIndex) => ((int)value & (1 << bitIndex - 1)) != 0;
+
+	public static bool GetSpecificBit(byte value, int bitIndex) => ((value >> bitIndex) & 1) == 1;
 }
