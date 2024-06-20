@@ -25,7 +25,7 @@ public class GlyphDisplay : Composition
 	{
 		Clear();
 
-		for (int i = 0; i < glyph.IndexCount; i++)
+		for (int i = 0; i < glyph.Coordinates.Length; i++)
 		{
 			var position = (Vector2)glyph.Coordinates[i] * GlyphScale;
 

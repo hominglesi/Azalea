@@ -1,16 +1,23 @@
 ﻿namespace Azalea.Text;
+
+/// <summary>
+/// All the data representing a single text character glyph.
+/// </summary>
 public readonly struct Glyph
 {
-	public int IndexCount => Coordinates.Length;
-	public int[] ContourEndIndices { get; init; }
-	public Vector2Int[] Coordinates { get; init; }
+	/// <summary>
+	/// Coordinates of all the indices for this glyph.
+	/// </summary>
+	public Vector2Int[] Coordinates { get; }
 
-	public Glyph(int[] contourEndIndices, int[] xCoordinates, int[] yCoordinates)
+	/// <summary>
+	/// Array of all the indices that mark an end of a contour
+	/// </summary>
+	public int[] ContourEndIndices { get; }
+
+	public Glyph(Vector2Int[] coordinates, int[] contourEndIndices)
 	{
+		Coordinates = coordinates;
 		ContourEndIndices = contourEndIndices;
-
-		Coordinates = new Vector2Int[xCoordinates.Length];
-		for (int i = 0; i < xCoordinates.Length; i++)
-			Coordinates[i] = new Vector2Int(xCoordinates[i], yCoordinates[i]);
 	}
 }

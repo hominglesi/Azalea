@@ -1,6 +1,6 @@
 #Description
 
-Binary reader specialized for reading TTF files.
+Binary reader specialized for reading TTF files and creating a [[Font]] from them.
 
 TTF files are stored as big endian so when reading them the values need to be read in reverse. 
 
@@ -26,3 +26,9 @@ Reads a 4-byte unsigned integer from the current stream using big-endian encodin
 void **ReadTag**();
 
 Reads a 4 character string from the current stream and advances the position of the stream by 4 bytes.
+
+
+[[Font]] **ParseFont**();
+
+Parses all the data of a font file from the current stream
+

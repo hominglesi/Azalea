@@ -1,3 +1,5 @@
-Classes used for font parsing and text rendering
+Classes and structures used for font parsing and text rendering
 
+- [[Font]]
 - [[FontReader]]
+- [[Glyph]]

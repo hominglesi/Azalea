@@ -6,7 +6,7 @@ using System.IO;
 namespace Azalea.Text;
 
 /// <summary>
-/// Binary reader specialized for reading True Type Font (.ttf) files
+/// Binary reader specialized for reading True Type Font (.ttf) files and creating a <see cref="Font"/> file from them.
 /// </summary>
 public class FontReader : BinaryReader
 {
@@ -80,36 +80,97 @@ public class FontReader : BinaryReader
 		return tag.ToString();
 	}
 
-	public Dictionary<string, uint> ReadFontTableOffsets(int numberOfTables)
+	/// <summary>
+	/// Parses all the data of a font file from the current stream
+	/// </summary>
+	/// <returns>Font data from the current stream </returns>
+	public Font ParseFont()
 	{
-		var table = new Dictionary<string, uint>();
+		var fontTableOffsets = parseFontTableOffsets();
 
-		for (int i = 0; i < numberOfTables; i++)
-		{
-			var tag = ReadTag();
-			var checksum = ReadUInt32();
-			var offset = ReadUInt32();
-			var length = ReadUInt32();
-			table.Add(tag, offset);
-		}
+		var allGlyphs = parseAllGlyphs(fontTableOffsets);
+		var unitsPerEm = parseUnitsPerEm(fontTableOffsets);
 
-		return table;
+		return new Font(fontTableOffsets, allGlyphs, unitsPerEm);
 	}
 
-	public Glyph ReadSimpleGlyph()
+	private Dictionary<string, uint> parseFontTableOffsets()
 	{
-		var numberOfContours = ReadInt16();
+		GoTo(0); // Go to Font Directory
+		SkipBytes(4); // Skip skaler type value
+		var fontTableCount = ReadUInt16();
 
-		var xMin = ReadInt16();
-		var yMin = ReadInt16();
-		var xMax = ReadInt16();
-		var yMax = ReadInt16();
+		GoTo(12); // Go to Table Directory
+		var fontTableOffsets = new Dictionary<string, uint>();
+		for (int i = 0; i < fontTableCount; i++)
+		{
+			var name = ReadTag();
+			SkipBytes(4);
+			var offset = ReadUInt32();
+			SkipBytes(4);
+			fontTableOffsets[name] = offset;
+		}
 
-		int[] contourEndIndices = new int[numberOfContours];
+		return fontTableOffsets;
+	}
+
+	private uint[] parseAllGlyphLocations(Dictionary<string, uint> fontTableOffsets)
+	{
+		GoTo(fontTableOffsets["maxp"] + 4);
+		var glyphCount = ReadUInt16();
+
+		GoTo(fontTableOffsets["head"] + 50);
+		var isTwoBytes = ReadInt16() == 0;
+
+		var locaTableOffset = fontTableOffsets["loca"];
+		var glyfTableOffset = fontTableOffsets["glyf"];
+		var allGlyphLocations = new uint[glyphCount];
+		for (int i = 0; i < glyphCount; i++)
+		{
+			var glyphLocationOffset = i * (isTwoBytes ? 2 : 4);
+			GoTo(locaTableOffset + glyphLocationOffset);
+
+			var glyphOffset = isTwoBytes ? ReadUInt16() * 2u : ReadUInt32();
+			allGlyphLocations[i] = glyfTableOffset + glyphOffset;
+		}
+
+		return allGlyphLocations;
+	}
+
+	public Glyph[] parseAllGlyphs(Dictionary<string, uint> fontTableOffsets)
+	{
+		var allGlyphLocations = parseAllGlyphLocations(fontTableOffsets);
+
+		var glyphs = new Glyph[allGlyphLocations.Length];
+		for (int i = 0; i < allGlyphLocations.Length; i++)
+		{
+			GoTo(allGlyphLocations[i]);
+			var contourCount = ReadInt16();
+			var isSimple = contourCount > 0;
+
+			if (isSimple)
+				glyphs[i] = readSimpleGlyph(contourCount);
+		}
+
+		return glyphs;
+	}
+
+	private uint parseUnitsPerEm(Dictionary<string, uint> fontTableOffsets)
+	{
+		GoTo(fontTableOffsets["head"] + 18);
+		return ReadUInt16();
+	}
+
+	private Glyph readSimpleGlyph(int contourCount)
+	{
+		SkipBytes(8); // Skip glyph bounds
+
+		int[] contourEndIndices = new int[contourCount];
 		for (int i = 0; i < contourEndIndices.Length; i++)
 			contourEndIndices[i] = ReadUInt16();
 
-		SkipBytes(ReadUInt16()); // Skip Instructions
+		var instructionLength = ReadUInt16();
+		SkipBytes(instructionLength);
 
 		var indexCount = contourEndIndices[^1] + 1;
 		var flags = new byte[indexCount];
@@ -132,12 +193,15 @@ public class FontReader : BinaryReader
 		var coordsX = readCoordinates(flags, readingX: true);
 		var coordsY = readCoordinates(flags, readingX: false);
 
+		//Flip the glyph to align it with our coordinate space
 		for (int i = 0; i < coordsY.Length; i++)
-		{
 			coordsY[i] *= -1;
-		}
 
-		return new Glyph(contourEndIndices, coordsX, coordsY);
+		var coordinates = new Vector2Int[coordsX.Length];
+		for (int i = 0; i < coordinates.Length; i++)
+			coordinates[i] = new(coordsX[i], coordsY[i]);
+
+		return new Glyph(coordinates, contourEndIndices);
 	}
 
 	private int[] readCoordinates(byte[] flags, bool readingX)
@@ -151,7 +215,6 @@ public class FontReader : BinaryReader
 			// Coordinate starts at previous value
 			coordinates[i] = coordinates[Math.Max(0, i - 1)];
 			byte flag = flags[i];
-			bool onCurve = BitwiseUtils.GetSpecificBit(flag, 0);
 
 			// Offset value is represented with 1 byte (unsigned)
 			if (BitwiseUtils.GetSpecificBit(flag, offsetSizeFlagBit))

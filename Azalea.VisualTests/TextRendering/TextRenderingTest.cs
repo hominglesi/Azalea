@@ -50,96 +50,48 @@ public class TextRenderingTest : TestScene
 			_fontsItemBox.Add(file);
 	}
 
-	private void changeSelectedFont(string font)
+	private void changeSelectedFont(string fontPath)
 	{
-		var fontStream = Assets.GetStream(font)!;
+		var fontStream = Assets.GetStream(fontPath)!;
 
 		FontReader reader = new(fontStream);
 
-		reader.SkipBytes(4);
-		var numTables = reader.ReadUInt16();
-		reader.SkipBytes(6);
+		_font = reader.ParseFont();
 
-		_numTablesText.Text = "numTables: " + numTables;
+		_numTablesText.Text = "numTables: " + _font.FontTableOffsets.Count;
 
 		_tablesContainer.Clear();
 
-		var tableOffsets = reader.ReadFontTableOffsets(numTables);
-
-		foreach (var table in tableOffsets)
+		foreach (var table in _font.FontTableOffsets)
 		{
 			_tablesContainer.AddText($"Tag: {table.Key}, Offset: {table.Value} \n");
 		}
 
-		reader.GoTo(tableOffsets["glyf"]);
-		_glyphLocations = getAllGlyphLocations(reader, tableOffsets);
-
-		var unitsPerEm = getUnitsPerEm(reader, tableOffsets);
-		_characterDisplay.GlyphScale = 450.0f / unitsPerEm;
-
-		_reader = reader;
+		_characterDisplay.GlyphScale = 450.0f / _font.UnitsPerEm;
 
 		RemoveAmends();
-		_nextGlyph = 0;
+		_nextGlyph = -1;
 		this.Loop(x => showNextGlyph(), 0.3f);
 	}
 
-	private FontReader _reader;
-	private uint[] _glyphLocations;
-	private int _nextGlyph = 0;
+	private Font _font;
+	private int _nextGlyph = -1;
 
 	private void showNextGlyph()
 	{
-		_reader.GoTo(_glyphLocations[_nextGlyph]);
-		if (_reader.ReadInt16() > 0)
-		{
-			_reader.GoTo(_glyphLocations[_nextGlyph]);
-			var firstGlyph = _reader.ReadSimpleGlyph();
-			_characterDisplay.Display(firstGlyph);
-		}
-		else
+		Glyph nextGlyph;
+
+		do
 		{
 			_nextGlyph++;
-			if (_nextGlyph > _glyphLocations.Length)
+			if (_nextGlyph > _font.Glyphs.Length)
 				_nextGlyph = 0;
-			showNextGlyph();
+
+			nextGlyph = _font.Glyphs[_nextGlyph];
 		}
+		while (nextGlyph.Coordinates == null);
 
-		_nextGlyph++;
-		if (_nextGlyph > _glyphLocations.Length)
-			_nextGlyph = 0;
-	}
-
-	private uint[] getAllGlyphLocations(FontReader reader, Dictionary<string, uint> fontTable)
-	{
-		reader.GoTo(fontTable["maxp"] + 4);
-		int numGlyphs = reader.ReadUInt16();
-
-		reader.GoTo(fontTable["head"]);
-		reader.SkipBytes(50);
-
-		bool isTwoByteEntry = reader.ReadInt16() == 0;
-
-		uint locationTableStart = fontTable["loca"];
-		uint glyphTableStart = fontTable["glyf"];
-		uint[] allGlyphLocations = new uint[numGlyphs];
-
-		for (int i = 0; i < numGlyphs; i++)
-		{
-			reader.GoTo(locationTableStart + i * (isTwoByteEntry ? 2 : 4));
-			uint glyphDataOffset = isTwoByteEntry ? reader.ReadUInt16() * 2u : reader.ReadUInt32();
-			allGlyphLocations[i] = glyphTableStart + glyphDataOffset;
-		}
-
-		return allGlyphLocations;
-	}
-
-	private int getUnitsPerEm(FontReader reader, Dictionary<string, uint> fontTable)
-	{
-		reader.GoTo(fontTable["head"]);
-		reader.SkipBytes(18);
-
-		return reader.ReadUInt16();
+		_characterDisplay.Display(nextGlyph);
 	}
 
 	private List<string> getAllAssetsInDirectory(string directory)
