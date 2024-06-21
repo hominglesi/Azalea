@@ -2,6 +2,7 @@
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
+using System;
 using System.Numerics;
 
 namespace Azalea.Design.UserInterface;
@@ -9,7 +10,8 @@ public abstract class TextBox : TextContainer
 {
 	private string _text = "";
 	private int _caratPosition = 0;
-	public TextBox()
+	public TextBox(Action<SpriteText>? defaultCreationParameters = null)
+		: base(defaultCreationParameters)
 	{
 		Input.OnTextInput += onTextInput;
 	}
