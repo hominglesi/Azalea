@@ -13,8 +13,7 @@ namespace Azalea.VisualTests.TextRendering;
 public class TextRenderingTest : TestScene
 {
 	private ItemBox _fontsItemBox;
-	private SpriteText _numTablesText;
-	private TextContainer _tablesContainer;
+	private FontInfoDisplay _fontInfoDisplay;
 	private GlyphDisplay _characterDisplay;
 
 	private List<string> _avalibleFonts = new();
@@ -23,21 +22,16 @@ public class TextRenderingTest : TestScene
 	{
 		Add(_fontsItemBox = new()
 		{
-			RelativeSizeAxes = Axes.Y,
-			Size = new(400, 1),
+			Size = new(300, 150),
 			BackgroundColor = Palette.Beige
 		});
 		_fontsItemBox.OnSelectedChanged += i => changeSelectedFont(_avalibleFonts[i]);
 
-		Add(_numTablesText = new()
+		Add(_fontInfoDisplay = new()
 		{
-			Position = new(420, 0)
-		});
-
-		Add(_tablesContainer = new()
-		{
-			Position = new(420, 30),
-			Size = new(400, 700)
+			Y = 160,
+			Size = new(300, 500),
+			BackgroundColor = Palette.Beige
 		});
 
 		Add(_characterDisplay = new()
@@ -57,15 +51,7 @@ public class TextRenderingTest : TestScene
 		FontReader reader = new(fontStream);
 
 		_font = reader.ParseFont();
-
-		_numTablesText.Text = "numTables: " + _font.FontTableOffsets.Count;
-
-		_tablesContainer.Clear();
-
-		foreach (var table in _font.FontTableOffsets)
-		{
-			_tablesContainer.AddText($"Tag: {table.Key}, Offset: {table.Value} \n");
-		}
+		_fontInfoDisplay.Display(_font);
 
 		_characterDisplay.GlyphScale = 450.0f / _font.UnitsPerEm;
 
