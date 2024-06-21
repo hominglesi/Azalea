@@ -12,7 +12,7 @@ public class BasicDockingContainer : DockingContainer
 	public Box NavigationBackground { get; }
 	public Box ContentBackground { get; }
 	public HollowBox ContentBorder { get; }
-	private FlexContainer _navigationContainer;
+	public FlexContainer NavigationContainer { get; }
 
 	private float _navigationHeight = 24;
 	public float NavigationHeight
@@ -51,7 +51,7 @@ public class BasicDockingContainer : DockingContainer
 			Depth = 1000
 		});
 
-		AddInternal(_navigationContainer = new FlexContainer());
+		AddInternal(NavigationContainer = new FlexContainer());
 
 		AddInternal(ContentBackground = new Box()
 		{
@@ -80,7 +80,7 @@ public class BasicDockingContainer : DockingContainer
 
 	protected override void UpdateDockablesNavigation()
 	{
-		_navigationContainer.Clear();
+		NavigationContainer.Clear();
 
 		foreach (var dockable in Dockables)
 		{
@@ -88,7 +88,7 @@ public class BasicDockingContainer : DockingContainer
 
 			navigationTab.ClickAction = _ => FocusDockable(dockable);
 
-			_navigationContainer.Add(navigationTab);
+			NavigationContainer.Add(navigationTab);
 		}
 	}
 
@@ -111,8 +111,8 @@ public class BasicDockingContainer : DockingContainer
 
 	protected override void UpdateContentLayout()
 	{
-		NavigationBackground.Position = _navigationContainer.Position = Vector2.Zero;
-		NavigationBackground.Size = _navigationContainer.Size = new Vector2(DrawWidth, _navigationHeight);
+		NavigationBackground.Position = NavigationContainer.Position = Vector2.Zero;
+		NavigationBackground.Size = NavigationContainer.Size = new Vector2(DrawWidth, _navigationHeight);
 
 		ContentBackground.Position = ContentComposition.Position
 			= ContentBorder.Position = new Vector2(0, _navigationHeight);
