@@ -20,14 +20,25 @@ public abstract class DockingContainer : ContentContainer
 			FocusDockable(dockable);
 	}
 
+	public void ClearDockables()
+	{
+		Dockables.Clear();
+
+		UpdateDockablesNavigation();
+
+		FocusDockable(null);
+	}
+
 	protected abstract void UpdateDockablesNavigation();
 
-	protected void FocusDockable(Dockable dockable)
+	protected void FocusDockable(Dockable? dockable)
 	{
 		if (dockable == FocusedDockable) return;
 
 		ContentComposition.ClearInternal();
-		ContentComposition.AddInternal(dockable.Content);
+
+		if (dockable is not null)
+			ContentComposition.AddInternal(dockable.Content);
 
 		FocusedDockable = dockable;
 
