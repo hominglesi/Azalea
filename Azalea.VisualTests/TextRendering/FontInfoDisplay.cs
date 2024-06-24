@@ -1,6 +1,5 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
-using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Text;
 
@@ -12,21 +11,9 @@ public class FontInfoDisplay : Composition
 	private SpriteText _unitsPerEmText;
 	public FontInfoDisplay()
 	{
-		Add(new SpriteText()
-		{
-			Anchor = Anchor.TopCenter,
-			Origin = Anchor.TopCenter,
-			Y = 10,
-			Text = "Font Description",
-			Color = Palette.Black,
-			Font = FontUsage.Default.With(size: 24)
-		});
-
 		Add(new FlexContainer()
 		{
-			Position = new(10, 50),
 			Direction = FlexDirection.Vertical,
-			Color = Palette.Black,
 			Children = new GameObject[]
 			{
 				_tableCountText = new SpriteText(),

@@ -1,5 +1,6 @@
 ﻿using Azalea.Amends;
 using Azalea.Design.Containers;
+using Azalea.Design.Docking;
 using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
@@ -18,25 +19,35 @@ public class TextRenderingTest : TestScene
 
 	private List<string> _avalibleFonts = new();
 
+	private DockingContainer _leftDocker;
+	private DockingContainer _rightDocker;
+
 	public TextRenderingTest()
 	{
-		Add(_fontsItemBox = new()
+		Add(_leftDocker = new BasicDockingContainer()
 		{
-			Size = new(300, 150),
-			BackgroundColor = Palette.Beige
+			Origin = Anchor.BottomLeft,
+			Anchor = Anchor.BottomLeft,
+			Size = new(300, 200)
 		});
+
+		Add(_rightDocker = new BasicDockingContainer()
+		{
+			Origin = Anchor.TopRight,
+			Anchor = Anchor.TopRight,
+			RelativeSizeAxes = Axes.Y,
+			Size = new(300, 1),
+			ContentPadding = new(20)
+		});
+
+		_leftDocker.AddDockable("Fonts", _fontsItemBox = new() { RelativeSizeAxes = Axes.Both });
 		_fontsItemBox.OnSelectedChanged += i => changeSelectedFont(_avalibleFonts[i]);
 
-		Add(_fontInfoDisplay = new()
-		{
-			Y = 160,
-			Size = new(300, 500),
-			BackgroundColor = Palette.Beige
-		});
+		_rightDocker.AddDockable("Font Info", _fontInfoDisplay = new());
 
 		Add(_characterDisplay = new()
 		{
-			Position = new(650, 550)
+			Position = new(500, 500)
 		});
 
 		_avalibleFonts = getAllAssetsInDirectory("Fonts/ttf/");
@@ -149,13 +160,12 @@ public class TextRenderingTest : TestScene
 				Add(_highlightBackground = new Box()
 				{
 					RelativeSizeAxes = Axes.Both,
-					Color = Palette.Orange,
+					Color = Palette.Black,
 					Alpha = 0
 				});
 				Add(new SpriteText()
 				{
 					X = 10,
-					Color = Palette.Black,
 					Text = text,
 				});
 			}
