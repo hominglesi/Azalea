@@ -1,7 +1,9 @@
 ﻿using Azalea.Amends;
 using Azalea.Design.Shapes;
 using Azalea.Graphics.Colors;
+using Azalea.Graphics.Sprites;
 using Azalea.Inputs.Events;
+using System;
 using System.Numerics;
 
 namespace Azalea.Design.UserInterface.Basic;
@@ -9,7 +11,8 @@ public class BasicTextBox : TextBox
 {
 	private Box _carat;
 
-	public BasicTextBox()
+	public BasicTextBox(Action<SpriteText>? defaultCreationParameters = null)
+		: base(defaultCreationParameters)
 	{
 		Size = new(500, 300);
 		BorderColor = Palette.Black;

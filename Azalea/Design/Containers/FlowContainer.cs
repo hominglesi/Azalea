@@ -70,7 +70,7 @@ public abstract class FlowContainer : Composition
 
 	private void performLayout()
 	{
-		if (Children.Any() == false)
+		if (FlexChildren.Any() == false)
 			return;
 
 		using var positionEnumerator = ComputeLayoutPositions().GetEnumerator();
