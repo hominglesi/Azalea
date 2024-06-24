@@ -14,6 +14,10 @@ public class Sprite : GameObject
 		get => _texture;
 		set
 		{
+			//Edge case where size would stay 0 even though we set a valid texture
+			if (value == Assets.MissingTexture && Size == Vector2.Zero)
+				Size = Assets.MissingTexture.Size;
+
 			if (_texture == value) return;
 			_texture = value;
 			_time = 0;
