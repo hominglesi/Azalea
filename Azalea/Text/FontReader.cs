@@ -137,6 +137,51 @@ public class FontReader : BinaryReader
 		return allGlyphLocations;
 	}
 
+	private Dictionary<uint, uint> parseUnicodeToGlyphMappings(Dictionary<string, uint> fontTableOffsets)
+	{
+		var mappings = new Dictionary<uint, uint>();
+		uint cmapTableOffset = fontTableOffsets["cmap"];
+		GoTo(cmapTableOffset + 2);
+
+		var subtableCount = ReadUInt16();
+
+		var cmapSubtableOffset = uint.MaxValue;
+		for (int i = 0; i < subtableCount; i++)
+		{
+			var platformID = ReadUInt16();
+			var platformSpecificID = ReadUInt16();
+			var offset = ReadUInt32();
+
+			// Platform ID 0 is Unicode
+			if (platformID == 0)
+			{
+				if (platformSpecificID == 4)
+					cmapSubtableOffset = offset;
+
+				if (platformSpecificID == 3 && cmapSubtableOffset == uint.MaxValue)
+					cmapSubtableOffset = offset;
+			}
+		}
+
+		if (cmapSubtableOffset == uint.MaxValue)
+			throw new Exception("Font doesn't have a supported Unicode subtable");
+
+		GoTo(cmapTableOffset + cmapSubtableOffset);
+
+		var format = ReadUInt16();
+
+		if (format == 4)
+		{
+
+		}
+		else if (format == 12)
+		{
+
+		}
+		else
+			throw new Exception("Font subtable version is not supported");
+	}
+
 	public Glyph[] parseAllGlyphs(Dictionary<string, uint> fontTableOffsets)
 	{
 		var allGlyphLocations = parseAllGlyphLocations(fontTableOffsets);

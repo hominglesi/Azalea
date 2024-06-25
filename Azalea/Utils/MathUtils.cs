@@ -47,4 +47,14 @@ public static class MathUtils
 
 	public static float DistanceBetween(Vector2 startPositon, Vector2 endPositon)
 		=> MathF.Sqrt(MathF.Pow(endPositon.X - startPositon.X, 2) + MathF.Pow(endPositon.Y - startPositon.Y, 2));
+
+	public static Vector2 InterpolateLinear(Vector2 startPosition, Vector2 endPosition, float time)
+		=> startPosition + (endPosition - startPosition) * time;
+
+	public static Vector2 InterpolateBezier(Vector2 startPosition, Vector2 middlePoint, Vector2 endPoint, float time)
+	{
+		var intermediateA = InterpolateLinear(startPosition, middlePoint, time);
+		var intermediateB = InterpolateLinear(middlePoint, endPoint, time);
+		return InterpolateLinear(intermediateA, intermediateB, time);
+	}
 }

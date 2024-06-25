@@ -26,9 +26,8 @@ public class TextRenderingTest : TestScene
 	{
 		Add(_leftDocker = new BasicDockingContainer()
 		{
-			Origin = Anchor.BottomLeft,
-			Anchor = Anchor.BottomLeft,
-			Size = new(300, 200)
+			RelativeSizeAxes = Axes.Y,
+			Size = new(300, 1)
 		});
 
 		Add(_rightDocker = new BasicDockingContainer()

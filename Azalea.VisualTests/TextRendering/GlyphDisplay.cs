@@ -3,6 +3,7 @@ using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Text;
+using Azalea.Utils;
 using System;
 using System.Numerics;
 
@@ -44,16 +45,32 @@ public class GlyphDisplay : Composition
 			int contourIndexCount = contourEndIndex - contourStartIndex + 1;
 			Span<Vector2Int> coords = glyph.Coordinates.AsSpan(contourStartIndex, contourIndexCount);
 
-			for (int i = 0; i < coords.Length; i++)
+			for (int i = 0; i < coords.Length; i += 2)
 			{
-				Add(new Line()
-				{
-					StartPoint = (Vector2)coords[i] * GlyphScale + Position,
-					EndPoint = (Vector2)coords[(i + 1) % coords.Length] * GlyphScale + Position
-				});
+				var c0 = (Vector2)coords[i] * GlyphScale;
+				var c1 = (Vector2)coords[(i + 1) % coords.Length] * GlyphScale;
+				var c2 = (Vector2)coords[(i + 2) % coords.Length] * GlyphScale;
+				addBezier(c0, c1, c2, 10);
 			}
 
 			contourStartIndex = contourEndIndex + 1;
+		}
+	}
+
+	private void addBezier(Vector2 p0, Vector2 p1, Vector2 p2, int resolution)
+	{
+		Vector2 prevPointOnCurve = p0;
+
+		for (int i = 0; i < resolution; i++)
+		{
+			float t = (i + 1f) / resolution;
+			Vector2 nextPointOnCurve = MathUtils.InterpolateBezier(p0, p1, p2, t);
+			Add(new Line()
+			{
+				StartPoint = prevPointOnCurve + Position,
+				EndPoint = nextPointOnCurve + Position
+			});
+			prevPointOnCurve = nextPointOnCurve;
 		}
 	}
 }
