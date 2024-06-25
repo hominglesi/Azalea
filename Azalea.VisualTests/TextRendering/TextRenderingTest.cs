@@ -1,10 +1,10 @@
-﻿using Azalea.Amends;
-using Azalea.Design.Containers;
+﻿using Azalea.Design.Containers;
 using Azalea.Design.Docking;
 using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
+using Azalea.Inputs;
 using Azalea.IO.Resources;
 using Azalea.Text;
 using System;
@@ -24,6 +24,8 @@ public class TextRenderingTest : TestScene
 
 	public TextRenderingTest()
 	{
+		Input.OnTextInput += onTextInput;
+
 		Add(_leftDocker = new BasicDockingContainer()
 		{
 			RelativeSizeAxes = Axes.Y,
@@ -64,30 +66,17 @@ public class TextRenderingTest : TestScene
 		_fontInfoDisplay.Display(_font);
 
 		_characterDisplay.GlyphScale = 450.0f / _font.UnitsPerEm;
-
-		RemoveAmends();
-		_nextGlyph = -1;
-		this.Loop(x => showNextGlyph(), 0.3f);
 	}
 
 	private Font _font;
-	private int _nextGlyph = -1;
 
-	private void showNextGlyph()
+	private void onTextInput(char character)
 	{
-		Glyph nextGlyph;
-
-		do
+		try
 		{
-			_nextGlyph++;
-			if (_nextGlyph > _font.Glyphs.Length)
-				_nextGlyph = 0;
-
-			nextGlyph = _font.Glyphs[_nextGlyph];
+			_characterDisplay.Display(_font.GetGlyph(character));
 		}
-		while (nextGlyph.Coordinates == null);
-
-		_characterDisplay.Display(nextGlyph);
+		catch (Exception) { };
 	}
 
 	private List<string> getAllAssetsInDirectory(string directory)

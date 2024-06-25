@@ -17,14 +17,13 @@ public class FontReader : BinaryReader
 	/// Seeks forward by the specified amount of bytes
 	/// </summary>
 	/// <param name="bytes">Specifies the number of bytes to skip</param>
-	public void SkipBytes(uint bytes)
-		=> BaseStream.Position += bytes;
+	public void SkipBytes(uint bytes) => BaseStream.Position += bytes;
 
-	public void GoTo(uint bytes)
-		=> BaseStream.Position = bytes;
+	public void GoTo(uint bytes) => BaseStream.Position = bytes;
 
-	public void GoTo(long bytes)
-		=> BaseStream.Position = bytes;
+	public void GoTo(long bytes) => BaseStream.Position = bytes;
+
+	public uint GetLocation() => (uint)BaseStream.Position;
 
 	/// <summary>
 	/// Reads a 2-byte unsigned integer from the current stream using big-endian encoding 
@@ -88,7 +87,9 @@ public class FontReader : BinaryReader
 	{
 		var fontTableOffsets = parseFontTableOffsets();
 
-		var allGlyphs = parseAllGlyphs(fontTableOffsets);
+		var unicodeToGlyphMappings = parseUnicodeToGlyphMappings(fontTableOffsets);
+		var glyphLocations = parseAllGlyphLocations(fontTableOffsets);
+		var allGlyphs = parseAllGlyphs(glyphLocations, unicodeToGlyphMappings);
 		var unitsPerEm = parseUnitsPerEm(fontTableOffsets);
 
 		return new Font(fontTableOffsets, allGlyphs, unitsPerEm);
@@ -137,9 +138,9 @@ public class FontReader : BinaryReader
 		return allGlyphLocations;
 	}
 
-	private Dictionary<uint, uint> parseUnicodeToGlyphMappings(Dictionary<string, uint> fontTableOffsets)
+	private (uint, uint)[] parseUnicodeToGlyphMappings(Dictionary<string, uint> fontTableOffsets)
 	{
-		var mappings = new Dictionary<uint, uint>();
+		var mappings = new List<(uint, uint)>();
 		uint cmapTableOffset = fontTableOffsets["cmap"];
 		GoTo(cmapTableOffset + 2);
 
@@ -172,29 +173,110 @@ public class FontReader : BinaryReader
 
 		if (format == 4)
 		{
+			SkipBytes(4); // Skip byteLength and languageCode
 
+			var segmentCountX2 = ReadUInt16();
+			var segmentCount = segmentCountX2 / 2;
+
+			SkipBytes(6); // Skip searchRange, entrySelector, and rangeShift
+
+			var endCodes = new int[segmentCount];
+			for (int i = 0; i < segmentCount; i++)
+				endCodes[i] = ReadUInt16();
+
+			SkipBytes(2); // Skip reserved
+
+			var startCodes = new int[segmentCount];
+			for (int i = 0; i < segmentCount; i++)
+				startCodes[i] = ReadUInt16();
+
+			var idDeltas = new int[segmentCount];
+			for (int i = 0; i < segmentCount; i++)
+				idDeltas[i] = ReadUInt16();
+
+			(int offset, int readLocation)[] idRangeOffsets = new (int, int)[segmentCount];
+			for (int i = 0; i < segmentCount; i++)
+			{
+				var readLocation = (int)GetLocation();
+				var offset = ReadUInt16();
+				idRangeOffsets[i] = (offset, readLocation);
+			}
+
+			for (int i = 0; i < segmentCount; i++)
+			{
+				var endCode = endCodes[i];
+				var currentCode = startCodes[i];
+
+				while (currentCode <= endCode)
+				{
+					int glyphIndex = 0;
+
+					if (idRangeOffsets[i].offset == 0)
+					{
+						glyphIndex = (currentCode + idDeltas[i]) % 65536;
+					}
+					else
+					{
+						var rangeOffsetLocation = idRangeOffsets[i].readLocation + idRangeOffsets[i].offset;
+						var glyphIndexArrayLocation = 2 * (currentCode - startCodes[i]) + rangeOffsetLocation;
+
+						var readerLocationOld = GetLocation();
+						GoTo(glyphIndexArrayLocation);
+						var glyphIndexOffset = ReadUInt16();
+						GoTo(readerLocationOld);
+
+						if (glyphIndexOffset != 0)
+							glyphIndex = (glyphIndexOffset + idDeltas[i]) % 65536;
+					}
+
+					mappings.Add(((uint)glyphIndex, (uint)currentCode));
+					currentCode++;
+				}
+			}
 		}
 		else if (format == 12)
 		{
+			SkipBytes(10); // Skip reserved, byteLength, and languageCode
+			var groupsCount = ReadUInt32();
 
+			for (int i = 0; i < groupsCount; i++)
+			{
+				var startCharCode = ReadUInt32();
+				var endCharCode = ReadUInt32();
+				var startGlyphIndex = ReadUInt32();
+
+				var charCount = endCharCode - startCharCode + 1;
+				for (int charCodeOffset = 0; charCodeOffset < charCount; charCodeOffset++)
+				{
+					uint charCode = (uint)(startCharCode + charCodeOffset);
+					uint glyphIndex = (uint)(startGlyphIndex + charCodeOffset);
+
+					mappings.Add((glyphIndex, charCode));
+				}
+			}
 		}
 		else
 			throw new Exception("Font subtable version is not supported");
+
+		return mappings.ToArray();
 	}
 
-	public Glyph[] parseAllGlyphs(Dictionary<string, uint> fontTableOffsets)
+	public Glyph[] parseAllGlyphs(uint[] glyphLocations, (uint, uint)[] unicodeMappings)
 	{
-		var allGlyphLocations = parseAllGlyphLocations(fontTableOffsets);
-
-		var glyphs = new Glyph[allGlyphLocations.Length];
-		for (int i = 0; i < allGlyphLocations.Length; i++)
+		var glyphs = new Glyph[unicodeMappings.Length];
+		for (int i = 0; i < glyphs.Length; i++)
 		{
-			GoTo(allGlyphLocations[i]);
+			GoTo(glyphLocations[unicodeMappings[i].Item1]);
 			var contourCount = ReadInt16();
 			var isSimple = contourCount > 0;
 
+			Glyph glyph = new();
+
 			if (isSimple)
-				glyphs[i] = readSimpleGlyph(contourCount);
+				glyph = readSimpleGlyph(contourCount);
+
+			glyph.Unicode = unicodeMappings[i].Item2;
+			glyphs[i] = glyph;
 		}
 
 		return glyphs;

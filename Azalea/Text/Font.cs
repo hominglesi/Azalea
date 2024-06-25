@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Azalea.Text;
 public class Font
@@ -15,10 +16,28 @@ public class Font
 
 	public uint UnitsPerEm { get; }
 
+	private Dictionary<uint, Glyph> _glyphTable;
+
 	public Font(Dictionary<string, uint> fontTableOffsets, Glyph[] glyphs, uint unitsPerEm)
 	{
 		FontTableOffsets = fontTableOffsets;
 		Glyphs = glyphs;
 		UnitsPerEm = unitsPerEm;
+
+		_glyphTable = new();
+
+		foreach (Glyph g in glyphs)
+		{
+			if (g.Coordinates == null) continue;
+			_glyphTable.Add(g.Unicode, g);
+		}
+	}
+
+	public Glyph GetGlyph(uint unicode)
+	{
+		if (_glyphTable.ContainsKey(unicode) == false)
+			throw new Exception("No glyph found in font");
+
+		return _glyphTable[unicode];
 	}
 }

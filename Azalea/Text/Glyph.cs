@@ -3,7 +3,7 @@
 /// <summary>
 /// All the data representing a single text character glyph.
 /// </summary>
-public readonly struct Glyph
+public struct Glyph
 {
 	/// <summary>
 	/// Coordinates of all the indices for this glyph.
@@ -15,9 +15,12 @@ public readonly struct Glyph
 	/// </summary>
 	public int[] ContourEndIndices { get; }
 
+	public uint Unicode { get; set; }
+
 	public Glyph(Vector2Int[] coordinates, int[] contourEndIndices)
 	{
 		Coordinates = coordinates;
 		ContourEndIndices = contourEndIndices;
+		Unicode = 0;
 	}
 }
