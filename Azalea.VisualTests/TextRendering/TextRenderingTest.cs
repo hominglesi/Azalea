@@ -4,7 +4,6 @@ using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
-using Azalea.Inputs;
 using Azalea.IO.Resources;
 using Azalea.Text;
 using System;
@@ -15,7 +14,7 @@ public class TextRenderingTest : TestScene
 {
 	private ItemBox _fontsItemBox;
 	private FontInfoDisplay _fontInfoDisplay;
-	private GlyphDisplay _characterDisplay;
+	private StringGlyphDisplay _stringDisplay;
 
 	private List<string> _avalibleFonts = new();
 
@@ -24,7 +23,6 @@ public class TextRenderingTest : TestScene
 
 	public TextRenderingTest()
 	{
-		Input.OnTextInput += onTextInput;
 
 		Add(_leftDocker = new BasicDockingContainer()
 		{
@@ -46,9 +44,10 @@ public class TextRenderingTest : TestScene
 
 		_rightDocker.AddDockable("Font Info", _fontInfoDisplay = new());
 
-		Add(_characterDisplay = new()
+		Add(_stringDisplay = new()
 		{
-			Position = new(500, 500)
+			Position = new(300, 500),
+			Text = "Ide Gas"
 		});
 
 		_avalibleFonts = getAllAssetsInDirectory("Fonts/ttf/");
@@ -60,23 +59,12 @@ public class TextRenderingTest : TestScene
 	{
 		var fontStream = Assets.GetStream(fontPath)!;
 
-		FontReader reader = new(fontStream);
+		var font = FontParser.Parse(fontStream);
 
-		_font = reader.ParseFont();
-		_fontInfoDisplay.Display(_font);
+		_fontInfoDisplay.Display(font);
 
-		_characterDisplay.GlyphScale = 450.0f / _font.UnitsPerEm;
-	}
-
-	private Font _font;
-
-	private void onTextInput(char character)
-	{
-		try
-		{
-			_characterDisplay.Display(_font.GetGlyph(character));
-		}
-		catch (Exception) { };
+		_stringDisplay.Font = font;
+		_stringDisplay.GlyphScale = 300.0f / font.UnitsPerEm;
 	}
 
 	private List<string> getAllAssetsInDirectory(string directory)

@@ -22,8 +22,22 @@ public class GlyphDisplay : Composition
 		});
 	}
 
+	private Vector2 _lastPosition;
+
+	protected override void Update()
+	{
+		if (_lastPosition != Position)
+		{
+			Display(_glyph);
+			_lastPosition = Position;
+		}
+	}
+
+	private Glyph _glyph;
 	public void Display(Glyph glyph)
 	{
+		_glyph = glyph;
+
 		Clear();
 
 		for (int i = 0; i < glyph.Coordinates.Length; i++)
@@ -37,6 +51,12 @@ public class GlyphDisplay : Composition
 				Position = position
 			});
 		}
+
+		Add(new HollowBox()
+		{
+			Size = (Vector2)glyph.Size * GlyphScale,
+			Y = -glyph.Size.Y * GlyphScale
+		});
 
 		int contourStartIndex = 0;
 
@@ -65,11 +85,19 @@ public class GlyphDisplay : Composition
 		{
 			float t = (i + 1f) / resolution;
 			Vector2 nextPointOnCurve = MathUtils.InterpolateBezier(p0, p1, p2, t);
-			Add(new Line()
+			var line = new Line()
 			{
 				StartPoint = prevPointOnCurve + Position,
 				EndPoint = nextPointOnCurve + Position
-			});
+			};
+
+			if (Parent is not null)
+			{
+				line.StartPoint += Parent.Position;
+				line.EndPoint += Parent.Position;
+			}
+
+			Add(line);
 			prevPointOnCurve = nextPointOnCurve;
 		}
 	}

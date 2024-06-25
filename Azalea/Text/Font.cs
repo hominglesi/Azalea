@@ -4,39 +4,40 @@ using System.Collections.Generic;
 namespace Azalea.Text;
 public class Font
 {
-	/// <summary>
-	/// Dictionary of start offsets for all the different font tables in this font. 
-	/// </summary>
-	public Dictionary<string, uint> FontTableOffsets { get; }
-
-	/// <summary>
-	/// Array of all the glyphs contained in this font.
-	/// </summary>
 	public Glyph[] Glyphs { get; }
-
 	public uint UnitsPerEm { get; }
 
+	private Glyph _missingGlyph;
 	private Dictionary<uint, Glyph> _glyphTable;
 
-	public Font(Dictionary<string, uint> fontTableOffsets, Glyph[] glyphs, uint unitsPerEm)
+	public Font(Glyph[] glyphs, uint unitsPerEm)
 	{
-		FontTableOffsets = fontTableOffsets;
 		Glyphs = glyphs;
 		UnitsPerEm = unitsPerEm;
 
 		_glyphTable = new();
 
-		foreach (Glyph g in glyphs)
+		foreach (Glyph glyph in glyphs)
 		{
-			if (g.Coordinates == null) continue;
-			_glyphTable.Add(g.Unicode, g);
+			if (glyph.Coordinates == null) continue;
+
+			_glyphTable.Add(glyph.UnicodeValue, glyph);
+
+			if (glyph.GlyphIndex == 0)
+				_missingGlyph = glyph;
 		}
 	}
 
 	public Glyph GetGlyph(uint unicode)
 	{
 		if (_glyphTable.ContainsKey(unicode) == false)
-			throw new Exception("No glyph found in font");
+		{
+			if (_missingGlyph.Exists == false)
+				throw new Exception($"This font doesn't contain a glyph for unicode value {unicode} " +
+					$"and no fallback missing glyph");
+
+			return _missingGlyph;
+		}
 
 		return _glyphTable[unicode];
 	}

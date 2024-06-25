@@ -25,7 +25,6 @@ public class FontInfoDisplay : Composition
 
 	public void Display(Font font)
 	{
-		_tableCountText.Text = $"Font Tables: {font.FontTableOffsets.Count}";
 		_glyphCountText.Text = $"Glyph Count: {font.Glyphs.Length}";
 		_unitsPerEmText.Text = $"Units Per Em: {font.UnitsPerEm}";
 	}
