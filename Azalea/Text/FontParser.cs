@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using static Azalea.Text.Glyph;
 
 namespace Azalea.Text;
 
@@ -265,31 +266,33 @@ public static class FontParser
 			}
 		}
 
-		var coordsX = ReadGlyphCoordinates(reader, flags, readingX: true);
-		var coordsY = ReadGlyphCoordinates(reader, flags, readingX: false);
+		var (coordsX, onCurve) = ReadGlyphCoordinates(reader, flags, readingX: true);
+		var (coordsY, _) = ReadGlyphCoordinates(reader, flags, readingX: false);
 
 		//Flip the glyph to align it with our coordinate space
 		for (int i = 0; i < coordsY.Length; i++)
 			coordsY[i] *= -1;
 
-		var coordinates = new Vector2Int[coordsX.Length];
+		var coordinates = new GlyphPoint[coordsX.Length];
 		for (int i = 0; i < coordinates.Length; i++)
-			coordinates[i] = new(coordsX[i], coordsY[i]);
+			coordinates[i] = new GlyphPoint(coordsX[i], coordsY[i], onCurve[i]);
 
 		return new SimpleGlyph(coordinates, contourEndIndices, minCoordinates, maxCoordinates);
 	}
 
-	internal static int[] ReadGlyphCoordinates(FontReader reader, byte[] glyphFlags, bool readingX)
+	internal static (int[], bool[]) ReadGlyphCoordinates(FontReader reader, byte[] glyphFlags, bool readingX)
 	{
 		int offsetSizeFlagBit = readingX ? 1 : 2;
 		int offsetSignOrSkipBit = readingX ? 4 : 5;
 		int[] coordinates = new int[glyphFlags.Length];
+		bool[] onCurve = new bool[glyphFlags.Length];
 
 		for (int i = 0; i < coordinates.Length; i++)
 		{
 			// Coordinate starts at previous value
 			coordinates[i] = coordinates[Math.Max(0, i - 1)];
 			byte flag = glyphFlags[i];
+			onCurve[i] = BitwiseUtils.GetSpecificBit(flag, 0);
 
 			// Offset value is represented with 1 byte (unsigned)
 			if (BitwiseUtils.GetSpecificBit(flag, offsetSizeFlagBit))
@@ -305,7 +308,7 @@ public static class FontParser
 				coordinates[i] += reader.ReadInt16();
 		}
 
-		return coordinates;
+		return (coordinates, onCurve);
 	}
 
 	internal static uint ParseUnitsPerEm(FontReader reader, Dictionary<string, uint> tableOffsets)
@@ -332,12 +335,12 @@ public static class FontParser
 
 	internal readonly struct SimpleGlyph
 	{
-		public readonly Vector2Int[] Coordinates { get; }
+		public readonly GlyphPoint[] Coordinates { get; }
 		public readonly int[] ContourEndIndices { get; }
 		public readonly Vector2Int MinCoordinates { get; }
 		public readonly Vector2Int MaxCoordinates { get; }
 
-		public SimpleGlyph(Vector2Int[] coordinates, int[] contourEndIndices,
+		public SimpleGlyph(GlyphPoint[] coordinates, int[] contourEndIndices,
 			Vector2Int minCoordinates, Vector2Int maxCoordinates)
 		{
 			Coordinates = coordinates;

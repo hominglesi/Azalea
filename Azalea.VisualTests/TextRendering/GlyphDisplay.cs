@@ -4,7 +4,6 @@ using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Text;
 using Azalea.Utils;
-using System;
 using System.Numerics;
 
 namespace Azalea.VisualTests.TextRendering;
@@ -42,7 +41,7 @@ public class GlyphDisplay : Composition
 
 		for (int i = 0; i < glyph.Coordinates.Length; i++)
 		{
-			var position = (Vector2)glyph.Coordinates[i] * GlyphScale;
+			var position = glyph.Coordinates[i].Position * GlyphScale;
 
 			Add(new Box()
 			{
@@ -51,29 +50,23 @@ public class GlyphDisplay : Composition
 				Position = position
 			});
 		}
-
 		Add(new HollowBox()
 		{
 			Size = (Vector2)glyph.Size * GlyphScale,
 			Y = -glyph.Size.Y * GlyphScale
 		});
 
-		int contourStartIndex = 0;
+		var glyphContours = glyph.CreateContoursWithImpliedPoints(GlyphScale);
 
-		foreach (var contourEndIndex in glyph.ContourEndIndices)
+		foreach (var contour in glyphContours)
 		{
-			int contourIndexCount = contourEndIndex - contourStartIndex + 1;
-			Span<Vector2Int> coords = glyph.Coordinates.AsSpan(contourStartIndex, contourIndexCount);
-
-			for (int i = 0; i < coords.Length; i += 2)
+			for (int i = 0; i < contour.Length; i += 2)
 			{
-				var c0 = (Vector2)coords[i] * GlyphScale;
-				var c1 = (Vector2)coords[(i + 1) % coords.Length] * GlyphScale;
-				var c2 = (Vector2)coords[(i + 2) % coords.Length] * GlyphScale;
+				var c0 = contour[i];
+				var c1 = contour[(i + 1) % contour.Length];
+				var c2 = contour[(i + 2) % contour.Length];
 				addBezier(c0, c1, c2, 10);
 			}
-
-			contourStartIndex = contourEndIndex + 1;
 		}
 	}
 

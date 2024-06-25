@@ -32,6 +32,8 @@ public struct Vector2Int : IEquatable<Vector2Int>
 	public static Vector2Int operator +(Vector2Int left, Vector2Int right) => new(left.X + right.X, left.Y + right.Y);
 	public static Vector2Int operator -(Vector2Int left, Vector2Int right) => new(left.X - right.X, left.Y - right.Y);
 	public static Vector2Int operator *(Vector2Int left, Vector2Int right) => new(left.X * right.X, left.Y * right.Y);
+	public static Vector2Int operator *(Vector2Int left, int right) => new(left.X * right, left.Y * right);
+	public static Vector2 operator *(Vector2Int left, float right) => new(left.X * right, left.Y * right);
 	public static Vector2Int operator /(Vector2Int left, Vector2Int right) => new(left.X / right.X, left.Y / right.Y);
 	public static Vector2Int operator /(Vector2Int left, int right) => new(left.X / right, left.Y / right);
 

@@ -1,7 +1,6 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Design.Shapes;
 using Azalea.Text;
-using System;
 using System.Numerics;
 
 namespace Azalea.VisualTests.TextRendering;
@@ -67,8 +66,6 @@ public class StringGlyphDisplay : FlexContainer
 			}
 			else
 			{
-				if (chr == 'I')
-					Console.WriteLine();
 				var glyph = _font.GetGlyph(chr);
 
 				var display = new GlyphDisplay()
@@ -82,7 +79,6 @@ public class StringGlyphDisplay : FlexContainer
 
 				display.Display(glyph);
 			}
-
 		}
 	}
 }
