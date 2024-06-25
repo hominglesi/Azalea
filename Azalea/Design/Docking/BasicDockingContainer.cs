@@ -71,6 +71,8 @@ public class BasicDockingContainer : DockingContainer
 	private Boundary _lastBorderThickness = new(-1);
 	protected override void Update()
 	{
+		base.Update();
+
 		if (_lastBorderThickness != ContentBorder.Thickness)
 		{
 			UpdateContentLayout();
