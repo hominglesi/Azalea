@@ -265,7 +265,7 @@ public static class Input
 		propagateInputEvent(new KeyDownEvent(key, true));
 	}
 
-	internal static void HandleTextInput(char input)
+	public static void HandleTextInput(char input)
 	{
 		OnTextInput?.Invoke(input);
 	}

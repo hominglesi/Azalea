@@ -14,7 +14,7 @@ public class BasicTextBox : TextBox
 	public BasicTextBox(Action<SpriteText>? defaultCreationParameters = null)
 		: base(defaultCreationParameters)
 	{
-		Size = new(500, 300);
+		Size = new(500, 45);
 		BorderColor = Palette.Black;
 
 		AddInternal(_carat = new Box()
