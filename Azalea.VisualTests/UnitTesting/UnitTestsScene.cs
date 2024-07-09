@@ -35,7 +35,7 @@ public class UnitTestsScene : TestScene
 			Size = new(0.75f, 1)
 		});
 
-		selectUnitTest(_manager.UnitTests[0]);
+		selectUnitTest(_manager.UnitTests[1]);
 	}
 
 	private void selectUnitTest(UnitTest? unitTest)

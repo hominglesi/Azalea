@@ -248,7 +248,7 @@ public static class Input
 		return true;
 	}
 
-	public static void HandleKeyboardKeyStateChange(Keys key, bool pressed)
+	internal static void HandleKeyboardKeyStateChange(Keys key, bool pressed)
 	{
 		_keyboardKeys[(int)key].SetState(pressed);
 
@@ -265,7 +265,7 @@ public static class Input
 		propagateInputEvent(new KeyDownEvent(key, true));
 	}
 
-	public static void HandleTextInput(char input)
+	internal static void HandleTextInput(char input)
 	{
 		OnTextInput?.Invoke(input);
 	}

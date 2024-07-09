@@ -26,6 +26,8 @@ public class DebuggingOverlay : ContentContainer
 	private Composition _leftContainer;
 	private Composition _bottomContainer;
 
+	public DebugConsole DebugConsole { get; private set; }
+
 	public DebugInspector Inspector;
 	private DebugSceneGraph _sceneGraph;
 
@@ -66,6 +68,8 @@ public class DebuggingOverlay : ContentContainer
 		});
 
 		AddInternal(new ColliderDebug());
+
+		DebugConsole = new DebugConsole();
 	}
 
 	protected override void UpdateContentLayout()
@@ -167,6 +171,23 @@ public class DebuggingOverlay : ContentContainer
 		{
 			_debuggerExpanded = !_debuggerExpanded;
 			UpdateContentLayout();
+		}
+
+		if (e.Key == Keys.F9)
+		{
+			if (DebugConsole.Parent == null)
+			{
+				AddInternal(DebugConsole);
+				Input.ChangeFocus(DebugConsole);
+			}
+			else
+			{
+				if (DebugConsole.HasFocus)
+					Input.ChangeFocus(null);
+
+				RemoveInternal(DebugConsole);
+			}
+
 		}
 
 		return base.OnKeyDown(e);

@@ -7,7 +7,6 @@ public class DebugInspector : FlexContainer
 	private GameObject? _observedObject;
 
 	private DebugProperties _properties;
-	private DebugConsole _console;
 
 	public DebugInspector()
 	{
