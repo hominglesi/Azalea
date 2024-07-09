@@ -93,11 +93,14 @@ public class ScrollableContainer : ContentContainer
 	{
 		if (_scrollRange.X == 0 && _scrollRange.Y == 0)
 		{
-			ScrollBar.Alpha = 0;
+			if (ScrollBar.Parent == this)
+				RemoveInternal(ScrollBar);
 		}
 		else
 		{
-			ScrollBar.Alpha = 1;
+			if (ScrollBar.Parent == null)
+				AddInternal(ScrollBar);
+
 			ScrollBar.Head.Height = DrawSize.Y / ContentComposition.DrawSize.Y;
 		}
 	}
@@ -105,7 +108,7 @@ public class ScrollableContainer : ContentContainer
 	private void updateChildLayout()
 	{
 		ContentComposition.Width = DrawSize.X;
-		if (ScrollBar.Alpha > 0)
+		if (ScrollBar.Parent == this)
 			ContentComposition.Width -= ScrollBar.DrawWidth;
 	}
 
