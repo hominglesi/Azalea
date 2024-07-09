@@ -9,7 +9,7 @@
     <Version>1.5</Version>
     <Authors>hominglesi</Authors>
     <Company>Azalea</Company>
-    <Description>A 2D game engine.</Description>
+    <Description>A lightweight 2D game framework.</Description>
     <PackageIcon>azalea-icon.png</PackageIcon>
     <PackageIconUrl>https://i.imgur.com/UPsEzXU.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/hominglesi/Azalea</RepositoryUrl>

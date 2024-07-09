@@ -1,4 +1,4 @@
-![Azalea Icon](https://github.com/hominglesi/Azalea/assets/38411358/37e112d5-1b15-41c6-a27b-937e2e0e51aa)
+![Azalea Icon](https://raw.githubusercontent.com/hominglesi/Azalea/master/Azalea/Resources/Textures/azalea-icon.png)
 # Azalea
 A lightweight 2D game framework. 
 
