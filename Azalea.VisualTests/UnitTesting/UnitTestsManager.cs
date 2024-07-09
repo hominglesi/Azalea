@@ -1,22 +1,24 @@
 ﻿using Azalea.Utils;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace Azalea.VisualTests.UnitTesting;
 public class UnitTestsManager
 {
-	public List<UnitTest> UnitTests { get; init; } = new();
+	public List<UnitTestSuite> UnitTestSuites { get; init; } = new();
+
+	public UnitTestSuite SelectedSuite { get; private set; }
 
 	public UnitTestsManager()
 	{
-		var unitTests = ReflectionUtils.GetAllChildrenOf(typeof(UnitTest)).Where(x => x.IsAbstract == false).Select(x => x.FullName!).ToList()!;
-		foreach (var testName in unitTests)
+		var unitTests = ReflectionUtils.GetAllChildrenOf(typeof(UnitTestSuite)).Where(x => x.IsAbstract == false);
+		foreach (var testType in unitTests)
 		{
-			var test = Activator.CreateInstance(Assembly.GetAssembly(typeof(VisualTests))!.FullName!, testName!)!.Unwrap() as UnitTest;
-			test!.DisplayName = VisualTestUtils.GetTestDisplayName(testName);
-			UnitTests.Add(test!);
+			var test = ReflectionUtils.InstantiateType<UnitTestSuite>(testType);
+			test!.DisplayName = VisualTestUtils.GetTestDisplayName(testType.FullName!);
+			UnitTestSuites.Add(test!);
 		}
+
+		SelectedSuite = UnitTestSuites[1];
 	}
 }

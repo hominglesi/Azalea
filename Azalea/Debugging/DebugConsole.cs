@@ -79,6 +79,12 @@ public class DebugConsole : TextBox
 		_commands.Add(keyword, command);
 	}
 
+	public void RemoveCommand(string keyword)
+	{
+		if (_commands.ContainsKey(keyword))
+			_commands.Remove(keyword);
+	}
+
 	public void ExecuteQuery(string query)
 	{
 		var commandParameters = new CommandParameters(query);

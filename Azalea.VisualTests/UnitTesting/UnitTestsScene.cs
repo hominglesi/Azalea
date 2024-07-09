@@ -1,6 +1,5 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
-using System;
 
 namespace Azalea.VisualTests.UnitTesting;
 public class UnitTestsScene : TestScene
@@ -35,7 +34,7 @@ public class UnitTestsScene : TestScene
 			Size = new(0.75f, 1)
 		});
 
-		selectUnitTest(_manager.UnitTests[1]);
+		selectUnitTest(_manager.SelectedSuite.Tests[0]);
 	}
 
 	private void selectUnitTest(UnitTest? unitTest)
@@ -52,31 +51,4 @@ public class UnitTestsScene : TestScene
 
 	private void resetUnitTest()
 		=> selectUnitTest(_selectedTest);
-
-	private void runAllTests()
-	{
-		foreach (var test in _manager.UnitTests)
-		{
-			test.Setup(_testContainer);
-
-			foreach (var step in test.Steps)
-			{
-				if (step is TestStepOperation operation)
-					operation.Action.Invoke();
-
-				else if (step is TestStepResult result)
-				{
-					var testResult = result.Action.Invoke();
-					if (testResult == false)
-						Console.WriteLine($"Check in {test.DisplayName}: '{step.Name}' failed.");
-				}
-			}
-
-			test.TearDown(_testContainer);
-
-			Console.WriteLine($"All steps in {test.DisplayName} Test ran.");
-		}
-
-		resetUnitTest();
-	}
 }

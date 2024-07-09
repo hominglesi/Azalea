@@ -14,8 +14,8 @@ public class UnitTestsSidebar : ContentContainer
 {
 	private readonly static float __headerHeight = 70;
 
-	private readonly static float __stepHeight = 50;
-	private readonly static float __stepCheckboxPadding = 10;
+	private readonly static float __stepHeight = 35;
+	private readonly static float __stepCheckboxPadding = 5;
 	private readonly static Color __stepBackgroundColor = new(252, 191, 73);
 	private readonly static Color __stepDoneBackgroundColor = new(247, 127, 0);
 	private readonly static Color __stepTextColor = new(0, 48, 73);
