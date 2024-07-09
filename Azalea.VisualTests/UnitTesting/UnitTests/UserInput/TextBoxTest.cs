@@ -26,9 +26,9 @@ public class TextBoxTest : UnitTest
 			Input.HandleTextInput('s');
 		});
 
-		AddResult("Check if Text is 'Ide Gas'", () => _textBox.DisplayedText == "Ide Gas");
+		AddResult("Check if Text is 'Ide Gas'", () => _textBox.Text == "Ide Gas");
 		AddOperation("Clear Textbox", () => _textBox.Text = "");
-		AddResult("Check if Textbox is empty", () => _textBox.DisplayedText == "");
+		AddResult("Check if Textbox is empty", () => _textBox.Text == "");
 	}
 
 	public override void Setup(Composition scene)

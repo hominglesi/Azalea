@@ -8,7 +8,6 @@ using System.Numerics;
 namespace Azalea.Design.UserInterface;
 public abstract class TextBox : TextContainer
 {
-	private string _text = "";
 	private int _caratPosition = 0;
 	public TextBox(Action<SpriteText>? defaultCreationParameters = null)
 		: base(defaultCreationParameters)
@@ -16,7 +15,21 @@ public abstract class TextBox : TextContainer
 		Input.OnTextInput += onTextInput;
 	}
 
-	public string DisplayedText => _text;
+	private string _text = "";
+
+	public new string Text
+	{
+		get => _text;
+		set
+		{
+			if (value == _text) return;
+
+			_text = value;
+
+			updateText(_text);
+		}
+	}
+
 	public override bool AcceptsFocus => true;
 
 	#region Input
@@ -93,7 +106,10 @@ public abstract class TextBox : TextContainer
 	private void updateText(string newText)
 	{
 		_text = newText;
-		Text = _text;
+		base.Text = _text;
+
+		if (_caratPosition > _text.Length)
+			_caratPosition = _text.Length;
 
 		PerformLayout();
 

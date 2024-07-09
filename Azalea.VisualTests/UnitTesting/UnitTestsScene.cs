@@ -1,7 +1,6 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
 using System;
-using System.Linq;
 
 namespace Azalea.VisualTests.UnitTesting;
 public class UnitTestsScene : TestScene
@@ -10,7 +9,7 @@ public class UnitTestsScene : TestScene
 	private UnitTestsSidebar _sidebar;
 	private Composition _testContainer;
 
-	private UnitTest _selectedTest;
+	private UnitTest? _selectedTest;
 
 	public UnitTestsScene()
 	{
@@ -35,12 +34,13 @@ public class UnitTestsScene : TestScene
 		selectUnitTest(_manager.UnitTests[0]);
 	}
 
-	private void selectUnitTest(UnitTest unitTest)
+	private void selectUnitTest(UnitTest? unitTest)
 	{
 		_selectedTest?.TearDown(_testContainer);
 		_sidebar.ClearSteps();
 
 		_selectedTest = unitTest;
+		if (_selectedTest is null) return;
 
 		_selectedTest.Setup(_testContainer);
 		_sidebar.AddSteps(_selectedTest.Steps);
@@ -51,9 +51,6 @@ public class UnitTestsScene : TestScene
 
 	private void runAllTests()
 	{
-		var currentChildren = _testContainer.Children.ToArray();
-		_testContainer.Clear();
-
 		foreach (var test in _manager.UnitTests)
 		{
 			test.Setup(_testContainer);
@@ -72,8 +69,10 @@ public class UnitTestsScene : TestScene
 			}
 
 			test.TearDown(_testContainer);
+
+			Console.WriteLine($"All steps in {test.DisplayName} Test ran.");
 		}
 
-		_testContainer.AddRange(currentChildren);
+		resetUnitTest();
 	}
 }
