@@ -37,6 +37,23 @@ public class DebugConsole : TextBox
 		AddCommand("windowtitle", args => AzaleaGame.Main.Host.Window.Title = args.ArgumentQuery);
 	}
 
+	public event Action? Activated;
+	public event Action? Deactivated;
+
+	internal void Activate()
+	{
+		Input.ChangeFocus(this);
+		Activated?.Invoke();
+	}
+
+	internal void Deactivate()
+	{
+		if (HasFocus)
+			Input.ChangeFocus(this);
+
+		Deactivated?.Invoke();
+	}
+
 	#region Style
 	protected override void OnFocus(FocusEvent e)
 	{

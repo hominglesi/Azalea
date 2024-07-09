@@ -178,16 +178,13 @@ public class DebuggingOverlay : ContentContainer
 			if (DebugConsole.Parent == null)
 			{
 				AddInternal(DebugConsole);
-				Input.ChangeFocus(DebugConsole);
+				DebugConsole.Activate();
 			}
 			else
 			{
-				if (DebugConsole.HasFocus)
-					Input.ChangeFocus(null);
-
+				DebugConsole.Deactivate();
 				RemoveInternal(DebugConsole);
 			}
-
 		}
 
 		return base.OnKeyDown(e);
