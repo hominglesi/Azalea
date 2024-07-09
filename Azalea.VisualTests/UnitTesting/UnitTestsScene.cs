@@ -5,6 +5,9 @@ using System;
 namespace Azalea.VisualTests.UnitTesting;
 public class UnitTestsScene : TestScene
 {
+	private static float __menuBarHeight = 30;
+	private static float __sidebarWidth = 340;
+
 	private UnitTestsManager _manager;
 	private UnitTestMenuBar _menuBar;
 	private UnitTestsSidebar _sidebar;
@@ -19,7 +22,7 @@ public class UnitTestsScene : TestScene
 		Add(_menuBar = new UnitTestMenuBar()
 		{
 			RelativeSizeAxes = Axes.X,
-			Size = new(1, 30)
+			Size = new(1, __menuBarHeight)
 		});
 
 		_menuBar.AddMenuButton("Next Suite", selectNextTestSuite);
@@ -29,8 +32,9 @@ public class UnitTestsScene : TestScene
 		Add(_sidebar = new UnitTestsSidebar()
 		{
 			Position = new(0, 30),
-			RelativeSizeAxes = Axes.Both,
-			Size = new(0.25f, 1)
+			RelativeSizeAxes = Axes.Y,
+			Size = new(__sidebarWidth, 1),
+			NegativeSize = new(0, __menuBarHeight)
 		});
 
 		_sidebar.AddHeaderButton("runStep", _sidebar.RunNextStep);
@@ -39,10 +43,9 @@ public class UnitTestsScene : TestScene
 
 		Add(_testContainer = new Composition()
 		{
-			RelativePositionAxes = Axes.X,
-			Position = new(0.25f, 0),
+			Position = new(__sidebarWidth, __menuBarHeight),
 			RelativeSizeAxes = Axes.Both,
-			Size = new(0.75f, 1)
+			NegativeSize = new(__sidebarWidth, __menuBarHeight)
 		});
 
 		displayUnitTest(_manager.SelectedUnitTest);

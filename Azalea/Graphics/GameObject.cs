@@ -242,7 +242,21 @@ public abstract partial class GameObject : Amendable, IGameObject
 		}
 	}
 
-	public Vector2 DrawSize => ApplyRelativeAxes(RelativeSizeAxes, Size, FillMode);
+	public Vector2 _negativeSize;
+	public Vector2 NegativeSize
+	{
+		get => _negativeSize;
+		set
+		{
+			if (value == _negativeSize) return;
+
+			_negativeSize = value;
+
+			invalidateParentSizeDependencies(Invalidation.DrawSize, Axes.Both);
+		}
+	}
+
+	public Vector2 DrawSize => ApplyRelativeAxes(RelativeSizeAxes, Size, FillMode) - NegativeSize;
 
 	public float DrawWidth => DrawSize.X;
 	public float DrawHeight => DrawSize.Y;

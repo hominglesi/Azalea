@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Azalea.VisualTests.UnitTesting;
-public class UnitTestsSidebar : ContentContainer
+public class UnitTestsSidebar : Composition
 {
 	private readonly static float __headerHeight = 65;
 	private readonly static float __suiteTitleHeight = 35;
@@ -30,9 +30,8 @@ public class UnitTestsSidebar : ContentContainer
 	public UnitTestsSidebar()
 	{
 		BackgroundColor = new Color(0, 48, 73);
-		ContentComposition.Y = __headerHeight + __suiteTitleHeight;
 
-		AddInternal(_headerContainer = new FlexContainer()
+		Add(_headerContainer = new FlexContainer()
 		{
 			RelativeSizeAxes = Axes.X,
 			Size = new(1, __headerHeight),
@@ -41,7 +40,7 @@ public class UnitTestsSidebar : ContentContainer
 			Wrapping = FlexWrapping.Wrap
 		});
 
-		AddInternal(_suiteTitle = new SpriteText()
+		Add(_suiteTitle = new SpriteText()
 		{
 			RelativePositionAxes = Axes.X,
 			Position = new(0.5f, __headerHeight + (__suiteTitleHeight / 3)),
@@ -52,6 +51,8 @@ public class UnitTestsSidebar : ContentContainer
 		Add(new ScrollableContainer()
 		{
 			RelativeSizeAxes = Axes.Both,
+			Position = new(0, __headerHeight + __suiteTitleHeight),
+			NegativeSize = new(0, __headerHeight + __suiteTitleHeight),
 			Child = _stepContainer = new FlexContainer()
 			{
 				RelativeSizeAxes = Axes.X,
@@ -142,12 +143,6 @@ public class UnitTestsSidebar : ContentContainer
 	{
 		while (_nextStep < _steps.Count)
 			RunNextStep();
-	}
-
-	protected override void UpdateContentLayout()
-	{
-		ContentComposition.Height = DrawHeight - __headerHeight - __suiteTitleHeight;
-		ContentComposition.Width = DrawWidth;
 	}
 
 	private class HeaderButton : Button
