@@ -5,9 +5,15 @@ using System.Collections.Generic;
 namespace Azalea.VisualTests.UnitTesting;
 public abstract class UnitTest
 {
-	public string DisplayName { get; set; } = "";
+	public string DisplayName { get; init; }
+	public UnitTestSuite? Suite { get; set; }
 
 	public List<TestStep> Steps { get; init; } = new();
+
+	public UnitTest()
+	{
+		DisplayName = VisualTestUtils.GetTestDisplayName(GetType());
+	}
 
 	internal void AddOperation(string name, Action action)
 		=> Steps.Add(new TestStepOperation(name, action));

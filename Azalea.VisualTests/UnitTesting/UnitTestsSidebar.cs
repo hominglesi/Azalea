@@ -12,7 +12,8 @@ using System.Collections.Generic;
 namespace Azalea.VisualTests.UnitTesting;
 public class UnitTestsSidebar : ContentContainer
 {
-	private readonly static float __headerHeight = 70;
+	private readonly static float __headerHeight = 65;
+	private readonly static float __suiteTitleHeight = 35;
 
 	private readonly static float __stepHeight = 35;
 	private readonly static float __stepCheckboxPadding = 5;
@@ -22,21 +23,14 @@ public class UnitTestsSidebar : ContentContainer
 	private readonly static Color __stepCheckboxPassed = Palette.Green;
 	private readonly static Color __stepCheckboxFailed = new(214, 40, 40);
 
-	public event Action? RunStepPressed;
-	public event Action? RunAllStepsPressed;
-	public event Action? ResetPressed;
-
-	private HeaderButton _runStepButton;
-	private HeaderButton _runAllStepsButton;
-	private HeaderButton _resetButton;
-
 	private FlexContainer _headerContainer;
+	private SpriteText _suiteTitle;
 	private FlexContainer _stepContainer;
 
 	public UnitTestsSidebar()
 	{
 		BackgroundColor = new Color(0, 48, 73);
-		ContentComposition.Y = __headerHeight;
+		ContentComposition.Y = __headerHeight + __suiteTitleHeight;
 
 		AddInternal(_headerContainer = new FlexContainer()
 		{
@@ -44,18 +38,16 @@ public class UnitTestsSidebar : ContentContainer
 			Size = new(1, __headerHeight),
 			Justification = FlexJustification.Center,
 			Alignment = FlexAlignment.Center,
-			Wrapping = FlexWrapping.Wrap,
-			Children = new[]
-			{
-				_runStepButton = new HeaderButton("runStep"),
-				_runAllStepsButton = new HeaderButton("runAllSteps"),
-				_resetButton = new HeaderButton("reset")
-			}
+			Wrapping = FlexWrapping.Wrap
 		});
 
-		_runStepButton.Click += (_) => RunStepPressed?.Invoke();
-		_runAllStepsButton.Click += (_) => RunAllStepsPressed?.Invoke();
-		_resetButton.Click += (_) => ResetPressed?.Invoke();
+		AddInternal(_suiteTitle = new SpriteText()
+		{
+			RelativePositionAxes = Axes.X,
+			Position = new(0.5f, __headerHeight + (__suiteTitleHeight / 3)),
+			Origin = Anchor.Center,
+			Text = "Placeholder"
+		});
 
 		Add(new ScrollableContainer()
 		{
@@ -69,9 +61,21 @@ public class UnitTestsSidebar : ContentContainer
 		});
 	}
 
+	public void AddHeaderButton(string iconName, Action clickAction)
+	{
+		var button = new HeaderButton(iconName);
+		button.Click += _ => clickAction.Invoke();
+		_headerContainer.Add(button);
+	}
+
 	private int _nextStep = 0;
 	private List<TestStep> _steps = new();
 	private List<TestStepButton> _stepButtons = new();
+
+	public void DisplaySuite(UnitTestSuite suite)
+	{
+		_suiteTitle.Text = suite.DisplayName;
+	}
 
 	public void AddSteps(List<TestStep> steps)
 	{
@@ -111,6 +115,12 @@ public class UnitTestsSidebar : ContentContainer
 		if (_nextStep >= _steps.Count)
 			return;
 
+		RunNextStepWithResult();
+	}
+
+	public bool RunNextStepWithResult()
+	{
+		var testResult = true;
 		var step = _steps[_nextStep];
 		var stepIndex = _nextStep;
 		var stepButton = _stepButtons[stepIndex];
@@ -119,12 +129,13 @@ public class UnitTestsSidebar : ContentContainer
 			operation.Action.Invoke();
 		else if (step is TestStepResult result)
 		{
-			var testResult = result.Action.Invoke();
+			testResult = result.Action.Invoke();
 			((TestStepResultButton)stepButton).SetResult(testResult);
 		}
 
 		stepButton.MarkAsDone();
 		_nextStep++;
+		return testResult;
 	}
 
 	public void RunAllSteps()
@@ -135,7 +146,7 @@ public class UnitTestsSidebar : ContentContainer
 
 	protected override void UpdateContentLayout()
 	{
-		ContentComposition.Height = DrawHeight - __headerHeight;
+		ContentComposition.Height = DrawHeight - __headerHeight - __suiteTitleHeight;
 		ContentComposition.Width = DrawWidth;
 	}
 

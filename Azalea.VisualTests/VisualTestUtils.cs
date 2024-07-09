@@ -3,14 +3,23 @@
 namespace Azalea.VisualTests;
 internal class VisualTestUtils
 {
-	public static string GetTestDisplayName(string fullName)
+	public static string GetTestDisplayName(Type testType)
+		=> GetTestDisplayName(testType.Name);
+
+	public static string GetTestDisplayName(string name)
 	{
-		var startIndex = fullName.LastIndexOf('.') + 1;
-		ReadOnlySpan<char> name = fullName.AsSpan(startIndex, fullName.Length - startIndex);
+		ReadOnlySpan<char> nameSpan = name.AsSpan();
 
-		if (name.EndsWith("Test"))
-			name = name[..^4];
+		var lastDot = nameSpan.LastIndexOf('.');
+		if (lastDot != -1)
+			nameSpan = nameSpan[(lastDot + 1)..];
 
-		return name.ToString();
+		if (nameSpan.EndsWith("Test"))
+			nameSpan = nameSpan[..^4];
+
+		else if (nameSpan.EndsWith("Tests"))
+			nameSpan = nameSpan[..^5];
+
+		return nameSpan.ToString();
 	}
 }

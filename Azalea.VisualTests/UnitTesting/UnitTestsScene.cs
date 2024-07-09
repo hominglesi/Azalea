@@ -1,30 +1,41 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
+using System;
 
 namespace Azalea.VisualTests.UnitTesting;
 public class UnitTestsScene : TestScene
 {
 	private UnitTestsManager _manager;
+	private UnitTestMenuBar _menuBar;
 	private UnitTestsSidebar _sidebar;
 	private Composition _testContainer;
-
-	private UnitTest? _selectedTest;
 
 	public UnitTestsScene()
 	{
 		AzaleaGame.Main.Host.Renderer.ClearColor = new(255, 248, 211);
 
 		_manager = new UnitTestsManager();
+
+		Add(_menuBar = new UnitTestMenuBar()
+		{
+			RelativeSizeAxes = Axes.X,
+			Size = new(1, 30)
+		});
+
+		_menuBar.AddMenuButton("Next Suite", selectNextTestSuite);
+		_menuBar.AddMenuButton("Next Test", selectNextUnitTest);
+		_menuBar.AddMenuButton("Run All", runAllTests);
+
 		Add(_sidebar = new UnitTestsSidebar()
 		{
+			Position = new(0, 30),
 			RelativeSizeAxes = Axes.Both,
 			Size = new(0.25f, 1)
 		});
 
-		_sidebar.RunStepPressed += _sidebar.RunNextStep;
-		_sidebar.RunAllStepsPressed += _sidebar.RunAllSteps;
-		_sidebar.ResetPressed += resetUnitTest;
-
+		_sidebar.AddHeaderButton("runStep", _sidebar.RunNextStep);
+		_sidebar.AddHeaderButton("runAllSteps", _sidebar.RunAllSteps);
+		_sidebar.AddHeaderButton("reset", resetUnitTest);
 
 		Add(_testContainer = new Composition()
 		{
@@ -34,21 +45,60 @@ public class UnitTestsScene : TestScene
 			Size = new(0.75f, 1)
 		});
 
-		selectUnitTest(_manager.SelectedSuite.Tests[0]);
+		displayUnitTest(_manager.SelectedUnitTest);
 	}
 
-	private void selectUnitTest(UnitTest? unitTest)
+	private UnitTest? _displayedUnitTest;
+	private void displayUnitTest(UnitTest unitTest)
 	{
-		_selectedTest?.TearDown(_testContainer);
+		_displayedUnitTest?.TearDown(_testContainer);
 		_sidebar.ClearSteps();
 
-		_selectedTest = unitTest;
-		if (_selectedTest is null) return;
+		_displayedUnitTest = unitTest;
+		if (_displayedUnitTest is null) return;
 
-		_selectedTest.Setup(_testContainer);
-		_sidebar.AddSteps(_selectedTest.Steps);
+		_displayedUnitTest.Setup(_testContainer);
+		_sidebar.DisplaySuite(_displayedUnitTest.Suite!);
+		_sidebar.AddSteps(_displayedUnitTest.Steps);
+		_displayedUnitTest = unitTest;
+	}
+
+	private void selectNextTestSuite()
+	{
+		_manager.SelectNextSuite();
+		displayUnitTest(_manager.SelectedUnitTest);
+	}
+
+	private void selectNextUnitTest()
+	{
+		_manager.SelectNextUnitTest();
+		displayUnitTest(_manager.SelectedUnitTest);
 	}
 
 	private void resetUnitTest()
-		=> selectUnitTest(_selectedTest);
+	{
+		if (_displayedUnitTest is null)
+			return;
+
+		_displayedUnitTest.TearDown(_testContainer);
+		_sidebar.ClearSteps();
+
+		_displayedUnitTest.Setup(_testContainer);
+		_sidebar.AddSteps(_displayedUnitTest.Steps);
+	}
+
+	private void runAllTests()
+	{
+		foreach (var test in _manager.GetAllTests())
+		{
+			displayUnitTest(test);
+			for (int i = 0; i < test.Steps.Count; i++)
+			{
+				var result = _sidebar.RunNextStepWithResult();
+
+				if (result == false)
+					Console.WriteLine($"FAILED: {test.Suite!.DisplayName}/{test.DisplayName}/Step {i + 1}: {test.Steps[i].Name}");
+			}
+		}
+	}
 }
