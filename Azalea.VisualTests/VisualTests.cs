@@ -1,5 +1,4 @@
-﻿//using Azalea.Audios;
-using Azalea.Amends;
+﻿using Azalea.Amends;
 using Azalea.Design.Containers;
 using Azalea.Design.Scenes;
 using Azalea.Design.Shapes;
@@ -79,14 +78,11 @@ public class VisualTests : AzaleaGame
 
 			foreach (var test in tests)
 			{
-				var lastDot = test.LastIndexOf('.') + 1;
-				var text = test[lastDot..];
-				if (text.EndsWith("Test"))
-					text = text[..^4];
+				var displayName = VisualTestUtils.GetTestDisplayName(test);
 
 				_testContainer.Add(new TestButton()
 				{
-					Text = text,
+					Text = displayName,
 					Action = () => { ChangeTest(test); }
 				});
 			}
