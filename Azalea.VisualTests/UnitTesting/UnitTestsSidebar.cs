@@ -17,17 +17,17 @@ public class UnitTestsSidebar : ContentContainer
 	private readonly static float __stepHeight = 50;
 	private readonly static float __stepCheckboxPadding = 10;
 	private readonly static Color __stepBackgroundColor = new(252, 191, 73);
-	private readonly static Color __stepHoveredBackgroundColor = new(247, 127, 0);
+	private readonly static Color __stepDoneBackgroundColor = new(247, 127, 0);
 	private readonly static Color __stepTextColor = new(0, 48, 73);
 	private readonly static Color __stepCheckboxPassed = Palette.Green;
 	private readonly static Color __stepCheckboxFailed = new(214, 40, 40);
 
-	public event Action? PlayPressed;
-	public event Action? StepPressed;
+	public event Action? RunStepPressed;
+	public event Action? RunAllStepsPressed;
 	public event Action? ResetPressed;
 
-	private HeaderButton _playButton;
-	private HeaderButton _stepButton;
+	private HeaderButton _runStepButton;
+	private HeaderButton _runAllStepsButton;
 	private HeaderButton _resetButton;
 
 	private FlexContainer _headerContainer;
@@ -47,14 +47,14 @@ public class UnitTestsSidebar : ContentContainer
 			Wrapping = FlexWrapping.Wrap,
 			Children = new[]
 			{
-				_playButton = new HeaderButton("play"),
-				_stepButton = new HeaderButton("step"),
+				_runStepButton = new HeaderButton("runStep"),
+				_runAllStepsButton = new HeaderButton("runAllSteps"),
 				_resetButton = new HeaderButton("reset")
 			}
 		});
 
-		_playButton.Click += (_) => PlayPressed?.Invoke();
-		_stepButton.Click += (_) => StepPressed?.Invoke();
+		_runStepButton.Click += (_) => RunStepPressed?.Invoke();
+		_runAllStepsButton.Click += (_) => RunAllStepsPressed?.Invoke();
 		_resetButton.Click += (_) => ResetPressed?.Invoke();
 
 		Add(new ScrollableContainer()
@@ -69,6 +69,7 @@ public class UnitTestsSidebar : ContentContainer
 		});
 	}
 
+	private int _nextStep = 0;
 	private List<TestStep> _steps = new();
 	private List<TestStepButton> _stepButtons = new();
 
@@ -83,14 +84,13 @@ public class UnitTestsSidebar : ContentContainer
 			TestStepButton? button = null;
 
 			if (step is TestStepOperation)
-				button = new TestStepOperationButton(step.Name, stepIndex);
+				button = new TestStepOperationButton(step.Name);
 			else if (step is TestStepResult)
-				button = new TestStepResultButton(step.Name, stepIndex);
+				button = new TestStepResultButton(step.Name);
 
 			if (button is null)
 				throw new NotImplementedException($"Test Step not implemented");
 
-			button.Pressed += stepPressed;
 			_stepContainer.Add(button);
 			_stepButtons.Add(button);
 		}
@@ -103,19 +103,34 @@ public class UnitTestsSidebar : ContentContainer
 		_steps.Clear();
 		_stepButtons.Clear();
 		_stepContainer.Clear();
+		_nextStep = 0;
 	}
 
-	private void stepPressed(int index)
+	public void RunNextStep()
 	{
-		var step = _steps[index];
+		if (_nextStep >= _steps.Count)
+			return;
+
+		var step = _steps[_nextStep];
+		var stepIndex = _nextStep;
+		var stepButton = _stepButtons[stepIndex];
 
 		if (step is TestStepOperation operation)
 			operation.Action.Invoke();
 		else if (step is TestStepResult result)
 		{
 			var testResult = result.Action.Invoke();
-			((TestStepResultButton)_stepButtons[index]).SetResult(testResult);
+			((TestStepResultButton)stepButton).SetResult(testResult);
 		}
+
+		stepButton.MarkAsDone();
+		_nextStep++;
+	}
+
+	public void RunAllSteps()
+	{
+		while (_nextStep < _steps.Count)
+			RunNextStep();
 	}
 
 	protected override void UpdateContentLayout()
@@ -126,8 +141,8 @@ public class UnitTestsSidebar : ContentContainer
 
 	private class HeaderButton : Button
 	{
-		private Sprite _backgroundSprite;
-		private Sprite _iconSprite;
+		private readonly Sprite _backgroundSprite;
+		private readonly Sprite _iconSprite;
 
 		public HeaderButton(string iconName)
 		{
@@ -169,15 +184,11 @@ public class UnitTestsSidebar : ContentContainer
 
 	private class TestStepButton : Composition
 	{
-		private readonly int _index;
-		public event Action<int>? Pressed;
-
 		internal readonly Box Background;
 		internal readonly SpriteText Text;
 
-		public TestStepButton(string text, int index)
+		public TestStepButton(string text)
 		{
-			_index = index;
 			RelativeSizeAxes = Axes.X;
 			Size = new(1, __stepHeight);
 
@@ -197,41 +208,24 @@ public class UnitTestsSidebar : ContentContainer
 			});
 		}
 
-		protected override bool OnHover(HoverEvent e)
+		public void MarkAsDone()
 		{
-			Background.Color = __stepHoveredBackgroundColor;
-			return true;
-		}
-
-		protected override void OnHoverLost(HoverLostEvent e)
-		{
-			Background.Color = __stepBackgroundColor;
-		}
-
-		internal void Invoke()
-		{
-			Pressed?.Invoke(_index);
+			Background.Color = __stepDoneBackgroundColor;
 		}
 	}
 
 	private class TestStepOperationButton : TestStepButton
 	{
-		public TestStepOperationButton(string text, int index)
-			: base(text, index) { }
-
-		protected override bool OnClick(ClickEvent e)
-		{
-			Invoke();
-			return true;
-		}
+		public TestStepOperationButton(string text)
+			: base(text) { }
 	}
 
 	private class TestStepResultButton : TestStepButton
 	{
 		private readonly Sprite _checkbox;
 
-		public TestStepResultButton(string text, int index)
-			: base(text, index)
+		public TestStepResultButton(string text)
+			: base(text)
 		{
 			Add(_checkbox = new Sprite()
 			{
@@ -241,12 +235,6 @@ public class UnitTestsSidebar : ContentContainer
 				Size = new(__stepHeight - (__stepCheckboxPadding * 2)),
 				Texture = Assets.GetTexture("Textures/Icons/checkbox-empty.png")
 			});
-		}
-
-		protected override bool OnClick(ClickEvent e)
-		{
-			Invoke();
-			return true;
 		}
 
 		public void SetResult(bool result)

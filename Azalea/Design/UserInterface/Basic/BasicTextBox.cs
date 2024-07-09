@@ -9,7 +9,7 @@ using System.Numerics;
 namespace Azalea.Design.UserInterface.Basic;
 public class BasicTextBox : TextBox
 {
-	private Box _carat;
+	private Box _carat { get; init; }
 
 	public BasicTextBox(Action<SpriteText>? defaultCreationParameters = null)
 		: base(defaultCreationParameters)
@@ -20,8 +20,16 @@ public class BasicTextBox : TextBox
 		AddInternal(_carat = new Box()
 		{
 			Size = new(1, 20),
-			Alpha = 0
+			Alpha = 0,
+			Color = _caratColor
 		});
+	}
+
+	private Color _caratColor = Palette.White;
+	public Color CaratColor
+	{
+		get => _caratColor;
+		set => _carat.Color = _caratColor = value;
 	}
 
 	protected override void OnFocus(FocusEvent e)

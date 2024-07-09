@@ -248,7 +248,7 @@ public static class Input
 		return true;
 	}
 
-	internal static void HandleKeyboardKeyStateChange(Keys key, bool pressed)
+	public static void HandleKeyboardKeyStateChange(Keys key, bool pressed)
 	{
 		_keyboardKeys[(int)key].SetState(pressed);
 

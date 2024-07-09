@@ -13,6 +13,8 @@ public class UnitTestsScene : TestScene
 
 	public UnitTestsScene()
 	{
+		AzaleaGame.Main.Host.Renderer.ClearColor = new(255, 248, 211);
+
 		_manager = new UnitTestsManager();
 		Add(_sidebar = new UnitTestsSidebar()
 		{
@@ -20,8 +22,10 @@ public class UnitTestsScene : TestScene
 			Size = new(0.25f, 1)
 		});
 
+		_sidebar.RunStepPressed += _sidebar.RunNextStep;
+		_sidebar.RunAllStepsPressed += _sidebar.RunAllSteps;
 		_sidebar.ResetPressed += resetUnitTest;
-		_sidebar.StepPressed += runAllTests;
+
 
 		Add(_testContainer = new Composition()
 		{
