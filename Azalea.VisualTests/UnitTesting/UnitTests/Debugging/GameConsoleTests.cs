@@ -1,5 +1,4 @@
 ﻿using Azalea.Debugging;
-using Azalea.Design.Containers;
 using Azalea.Inputs;
 using Azalea.Platform;
 using Azalea.Utils;
@@ -57,8 +56,10 @@ public class GameConsoleTests : UnitTestSuite
 			AddResult("Check if command was ran", () => _commandRan);
 		}
 
-		public override void TearDown(Composition scene)
+		public override void TearDown(UnitTestContainer scene)
 		{
+			base.TearDown(scene);
+
 			Editor.Overlay.DebugConsole.RemoveCommand(_customCommand);
 		}
 	}

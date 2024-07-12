@@ -1,5 +1,4 @@
-﻿using Azalea.Design.Containers;
-using Azalea.Graphics;
+﻿using Azalea.Graphics;
 using System;
 
 namespace Azalea.VisualTests.UnitTesting;
@@ -11,7 +10,7 @@ public class UnitTestsScene : TestScene
 	private UnitTestsManager _manager;
 	private UnitTestMenuBar _menuBar;
 	private UnitTestsSidebar _sidebar;
-	private Composition _testContainer;
+	private UnitTestContainer _testContainer;
 
 	public UnitTestsScene()
 	{
@@ -41,7 +40,7 @@ public class UnitTestsScene : TestScene
 		_sidebar.AddHeaderButton("runAllSteps", _sidebar.RunAllSteps);
 		_sidebar.AddHeaderButton("reset", resetUnitTest);
 
-		Add(_testContainer = new Composition()
+		Add(_testContainer = new UnitTestContainer()
 		{
 			Position = new(__sidebarWidth, __menuBarHeight),
 			RelativeSizeAxes = Axes.Both,

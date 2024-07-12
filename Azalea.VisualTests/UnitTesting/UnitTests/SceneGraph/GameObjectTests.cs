@@ -28,8 +28,10 @@ public class GameObjectTests : UnitTestSuite
 			AddResult("Check if Box.DrawSize is (120, 100)", () => _box.DrawSize == new Vector2(120, 100));
 		}
 
-		public override void Setup(Composition scene)
+		public override void Setup(UnitTestContainer scene)
 		{
+			base.Setup(scene);
+
 			_boxParent = new Composition()
 			{
 				Origin = Anchor.Center,
@@ -46,8 +48,10 @@ public class GameObjectTests : UnitTestSuite
 			scene.Add(_boxParent);
 		}
 
-		public override void TearDown(Composition scene)
+		public override void TearDown(UnitTestContainer scene)
 		{
+			base.TearDown(scene);
+
 			scene.Remove(_boxParent);
 		}
 	}

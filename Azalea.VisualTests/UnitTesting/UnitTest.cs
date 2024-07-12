@@ -1,5 +1,4 @@
-﻿using Azalea.Design.Containers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Azalea.VisualTests.UnitTesting;
@@ -7,7 +6,7 @@ public abstract class UnitTest
 {
 	public string DisplayName { get; init; }
 	public UnitTestSuite? Suite { get; set; }
-
+	public UnitTestContainer? TestContainer { get; set; }
 	public List<TestStep> Steps { get; init; } = new();
 
 	public UnitTest()
@@ -21,8 +20,14 @@ public abstract class UnitTest
 	internal void AddResult(string name, TestStepResultDelegate action)
 		=> Steps.Add(new TestStepResult(name, action));
 
-	public virtual void Setup(Composition scene) { }
-	public virtual void TearDown(Composition scene) { }
+	public virtual void Setup(UnitTestContainer scene)
+	{
+		TestContainer = scene;
+	}
+	public virtual void TearDown(UnitTestContainer scene)
+	{
+		TestContainer = null;
+	}
 }
 
 public class TestStep

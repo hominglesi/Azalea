@@ -1,5 +1,4 @@
-﻿using Azalea.Design.Containers;
-using Azalea.Design.UserInterface;
+﻿using Azalea.Design.UserInterface;
 using Azalea.Design.UserInterface.Basic;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
@@ -8,7 +7,7 @@ using Azalea.Utils;
 
 #pragma warning disable CS8602, CS8618
 
-namespace Azalea.VisualTests.UnitTesting.UnitTests.UserInput;
+namespace Azalea.VisualTests.UnitTesting.UserInterface.UserInput;
 public class TextBoxTests : UnitTestSuite
 {
 	public class InputTest : UnitTest
@@ -47,8 +46,10 @@ public class TextBoxTests : UnitTestSuite
 			AddResult("Check if Textbox is empty", () => _textBox.Text == "");
 		}
 
-		public override void Setup(Composition scene)
+		public override void Setup(UnitTestContainer scene)
 		{
+			base.Setup(scene);
+
 			_textBox = new BasicTextBox(t => t.Color = Palette.Black)
 			{
 				Origin = Anchor.Center,
@@ -59,8 +60,10 @@ public class TextBoxTests : UnitTestSuite
 			scene.Add(_textBox);
 		}
 
-		public override void TearDown(Composition scene)
+		public override void TearDown(UnitTestContainer scene)
 		{
+			base.TearDown(scene);
+
 			scene.Remove(_textBox);
 		}
 	}
