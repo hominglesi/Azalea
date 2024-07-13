@@ -53,9 +53,9 @@ public class Sprite : GameObject
 			texture = anim.GetTextureAtTime(Time);
 		}
 
-		renderer.DrawQuad(
-			texture,
-			ScreenSpaceDrawQuad,
-			DrawColorInfo);
+		DrawTexture(renderer, texture);
 	}
+
+	protected virtual void DrawTexture(IRenderer renderer, Texture texture)
+		=> renderer.DrawQuad(texture, ScreenSpaceDrawQuad, DrawColorInfo);
 }

@@ -2,5 +2,6 @@
 public enum GLWrapFunction
 {
 	ClampToEdge = 0x812F,
-	MirroredRepeat = 0x8370F
+	Repeat = 0x2901,
+	MirroredRepeat = 0x8370F,
 }

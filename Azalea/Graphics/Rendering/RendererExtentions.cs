@@ -24,7 +24,7 @@ public static class RendererExtentions
 		return false;
 	}
 
-	internal static void DrawQuad(this IRenderer renderer, Texture texture, Quad vertexQuad, DrawColorInfo drawColorInfo)
+	internal static void DrawQuad(this IRenderer renderer, Texture texture, Quad vertexQuad, DrawColorInfo drawColorInfo, Rectangle? customUV = null)
 	{
 		if (ClientContainsQuad(vertexQuad) == false)
 			return;
@@ -33,7 +33,7 @@ public static class RendererExtentions
 
 		var vertexAction = renderer.DefaultQuadBatch.AddAction;
 
-		var textureRegion = texture.GetUVCoordinates();
+		var textureRegion = customUV ?? texture.GetUVCoordinates();
 
 		vertexAction(new TexturedVertex2D
 		{
