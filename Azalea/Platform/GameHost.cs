@@ -119,6 +119,10 @@ public abstract class GameHost
 		Input.Initialize(_root);
 		Renderer.Initialize();
 		AudioManager.Initialize();
+
+		if (_root is DebuggingOverlay debug)
+			debug.Initialize();
+
 		Initialized?.Invoke();
 	}
 

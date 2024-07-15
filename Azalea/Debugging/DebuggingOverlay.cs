@@ -1,9 +1,9 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
-using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
+using Azalea.Platform;
 using System.Numerics;
 
 namespace Azalea.Debugging;
@@ -12,47 +12,20 @@ public class DebuggingOverlay : ContentContainer
 	private const float LeftContainerSize = 0.25f;
 	private const float BottomContainerSize = 0.25f;
 
-	protected override void Update()
-	{
-		if (_initialized == false)
-		{
-			initialize();
-			_initialized = true;
-		}
-
-		base.Update();
-	}
-
 	private Composition _leftContainer;
 	private Composition _bottomContainer;
 
 	public DebugConsole DebugConsole { get; private set; }
+	public DebugDisplayValues DisplayValues { get; private set; }
 
 	public DebugInspector Inspector;
 	private DebugSceneGraph _sceneGraph;
 
-	private static SpriteText? _fpsDislpay;
-	public static SpriteText FpsDisplay
-	{
-		get
-		{
-			_fpsDislpay ??= new FpsDisplay()
-			{
-				Origin = Anchor.TopRight,
-				Anchor = Anchor.TopRight,
-			};
-			return _fpsDislpay;
-		}
-	}
-
-	private bool _initialized;
-	private void initialize()
+	internal void Initialize()
 	{
 		//We need to initialize this later because the constructor is called before the game has been initialized
 		ContentComposition.Origin = Anchor.TopRight;
 		ContentComposition.Anchor = Anchor.TopRight;
-
-		AddInternal(FpsDisplay);
 
 		AddInternal(_leftContainer = new Composition()
 		{
@@ -70,6 +43,19 @@ public class DebuggingOverlay : ContentContainer
 		AddInternal(new ColliderDebug());
 
 		DebugConsole = new DebugConsole();
+
+		AddInternal(DisplayValues = new DebugDisplayValues()
+		{
+			Origin = Anchor.BottomLeft,
+			Anchor = Anchor.BottomLeft,
+			Direction = FlexDirection.VerticalReverse,
+			RelativeSizeAxes = Axes.Both,
+			Wrapping = FlexWrapping.Wrap,
+			Position = new(5, -5),
+			Spacing = new(5),
+		});
+
+		DisplayValues.AddDisplayedValue("Fps", () => Time.FpsCount);
 	}
 
 	protected override void UpdateContentLayout()
