@@ -130,6 +130,8 @@ public class IWindowTest : TestScene
 					(value) => $"Window resized to {value}"),
 				CreateObservedValue("VSync",
 					() => _window.VSync),
+				CreateObservedValue("CanChangeVSync",
+					() => _window.CanChangeVSync),
 				CreateObservedValue("Cursor Visible",
 					() => _window.CursorVisible)
 			})

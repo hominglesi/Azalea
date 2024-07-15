@@ -55,6 +55,11 @@ public interface IWindow : IDisposable
 	bool VSync { get; set; }
 
 	/// <summary>
+	/// Whether the application can change VSync setting
+	/// </summary>
+	bool CanChangeVSync { get; }
+
+	/// <summary>
 	/// Whether Cursor is shown
 	/// </summary>
 	bool CursorVisible { get; set; }

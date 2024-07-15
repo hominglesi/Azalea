@@ -22,6 +22,10 @@ internal static unsafe class GL
 	private static SwapIntervalDelegate? _wglSwapInterval;
 	public static void SwapInterval(int interval) => _wglSwapInterval!(interval);
 
+	private delegate int GetSwapIntervalDelegate();
+	private static GetSwapIntervalDelegate? _wglGetSwapInterval;
+	public static int GetSwapInterval() => _wglGetSwapInterval!();
+
 	[DllImport(LibraryPath, EntryPoint = "glGetString")]
 	private static extern IntPtr getString(GLStringName name);
 	public static string GetString(GLStringName name)
@@ -346,6 +350,7 @@ internal static unsafe class GL
 	public static void ImportFunctions()
 	{
 		_wglSwapInterval = Marshal.GetDelegateForFunctionPointer<SwapIntervalDelegate>(wglGetProcAddress("wglSwapIntervalEXT"));
+		_wglGetSwapInterval = Marshal.GetDelegateForFunctionPointer<GetSwapIntervalDelegate>(wglGetProcAddress("wglGetSwapIntervalEXT"));
 		_glCreateBuffers = Marshal.GetDelegateForFunctionPointer<CreateBuffersDelegate>(wglGetProcAddress("glCreateBuffers"));
 		_glGenBuffers = Marshal.GetDelegateForFunctionPointer<GenBuffersDelegate>(wglGetProcAddress("glGenBuffers"));
 		_glGenVertexArrays = Marshal.GetDelegateForFunctionPointer<GenVertexArraysDelegate>(wglGetProcAddress("glGenVertexArrays"));

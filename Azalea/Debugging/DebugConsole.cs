@@ -35,6 +35,11 @@ public class DebugConsole : TextBox
 		AddCommand("maximize", args => AzaleaGame.Main.Host.Window.State = WindowState.Maximized);
 		AddCommand("restorewindow", args => AzaleaGame.Main.Host.Window.State = WindowState.Normal);
 		AddCommand("windowtitle", args => AzaleaGame.Main.Host.Window.Title = args.ArgumentQuery);
+		AddCommand("vsync", args =>
+		{
+			if (args.ArgumentQuery.ToLower() == "on") AzaleaGame.Main.Host.Window.VSync = true;
+			else if (args.ArgumentQuery.ToLower() == "off") AzaleaGame.Main.Host.Window.VSync = false;
+		});
 	}
 
 	public event Action? Activated;

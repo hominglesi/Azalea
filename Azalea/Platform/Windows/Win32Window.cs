@@ -217,6 +217,20 @@ internal class Win32Window : PlatformWindow
 	protected override void SetVSyncImplementation(bool enabled)
 		=> GL.SwapInterval(enabled ? 1 : 0);
 
+	protected override bool GetVSyncImplementation()
+		=> GL.GetSwapInterval() == 1;
+
+	protected override bool GetCanChangeVSyncImplementation()
+	{
+		var current = GetVSyncImplementation();
+
+		SetVSyncImplementation(!current);
+		var changed = current != GetVSyncImplementation();
+
+		SetVSyncImplementation(current);
+		return changed;
+	}
+
 	protected override void SetCursorVisible(bool show)
 	{
 		WinAPI.ShowCursor(show);
