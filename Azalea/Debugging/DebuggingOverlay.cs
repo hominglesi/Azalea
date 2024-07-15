@@ -173,6 +173,14 @@ public class DebuggingOverlay : ContentContainer
 			}
 		}
 
+		if (e.Key == Keys.F10)
+		{
+			if (DisplayValues.Parent == null)
+				AddInternal(DisplayValues);
+			else
+				RemoveInternal(DisplayValues);
+		}
+
 		return base.OnKeyDown(e);
 	}
 }

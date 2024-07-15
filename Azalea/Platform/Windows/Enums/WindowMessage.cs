@@ -102,7 +102,7 @@ internal enum WindowMessage : uint
 	/// active window. The window that receives the message can distinguish between these two contexts
 	/// by checking the context code in the lParam parameter.
 	/// </summary>
-	SysKeyDown = 261,
+	SysKeyDown = 260,
 	/// <summary>
 	/// A window receives this message when the user chooses a command from the Window menu
 	/// (formerly known as the system or control menu) or when the user chooses the maximize button, minimize button,

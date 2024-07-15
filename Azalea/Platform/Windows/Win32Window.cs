@@ -140,10 +140,7 @@ internal class Win32Window : PlatformWindow
 			case WindowMessage.KeyDown:
 				var isRepeat = BitwiseUtils.GetSpecificBit(lParam, 31);
 				var downKey = WindowsExtentions.KeycodeToKey((int)wParam);
-				if (isRepeat)
-					Input.HandleKeyboardKeyRepeat(downKey);
-				else
-					Input.HandleKeyboardKeyStateChange(downKey, true);
+				handleKeyDown(downKey, isRepeat);
 				break;
 			case WindowMessage.KeyUp:
 				Input.HandleKeyboardKeyStateChange(WindowsExtentions.KeycodeToKey((int)wParam), false); break;
@@ -151,13 +148,25 @@ internal class Win32Window : PlatformWindow
 				var downSysKey = WindowsExtentions.KeycodeToKey((int)wParam);
 
 				if (downSysKey == Keys.F10)
+				{
+					var downSysKeyIsRepeat = BitwiseUtils.GetSpecificBit(lParam, 31);
+					handleKeyDown(downSysKey, downSysKeyIsRepeat);
 					return IntPtr.Zero;
+				}
 
 				break;
 
 		}
 
 		return WinAPI.DefWindowProc(window, message, wParam, lParam);
+	}
+
+	private void handleKeyDown(Keys key, bool isRepeat)
+	{
+		if (isRepeat)
+			Input.HandleKeyboardKeyRepeat(key);
+		else
+			Input.HandleKeyboardKeyStateChange(key, true);
 	}
 
 	#region Implementations
