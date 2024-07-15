@@ -139,14 +139,22 @@ internal class Win32Window : PlatformWindow
 				Input.HandleTextInput((char)wParam); break;
 			case WindowMessage.KeyDown:
 				var isRepeat = BitwiseUtils.GetSpecificBit(lParam, 31);
-				var key = WindowsExtentions.KeycodeToKey((int)wParam);
+				var downKey = WindowsExtentions.KeycodeToKey((int)wParam);
 				if (isRepeat)
-					Input.HandleKeyboardKeyRepeat(key);
+					Input.HandleKeyboardKeyRepeat(downKey);
 				else
-					Input.HandleKeyboardKeyStateChange(key, true);
+					Input.HandleKeyboardKeyStateChange(downKey, true);
 				break;
 			case WindowMessage.KeyUp:
 				Input.HandleKeyboardKeyStateChange(WindowsExtentions.KeycodeToKey((int)wParam), false); break;
+			case WindowMessage.SysKeyDown:
+				var downSysKey = WindowsExtentions.KeycodeToKey((int)wParam);
+
+				if (downSysKey == Keys.F10)
+					return IntPtr.Zero;
+
+				break;
+
 		}
 
 		return WinAPI.DefWindowProc(window, message, wParam, lParam);
