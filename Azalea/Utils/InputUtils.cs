@@ -6,13 +6,13 @@ public static class InputUtils
 	public static void SimulateCharInput(string charString)
 	{
 		foreach (var chr in charString)
-			Input.HandleTextInput(chr);
+			Input.ExecuteTextInput(chr);
 	}
 
 	public static void SimulateKeyInput(Keys key)
 	{
-		Input.HandleKeyboardKeyStateChange(key, true);
-		Input.HandleKeyboardKeyStateChange(key, false);
+		Input.ExecuteKeyboardKeyStateChange(key, true);
+		Input.ExecuteKeyboardKeyStateChange(key, false);
 	}
 
 	public static void SimulateMultipleKeyInput(Keys key, int count)

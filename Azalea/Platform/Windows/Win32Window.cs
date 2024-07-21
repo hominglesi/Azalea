@@ -109,41 +109,41 @@ internal class Win32Window : PlatformWindow
 
 			//Mouse Input
 			case WindowMessage.LeftButtonDown:
-				Input.HandleMouseButtonStateChange(MouseButton.Left, true);
+				Input.ExecuteMouseButtonStateChange(MouseButton.Left, true);
 				WinAPI.SetCapture(_window);
 				break;
 			case WindowMessage.LeftButtonUp:
-				Input.HandleMouseButtonStateChange(MouseButton.Left, false);
+				Input.ExecuteMouseButtonStateChange(MouseButton.Left, false);
 				WinAPI.ReleaseCapture();
 				break;
 			case WindowMessage.RightButtonDown:
-				Input.HandleMouseButtonStateChange(MouseButton.Right, true); break;
+				Input.ExecuteMouseButtonStateChange(MouseButton.Right, true); break;
 			case WindowMessage.RightButtonUp:
-				Input.HandleMouseButtonStateChange(MouseButton.Right, false); break;
+				Input.ExecuteMouseButtonStateChange(MouseButton.Right, false); break;
 			case WindowMessage.MiddleButtonDown:
-				Input.HandleMouseButtonStateChange(MouseButton.Middle, true); break;
+				Input.ExecuteMouseButtonStateChange(MouseButton.Middle, true); break;
 			case WindowMessage.MiddleButtonUp:
-				Input.HandleMouseButtonStateChange(MouseButton.Middle, false); break;
+				Input.ExecuteMouseButtonStateChange(MouseButton.Middle, false); break;
 			case WindowMessage.XButtonDown:
 				var xButtonDown = MouseButton.Middle + BitwiseUtils.GetHighOrderValue(wParam);
-				Input.HandleMouseButtonStateChange(xButtonDown, true); break;
+				Input.ExecuteMouseButtonStateChange(xButtonDown, true); break;
 			case WindowMessage.XButtonUp:
 				var xButtonUp = MouseButton.Middle + BitwiseUtils.GetHighOrderValue(wParam);
-				Input.HandleMouseButtonStateChange(xButtonUp, false); break;
+				Input.ExecuteMouseButtonStateChange(xButtonUp, false); break;
 			case WindowMessage.MouseWheel:
 				var delta = BitwiseUtils.GetHighOrderValue(wParam) / 120;
-				Input.HandleScroll(delta); break;
+				Input.ExecuteScroll(delta); break;
 
 			//Keyboad Input
 			case WindowMessage.Char:
-				Input.HandleTextInput((char)wParam); break;
+				Input.ExecuteTextInput((char)wParam); break;
 			case WindowMessage.KeyDown:
 				var isRepeat = BitwiseUtils.GetSpecificBit(lParam, 31);
 				var downKey = WindowsExtentions.KeycodeToKey((int)wParam);
 				handleKeyDown(downKey, isRepeat);
 				break;
 			case WindowMessage.KeyUp:
-				Input.HandleKeyboardKeyStateChange(WindowsExtentions.KeycodeToKey((int)wParam), false); break;
+				Input.ExecuteKeyboardKeyStateChange(WindowsExtentions.KeycodeToKey((int)wParam), false); break;
 			case WindowMessage.SysKeyDown:
 				var downSysKey = WindowsExtentions.KeycodeToKey((int)wParam);
 
@@ -164,9 +164,9 @@ internal class Win32Window : PlatformWindow
 	private void handleKeyDown(Keys key, bool isRepeat)
 	{
 		if (isRepeat)
-			Input.HandleKeyboardKeyRepeat(key);
+			Input.ExecuteKeyboardKeyRepeat(key);
 		else
-			Input.HandleKeyboardKeyStateChange(key, true);
+			Input.ExecuteKeyboardKeyStateChange(key, true);
 	}
 
 	#region Implementations
@@ -323,7 +323,7 @@ internal class Win32Window : PlatformWindow
 		//Update mouse position
 		WinAPI.GetCursorPos(out _mousePosition);
 		WinAPI.ScreenToClient(_window, ref _mousePosition);
-		Input.HandleMousePositionChange(_mousePosition);
+		Input.ExecuteMousePositionChange(_mousePosition);
 	}
 
 	#endregion

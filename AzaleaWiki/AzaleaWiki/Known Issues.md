@@ -1,1 +1,0 @@
--If you start a window in fullscreen and then switch to windowed, the icon disappears. This is a known [GLFW issue](https://github.com/glfw/glfw/issues/1163) and might be fixed on their side.
