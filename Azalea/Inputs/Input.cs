@@ -79,6 +79,7 @@ public static class Input
 
 	/// <summary>
 	/// Returns a read-only list of all the currently hovered objects.
+	/// <paramref name="recalculate"/> specifies if the scene graph needs to be reevaluated for moved objects.
 	/// </summary>
 	public static IReadOnlyList<GameObject> GetHoveredObjects(bool recalculate = false)
 	{

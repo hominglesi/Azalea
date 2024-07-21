@@ -2,72 +2,104 @@ Every kind of user input goes through the Input class. We can use it to get the 
 
 ## Getting Input
 
-#### `MousePosition`
-
+#### MousePosition
+---
 Current mouse coordinates in screen space, meaning that (0, 0) is the top-left of the window client area.
 
-#### `MouseWheelDelta`
+`public static Vector2 MousePosition { get; }`
 
+#### MouseWheelDelta
+---
 Scroll value change since last frame.
 
-#### `GetMouseButton(MouseButton button)`
+`public static float MouseWheelDelta { get; }`
 
+#### GetMouseButton
+---
 Returns the state of the specified mouse button.
 
-#### `GetHoveredObjects()`
+`public static ButtonState GetMouseButton(MouseButton button)`
 
-Returns a read-only list of all the currently hovered objects.
+#### GetHoveredObjects`
+---
+Returns a read-only list of all the currently hovered objects. `recalculate` specifies if the scene graph needs to be reevaluated for moved objects.
 
-#### `GetKey(Keys key)`
+`public static IReadOnlyList<GameObject> GetHoveredObjects(bool recalculate)`
 
+#### GetKey
+---
 Returns the state of the specified key.
 
-#### `OnTextInput`
+`public static ButtonState GetKey(Keys key)`
 
+#### OnTextInput
+---
 Event that get raised whenever a character is inputted on the keyboard.
 
-#### `GetDirectionalMovement()`
+`public static event Action<char>? OnTextInput`
 
+#### GetDirectionalMovement
+---
 Returns the movement vector by getting the state of the WASD and Arrow keys.
+
+`public static Vector2 GetDirectionalMovement()`
 
 ## Other
 
-#### `ChangeFocus(GameObject? newFocus)`
-
+#### ChangeFocus
+---
 Changes the focused object. Can be set to null to remove current focus.
 
-#### `GetPositionalInputQueue(Vector2 position)`
+`public static bool ChangeFocus(GameObject? newFocus)`
 
+#### GetPositionalInputQueue
+---
 Gets a list of all the objects in the scene graph that contain the specified position starting with the deepest ones and going out.
 
-#### `GetNonPositionalInputQueue()`
+`public static IReadOnlyList<GameObject> GetPositionalInputQueue(Vector2 position)`
 
+#### GetNonPositionalInputQueue
+---
 Gets a list of all the objects in the scene graph starting with the deepest ones and going out.
+
+`public static IReadOnlyList<GameObject> GetNonPositionalInputQueue()`
 
 ## Executing Actions
 
 Using the `Input` class we can also simulate actions as if the user has performed them. This is not advised as the action is executed out of normal update loop order and can cause unexpected behavior, but it is useful for testing purposes.
 
-#### `ExecuteMousePositionChange(Vector2 newPosition)`
-
+#### ExecuteMousePositionChange
+---
 Executes a mouse move action.
 
-#### `ExecuteScroll(float delta)`
+`public static void ExecuteMousePositionChange(Vector2 newPosition)`
 
+#### ExecuteScroll
+---
 Executes a scroll action.
 
-#### `ExecuteMouseButtonStateChange(MouseButton button, bool pressed)`
+`public static void ExecuteScroll(float delta)`
 
+#### ExecuteMouseButtonStateChange
+---
 Executes a pressed state change action on the specified button.
 
-#### `ExecuteKeyboardKeyStateChange(Keys key, bool pressed)`
+`public static void ExecuteMouseButtonStateChange(MouseButton button, bool pressed)`
 
+#### ExecuteKeyboardKeyStateChange
+---
 Executes a pressed state change action on the specified key.
 
-#### `ExecuteKeyboardKeyRepeat(Keys key)`
+`public static void ExecuteKeyboardKeyStateChange(Keys key, bool pressed)`
 
+#### ExecuteKeyboardKeyRepeat
+---
 Sets the repeat state of the specified key to true.
 
-#### `ExecuteTextInput(char input)`
+`public static void ExecuteKeyboardKeyRepeat(Keys key)`
 
+#### ExecuteTextInput
+---
 Executes a text input action with the specified character.
+
+`public static void ExecuteTextInput(char input)`
