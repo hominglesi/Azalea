@@ -1,5 +1,10 @@
+
+# Table of Contents
+
 * Getting Started
   * [Getting Input](Getting-Input)
+  
 * Documentation
-  * [Input](The-Input-Class)
+  * [Input](Input.md)
+  
 * [Coding Style](Coding-Style)
