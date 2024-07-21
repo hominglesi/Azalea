@@ -1,10 +1,13 @@
 
-# Table of Contents
+### Introduction
 
-* Getting Started
-  * [Getting Input](Getting-Input)
-  
-* Documentation
-  * [Input](Input.md)
-  
 * [Coding Style](Coding-Style)
+---
+### Getting Started
+
+* [Getting Input](Getting-Input)
+---
+### Documentation
+
+* [Input](Input.md)
+

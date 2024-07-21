@@ -2,7 +2,17 @@ Welcome to the Azalea wiki!
 
 This wiki contains documentation and guidelines for contribution.
 
-[Coding Style](Coding-Style)
+# Table of Contents
 
-FAQ
-- [How to get User Input?](Getting-Input)
+### Introduction
+
+* [Coding Style](Coding-Style)
+---
+### Getting Started
+
+* [Getting Input](Getting-Input)
+---
+### Documentation
+
+* [Input](Input.md)
+
