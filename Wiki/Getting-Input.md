@@ -2,7 +2,7 @@
 
 Every window input is handled through the static `Input` class. This ensures that getting user input is simple from anywhere in the code. Additionally, every `GameObject` has their own virtual functions for responding to certain inputs, such as an `OnClick` function that is called only when the `MouseDownEvent` and `MouseUpEvent` happen while hovering that object. It is recommended to use the latter option as it supports more features such as "consuming" input and won't break if we ever introduce support for multiple windows.
 
-- [[The-Input-Class|Input class documentation]]
+- [[Input class documentation|The-Input-Class]]
 
 # Examples
 
