@@ -14,5 +14,5 @@ This wiki contains documentation and guidelines for contribution.
 ---
 ### Documentation
 
-* [Input](Input.md)
+* [Input](Input)
 

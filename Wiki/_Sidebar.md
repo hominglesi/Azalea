@@ -9,5 +9,5 @@
 ---
 ### Documentation
 
-* [Input](Input.md)
+* [Input](Input)
 
