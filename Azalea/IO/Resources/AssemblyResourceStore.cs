@@ -3,12 +3,12 @@ using System.IO;
 using System.Reflection;
 
 namespace Azalea.IO.Resources;
-public class AssemblyResourceStore : IResourceStore
+public class EmbeddedResourceStore : IResourceStore
 {
 	private Assembly _assembly;
 	private string _prefix;
 
-	public AssemblyResourceStore(Assembly assembly)
+	public EmbeddedResourceStore(Assembly assembly)
 	{
 		_assembly = assembly;
 		_prefix = assembly.GetName().Name ??= "";

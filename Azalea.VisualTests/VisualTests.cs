@@ -29,7 +29,7 @@ public class VisualTests : AzaleaGame
 
 	protected override void OnInitialize()
 	{
-		Assets.AddToMainStore(new NamespacedResourceStore(new AssemblyResourceStore(typeof(VisualTests).Assembly), "Resources"));
+		Assets.AddToMainStore(new NamespacedResourceStore(new EmbeddedResourceStore(typeof(VisualTests).Assembly), "Resources"));
 		Assets.AddFont("Fonts/TitanOne-Regular.fnt", "TitanOne");
 		_tests = ReflectionUtils.GetAllChildrenOf(typeof(TestScene)).Where(x => x.IsAbstract == false).Select(x => x.FullName).ToList()!;
 

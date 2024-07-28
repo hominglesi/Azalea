@@ -4,7 +4,6 @@ using Azalea.Design.Containers;
 using Azalea.Extentions;
 using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
-using Azalea.IO.Resources;
 using Azalea.Physics;
 using System;
 using System.Diagnostics;
@@ -98,7 +97,6 @@ public abstract class GameHost
 
 		Window.Dispose();
 		AudioManager.Dispose();
-		Assets.DisposeAssets();
 	}
 
 	private long _frameStart;

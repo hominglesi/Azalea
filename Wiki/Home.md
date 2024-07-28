@@ -10,9 +10,10 @@ This wiki contains documentation and guidelines for contribution.
 ---
 ### Getting Started
 
+* [Getting Assets](Getting-Assets)
 * [Getting Input](Getting-Input)
 ---
 ### Documentation
 
+- [Assets](Assets)
 * [Input](Input)
-

@@ -41,6 +41,34 @@ public static class Input
 			mouseButton.Update();
 	}
 
+	/// <summary>
+	/// Gets a list of all the objects in the scene graph that contain the specified position
+	/// starting with the deepest ones and going out.
+	/// </summary>
+	public static IReadOnlyList<GameObject> GetPositionalInputQueue(Vector2 position)
+	{
+		Debug.Assert(_rootObject is not null);
+
+		var inputQueue = new List<GameObject>();
+		_rootObject.BuildPositionalInputQueue(position, inputQueue);
+		inputQueue.Reverse();
+		return inputQueue;
+	}
+
+	/// <summary>
+	/// Gets a list of all the objects in the scene graph
+	/// starting with the deepest ones and going out.
+	/// </summary>
+	public static IReadOnlyList<GameObject> GetNonPositionalInputQueue()
+	{
+		Debug.Assert(_rootObject is not null);
+
+		var inputQueue = new List<GameObject>();
+		_rootObject.BuildNonPositionalInputQueue(inputQueue);
+		inputQueue.Reverse();
+		return inputQueue;
+	}
+
 	private static void propagateNonPositionalInputEvent(InputEvent e)
 	{
 		foreach (var obj in GetNonPositionalInputQueue())
@@ -85,34 +113,6 @@ public static class Input
 	{
 		if (recalculate) updateHoveredObjects();
 		return _hoveredObjects;
-	}
-
-	/// <summary>
-	/// Gets a list of all the objects in the scene graph that contain the specified position
-	/// starting with the deepest ones and going out.
-	/// </summary>
-	public static IReadOnlyList<GameObject> GetPositionalInputQueue(Vector2 position)
-	{
-		Debug.Assert(_rootObject is not null);
-
-		var inputQueue = new List<GameObject>();
-		_rootObject.BuildPositionalInputQueue(position, inputQueue);
-		inputQueue.Reverse();
-		return inputQueue;
-	}
-
-	/// <summary>
-	/// Gets a list of all the objects in the scene graph
-	/// starting with the deepest ones and going out.
-	/// </summary>
-	public static IReadOnlyList<GameObject> GetNonPositionalInputQueue()
-	{
-		Debug.Assert(_rootObject is not null);
-
-		var inputQueue = new List<GameObject>();
-		_rootObject.BuildNonPositionalInputQueue(inputQueue);
-		inputQueue.Reverse();
-		return inputQueue;
 	}
 
 	private static void updateHoveredObjects()

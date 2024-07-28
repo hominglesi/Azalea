@@ -22,7 +22,7 @@ public class MemoryGame : AzaleaGame
 		Host.Renderer.ClearColor = new Color(189, 223, 214);
 		Host.Window.Resizable = true;
 
-		var assemblyStore = new NamespacedResourceStore(new AssemblyResourceStore(typeof(MemoryGame).Assembly), "Resources");
+		var assemblyStore = new NamespacedResourceStore(new EmbeddedResourceStore(typeof(MemoryGame).Assembly), "Resources");
 
 		Assets.AddToMainStore(assemblyStore);
 		_tilesStore = new NamespacedResourceStore(assemblyStore, "Textures/Tiles");
