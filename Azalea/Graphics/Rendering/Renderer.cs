@@ -49,7 +49,7 @@ internal abstract class Renderer : IRenderer
 	public Texture WhitePixel => _whitePixel ??= generateWhitePixel();
 	private Texture generateWhitePixel()
 	{
-		var whitePixel = new Image(1, 1,
+		var whitePixel = new Image(1, 1, 4,
 			new byte[4] { byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue });
 
 		return CreateTexture(whitePixel);
@@ -118,6 +118,8 @@ internal abstract class Renderer : IRenderer
 		return true;
 	}
 
+	internal virtual void Dispose() { }
+
 	#region Scissor test
 
 	private Stack<RectangleInt> _scissorRectangles = new();
@@ -171,4 +173,5 @@ internal abstract class Renderer : IRenderer
 	void IRenderer.FlushCurrentBatch() => FlushCurrentBatch();
 	IVertexBatch IRenderer.CreateQuadBatch(int size) => CreateQuadBatch(size);
 	bool IRenderer.BindTexture(Texture texture, int unit) => BindTexture(texture, unit);
+	void IRenderer.Dispose() => Dispose();
 }

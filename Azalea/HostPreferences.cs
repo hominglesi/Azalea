@@ -1,9 +1,11 @@
-﻿using Azalea.Platform;
+﻿using Azalea.Graphics;
+using Azalea.Platform;
 
 namespace Azalea;
 
 public struct HostPreferences
 {
+	public GraphicsAPI GraphicsAPI = GraphicsAPI.OpenGL;
 	public Vector2Int ClientSize = new(1280, 720);
 	public WindowState WindowState = WindowState.Normal;
 	public bool WindowResizable = false;

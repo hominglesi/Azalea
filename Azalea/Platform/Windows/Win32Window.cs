@@ -1,5 +1,4 @@
 ﻿using Azalea.Graphics;
-using Azalea.Graphics.OpenGL;
 using Azalea.Inputs;
 using Azalea.Utils;
 using System;
@@ -57,21 +56,11 @@ internal class Win32Window : PlatformWindow
 			return;
 		}
 
-		//Setup OpenGL
-		_deviceContext = WinAPI.GetDC(_window);
-
-		var pfDescriptor = new PixelFormatDescriptor();
-		var format = WinAPI.ChoosePixelFormat(_deviceContext, ref pfDescriptor);
-
-		WinAPI.SetPixelFormat(_deviceContext, format, ref pfDescriptor);
-
-		var glContext = GL.CreateContext(_deviceContext);
-		GL.MakeCurrent(_deviceContext, glContext);
-		GL.ImportFunctions();
-
 		//Sync values with PlatformWindow
 		var windowSize = WinAPI.GetWindowRect(_window).Size;
 		UpdateSize(windowSize, clientSize);
+
+		_deviceContext = WinAPI.GetDC(_window);
 	}
 
 	private IntPtr windowProcedure(IntPtr window, uint message, IntPtr wParam, IntPtr lParam)
@@ -232,10 +221,10 @@ internal class Win32Window : PlatformWindow
 	}
 
 	protected override void SetVSyncImplementation(bool enabled)
-		=> GL.SwapInterval(enabled ? 1 : 0);
+	{ } //GL.SwapInterval(enabled ? 1 : 0);
 
 	protected override bool GetVSyncImplementation()
-		=> GL.GetSwapInterval() == 1;
+		=> true; //GL.GetSwapInterval() == 1;
 
 	protected override bool GetCanChangeVSyncImplementation()
 	{
@@ -332,6 +321,8 @@ internal class Win32Window : PlatformWindow
 	private WindowStylesEx getCurrentStyleEx() => (WindowStylesEx)WinAPI.GetWindowLong(_window, (int)WindowLongValue.ExStyle);
 	private IntPtr getCurrentMonitor() => WinAPI.MonitorFromWindow(_window, MonitorFromFlags.DefaultToNearest);
 	private MonitorInfo getCurrentMonitorInfo() => WinAPI.GetMonitorInfo(getCurrentMonitor());
+
+	public IntPtr Handle => _window;
 
 	protected override void OnDispose()
 	{

@@ -95,6 +95,7 @@ public abstract class GameHost
 
 		PerformanceTrace.SaveEventsTo("C:\\Programming\\trace.txt");
 
+		Renderer.Dispose();
 		Window.Dispose();
 		AudioManager.Dispose();
 	}

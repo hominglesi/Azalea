@@ -29,4 +29,6 @@ public interface IRenderer
 
 	internal void PushScissor(RectangleInt scissorRect);
 	internal void PopScissor();
+
+	internal void Dispose();
 }

@@ -7,12 +7,27 @@ using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Numerics;
 using Azalea.Platform;
+using Azalea.Platform.Windows;
 
 namespace Azalea.Graphics.OpenGL;
 internal class GLRenderer : Renderer
 {
 	public GLRenderer(IWindow window)
-		: base(window) { }
+		: base(window)
+	{
+		if (window is not Win32Window win32Window)
+			throw new System.Exception("Cant create surface from non win32 windows");
+
+		var deviceContext = WinAPI.GetDC(win32Window.Handle);
+		var pfDescriptor = new PixelFormatDescriptor();
+		var format = WinAPI.ChoosePixelFormat(deviceContext, ref pfDescriptor);
+
+		WinAPI.SetPixelFormat(deviceContext, format, ref pfDescriptor);
+
+		var glContext = GL.CreateContext(deviceContext);
+		GL.MakeCurrent(deviceContext, glContext);
+		GL.ImportFunctions();
+	}
 
 	internal override void FinishFrame()
 	{

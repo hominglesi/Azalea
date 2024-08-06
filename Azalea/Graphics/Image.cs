@@ -8,23 +8,26 @@ namespace Azalea.Graphics;
 
 public class Image
 {
-	private byte[] _data;
 	private int _width;
 	private int _height;
+	private int _channelCount;
+	private byte[] _data;
 
 	public int Width => _width;
 	public int Height => _height;
+	public int ChannelCount => _channelCount;
 	public byte[] Data => _data;
 
-	public Image(int width, int height, byte[] data)
+	public Image(int width, int height, int channelCount, byte[] data)
 	{
 		_width = width;
 		_height = height;
+		_channelCount = channelCount;
 		_data = data;
 	}
 
 	public Image(int width, int height)
-		: this(width, height, new byte[width * height * 4])
+		: this(width, height, 4, new byte[width * height * 4])
 	{
 
 	}
@@ -65,7 +68,7 @@ public class Image
 
 			byte[] data = new byte[width * height * (int)ColorComponents.RedGreenBlueAlpha];
 			Marshal.Copy(new IntPtr(ptr), data, 0, data.Length);
-			return new Image(width, height, data);
+			return new Image(width, height, comp, data);
 		}
 		finally
 		{
