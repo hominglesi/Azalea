@@ -20,9 +20,6 @@ public class Texture : Disposable
 		NativeTexture = nativeTexture ?? throw new ArgumentNullException(nameof(nativeTexture));
 	}
 
-	internal void SetData(Image upload)
-		=> NativeTexture.SetData(upload);
-
 	internal void SetFiltering(TextureFiltering minFilter, TextureFiltering magFilter)
 		=> NativeTexture.SetFiltering(minFilter, magFilter);
 

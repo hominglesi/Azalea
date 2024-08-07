@@ -5,15 +5,18 @@ using Azalea.Utils;
 namespace Azalea.Graphics.Vulkan;
 internal class VulkanTexture : Disposable, INativeTexture
 {
+	private uint _textureIndex;
 	private int _width;
 	private int _height;
 	private VulkanRenderer _renderer;
 
-	public VulkanTexture(VulkanRenderer renderer, int width, int height)
+	public VulkanTexture(VulkanRenderer renderer, Image image)
 	{
 		_renderer = renderer;
-		_width = width;
-		_height = height;
+		_width = image.Width;
+		_height = image.Height;
+
+		_textureIndex = renderer.Controller.CreateTexture(image);
 	}
 
 	public IRenderer Renderer => _renderer;
@@ -22,8 +25,7 @@ internal class VulkanTexture : Disposable, INativeTexture
 
 	public int Height => _height;
 
-	// Not Implemented
-	public void SetData(Image upload) { }
+	public uint TextureIndex => _textureIndex;
 
 	// Not Implemented
 	public void SetFiltering(TextureFiltering minFilter, TextureFiltering magFilter) { }

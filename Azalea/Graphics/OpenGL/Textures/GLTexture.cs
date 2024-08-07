@@ -13,13 +13,14 @@ internal class GLTexture : Disposable, INativeTexture
 	private int _height;
 	private GLRenderer _renderer;
 
-	public GLTexture(GLRenderer renderer, int width, int height)
+	public GLTexture(GLRenderer renderer, Image image)
 	{
 		_renderer = renderer;
-		_width = width;
-		_height = height;
+		_width = image.Width;
+		_height = image.Height;
 
 		_handle = GL.GenTexture();
+		SetData(image);
 	}
 
 	internal void SetData(Image image)
@@ -62,9 +63,6 @@ internal class GLTexture : Disposable, INativeTexture
 	public IRenderer Renderer => _renderer;
 	public int Width => _width;
 	public int Height => _height;
-
-
-	void INativeTexture.SetData(Image upload) => SetData(upload);
 
 	protected override void OnDispose()
 	{

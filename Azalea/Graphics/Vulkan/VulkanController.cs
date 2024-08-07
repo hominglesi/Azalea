@@ -25,21 +25,21 @@ internal unsafe class VulkanController
 				vertShaderDataPointer, vertShaderData.Length,
 				fragShaderDataPointer, fragShaderData.Length);
 		}
-
-		Image image = Assets.MainStore.GetImage("Textures/azalea-icon.png");
-
-		fixed (void* imageData = image.Data)
-		{
-			createTexture(_handle, image.Width, image.Height, image.ChannelCount, imageData);
-		}
 	}
 
 	public void Destroy() => destroyVulkanController(_handle);
 
+	public uint CreateTexture(Image image)
+	{
+		fixed (void* imageData = image.Data)
+		{
+			return createTexture(_handle, image.Width, image.Height, image.ChannelCount, imageData);
+		}
+	}
 	public void BeginFrame() => beginFrame(_handle);
 	public void FinishFrame() => finishFrame(_handle);
 
-	public void PushQuad(Vector2 topLeft, Vector2 topRight, Vector2 bottomRight, Vector2 bottomLeft)
+	public void PushQuad(VulkanVertex topLeft, VulkanVertex topRight, VulkanVertex bottomRight, VulkanVertex bottomLeft)
 		=> pushQuad(_handle, topLeft, topRight, bottomRight, bottomLeft);
 
 	public void SetProjectionMatrix(Matrix4x4 matrix) => setProjectionMatrix(_handle, matrix);
@@ -54,7 +54,7 @@ internal unsafe class VulkanController
 	private static extern void destroyVulkanController(IntPtr vulkanController);
 
 	[DllImport("AzaleaNative.dll", EntryPoint = "VulkanCreateTexture")]
-	private static extern void createTexture(IntPtr vulkanController, int width, int height, int channelCount, void* data);
+	private static extern uint createTexture(IntPtr vulkanController, int width, int height, int channelCount, void* data);
 
 	[DllImport("AzaleaNative.dll", EntryPoint = "VulkanBeginFrame")]
 	private static extern void beginFrame(IntPtr vulkanController);
@@ -63,7 +63,7 @@ internal unsafe class VulkanController
 	private static extern void finishFrame(IntPtr vulkanController);
 
 	[DllImport("AzaleaNative.dll", EntryPoint = "VulkanPushQuad")]
-	private static extern void pushQuad(IntPtr vulkanController, Vector2 topLeft, Vector2 topRight, Vector2 bottomRight, Vector2 bottomLeft);
+	private static extern void pushQuad(IntPtr vulkanController, VulkanVertex topLeft, VulkanVertex topRight, VulkanVertex bottomRight, VulkanVertex bottomLeft);
 
 	[DllImport("AzaleaNative.dll", EntryPoint = "VulkanSetProjectionMatrix")]
 	private static extern void setProjectionMatrix(IntPtr vulkanController, Matrix4x4 projectionMatrix);

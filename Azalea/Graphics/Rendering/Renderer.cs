@@ -65,11 +65,10 @@ internal abstract class Renderer : IRenderer
 	protected abstract void SetViewportImplementation(Vector2Int size);
 
 	protected abstract IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size);
-	protected abstract INativeTexture CreateNativeTexture(int width, int height);
+	protected abstract INativeTexture CreateNativeTexture(Image image);
 	public Texture CreateTexture(Image image)
 	{
-		var nativeTexture = CreateNativeTexture(image.Width, image.Height);
-		nativeTexture.SetData(image);
+		var nativeTexture = CreateNativeTexture(image);
 
 		return new Texture(nativeTexture);
 	}

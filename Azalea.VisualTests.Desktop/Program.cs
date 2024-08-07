@@ -1,11 +1,12 @@
 ﻿using Azalea;
+using Azalea.Debugging;
 using Azalea.Graphics;
 using Azalea.IO.Configs;
 using Azalea.IO.Resources;
 using Azalea.Platform;
 using Azalea.VisualTests;
 
-//PerformanceTrace.Enabled = true;
+PerformanceTrace.Enabled = true;
 
 Assets.SetupPersistentStore("Azalea.VisualTests");
 

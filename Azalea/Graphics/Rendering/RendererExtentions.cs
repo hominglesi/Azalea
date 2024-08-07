@@ -1,9 +1,12 @@
 ﻿using Azalea.Graphics.Colors;
+using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Graphics.Textures;
+using Azalea.Graphics.Vulkan;
 using Azalea.Numerics;
 using System;
+using System.Numerics;
 
 namespace Azalea.Graphics.Rendering;
 
@@ -29,39 +32,80 @@ public static class RendererExtentions
 		if (ClientContainsQuad(vertexQuad) == false)
 			return;
 
-		renderer.BindTexture(texture);
-
-		var vertexAction = renderer.DefaultQuadBatch.AddAction;
-
 		var textureRegion = customUV ?? texture.GetUVCoordinates();
 
-		vertexAction(new TexturedVertex2D
+		if (renderer is GLRenderer)
 		{
-			Position = vertexQuad.BottomLeft,
-			Color = drawColorInfo.Color.BottomLeft,
-			TexturePosition = textureRegion.BottomLeft
-		});
+			renderer.BindTexture(texture);
 
-		vertexAction(new TexturedVertex2D
-		{
-			Position = vertexQuad.BottomRight,
-			Color = drawColorInfo.Color.BottomRight,
-			TexturePosition = textureRegion.BottomRight
-		});
+			var vertexAction = renderer.DefaultQuadBatch.AddAction;
 
-		vertexAction(new TexturedVertex2D
-		{
-			Position = vertexQuad.TopRight,
-			Color = drawColorInfo.Color.TopRight,
-			TexturePosition = textureRegion.TopRight
-		});
+			vertexAction(new TexturedVertex2D
+			{
+				Position = vertexQuad.BottomLeft,
+				Color = drawColorInfo.Color.BottomLeft,
+				TexturePosition = textureRegion.BottomLeft
+			});
 
-		vertexAction(new TexturedVertex2D
+			vertexAction(new TexturedVertex2D
+			{
+				Position = vertexQuad.BottomRight,
+				Color = drawColorInfo.Color.BottomRight,
+				TexturePosition = textureRegion.BottomRight
+			});
+
+			vertexAction(new TexturedVertex2D
+			{
+				Position = vertexQuad.TopRight,
+				Color = drawColorInfo.Color.TopRight,
+				TexturePosition = textureRegion.TopRight
+			});
+
+			vertexAction(new TexturedVertex2D
+			{
+				Position = vertexQuad.TopLeft,
+				Color = drawColorInfo.Color.TopLeft,
+				TexturePosition = textureRegion.TopLeft
+			});
+		}
+		else if (renderer is VulkanRenderer vkRenderer)
 		{
-			Position = vertexQuad.TopLeft,
-			Color = drawColorInfo.Color.TopLeft,
-			TexturePosition = textureRegion.TopLeft
-		});
+			var vulkanTexture = (VulkanTexture)texture.NativeTexture;
+
+			var topLeft = new VulkanVertex()
+			{
+				Position = vertexQuad.TopLeft,
+				Color = new Vector3(drawColorInfo.Color.TopLeft.RNormalized, drawColorInfo.Color.TopLeft.GNormalized, drawColorInfo.Color.TopLeft.BNormalized),
+				TextureCoordinate = textureRegion.TopLeft,
+				TextureIndex = vulkanTexture.TextureIndex
+			};
+
+			var topRight = new VulkanVertex()
+			{
+				Position = vertexQuad.TopRight,
+				Color = new Vector3(drawColorInfo.Color.TopRight.RNormalized, drawColorInfo.Color.TopRight.GNormalized, drawColorInfo.Color.TopRight.BNormalized),
+				TextureCoordinate = textureRegion.TopRight,
+				TextureIndex = vulkanTexture.TextureIndex
+			};
+
+			var bottomRight = new VulkanVertex()
+			{
+				Position = vertexQuad.BottomRight,
+				Color = new Vector3(drawColorInfo.Color.BottomRight.RNormalized, drawColorInfo.Color.BottomRight.GNormalized, drawColorInfo.Color.BottomRight.BNormalized),
+				TextureCoordinate = textureRegion.BottomRight,
+				TextureIndex = vulkanTexture.TextureIndex
+			};
+
+			var bottomLeft = new VulkanVertex()
+			{
+				Position = vertexQuad.BottomLeft,
+				Color = new Vector3(drawColorInfo.Color.BottomLeft.RNormalized, drawColorInfo.Color.BottomLeft.GNormalized, drawColorInfo.Color.BottomLeft.BNormalized),
+				TextureCoordinate = textureRegion.BottomLeft,
+				TextureIndex = vulkanTexture.TextureIndex
+			};
+
+			vkRenderer.Controller.PushQuad(topLeft, topRight, bottomRight, bottomLeft);
+		}
 	}
 
 	internal static void DrawRectangle(this IRenderer renderer, Rectangle rect, Matrix3 drawMatrix, Boundary thickness, DrawColorInfo color, bool towardsOutside)

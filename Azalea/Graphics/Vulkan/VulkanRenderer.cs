@@ -1,7 +1,6 @@
 ﻿using Azalea.Graphics.Colors;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
-using Azalea.Inputs;
 using Azalea.Numerics;
 using Azalea.Platform;
 using Azalea.Platform.Windows;
@@ -10,7 +9,7 @@ using System.Numerics;
 namespace Azalea.Graphics.Vulkan;
 internal class VulkanRenderer : Renderer
 {
-	private readonly VulkanController _controller;
+	public readonly VulkanController Controller;
 
 	public VulkanRenderer(IWindow window)
 		: base(window)
@@ -18,25 +17,26 @@ internal class VulkanRenderer : Renderer
 		if (window is not Win32Window win32Window)
 			throw new System.Exception("Cant create surface from non win32 windows");
 
-		_controller = new VulkanController(win32Window.Handle);
+		Controller = new VulkanController(win32Window.Handle);
 
-		window.OnClientResized += (_) => _controller.SetFramebufferResized();
+		window.OnClientResized += (_) => Controller.SetFramebufferResized();
 	}
 
 	internal override void BeginFrame()
 	{
 		base.BeginFrame();
 
-		_controller.BeginFrame();
+		Controller.BeginFrame();
 
-		_controller.PushQuad(new Vector2(50.0f, 50.0f), new Vector2(100.0f, 50.0f), new Vector2(100.0f, 100.0f), new Vector2(50.0f, 100.0f));
-		_controller.PushQuad(new Vector2(700.0f, 500.0f), new Vector2(900.0f, 500.0f), new Vector2(900.0f, 600.0f), new Vector2(700.0f, 600.0f));
+		/*
+		Controller.PushQuad(new Vector2(50.0f, 50.0f), new Vector2(100.0f, 50.0f), new Vector2(100.0f, 100.0f), new Vector2(50.0f, 100.0f), 0);
+		Controller.PushQuad(new Vector2(700.0f, 500.0f), new Vector2(900.0f, 500.0f), new Vector2(900.0f, 600.0f), new Vector2(700.0f, 600.0f), 0);
 		var mousePosition = Input.MousePosition;
-		_controller.PushQuad(
+		Controller.PushQuad(
 			mousePosition + new Vector2(-25, -25),
 			mousePosition + new Vector2(25, -25),
 			mousePosition + new Vector2(25, 25),
-			mousePosition + new Vector2(-25, 25));
+			mousePosition + new Vector2(-25, 25), 1);*/
 	}
 
 	internal override void FinishFrame()
@@ -45,15 +45,15 @@ internal class VulkanRenderer : Renderer
 
 		var clientSize = Window.ClientSize;
 		var projectionMatrix = Matrix4x4.CreateOrthographicOffCenter(0, clientSize.X, 0, clientSize.Y, 0.1f, 10);
-		_controller.SetProjectionMatrix(projectionMatrix);
-		_controller.FinishFrame();
+		Controller.SetProjectionMatrix(projectionMatrix);
+		Controller.FinishFrame();
 	}
 
 	// Not Implemented
 	protected override void ClearImplementation(Color color) { }
 
-	protected override INativeTexture CreateNativeTexture(int width, int height)
-		=> new VulkanTexture(this, width, height);
+	protected override INativeTexture CreateNativeTexture(Image image)
+		=> new VulkanTexture(this, image);
 
 	// Not Implemented
 	protected override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
@@ -75,6 +75,6 @@ internal class VulkanRenderer : Renderer
 	{
 		base.Dispose();
 
-		_controller.Destroy();
+		Controller.Destroy();
 	}
 }

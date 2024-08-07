@@ -31,9 +31,52 @@ const std::vector<VkDynamicState> dynamicStates = {
 	VK_DYNAMIC_STATE_SCISSOR
 };
 
+struct Vertex {
+	vector2 pos;
+	vector3 color;
+	uint32_t texIndex;
+	vector2 texCoord;
+
+	static VkVertexInputBindingDescription getBindingDescription() {
+		VkVertexInputBindingDescription bindingDescription{};
+		bindingDescription.binding = 0;
+		bindingDescription.stride = sizeof(Vertex);
+		bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+		return bindingDescription;
+	}
+
+	static std::array<VkVertexInputAttributeDescription, 4> getAttributeDescriptions() {
+		std::array<VkVertexInputAttributeDescription, 4> attributeDescriptions{};
+		attributeDescriptions[0].binding = 0;
+		attributeDescriptions[0].location = 0;
+		attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+		attributeDescriptions[0].offset = offsetof(Vertex, pos);
+
+		attributeDescriptions[1].binding = 0;
+		attributeDescriptions[1].location = 1;
+		attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attributeDescriptions[1].offset = offsetof(Vertex, color);
+
+		attributeDescriptions[2].binding = 0;
+		attributeDescriptions[2].location = 2;
+		attributeDescriptions[2].format = VK_FORMAT_R32_UINT;
+		attributeDescriptions[2].offset = offsetof(Vertex, texIndex);
+
+		attributeDescriptions[3].binding = 0;
+		attributeDescriptions[3].location = 3;
+		attributeDescriptions[3].format = VK_FORMAT_R32G32_SFLOAT;
+		attributeDescriptions[3].offset = offsetof(Vertex, texCoord);
+
+		return attributeDescriptions;
+	}
+};
+
 const int MAX_VERTEX_INDEX = 65535;
 const int VERTEX_BUFFER_LENGTH = 65536;
 const int INDEX_BUFFER_LENGTH = 98304;
+const int TEXTURE_ARRAY_LENGTH = 1024;
+const int MAX_FRAMES_IN_FLIGHT = 2;
 
 class VulkanController {
 
@@ -81,9 +124,9 @@ public:
 		cleanupSwapchain(device, framebuffers, swapchainImageViews, swapchain);
 
 		destroySampler(device, textureSampler);
-		destroyImageView(device, textureImageView);
-		destroyImage(device, textureImage);
-		freeDeviceMemory(device, textureImageMemory);
+		destroyImageViews(device, textureImageViews);
+		destroyImages(device, textureImages);
+		freeDeviceMemories(device, textureImageMemories);
 		destroyBuffer(device, indexBuffer);
 		freeDeviceMemory(device, indexBufferMemory);
 		destroyBuffer(device, vertexBuffer);
@@ -164,7 +207,11 @@ public:
 		};
 	}
 
-	void CreateTexture(int width, int height, int channelCount, void* textureData) {
+	uint32_t CreateTexture(int width, int height, int channelCount, void* textureData) {
+		if (textureCount >= TEXTURE_ARRAY_LENGTH) {
+			THROW("Maximum amount of textures has been bound");
+		}
+
 		VkDeviceSize imageSize = width * height * 4;
 
 		VkBuffer stagingBuffer = createBuffer(device, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
@@ -175,8 +222,8 @@ public:
 		memcpy(data, textureData, static_cast<size_t>(imageSize));
 		vkUnmapMemory(device, stagingBufferMemory);
 
-		textureImage = createTextureImage(device, width, height, channelCount, textureData);
-		textureImageMemory = allocateImageMemory(physicalDevice, device, textureImage);
+		VkImage textureImage = createTextureImage(device, width, height, channelCount, textureData);
+		VkDeviceMemory textureImageMemory = allocateImageMemory(physicalDevice, device, textureImage);
 
 		transitionImageLayout(device, commandPool, graphicsQueue, textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 		copyBufferToImage(device, commandPool, graphicsQueue, stagingBuffer, textureImage, width, height);
@@ -186,8 +233,15 @@ public:
 		destroyBuffer(device, stagingBuffer);
 		freeDeviceMemory(device, stagingBufferMemory);
 
-		textureImageView = createImageView(device, textureImage, VK_FORMAT_R8G8B8A8_SRGB);
-		configureUniformDescriptor(device, uniformBuffer, textureImageView, textureSampler, descriptorSet);
+		VkImageView textureImageView = createImageView(device, textureImage, VK_FORMAT_R8G8B8A8_SRGB);
+		
+		textureImages.push_back(textureImage);
+		textureImageMemories.push_back(textureImageMemory);
+		textureImageViews.push_back(textureImageView);
+
+		texturesUpdated = true;
+
+		return textureCount++;
 	}
 
 	void BeginFrame() {
@@ -254,17 +308,22 @@ public:
 		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
 	}
 
-	void PushQuad(vector2 topLeft, vector2 topRight, vector2 bottomRight, vector2 bottomLeft) {
-		vertexBufferData.push_back({ topLeft,     { 1.0f, 1.0f, 1.0f }, 0.0f, { 0.0f, 0.0f } });
-		vertexBufferData.push_back({ topRight,    { 1.0f, 1.0f, 1.0f }, 0.0f, { 1.0f, 0.0f } });
-		vertexBufferData.push_back({ bottomRight, { 1.0f, 1.0f, 1.0f }, 0.0f, { 1.0f, 1.0f } });
-		vertexBufferData.push_back({ bottomLeft,  { 1.0f, 1.0f, 1.0f }, 0.0f, { 0.0f, 1.0f } });
+	void PushQuad(Vertex topLeft, Vertex topRight, Vertex bottomRight, Vertex bottomLeft) {
+		vertexBufferData.push_back(topLeft);
+		vertexBufferData.push_back(topRight);
+		vertexBufferData.push_back(bottomRight);
+		vertexBufferData.push_back(bottomLeft);
 
 		currentVertexCount += 4;
 		currentIndexCount += 6;
 	}
 
 	void FinishFrame() {
+		if (texturesUpdated) {
+			configureUniformDescriptor(device, uniformBuffer, textureImageViews, textureSampler, descriptorSet);
+			texturesUpdated = false;
+		}
+
 		vkCmdDrawIndexed(commandBuffer, currentIndexCount, 1, 0, 0, 0);
 		vkCmdEndRenderPass(commandBuffer);
 
@@ -348,47 +407,6 @@ private:
 		std::vector<VkPresentModeKHR> presentModes;
 	};
 
-	struct Vertex {
-		vector2 pos;
-		vector3 color;
-		float texIndex;
-		vector2 texCoord;
-
-		static VkVertexInputBindingDescription getBindingDescription() {
-			VkVertexInputBindingDescription bindingDescription{};
-			bindingDescription.binding = 0;
-			bindingDescription.stride = sizeof(Vertex);
-			bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-			return bindingDescription;
-		}
-
-		static std::array<VkVertexInputAttributeDescription, 4> getAttributeDescriptions() {
-			std::array<VkVertexInputAttributeDescription, 4> attributeDescriptions{};
-			attributeDescriptions[0].binding = 0;
-			attributeDescriptions[0].location = 0;
-			attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
-			attributeDescriptions[0].offset = offsetof(Vertex, pos);
-
-			attributeDescriptions[1].binding = 0;
-			attributeDescriptions[1].location = 1;
-			attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-			attributeDescriptions[1].offset = offsetof(Vertex, color);
-
-			attributeDescriptions[2].binding = 0;
-			attributeDescriptions[2].location = 2;
-			attributeDescriptions[2].format = VK_FORMAT_R32_SFLOAT;
-			attributeDescriptions[2].offset = offsetof(Vertex, texIndex);
-
-			attributeDescriptions[3].binding = 0;
-			attributeDescriptions[3].location = 3;
-			attributeDescriptions[3].format = VK_FORMAT_R32G32_SFLOAT;
-			attributeDescriptions[3].offset = offsetof(Vertex, texCoord);
-
-			return attributeDescriptions;
-		}
-	};
-
 	struct UniformBufferObject {
 		alignas(16) matrix4x4 projection;
 	};
@@ -428,9 +446,11 @@ private:
 	VkBuffer uniformBuffer;
 	VkDeviceMemory uniformBufferMemory;
 	void* uniformBufferMapping;
-	VkImage textureImage;
-	VkDeviceMemory textureImageMemory;
-	VkImageView textureImageView;
+	uint32_t textureCount;
+	bool texturesUpdated = false;
+	std::vector<VkImage> textureImages;
+	std::vector<VkDeviceMemory> textureImageMemories;
+	std::vector<VkImageView> textureImageViews;
 	VkSampler textureSampler;
 
 	bool framebufferResized = false;
@@ -681,8 +701,6 @@ private:
 				static_cast<uint32_t>(clientRectiangle.right),
 				static_cast<uint32_t>(clientRectiangle.bottom)
 			};
-
-			std::cout << actualExtent.width;
 
 			actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
 			actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
@@ -1126,7 +1144,7 @@ private:
 		VkDescriptorSetLayoutBinding samplerLayoutBinding{};
 		samplerLayoutBinding.binding = 1;
 		samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		samplerLayoutBinding.descriptorCount = 1;
+		samplerLayoutBinding.descriptorCount = TEXTURE_ARRAY_LENGTH;
 		samplerLayoutBinding.pImmutableSamplers = nullptr;
 		samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
@@ -1217,6 +1235,12 @@ private:
 
 	static void destroyImage(VkDevice device, VkImage image) {
 		vkDestroyImage(device, image, nullptr);
+	}
+
+	static void destroyImages(VkDevice device, std::vector<VkImage> images) {
+		for (auto image : images) {
+			destroyImage(device, image);
+		}
 	}
 
 	static VkSampler createTextureSampler(VkPhysicalDevice physicalDevice, VkDevice device) {
@@ -1313,6 +1337,12 @@ private:
 
 	static void freeDeviceMemory(VkDevice device, VkDeviceMemory memory) {
 		vkFreeMemory(device, memory, nullptr);
+	}
+
+	static void freeDeviceMemories(VkDevice device, std::vector<VkDeviceMemory> memories) {
+		for (auto memory : memories) {
+			freeDeviceMemory(device, memory);
+		}
 	}
 
 	static VkCommandBuffer beginSingleTimeCommands(VkDevice device, VkCommandPool commandPool) {
@@ -1424,16 +1454,25 @@ private:
 		finishSingleTimeCommands(device, commandPool, graphicsQueue, commandBuffer);
 	}
 
-	static void configureUniformDescriptor(VkDevice device, VkBuffer uniformBuffer, VkImageView textureImageView, VkSampler textureSampler, VkDescriptorSet descriptorSet) {
+	static void configureUniformDescriptor(VkDevice device, VkBuffer uniformBuffer, std::vector<VkImageView> textureImageViews, VkSampler textureSampler, VkDescriptorSet descriptorSet) {
 		VkDescriptorBufferInfo bufferInfo{};
 		bufferInfo.buffer = uniformBuffer;
 		bufferInfo.offset = 0;
 		bufferInfo.range = sizeof(UniformBufferObject);
 
-		VkDescriptorImageInfo imageInfo{};
-		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = textureImageView;
-		imageInfo.sampler = textureSampler;
+		std::array<VkDescriptorImageInfo, TEXTURE_ARRAY_LENGTH> imageInfos{};
+		for (uint32_t i = 0; i < TEXTURE_ARRAY_LENGTH; i++)
+		{
+			imageInfos[i].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			imageInfos[i].sampler = textureSampler;
+
+			if (textureImageViews.size() > i) {
+				imageInfos[i].imageView = textureImageViews[i];
+			}
+			else {
+				imageInfos[i].imageView = textureImageViews[0];
+			}
+		}
 
 		std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
 		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -1449,8 +1488,8 @@ private:
 		descriptorWrites[1].dstBinding = 1;
 		descriptorWrites[1].dstArrayElement = 0;
 		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		descriptorWrites[1].descriptorCount = 1;
-		descriptorWrites[1].pImageInfo = &imageInfo;
+		descriptorWrites[1].descriptorCount = TEXTURE_ARRAY_LENGTH;
+		descriptorWrites[1].pImageInfo = imageInfos.data();
 
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 	}
@@ -1488,8 +1527,8 @@ extern "C" __declspec(dllexport) void DestroyVulkanController(VulkanController* 
 	delete controller; 
 }
 
-extern "C" __declspec(dllexport) void VulkanCreateTexture(VulkanController* controller, int width, int height, int channelCount, void* data) {
-	controller->CreateTexture(width, height, channelCount, data);
+extern "C" __declspec(dllexport) uint32_t VulkanCreateTexture(VulkanController* controller, int width, int height, int channelCount, void* data) {
+	return controller->CreateTexture(width, height, channelCount, data);
 }
 
 extern "C" __declspec(dllexport) void VulkanBeginFrame(VulkanController* controller) {
@@ -1500,7 +1539,7 @@ extern "C" __declspec(dllexport) void VulkanFinishFrame(VulkanController* contro
 	controller->FinishFrame();
 }
 
-extern "C" __declspec(dllexport) void VulkanPushQuad(VulkanController* controller, vector2 topLeft, vector2 topRight, vector2 bottomRight, vector2 bottomLeft) {
+extern "C" __declspec(dllexport) void VulkanPushQuad(VulkanController* controller, Vertex topLeft, Vertex topRight, Vertex bottomRight, Vertex bottomLeft) {
 	controller->PushQuad(topLeft, topRight, bottomRight, bottomLeft);
 }
 

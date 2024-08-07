@@ -53,8 +53,8 @@ internal class GLRenderer : Renderer
 	protected override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
 		=> new GLVertexBatch<TexturedVertex2D>(Window, size);
 
-	protected override INativeTexture CreateNativeTexture(int width, int height)
-		=> new GLTexture(this, width, height);
+	protected override INativeTexture CreateNativeTexture(Image image)
+		=> new GLTexture(this, image);
 
 	protected override bool SetTextureImplementation(INativeTexture? texture, int unit)
 	{
