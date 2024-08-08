@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.Colors;
+﻿using Azalea.Debugging;
+using Azalea.Graphics.Colors;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Numerics;
@@ -27,16 +28,6 @@ internal class VulkanRenderer : Renderer
 		base.BeginFrame();
 
 		Controller.BeginFrame();
-
-		/*
-		Controller.PushQuad(new Vector2(50.0f, 50.0f), new Vector2(100.0f, 50.0f), new Vector2(100.0f, 100.0f), new Vector2(50.0f, 100.0f), 0);
-		Controller.PushQuad(new Vector2(700.0f, 500.0f), new Vector2(900.0f, 500.0f), new Vector2(900.0f, 600.0f), new Vector2(700.0f, 600.0f), 0);
-		var mousePosition = Input.MousePosition;
-		Controller.PushQuad(
-			mousePosition + new Vector2(-25, -25),
-			mousePosition + new Vector2(25, -25),
-			mousePosition + new Vector2(25, 25),
-			mousePosition + new Vector2(-25, 25), 1);*/
 	}
 
 	internal override void FinishFrame()
@@ -47,6 +38,8 @@ internal class VulkanRenderer : Renderer
 		var projectionMatrix = Matrix4x4.CreateOrthographicOffCenter(0, clientSize.X, 0, clientSize.Y, 0.1f, 10);
 		Controller.SetProjectionMatrix(projectionMatrix);
 		Controller.FinishFrame();
+
+		PerformanceTrace.RunAndTrace(Controller.PresentSwapchain, "Present Swapchain");
 	}
 
 	// Not Implemented

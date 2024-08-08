@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.Colors;
+﻿using Azalea.Debugging;
+using Azalea.Graphics.Colors;
 using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering.Vertices;
@@ -32,10 +33,13 @@ public static class RendererExtentions
 		if (ClientContainsQuad(vertexQuad) == false)
 			return;
 
+		long drawQuadStart = 0;
 		var textureRegion = customUV ?? texture.GetUVCoordinates();
 
 		if (renderer is GLRenderer)
 		{
+			drawQuadStart = PerformanceTrace.StartEvent();
+
 			renderer.BindTexture(texture);
 
 			var vertexAction = renderer.DefaultQuadBatch.AddAction;
@@ -104,8 +108,12 @@ public static class RendererExtentions
 				TextureIndex = vulkanTexture.TextureIndex
 			};
 
+			drawQuadStart = PerformanceTrace.StartEvent();
+
 			vkRenderer.Controller.PushQuad(topLeft, topRight, bottomRight, bottomLeft);
 		}
+
+		PerformanceTrace.AddEvent(drawQuadStart, "DrawQuad");
 	}
 
 	internal static void DrawRectangle(this IRenderer renderer, Rectangle rect, Matrix3 drawMatrix, Boundary thickness, DrawColorInfo color, bool towardsOutside)

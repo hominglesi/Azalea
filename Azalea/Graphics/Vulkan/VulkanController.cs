@@ -38,6 +38,7 @@ internal unsafe class VulkanController
 	}
 	public void BeginFrame() => beginFrame(_handle);
 	public void FinishFrame() => finishFrame(_handle);
+	public void PresentSwapchain() => presentSwapchain(_handle);
 
 	public void PushQuad(VulkanVertex topLeft, VulkanVertex topRight, VulkanVertex bottomRight, VulkanVertex bottomLeft)
 		=> pushQuad(_handle, topLeft, topRight, bottomRight, bottomLeft);
@@ -61,6 +62,9 @@ internal unsafe class VulkanController
 
 	[DllImport("AzaleaNative.dll", EntryPoint = "VulkanFinishFrame")]
 	private static extern void finishFrame(IntPtr vulkanController);
+
+	[DllImport("AzaleaNative.dll", EntryPoint = "VulkanPresentSwapchain")]
+	private static extern void presentSwapchain(IntPtr vulkanController);
 
 	[DllImport("AzaleaNative.dll", EntryPoint = "VulkanPushQuad")]
 	private static extern void pushQuad(IntPtr vulkanController, VulkanVertex topLeft, VulkanVertex topRight, VulkanVertex bottomRight, VulkanVertex bottomLeft);

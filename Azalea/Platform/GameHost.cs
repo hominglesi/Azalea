@@ -127,12 +127,13 @@ public abstract class GameHost
 
 	public virtual void CallOnRender()
 	{
-		Renderer.BeginFrame();
+		PerformanceTrace.RunAndTrace(Renderer.BeginFrame, "Begin frame");
+
 		if (Renderer.AutomaticallyClear) Renderer.Clear();
 
 		Root.Draw(Renderer);
 
-		Renderer.FinishFrame();
+		PerformanceTrace.RunAndTrace(Renderer.FinishFrame, "Finish frame");
 	}
 
 	public virtual void CallOnUpdate()
