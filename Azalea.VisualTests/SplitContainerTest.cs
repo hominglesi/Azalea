@@ -12,15 +12,13 @@ public class SplitContainerTest : TestScene
 	{
 		_subContainer = new SplitContainer(new Box() { Color = Rng.Color() }, new Box() { Color = Rng.Color() })
 		{
-			Direction = SplitDirection.Vertical
+			//Direction = SplitDirection.Vertical,
+			ReversedPriority = true
 		};
 
 		Add(_container = new SplitContainer(new Box() { Color = Rng.Color() }, _subContainer)
 		{
-			Direction = SplitDirection.Horizontal,
 			RelativeSizeAxes = Axes.Both,
 		});
-
-
 	}
 }

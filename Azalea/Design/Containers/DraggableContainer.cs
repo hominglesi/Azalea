@@ -22,7 +22,9 @@ public class DraggableContainer : Composition
 			_dragBoundary = value;
 
 			var newPosition = _dragBoundary.ClampWithin(Position);
-			changePosition(newPosition);
+
+			if (newPosition != Position)
+				changePosition(newPosition);
 		}
 	}
 

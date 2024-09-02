@@ -1,11 +1,11 @@
 ﻿using Azalea.Graphics;
-using System;
 using System.Numerics;
 
 namespace Azalea.Design.Containers;
 public class SplitContainer : Composition
 {
 	public SplitDirection Direction { get; set; } = SplitDirection.Horizontal;
+	public bool ReversedPriority { get; set; } = false;
 
 	private GameObject _firstObject;
 	private GameObject _secondObject;
@@ -19,7 +19,7 @@ public class SplitContainer : Composition
 		_secondObject = secondObject;
 
 		SplitLine = CreateSplitLine();
-		SplitLine.PositionChanged += updateLayout;
+		//SplitLine.PositionChanged += updateLayout;
 
 		AddRange(new GameObject[] { _firstObject, _secondObject, SplitLine });
 	}
@@ -56,11 +56,13 @@ public class SplitContainer : Composition
 		}
 	}
 
+	private Vector2 _lastSplitPosition;
 	private Vector2 _lastDrawSize;
 	private SplitDirection _lastDirection = SplitDirection.Horizontal;
+	private bool _lastReversedPriority = false;
 	protected override void Update()
 	{
-		if (DrawSize == _lastDrawSize && _lastDirection == Direction)
+		if (DrawSize == _lastDrawSize && _lastDirection == Direction && _lastReversedPriority == ReversedPriority && SplitLine.Position == _lastSplitPosition)
 			return;
 
 		var maxScroll = Direction == SplitDirection.Horizontal ? DrawWidth : DrawHeight;
@@ -72,16 +74,39 @@ public class SplitContainer : Composition
 			scrollRange.Y -= _minSize;
 		}
 
-		SplitLine.UpdateLayout(Direction, scrollRange);
+		float lastValue;
+		if (_lastDirection == SplitDirection.Horizontal)
+		{
+			lastValue = SplitLine.X;
+			if (_lastReversedPriority)
+				lastValue = _lastDrawSize.X - lastValue;
+		}
+		else
+		{
+			lastValue = SplitLine.Y;
+			if (_lastReversedPriority)
+				lastValue = _lastDrawSize.Y - lastValue;
+		}
+
+		var newValue = lastValue;
+		if (ReversedPriority)
+		{
+			var newValueMax = Direction == SplitDirection.Horizontal ? DrawWidth : DrawHeight;
+			newValue = newValueMax - newValue;
+		}
+
+		SplitLine.UpdateLayout(Direction, scrollRange, newValue);
 		updateLayout();
 
+		_lastSplitPosition = SplitLine.Position;
 		_lastDirection = Direction;
 		_lastDrawSize = DrawSize;
+		_lastReversedPriority = ReversedPriority;
 	}
 
 	public abstract class SplitContainerLine : DraggableContainer
 	{
-		public abstract void UpdateLayout(SplitDirection direction, Vector2 scrollRange);
+		public abstract void UpdateLayout(SplitDirection direction, Vector2 scrollRange, float newValue);
 	}
 
 	protected virtual SplitContainerLine CreateSplitLine()
@@ -94,14 +119,12 @@ public class SplitContainer : Composition
 			X = 300;
 		}
 
-		public override void UpdateLayout(SplitDirection direction, Vector2 scrollRange)
+		public override void UpdateLayout(SplitDirection direction, Vector2 scrollRange, float newValue)
 		{
-			var offset = Math.Max(X, Y);
-
 			if (direction == SplitDirection.Horizontal)
 			{
 				Origin = Anchor.TopCenter;
-				X = offset;
+				X = newValue;
 				Y = 0;
 				RelativeSizeAxes = Axes.Y;
 				Size = new(0, 1);
@@ -115,7 +138,7 @@ public class SplitContainer : Composition
 			{
 				Origin = Anchor.CenterLeft;
 				X = 0;
-				Y = offset;
+				Y = newValue;
 				RelativeSizeAxes = Axes.X;
 				Size = new(1, 0);
 				DragBoundary = new(scrollRange.X, 0, scrollRange.Y, 0);

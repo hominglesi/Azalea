@@ -45,7 +45,8 @@ public class DebuggingOverlay : Composition
 
 		_verticalSplit = new SplitContainer(_mainSplitContainer, _bottomContainer)
 		{
-			Direction = SplitDirection.Vertical
+			Direction = SplitDirection.Vertical,
+			ReversedPriority = true
 		};
 
 		_horizontalSplit = new SplitContainer(_leftContainer, _verticalSplit)
@@ -66,6 +67,7 @@ public class DebuggingOverlay : Composition
 			Wrapping = FlexWrapping.Wrap,
 			Position = new(5, -5),
 			Spacing = new(5),
+			Depth = -1000
 		});
 
 		DisplayValues.AddDisplayedValue("Fps", () => Time.FpsCount);
