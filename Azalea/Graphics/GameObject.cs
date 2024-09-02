@@ -17,7 +17,7 @@ using System.Numerics;
 
 namespace Azalea.Graphics;
 
-public abstract partial class GameObject : Amendable, IGameObject
+public partial class GameObject : Amendable, IGameObject
 {
 	public GameObject()
 	{

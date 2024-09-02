@@ -7,6 +7,7 @@ using Azalea.VisualTests;
 //PerformanceTrace.Enabled = true;
 
 Assets.SetupPersistentStore("Azalea.VisualTests");
+Assets.SetupReflectedStore("../../../../../../Azalea.VisualTests/");
 
 Config.Load();
 

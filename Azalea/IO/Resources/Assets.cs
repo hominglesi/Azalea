@@ -3,6 +3,7 @@ using Azalea.Graphics.Textures;
 using Azalea.Utils;
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace Azalea.IO.Resources;
 
@@ -25,8 +26,12 @@ public static partial class Assets
 	/// using by calling the <see cref="SetupPersistentStore(string)"/> method.
 	/// </summary>
 	public static Storage PersistentStore => _persistentStore
-		?? throw new Exception("A persistent store has not been set up. Please use Assets.SetupPersistentStore before trying to use it");
+		?? throw new Exception("A persistent store has not been set up. Please use Assets.SetupPersistentStore before trying to access it");
 	private static Storage? _persistentStore;
+
+	public static Storage ReflectedStore => _reflectedStore
+		?? throw new Exception("A reflected store has not been set up. Please use Assets.SetupReflectedStore before trying to access it");
+	private static Storage? _reflectedStore;
 
 	static Assets()
 	{
@@ -46,6 +51,13 @@ public static partial class Assets
 		var path = FileSystemUtils.CombinePaths(
 			Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), folderName);
 		_persistentStore = new Storage(path);
+	}
+
+	public static void SetupReflectedStore(string reflectedPath)
+	{
+		var exePath = Assembly.GetEntryAssembly()!.Location;
+		var path = FileSystemUtils.CombinePaths(exePath, reflectedPath);
+		_reflectedStore = new Storage(path);
 	}
 
 	/// <summary>

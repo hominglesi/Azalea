@@ -27,6 +27,9 @@ public struct Boundary : IEquatable<Boundary>
 
 	public static readonly Boundary Zero = new(0);
 
+	public readonly Vector2 ClampWithin(Vector2 vector)
+		=> new(Math.Clamp(vector.X, Left, Right), Math.Clamp(vector.Y, Top, Bottom));
+
 	public readonly bool Equals(Boundary other) => Top == other.Top && Left == other.Left && Bottom == other.Bottom && Right == other.Right;
 	public readonly override bool Equals(object? obj) => obj is Boundary b && Equals(b);
 	public override readonly string ToString() => $@"({Top}, {Right}, {Bottom}, {Left})";

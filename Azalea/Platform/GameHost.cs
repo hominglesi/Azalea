@@ -39,8 +39,6 @@ public abstract class GameHost
 		else
 			_root = new Composition();
 
-		_root.Add(game);
-
 		game.SetHost(this);
 
 		_clipboard = CreateClipboard();
@@ -52,6 +50,7 @@ public abstract class GameHost
 		float targetFrameTime = 1 / (float)60;
 
 		CallInitialized();
+		_root.Add(game);
 
 		DateTime lastFrameTime = Time.GetCurrentPreciseTime();
 		DateTime frameTime;

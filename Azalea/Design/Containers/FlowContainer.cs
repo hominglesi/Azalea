@@ -99,14 +99,16 @@ public abstract class FlowContainer : Composition
 		}
 	}
 
+	private Vector2 _lastDrawSize;
 	protected override void UpdateAfterChildren()
 	{
 		base.UpdateAfterChildren();
 
-		if (_childLayout.IsValid == false)
+		if (_childLayout.IsValid == false || DrawSize != _lastDrawSize)
 		{
 			InvalidateLayout();
 			_childLayout.Validate();
+			_lastDrawSize = DrawSize;
 		}
 
 		if (_layout.IsValid == false)

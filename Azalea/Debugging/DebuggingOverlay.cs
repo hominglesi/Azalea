@@ -4,16 +4,17 @@ using Azalea.Graphics.Colors;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.Platform;
-using System.Numerics;
 
 namespace Azalea.Debugging;
-public class DebuggingOverlay : ContentContainer
+public class DebuggingOverlay : Composition
 {
-	private const float LeftContainerSize = 0.25f;
-	private const float BottomContainerSize = 0.25f;
+	private SplitContainer _horizontalSplit;
+	private SplitContainer _verticalSplit;
 
 	private Composition _leftContainer;
 	private Composition _bottomContainer;
+	private Composition _mainSplitContainer;
+	private Composition _gameContainer;
 
 	public DebugConsole DebugConsole { get; private set; }
 	public DebugDisplayValues DisplayValues { get; private set; }
@@ -24,21 +25,33 @@ public class DebuggingOverlay : ContentContainer
 	internal void Initialize()
 	{
 		//We need to initialize this later because the constructor is called before the game has been initialized
-		ContentComposition.Origin = Anchor.TopRight;
-		ContentComposition.Anchor = Anchor.TopRight;
 
-		AddInternal(_leftContainer = new Composition()
+		_leftContainer = new Composition()
 		{
 			BackgroundColor = new Color(51, 51, 51),
 			Masking = true,
-		});
+		};
 
-		AddInternal(_bottomContainer = new Composition()
+		_bottomContainer = new Composition()
 		{
-			Origin = Anchor.BottomRight,
-			Anchor = Anchor.BottomRight,
 			BackgroundColor = new Color(82, 82, 82),
-		});
+		};
+
+		_mainSplitContainer = new Composition();
+		_gameContainer = new Composition()
+		{
+			RelativeSizeAxes = Axes.Both
+		};
+
+		_verticalSplit = new SplitContainer(_mainSplitContainer, _bottomContainer)
+		{
+			Direction = SplitDirection.Vertical
+		};
+
+		_horizontalSplit = new SplitContainer(_leftContainer, _verticalSplit)
+		{
+			RelativeSizeAxes = Axes.Both,
+		};
 
 		AddInternal(new ColliderDebug());
 
@@ -56,31 +69,11 @@ public class DebuggingOverlay : ContentContainer
 		});
 
 		DisplayValues.AddDisplayedValue("Fps", () => Time.FpsCount);
-	}
 
-	protected override void UpdateContentLayout()
-	{
-		if (_debuggerExpanded)
-		{
-			if (_debuggerInitialized == false) initializeDebugger();
-
-			ContentComposition.Width = DrawSize.X * (1 - LeftContainerSize);
-			ContentComposition.Height = DrawSize.Y * (1 - BottomContainerSize);
-			_leftContainer.Height = DrawSize.Y;
-			_leftContainer.Width = DrawSize.X * LeftContainerSize;
-			_bottomContainer.Height = DrawSize.Y * BottomContainerSize;
-			_bottomContainer.Width = DrawSize.X * (1 - LeftContainerSize);
-		}
-		else
-		{
-			ContentComposition.Size = DrawSize;
-			_leftContainer.Size = Vector2.Zero;
-			_bottomContainer.Size = Vector2.Zero;
-		}
+		AddInternal(_gameContainer);
 	}
 
 	private bool _debuggerExpanded;
-
 	private bool _debuggerInitialized;
 	private void initializeDebugger()
 	{
@@ -155,8 +148,22 @@ public class DebuggingOverlay : ContentContainer
 	{
 		if (e.Key == Keys.Q && Input.GetKey(Keys.ControlLeft).Pressed)
 		{
+			if (_debuggerInitialized == false)
+				initializeDebugger();
+
+			if (_debuggerExpanded)
+			{
+				RemoveInternal(_horizontalSplit);
+				_mainSplitContainer.Remove(_gameContainer);
+				AddInternal(_gameContainer);
+			}
+			else
+			{
+				RemoveInternal(_gameContainer);
+				_mainSplitContainer.Add(_gameContainer);
+				AddInternal(_horizontalSplit);
+			}
 			_debuggerExpanded = !_debuggerExpanded;
-			UpdateContentLayout();
 		}
 
 		if (e.Key == Keys.F9)
@@ -183,4 +190,8 @@ public class DebuggingOverlay : ContentContainer
 
 		return base.OnKeyDown(e);
 	}
+
+	public override void Add(GameObject gameObject) => _gameContainer.Add(gameObject);
+	public override bool Remove(GameObject gameObject) => _gameContainer.Remove(gameObject);
+	public override void Clear() => _gameContainer.Clear();
 }

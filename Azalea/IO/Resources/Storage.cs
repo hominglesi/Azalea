@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Azalea.Utils;
 using System.Collections.Generic;
 using System.IO;
 
@@ -27,8 +27,11 @@ public class Storage : IResourceStore
 	{
 		var fullPath = _path + path;
 		var directoryPath = Path.GetDirectoryName(fullPath)!;
-		Directory.CreateDirectory(directoryPath);
-		return File.OpenWrite(fullPath);
+
+		if (Directory.Exists(directoryPath) == false)
+			Directory.CreateDirectory(directoryPath);
+
+		return new FileStream(fullPath, FileMode.OpenOrCreate);
 	}
 
 	public bool Exists(string path)
@@ -42,8 +45,22 @@ public class Storage : IResourceStore
 			File.Delete(_path + path);
 	}
 
+	public IEnumerable<string> GetContainedResources(string subPath = "")
+	{
+		var path = FileSystemUtils.CombinePaths(_path, subPath);
+
+		var files = Directory.GetFiles(path);
+		var directories = Directory.GetDirectories(path);
+
+		foreach (var directory in directories)
+			yield return directory;
+
+		foreach (var file in files)
+			yield return file;
+	}
+
 	public IEnumerable<string> GetAvalibleResources()
 	{
-		throw new NotImplementedException();
+		return GetContainedResources();
 	}
 }
