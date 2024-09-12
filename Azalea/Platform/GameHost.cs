@@ -13,6 +13,8 @@ namespace Azalea.Platform;
 
 public abstract class GameHost
 {
+	private const float __fixedUpdateFrametime = 1f / 60;
+
 	public abstract IWindow Window { get; }
 	public abstract IRenderer Renderer { get; }
 
@@ -27,6 +29,8 @@ public abstract class GameHost
 	public Composition Root => _root ?? throw new Exception("Cannot use root before the game has started.");
 
 	private Composition? _root;
+
+	private long _frameStart;
 
 	public virtual void Run(AzaleaGame game)
 	{
@@ -46,49 +50,40 @@ public abstract class GameHost
 		_physics = new PhysicsGenerator();
 		_physics.UsesGravity = false;
 
-		float accumulator = 0;
-		float targetFrameTime = 1 / (float)60;
-
 		CallInitialized();
 		_root.Add(game);
 
-		DateTime lastFrameTime = Time.GetCurrentPreciseTime();
-		DateTime frameTime;
-		float deltaTime;
-		var firstWindowShow = false;
+		Time.Setup();
+
+		var accumulator = 0f;
+		var firstWindowShown = false;
 
 		//Game Loop
 		while (Window.ShouldClose == false)
 		{
-			StartFrame();
+			_frameStart = PerformanceTrace.StartEvent();
 
-			frameTime = Time.GetCurrentPreciseTime();
-			deltaTime = (float)frameTime.Subtract(lastFrameTime).TotalSeconds;
-			lastFrameTime = frameTime;
+			Time.UpdateDeltaTime();
+			accumulator += Time.DeltaTime;
 
-			Time.Update(deltaTime);
+			Window.ProcessEvents();
 
-			accumulator += deltaTime;
-
-			while (accumulator >= targetFrameTime)
+			while (accumulator >= __fixedUpdateFrametime)
 			{
 				PerformanceTrace.RunAndTrace(CallOnFixedUpdate, "FixedUpdate");
-				accumulator -= targetFrameTime;
+				accumulator -= __fixedUpdateFrametime;
 			}
 
 			PerformanceTrace.RunAndTrace(CallOnUpdate, "Update");
 			PerformanceTrace.RunAndTrace(CallOnRender, "Render");
 
-			if (firstWindowShow == false)
+			if (firstWindowShown == false)
 			{
 				Window.Show(true);
-				firstWindowShow = true;
+				firstWindowShown = true;
 			}
 
-			Window.ProcessEvents();
-			//PerformanceTrace.RunAndTrace(InputManager.ProcessInputs, "Input");
-
-			EndFrame();
+			PerformanceTrace.AddEvent(_frameStart, "Frame");
 		}
 		Window.Hide();
 
@@ -96,17 +91,6 @@ public abstract class GameHost
 
 		Window.Dispose();
 		AudioManager.Dispose();
-	}
-
-	private long _frameStart;
-	internal void StartFrame()
-	{
-		_frameStart = PerformanceTrace.StartEvent();
-	}
-
-	protected void EndFrame()
-	{
-		PerformanceTrace.AddEvent(_frameStart, "Frame");
 	}
 
 	public virtual void CallInitialized()
