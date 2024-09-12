@@ -23,7 +23,7 @@ public class ScrollableContainer : ContentContainer
 		ScrollBar.OnValueChanged += onSliderMoved;
 	}
 
-	protected Slider CreateSlider()
+	protected virtual Slider CreateSlider()
 		=> new DefaultScrollableSlider()
 		{
 			Origin = Anchor.TopRight,

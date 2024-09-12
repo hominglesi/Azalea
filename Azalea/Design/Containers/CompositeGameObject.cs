@@ -413,7 +413,7 @@ public partial class CompositeGameObject : GameObject
 
 	internal override bool BuildPositionalInputQueue(Vector2 screenSpacePos, List<GameObject> queue)
 	{
-		if (base.BuildPositionalInputQueue(screenSpacePos, queue) == false)
+		if (base.BuildPositionalInputQueue(screenSpacePos, queue) == false && Masking)
 			return false;
 
 		foreach (var child in _internalChildren)

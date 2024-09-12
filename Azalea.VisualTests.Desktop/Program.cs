@@ -13,7 +13,7 @@ Config.Load();
 
 var host = Host.CreateHost(new HostPreferences
 {
-	ClientSize = new Vector2Int(1280, 720),
+	ClientSize = new Vector2Int(1600, 900),
 	WindowResizable = true,
 	WindowTitle = "Azalea Visual Tests",
 	WindowState = WindowState.Normal,

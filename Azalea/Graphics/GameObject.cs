@@ -820,9 +820,10 @@ public partial class GameObject : Amendable, IGameObject
 
 	internal virtual bool BuildPositionalInputQueue(Vector2 screenSpacePos, List<GameObject> queue)
 	{
-		if (DrawRectangle.Contains(ToLocalSpace(screenSpacePos)))
-			queue.Add(this);
+		if (DrawRectangle.Contains(ToLocalSpace(screenSpacePos)) == false)
+			return false;
 
+		queue.Add(this);
 		return true;
 	}
 

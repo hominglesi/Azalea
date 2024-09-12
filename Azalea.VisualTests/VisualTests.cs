@@ -56,10 +56,9 @@ public class VisualTests : AzaleaGame
 		{
 			Main.SceneManager.ChangeScene(_testSelectScene);
 			Main.Host.Renderer.ClearColor = new Color(40, 51, 60);
-			Main.Host.Window.ClientSize = new(1280, 720);
+			Main.Host.Window.ClientSize = new(1600, 900);
 			Main.Host.Window.Center();
 		}
-
 	}
 
 	private class TestSelectScene : Scene

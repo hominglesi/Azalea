@@ -114,20 +114,20 @@ public abstract class Slider : Composition
 	private float getDirectionalValue(Vector2 vector)
 		=> Direction == SliderDirection.Horizontal ? vector.X : vector.Y;
 
+	public bool IsHeld { get; private set; }
 	private float _heldOffset;
-	private bool _isHeld;
 
 	protected void onHeadMouseDown(MouseDownEvent e)
 	{
-		_isHeld = true;
+		IsHeld = true;
 		_heldOffset = getDirectionalValue(Head.Position) - getLocalMousePosition();
 	}
 
 	protected override bool OnMouseDown(MouseDownEvent e)
 	{
-		if (_isHeld) return true;
+		if (IsHeld) return true;
 
-		_isHeld = true;
+		IsHeld = true;
 		_heldOffset = 0;
 		return true;
 	}
@@ -137,14 +137,14 @@ public abstract class Slider : Composition
 	protected override void Update()
 	{
 		if (Input.GetMouseButton(0).Released)
-			_isHeld = false;
+			IsHeld = false;
 
 		if (_lastDrawSize != DrawSize || _lastHeadLength != _headLength)
 		{
 			uncacheSliderRange();
 		}
 
-		if (_isHeld)
+		if (IsHeld)
 		{
 			var newPosition = getLocalMousePosition() + _heldOffset;
 			newPosition = Math.Clamp(newPosition, SliderRange.X, SliderRange.Y);

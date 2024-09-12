@@ -135,7 +135,7 @@ public class DebuggingOverlay : Composition
 			}
 		});
 
-		_bottomContainer.Add(new Composition()
+		_bottomContainer.Add(new ResourceExplorer()
 		{
 			RelativeSizeAxes = Axes.Both
 		});

@@ -1,6 +1,6 @@
 ﻿using Azalea.Design.Containers;
+using Azalea.Design.UserInterface;
 using Azalea.Graphics;
-using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
@@ -8,22 +8,20 @@ using Azalea.Utils;
 using System;
 using System.IO;
 
-namespace Azalea.VisualTests;
-public class ReflectedDataTest : TestScene
+namespace Azalea.Debugging;
+public class ResourceExplorer : ScrollableContainer
 {
-	public ReflectedDataTest()
+	public ResourceExplorer()
 	{
-		AzaleaGame.Main.Host.Renderer.ClearColor = new Color(30, 30, 30);
-		Add(new ScrollableContainer()
+		RelativeSizeAxes = Axes.Both;
+		Add(new DirectoryContainer(Assets.ReflectedStore)
 		{
-			RelativeSizeAxes = Axes.Both,
-			Child = new DirectoryContainer(Assets.ReflectedStore)
-			{
-				RelativeSizeAxes = Axes.X,
-				AutoSizeAxes = Axes.Y,
-			}
+			RelativeSizeAxes = Axes.X,
+			AutoSizeAxes = Axes.Y,
 		});
 	}
+
+	protected override Slider CreateSlider() => new DebugScrollbar();
 
 	private class DirectoryContainer : FlexContainer
 	{
@@ -34,9 +32,28 @@ public class ReflectedDataTest : TestScene
 			_storage = storage;
 
 			Wrapping = FlexWrapping.Wrap;
-			Spacing = new(20);
+			Spacing = new(12, 6);
 
 			displayDirectory(_subPath);
+		}
+
+		private void displayDirectory(string path)
+		{
+			Clear();
+
+			if (path != "")
+				addReturn();
+
+			var resources = _storage.GetContainedResources(path);
+			foreach (var resource in resources)
+			{
+				var resourceAttributes = File.GetAttributes(resource);
+
+				if (resourceAttributes.HasFlag(FileAttributes.Directory))
+					addDirectory(resource);
+				else
+					addFile(resource);
+			}
 		}
 
 		private void addFile(string path)
@@ -88,15 +105,15 @@ public class ReflectedDataTest : TestScene
 		{
 			return new Composition()
 			{
-				Size = new(150, 130),
+				Size = new(105, 120),
 				Children = new GameObject[]
 				{
 					new Sprite()
 					{
-						Size = new(100),
-						Origin = Anchor.Center,
-						Anchor = Anchor.Center,
-						Y = -10,
+						Size = new(90),
+						Origin = Anchor.TopCenter,
+						Anchor = Anchor.TopCenter,
+						Y = 3,
 						Texture = icon
 					},
 					new SpriteText()
@@ -104,30 +121,11 @@ public class ReflectedDataTest : TestScene
 						Origin = Anchor.BottomCenter,
 						Anchor = Anchor.BottomCenter,
 						Y = -5,
-						Text = name
+						Text = name,
+						Font = FontUsage.Default.With(size: 16)
 					}
 				}
 			};
 		}
-
-		private void displayDirectory(string path)
-		{
-			Clear();
-
-			if (path != "")
-				addReturn();
-
-			var resources = _storage.GetContainedResources(path);
-			foreach (var resource in resources)
-			{
-				var resourceAttributes = File.GetAttributes(resource);
-
-				if (resourceAttributes.HasFlag(FileAttributes.Directory))
-					addDirectory(resource);
-				else
-					addFile(resource);
-			}
-		}
 	}
-
 }
