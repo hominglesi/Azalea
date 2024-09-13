@@ -1,10 +1,13 @@
-﻿using Azalea.Design.Containers;
+﻿using Azalea.Debugging.Design;
+using Azalea.Design.Containers;
 using Azalea.Design.Docking;
+using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.Platform;
+using Azalea.Utils;
 using System.Diagnostics;
 
 namespace Azalea.Debugging;
@@ -23,6 +26,7 @@ public class DebuggingOverlay : Composition
 
 	public DebugInspector Inspector;
 	private DebugSceneGraph _sceneGraph;
+	private DebugTemplateEditor _templateEditor;
 
 	public DebuggingOverlay()
 	{
@@ -56,19 +60,10 @@ public class DebuggingOverlay : Composition
 	private void initializeDebugger()
 	{
 		_debuggingOverlay = new SplitContainer(
-			_leftDocker = new BasicDockingContainer()
-			{
-				ContentPadding = new(0)
-			},
+			_leftDocker = new DebugDockingContainer(),
 			new SplitContainer(
-				_mainDocker = new BasicDockingContainer()
-				{
-					ContentPadding = new(0)
-				},
-				_bottomDocker = new BasicDockingContainer()
-				{
-					ContentPadding = new(0),
-				}
+				_mainDocker = new DebugDockingContainer(),
+				_bottomDocker = new DebugDockingContainer()
 			)
 			{
 				Direction = SplitDirection.Vertical,
@@ -84,13 +79,14 @@ public class DebuggingOverlay : Composition
 			RelativeSizeAxes = Axes.Both
 		});
 
-		_mainDocker.AddDockable("Editor", new Composition()
+		_mainDocker.AddDockable("Template Editor", _templateEditor = new DebugTemplateEditor()
 		{
 			RelativeSizeAxes = Axes.Both
 		});
+		_templateEditor.InspectObject(new Box() { Color = Rng.Color(), Size = new(150) });
 
 		_leftDocker.ContentBackground.Color = new Color(51, 51, 51);
-		_leftDocker.AddDockable("Inspector", new Composition()
+		_leftDocker.AddDockable("Inspector Old", new Composition()
 		{
 			RelativeSizeAxes = Axes.Both,
 			Padding = new(16),

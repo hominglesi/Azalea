@@ -5,7 +5,7 @@ using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Inputs.Events;
 
-namespace Azalea.Debugging;
+namespace Azalea.Debugging.Design;
 public class DebugScrollbar : Slider
 {
 	private const float _animationSpeed = 0.15f;
