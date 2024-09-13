@@ -1,85 +1,96 @@
 ﻿using Azalea.Design.Containers;
+using Azalea.Design.Docking;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.Platform;
+using System.Diagnostics;
 
 namespace Azalea.Debugging;
 public class DebuggingOverlay : Composition
 {
-	private SplitContainer _horizontalSplit;
-	private SplitContainer _verticalSplit;
+	private GameObject? _debuggingOverlay;
+	private BasicDockingContainer? _leftDocker;
+	private BasicDockingContainer? _bottomDocker;
+	private BasicDockingContainer? _mainDocker;
 
-	private Composition _leftContainer;
-	private Composition _bottomContainer;
-	private Composition _mainSplitContainer;
+	private Composition? _gameCategoryContainer;
 	private Composition _gameContainer;
 
-	public DebugConsole DebugConsole { get; private set; }
-	public DebugDisplayValues DisplayValues { get; private set; }
+	public DebugConsole DebugConsole { get; init; }
+	public DebugDisplayValues DisplayValues { get; init; }
 
 	public DebugInspector Inspector;
 	private DebugSceneGraph _sceneGraph;
 
-	internal void Initialize()
+	public DebuggingOverlay()
 	{
-		//We need to initialize this later because the constructor is called before the game has been initialized
-
-		_leftContainer = new Composition()
+		AddRangeInternal(new GameObject[]
 		{
-			BackgroundColor = new Color(51, 51, 51),
-			Masking = true,
-		};
-
-		_bottomContainer = new Composition()
-		{
-			BackgroundColor = new Color(82, 82, 82),
-		};
-
-		_mainSplitContainer = new Composition();
-		_gameContainer = new Composition()
-		{
-			RelativeSizeAxes = Axes.Both
-		};
-
-		_verticalSplit = new SplitContainer(_mainSplitContainer, _bottomContainer)
-		{
-			Direction = SplitDirection.Vertical,
-			ReversedPriority = true
-		};
-
-		_horizontalSplit = new SplitContainer(_leftContainer, _verticalSplit)
-		{
-			RelativeSizeAxes = Axes.Both,
-		};
-
-		AddInternal(new ColliderDebug());
-
-		DebugConsole = new DebugConsole();
-
-		AddInternal(DisplayValues = new DebugDisplayValues()
-		{
-			Origin = Anchor.BottomLeft,
-			Anchor = Anchor.BottomLeft,
-			Direction = FlexDirection.VerticalReverse,
-			RelativeSizeAxes = Axes.Both,
-			Wrapping = FlexWrapping.Wrap,
-			Position = new(5, -5),
-			Spacing = new(5),
-			Depth = -1000
+			_gameContainer = new Composition()
+			{
+				RelativeSizeAxes = Axes.Both
+			},
+			DisplayValues = new DebugDisplayValues()
+			{
+				Origin = Anchor.BottomLeft,
+				Anchor = Anchor.BottomLeft,
+				Direction = FlexDirection.VerticalReverse,
+				RelativeSizeAxes = Axes.Both,
+				Wrapping = FlexWrapping.Wrap,
+				Position = new(5, -5),
+				Spacing = new(5),
+				Depth = -1000
+			},
+			new ColliderDebug()
 		});
 
-		DisplayValues.AddDisplayedValue("Fps", () => Time.FpsCount);
+		DebugConsole = new DebugConsole();
+		Inspector = new DebugInspector();
+		_sceneGraph = new DebugSceneGraph(this);
 
-		AddInternal(_gameContainer);
+		DisplayValues.AddDisplayedValue("Fps", () => Time.FpsCount);
 	}
 
-	private bool _debuggerExpanded;
-	private bool _debuggerInitialized;
 	private void initializeDebugger()
 	{
-		_leftContainer.Add(new Composition()
+		_debuggingOverlay = new SplitContainer(
+			_leftDocker = new BasicDockingContainer()
+			{
+				ContentPadding = new(0)
+			},
+			new SplitContainer(
+				_mainDocker = new BasicDockingContainer()
+				{
+					ContentPadding = new(0)
+				},
+				_bottomDocker = new BasicDockingContainer()
+				{
+					ContentPadding = new(0),
+				}
+			)
+			{
+				Direction = SplitDirection.Vertical,
+				ReversedPriority = true
+			}
+		)
+		{
+			RelativeSizeAxes = Axes.Both,
+		};
+
+		_mainDocker.AddDockable("Game", _gameCategoryContainer = new Composition()
+		{
+			RelativeSizeAxes = Axes.Both
+		});
+
+		_mainDocker.AddDockable("Editor", new Composition()
+		{
+			RelativeSizeAxes = Axes.Both
+		});
+
+		_leftDocker.ContentBackground.Color = new Color(51, 51, 51);
+		_leftDocker.AddDockable("Inspector", new Composition()
 		{
 			RelativeSizeAxes = Axes.Both,
 			Padding = new(16),
@@ -114,7 +125,7 @@ public class DebuggingOverlay : Composition
 					{
 						RelativeSizeAxes = Axes.Both,
 						Padding = new(5),
-						Child = Inspector = new DebugInspector()
+						Child = Inspector
 					},
 
 				},
@@ -129,41 +140,44 @@ public class DebuggingOverlay : Composition
 					{
 						RelativeSizeAxes = Axes.Both,
 						Padding = new(5),
-						Child = _sceneGraph = new DebugSceneGraph(this)
+						Child = _sceneGraph
 					}
 				}
 			}
 		});
 
-		_bottomContainer.Add(new ResourceExplorer()
+		_bottomDocker.ContentBackground.Color = new Color(82, 82, 82);
+		_bottomDocker.AddDockable("Resources", new ResourceExplorer()
 		{
 			RelativeSizeAxes = Axes.Both
 		});
 
 		Inspector.SetObservedObject(this);
 		_sceneGraph.ObjectSelected += Editor.InspectObject;
-
-		_debuggerInitialized = true;
 	}
 
+	private bool _debuggerExpanded;
 	protected override bool OnKeyDown(KeyDownEvent e)
 	{
 		if (e.Key == Keys.Q && Input.GetKey(Keys.ControlLeft).Pressed)
 		{
-			if (_debuggerInitialized == false)
+			if (_debuggingOverlay == null)
 				initializeDebugger();
+
+			Debug.Assert(_debuggingOverlay is not null);
+			Debug.Assert(_gameCategoryContainer is not null);
 
 			if (_debuggerExpanded)
 			{
-				RemoveInternal(_horizontalSplit);
-				_mainSplitContainer.Remove(_gameContainer);
+				RemoveInternal(_debuggingOverlay);
+				_gameCategoryContainer.Remove(_gameContainer);
 				AddInternal(_gameContainer);
 			}
 			else
 			{
 				RemoveInternal(_gameContainer);
-				_mainSplitContainer.Add(_gameContainer);
-				AddInternal(_horizontalSplit);
+				_gameCategoryContainer.Add(_gameContainer);
+				AddInternal(_debuggingOverlay);
 			}
 			_debuggerExpanded = !_debuggerExpanded;
 		}

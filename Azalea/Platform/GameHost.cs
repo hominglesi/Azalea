@@ -6,7 +6,6 @@ using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
 using Azalea.Physics;
 using System;
-using System.Diagnostics;
 using System.Numerics;
 
 namespace Azalea.Platform;
@@ -34,6 +33,10 @@ public abstract class GameHost
 
 	public virtual void Run(AzaleaGame game)
 	{
+		game.SetHost(this);
+
+		CallInitialized();
+
 		if (AzaleaSettings.EnableDebugging)
 		{
 			var root = new DebuggingOverlay();
@@ -43,14 +46,15 @@ public abstract class GameHost
 		else
 			_root = new Composition();
 
-		game.SetHost(this);
-
 		_clipboard = CreateClipboard();
 
-		_physics = new PhysicsGenerator();
-		_physics.UsesGravity = false;
+		_physics = new PhysicsGenerator
+		{
+			UsesGravity = false
+		};
 
-		CallInitialized();
+		Input.Initialize(_root);
+
 		_root.Add(game);
 
 		Time.Setup();
@@ -95,14 +99,8 @@ public abstract class GameHost
 
 	public virtual void CallInitialized()
 	{
-		Debug.Assert(_root is not null);
-
-		Input.Initialize(_root);
 		Renderer.Initialize();
 		AudioManager.Initialize();
-
-		if (_root is DebuggingOverlay debug)
-			debug.Initialize();
 
 		Initialized?.Invoke();
 	}
