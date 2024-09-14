@@ -1,13 +1,11 @@
 ﻿using Azalea.Debugging.Design;
 using Azalea.Design.Containers;
 using Azalea.Design.Docking;
-using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.Platform;
-using Azalea.Utils;
 using System.Diagnostics;
 
 namespace Azalea.Debugging;
@@ -23,10 +21,10 @@ public class DebuggingOverlay : Composition
 
 	public DebugConsole DebugConsole { get; init; }
 	public DebugDisplayValues DisplayValues { get; init; }
+	public DebugTemplateEditor TemplateEditor { get; init; }
 
 	public DebugInspector Inspector;
 	private DebugSceneGraph _sceneGraph;
-	private DebugTemplateEditor _templateEditor;
 
 	public DebuggingOverlay()
 	{
@@ -53,6 +51,10 @@ public class DebuggingOverlay : Composition
 		DebugConsole = new DebugConsole();
 		Inspector = new DebugInspector();
 		_sceneGraph = new DebugSceneGraph(this);
+		TemplateEditor = new DebugTemplateEditor()
+		{
+			RelativeSizeAxes = Axes.Both
+		};
 
 		DisplayValues.AddDisplayedValue("Fps", () => Time.FpsCount);
 	}
@@ -79,11 +81,7 @@ public class DebuggingOverlay : Composition
 			RelativeSizeAxes = Axes.Both
 		});
 
-		_mainDocker.AddDockable("Template Editor", _templateEditor = new DebugTemplateEditor()
-		{
-			RelativeSizeAxes = Axes.Both
-		});
-		_templateEditor.InspectObject(new Box() { Color = Rng.Color(), Size = new(150) });
+		_mainDocker.AddDockable("Template Editor", TemplateEditor);
 
 		_leftDocker.ContentBackground.Color = new Color(51, 51, 51);
 		_leftDocker.AddDockable("Inspector Old", new Composition()
@@ -202,6 +200,8 @@ public class DebuggingOverlay : Composition
 
 		return base.OnKeyDown(e);
 	}
+
+	public void FocusTemplateEditor() => _mainDocker?.FocusContent(TemplateEditor);
 
 	public override void Add(GameObject gameObject) => _gameContainer.Add(gameObject);
 	public override bool Remove(GameObject gameObject) => _gameContainer.Remove(gameObject);

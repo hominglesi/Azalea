@@ -1,5 +1,6 @@
 ﻿using Azalea.Debugging.Design;
 using Azalea.Design.Containers;
+using Azalea.Design.Shapes;
 using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
@@ -72,6 +73,17 @@ public class ResourceExplorer : ScrollableContainer
 					{
 						using var reader = new StreamReader(path);
 						Console.WriteLine(reader.ReadToEnd());
+					};
+					break;
+				case ".at":
+					icon.Click += _ =>
+					{
+						using var reader = new StreamReader(path);
+						Editor.Overlay.FocusTemplateEditor();
+						Editor.Overlay.TemplateEditor.InspectObject(new Box()
+						{
+							Size = Vector2Int.Parse(reader.ReadLine() ?? "0,0")
+						});
 					};
 					break;
 			}
