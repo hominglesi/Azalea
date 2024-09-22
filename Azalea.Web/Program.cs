@@ -1,18 +1,16 @@
+using Azalea.Web.Rendering;
 using System;
-using System.Runtime.InteropServices.JavaScript;
-
-Console.WriteLine("Hello, Browser!");
-
-public partial class MyClass
+namespace Azalea.Web;
+public class Program
 {
-	[JSExport]
-	internal static string Greeting()
-	{
-		var text = $"Hello, World! Greetings from {GetHRef()}";
-		Console.WriteLine(text);
-		return text;
+	static void Main(string[] args) {
+		try
+		{
+			WebGL.MainLoop();
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine(ex.ToString());
+		}
 	}
-
-	[JSImport("window.location.href", "main.js")]
-	internal static partial string GetHRef();
 }

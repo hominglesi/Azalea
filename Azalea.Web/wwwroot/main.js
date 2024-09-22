@@ -8,18 +8,30 @@ const { setModuleImports, getAssemblyExports, getConfig } = await dotnet
     .withApplicationArgumentsFromQuery()
     .create();
 
-setModuleImports('main.js', {
-    window: {
-        location: {
-            href: () => globalThis.window.location.href
-        }
-    }
+setModuleImports('JSImports', {
+    draw: (color1, color2) => draw(color1, color2)
+    //, add new functions here
 });
-
 const config = getConfig();
 const exports = await getAssemblyExports(config.mainAssemblyName);
-const text = exports.MyClass.Greeting();
-console.log(text);
 
-document.getElementById('out').innerHTML = text;
+//main loop call
+
+
+//dotnet.run() starts the actual program main
 await dotnet.run();
+
+
+
+
+function draw(color1, color2) {
+    const canvas = document.getElementById("Canvas");
+    if (canvas.getContext) {
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = color1;
+        ctx.fillRect(10, 10, 50, 50);
+
+        ctx.fillStyle = color2;
+        ctx.fillRect(30, 30, 50, 50);
+    }
+}
