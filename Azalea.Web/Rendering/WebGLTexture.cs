@@ -8,7 +8,7 @@ namespace Azalea.Web.Rendering;
 
 internal class WebGLTexture : Disposable, INativeTexture
 {
-	private int _handle;
+	public object Handle { get; init; }
 
 	private int _width;
 	private int _height;
