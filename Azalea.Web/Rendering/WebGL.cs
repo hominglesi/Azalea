@@ -4,16 +4,12 @@ namespace Azalea.Web.Rendering;
 
 public partial class WebGL
 {
-	[JSExport]
-	public static void MainLoop()
-	{
-		//while(true) update loop
-		DrawSquares("pink", "purple");
-	}
-
-
 	[JSImport("draw", "JSImports")]
-	internal static partial void DrawSquares([JSMarshalAs<JSType.String>] string a, [JSMarshalAs<JSType.String>] string b);
+	internal static partial void DrawSquares(string a, string b);
+	[JSImport("clearColor", "JSImports")]
+	internal static partial void SetClearColor(float r, float g, float b, float a);
 
-
+	[JSImport("clearScreen", "JSImports")]
+	internal static partial void ClearCanvas();
+	
 }

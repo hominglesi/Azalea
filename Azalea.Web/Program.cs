@@ -6,7 +6,8 @@ public class Program
 	static void Main(string[] args) {
 		try
 		{
-			WebGL.MainLoop();
+			WebGL.SetClearColor(0.5f, 0.5f, 1f, 1f);
+			WebGL.ClearCanvas();
 		}
 		catch (Exception ex)
 		{
