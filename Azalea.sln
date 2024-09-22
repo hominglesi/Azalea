@@ -21,7 +21,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azalea.Web", "Azalea.Web\Azalea.Web.csproj", "{6CD4537C-AEA8-4A4D-A0C8-25DC6BD3C7D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azalea.Web", "Azalea.Web\Azalea.Web.csproj", "{6CD4537C-AEA8-4A4D-A0C8-25DC6BD3C7D2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{38689BE4-5B41-4D24-A581-1BC302DF0D85} = {38689BE4-5B41-4D24-A581-1BC302DF0D85}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
