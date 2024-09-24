@@ -1,6 +1,5 @@
 import { dotnet } from './_framework/dotnet.js'
 
-
 const { setModuleImports, getAssemblyExports, getConfig } = await dotnet
     .withDiagnosticTracing(false)
     .withApplicationArgumentsFromQuery()
@@ -34,17 +33,20 @@ setModuleImports('JSImports', {
         Uniform4f,
         UniformMatrix4fv,
         VertexAttribPointer,
-        Viewport,
+        Viewport
+    },
+    WebEvents: {
+        RequestAnimationFrame
     }
 });
 
-
 const config = getConfig();
-const exports = await getAssemblyExports(config.mainAssemblyName);
+exports = await getAssemblyExports(config.mainAssemblyName);
+
+InvokeWindowResized();
+window.addEventListener("resize", InvokeWindowResized);
 
 //dotnet.run() starts the actual program main
 await dotnet.run();
-
-
 
 

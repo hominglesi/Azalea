@@ -1,19 +1,16 @@
-using Azalea.Graphics.OpenGL.Enums;
-using Azalea.Web.Rendering;
-using System;
+using Azalea.IO.Resources;
+using Azalea.Web.Platform;
 namespace Azalea.Web;
 public class Program
 {
 	static void Main(string[] args)
 	{
-		try
-		{
-			WebGL.ClearColor(0.5f, 0.5f, 1f, 1f);
-			WebGL.Clear(GLBufferBit.Color);
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine(ex.ToString());
-		}
+		Assets.AddToMainStore(new NamespacedResourceStore(new EmbeddedResourceStore(typeof(Program).Assembly), "Resources"));
+		new WebHost().Run(new Game());
+	}
+
+	private class Game : AzaleaGame
+	{
+
 	}
 }

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices.JavaScript;
 
 namespace Azalea.Web.Rendering;
 
-public partial class WebGL
+internal static partial class WebGL
 {
 	[JSImport("WebGL.AttachShader", "JSImports")]
 	internal static partial void AttachShader([JSMarshalAs<JSType.Any>] object program, [JSMarshalAs<JSType.Any>] object shader);

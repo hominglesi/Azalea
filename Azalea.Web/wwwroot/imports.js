@@ -1,6 +1,7 @@
 ﻿const canvas = document.getElementById("Canvas");
 const gl = canvas.getContext("webgl");
 
+// WebGL
 const AttachShader = (program, shader) => gl.attachShader(program, shader);
 const BindBuffer = (target, buffer) => gl.bindBuffer(target, buffer);
 const BindTexture = (target, texture) => gl.bindTexture(target, texture);
@@ -28,3 +29,6 @@ const Uniform4f = (location, v0, v1, v2, v3) => gl.uniform4f(location, v0, v1, v
 const UniformMatrix4fv = (location, transpose, value) => gl.uniformMatrix4fv(location, transpose, value);
 const VertexAttribPointer = (index, size, type, normalized, stride, offset) => gl.vertexAttribPointer(index, size, type, normalized, stride, offset);
 const Viewport = (x, y, width, height) => gl.viewport(x, y, width, height);
+
+// WebEvents
+const RequestAnimationFrame = () => window.requestAnimationFrame(InvokeAnimationFrameRequested);
