@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics.OpenGL.Enums;
+using System;
 using System.Runtime.InteropServices.JavaScript;
 
 namespace Azalea.Web.Rendering;
@@ -24,9 +25,9 @@ internal static partial class WebGL
 		=> blendFuncSeparate((int)srcRGB, (int)dstRGB, (int)srcAlpha, (int)dstAlpha);
 
 	[JSImport("WebGL.BufferData", "JSImports")]
-	private static partial void bufferData(int target, int size, int usage);
-	internal static void BufferData(GLBufferType target, int size, GLBufferType usage)
-		=> bufferData((int)target, size, (int)usage);
+	private static partial void bufferData(int target, [JSMarshalAs<JSType.MemoryView>] Span<int> data, int usage);
+	internal static void BufferData(GLBufferType target, Span<int> data, GLUsageHint usage)
+		=> bufferData((int)target, data, (int)usage);
 
 	[JSImport("WebGL.ClearColor", "JSImports")]
 	internal static partial void ClearColor(float red, float green, float blue, float alpha);
@@ -62,7 +63,7 @@ internal static partial class WebGL
 	internal static void Disable(GLCapability capability)
 		=> disable((int)capability);
 
-	[JSImport("WebGL.DrawElements", "JSImport")]
+	[JSImport("WebGL.DrawElements", "JSImports")]
 	private static partial void drawElements(int mode, int count, int type, int offset);
 	internal static void DrawElements(GLBeginMode mode, int count, GLDataType type, int offset)
 		=> drawElements((int)mode, count, (int)type, offset);

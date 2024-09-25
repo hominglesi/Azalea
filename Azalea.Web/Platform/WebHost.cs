@@ -35,9 +35,15 @@ public class WebHost : GameHost
 		WebGL.ClearColor(0.5f, 0.5f, 1f, 1f);
 		WebGL.Clear(GLBufferBit.Color);
 
+		_indexBuffer = new WebGLIndexBuffer();
+		_indexBuffer.SetData(_indices, GLUsageHint.StaticDraw);
+
 		WebEvents.OnAnimationFrameRequested += runGameLoop;
 		WebEvents.RequestAnimationFrame();
 	}
+
+	private WebGLIndexBuffer _indexBuffer;
+	private int[] _indices = [0, 1, 2, 1, 3, 2];
 
 	private void runGameLoop()
 	{

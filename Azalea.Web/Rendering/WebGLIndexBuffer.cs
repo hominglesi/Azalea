@@ -6,31 +6,27 @@ namespace Azalea.Web.Rendering;
 
 public class WebGLIndexBuffer : Disposable
 {
-	private uint _handle;
+	private object _handle;
 
 	public WebGLIndexBuffer()
 	{
-		// Call Implementation
-		// 
+		_handle = WebGL.CreateBuffer();
 	}
 
-	public void SetData(uint[] data, GLUsageHint hint)
+	public void SetData(int[] data, GLUsageHint hint)
 	{
 		Bind();
-
-		// Call Implementation
-		// GL.BufferData(GLBufferType.ElementArray, data, hint);
+		WebGL.BufferData(GLBufferType.ElementArray, data, hint);
 	}
 
 	// Call Implementation
-	public void Bind() => throw new NotImplementedException();
+	public void Bind() => WebGL.BindBuffer(GLBufferType.ElementArray, _handle);
 
 	// Call Implementation
 	public void Unbind() => throw new NotImplementedException();
 
 	protected override void OnDispose()
 	{
-		// TODO: Call implementation
-		// 
+		//WebGL.DeleteBuffer();
 	}
 }

@@ -30,8 +30,8 @@ internal class WebGLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 		_window = window;
 		AddAction = Add;
 
-		var _indices = new uint[size * IRenderer.INDICES_PER_QUAD];
-		for (uint i = 0, j = 0; i < size * IRenderer.VERTICES_PER_QUAD; i += IRenderer.VERTICES_PER_QUAD, j += IRenderer.INDICES_PER_QUAD)
+		var _indices = new int[size * IRenderer.INDICES_PER_QUAD];
+		for (int i = 0, j = 0; i < size * IRenderer.VERTICES_PER_QUAD; i += IRenderer.VERTICES_PER_QUAD, j += IRenderer.INDICES_PER_QUAD)
 		{
 			_indices[j] = i;
 			_indices[j + 1] = i + 1;
