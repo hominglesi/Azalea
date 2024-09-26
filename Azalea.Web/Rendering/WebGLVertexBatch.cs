@@ -69,7 +69,7 @@ internal class WebGLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 		_indexBuffer.Bind();
 		_shader.Bind();
 
-		_vertexBuffer.SetData(_vertices, _vertexCount * _stride, GLUsageHint.DynamicDraw);
+		//_vertexBuffer.SetData(_vertices, _vertexCount * _stride, GLUsageHint.DynamicDraw);
 
 		var clientSize = _window.ClientSize;
 		var projectionMatrix = Matrix4x4.CreateOrthographicOffCenter(0, clientSize.X, clientSize.Y, 0, 0.1f, 100);

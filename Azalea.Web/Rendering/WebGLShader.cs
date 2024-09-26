@@ -9,32 +9,39 @@ namespace Azalea.Web.Rendering;
 
 public class WebGLShader : Disposable
 {
-	private uint _handle;
+	public object Handle { get; init; }
 
 	public WebGLShader(string vertexShaderSource, string fragmentShaderSource)
 	{
-		// Call Implementation
-		// _handle = GL.CreateProgram();
+		Handle = WebGL.CreateProgram();
 		var vertexShader = compileShader(GLShaderType.Vertex, vertexShaderSource);
 		var fragmentShader = compileShader(GLShaderType.Fragment, fragmentShaderSource);
 
-		// Call Implementation
-		// GL.AttachShader(_handle, vertexShader);
-		// GL.AttachShader(_handle, fragmentShader);
+		WebGL.AttachShader(Handle, vertexShader);
+		WebGL.AttachShader(Handle, fragmentShader);
 
-		// GL.LinkProgram(_handle);
-		// GL.ValidateProgram(_handle);
+		WebGL.LinkProgram(Handle);
+		WebGL.ValidateProgram(Handle);
 
-		// GL.DeleteShader(vertexShader);
-		// GL.DeleteShader(fragmentShader);
+		if (WebGL.GetProgramParameter(Handle, GLParameterName.LinkStatus) == false)
+		{
+			Console.WriteLine("Link Error: " + WebGL.GetProgramInfoLog(Handle));
+		}
+
+		WebGL.DeleteShader(vertexShader);
+		WebGL.DeleteShader(fragmentShader);
 	}
 
-	//TODO: Create Implementation
-	private static uint compileShader(GLShaderType type, string source)
+	private static object compileShader(GLShaderType type, string source)
 	{
-		//var id = GL.CreateShader(type);
-		//GL.ShaderSource(id, source);
-		//GL.CompileShader(id);
+		var id = WebGL.CreateShader(type);
+		WebGL.ShaderSource(id, source);
+		WebGL.CompileShader(id);
+
+		if (WebGL.GetShaderParameter(id, GLParameterName.CompileStatus) == false)
+		{
+			Console.WriteLine("Shader compile error: " + WebGL.GetShaderInfoLog(id));
+		}
 
 		/*
 		Error Checking
@@ -58,58 +65,57 @@ public class WebGLShader : Disposable
 		}
 		*/
 
-		return 0;//id;
+		return id;
 	}
 
 	// Call Implementation
-	public void Bind() => throw new NotImplementedException();
+	public void Bind() => WebGL.UseProgram(Handle);
 	public void Unbind() => throw new NotImplementedException();
 
 	public void SetUniform(string name, int i)
 	{
 		Bind();
-		// Call Implementation
-		// GL.Uniform1i(getUniformLocation(name), i);
+		WebGL.Uniform1i(getUniformLocation(name), i);
 	}
 
 	public void SetUniform(string name, int[] array)
 	{
 		Bind();
-		// Call Implementation
-		// GL.Uniform1iv(getUniformLocation(name), array);
+		WebGL.Uniform1iv(getUniformLocation(name), array);
 	}
 
 	public void SetUniform(string name, float f0, float f1, float f2, float f3)
 	{
 		Bind();
-		// Call Implementation
-		// GL.Uniform4f(getUniformLocation(name), f0, f1, f2, f3);
+		WebGL.Uniform4f(getUniformLocation(name), f0, f1, f2, f3);
 	}
 
 	public void SetUniform(string name, Color color)
 	{
 		Bind();
-		// Call Implementation
-		// GL.UniformColor(getUniformLocation(name), color);
+		WebGL.UniformColor(getUniformLocation(name), color);
 	}
 
 	public void SetUniform(string name, Matrix4x4 matrix)
 	{
 		Bind();
-		// Call Implementation
-		// GL.UniformMatrix4(getUniformLocation(name), 1, false, matrix);
+		WebGL.UniformMatrix4fv(getUniformLocation(name), false, [
+			matrix.M11, matrix.M12, matrix.M13, matrix.M14,
+			matrix.M21, matrix.M22, matrix.M23, matrix.M24,
+			matrix.M31, matrix.M32, matrix.M33, matrix.M34,
+			matrix.M41, matrix.M42, matrix.M43, matrix.M44,
+		]);
 	}
 
-	private Dictionary<string, int> _uniformLocations = new();
+	private Dictionary<string, object> _uniformLocations = new();
 
-	private int getUniformLocation(string name)
+	private object getUniformLocation(string name)
 	{
 		if (_uniformLocations.ContainsKey(name)) return _uniformLocations[name];
 
 		Bind();
-		// Call Implementation
-		var location = 0; //GL.GetUniformLocation(_handle, name);
-		if (location == -1) Console.WriteLine($"Uniform with name '{name}' was not found.");
+		var location = WebGL.GetUniformLocation(Handle, name);
+		//if (location == -1) Console.WriteLine($"Uniform with name '{name}' was not found.");
 
 		_uniformLocations.Add(name, location);
 		return location;
@@ -117,7 +123,6 @@ public class WebGLShader : Disposable
 
 	protected override void OnDispose()
 	{
-		// Call Implementation
-		// GL.DeleteProgram(_handle);
+		WebGL.DeleteProgram(Handle);
 	}
 }

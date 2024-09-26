@@ -1,5 +1,4 @@
-﻿using Azalea.Graphics.OpenGL;
-using Azalea.Graphics.OpenGL.Enums;
+﻿using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Utils;
 using System;
 
@@ -7,31 +6,28 @@ namespace Azalea.Web.Rendering;
 
 public class WebGLVertexBuffer : Disposable
 {
-	private uint _handle;
+	private object _handle;
 
 	public WebGLVertexBuffer()
 	{
-		_handle = GL.GenBuffer();
+		_handle = WebGL.CreateBuffer();
 	}
 
-	// TODO: Call implementation
-	public void Bind() => throw new NotImplementedException();
-	// TODO: Call implementation
+	public void Bind() => WebGL.BindBuffer(GLBufferType.Array, _handle);
+
 	public void Unbind() => throw new NotImplementedException();
 
-	public void SetData(float[] data, GLUsageHint hint)
+	public void SetData(double[] data, GLUsageHint hint)
 		=> SetData(data, data.Length, hint);
 
-	public void SetData(float[] data, int length, GLUsageHint hint)
+	public void SetData(double[] data, int length, GLUsageHint hint)
 	{
 		Bind();
-		// TODO: Call implementation
-		// GL.BufferData(GLBufferType.Array, data, length, hint);
+		//WebGL.BufferData(GLBufferType.Array, data, hint);
 	}
 
 	protected override void OnDispose()
 	{
-		// TODO: Call implementation
-		// GL.DeleteBuffer(_handle);
+		WebGL.DeleteBuffer(_handle);
 	}
 }
