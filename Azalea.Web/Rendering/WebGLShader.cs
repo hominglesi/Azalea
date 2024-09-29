@@ -7,13 +7,12 @@ using System.Numerics;
 
 namespace Azalea.Web.Rendering;
 
-public class WebGLShader : Disposable
+public class WebGLShader : UnmanagedObject<object>
 {
-	public object Handle { get; init; }
+	protected override object CreateObject() => WebGL.CreateProgram();
 
 	public WebGLShader(string vertexShaderSource, string fragmentShaderSource)
 	{
-		Handle = WebGL.CreateProgram();
 		var vertexShader = compileShader(GLShaderType.Vertex, vertexShaderSource);
 		var fragmentShader = compileShader(GLShaderType.Fragment, fragmentShaderSource);
 
@@ -24,9 +23,7 @@ public class WebGLShader : Disposable
 		WebGL.ValidateProgram(Handle);
 
 		if (WebGL.GetProgramParameter(Handle, GLParameterName.LinkStatus) == false)
-		{
 			Console.WriteLine("Link Error: " + WebGL.GetProgramInfoLog(Handle));
-		}
 
 		WebGL.DeleteShader(vertexShader);
 		WebGL.DeleteShader(fragmentShader);
@@ -39,38 +36,11 @@ public class WebGLShader : Disposable
 		WebGL.CompileShader(id);
 
 		if (WebGL.GetShaderParameter(id, GLParameterName.CompileStatus) == false)
-		{
 			Console.WriteLine("Shader compile error: " + WebGL.GetShaderInfoLog(id));
-		}
-
-		/*
-		Error Checking
-		int result;
-		GL.GetShaderiv(id, GLParameterName.CompileStatus, &result);
-		if (result == 0)
-		{
-
-			int length;
-			GL.GetShaderiv(id, GLParameterName.InfoLogLength, &length);
-			Console.WriteLine(length);
-			
-			var str = new StringBuilder(length);
-			for(int i = 0; i < length; i++)
-			{
-				str.Append((char)Marshal.ReadByte(result, i));
-			}	
-			Console.WriteLine("THERE IS AN ERROR!!!!");
-			GL.DeleteShader(id);
-			return 0;
-		}
-		*/
 
 		return id;
 	}
-
-	// Call Implementation
 	public void Bind() => WebGL.UseProgram(Handle);
-	public void Unbind() => throw new NotImplementedException();
 
 	public void SetUniform(string name, int i)
 	{
@@ -111,18 +81,15 @@ public class WebGLShader : Disposable
 
 	private object getUniformLocation(string name)
 	{
-		if (_uniformLocations.ContainsKey(name)) return _uniformLocations[name];
+		if (_uniformLocations.TryGetValue(name, out object? value)) return value;
 
 		Bind();
-		var location = WebGL.GetUniformLocation(Handle, name);
-		//if (location == -1) Console.WriteLine($"Uniform with name '{name}' was not found.");
+		var location = WebGL.GetUniformLocation(Handle, name)
+			?? throw new Exception($"Uniform with name '{name}' was not found.");
 
 		_uniformLocations.Add(name, location);
 		return location;
 	}
 
-	protected override void OnDispose()
-	{
-		WebGL.DeleteProgram(Handle);
-	}
+	protected override void OnDispose() => WebGL.DeleteProgram(Handle);
 }

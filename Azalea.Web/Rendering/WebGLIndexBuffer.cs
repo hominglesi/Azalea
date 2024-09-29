@@ -1,32 +1,21 @@
 ﻿using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Utils;
 using System;
+using System.Runtime.InteropServices;
 
 namespace Azalea.Web.Rendering;
 
-public class WebGLIndexBuffer : Disposable
+public class WebGLIndexBuffer : UnmanagedObject<object>
 {
-	private object _handle;
+	protected override object CreateObject() => WebGL.CreateBuffer();
 
-	public WebGLIndexBuffer()
-	{
-		_handle = WebGL.CreateBuffer();
-	}
+	public void Bind() => WebGL.BindBuffer(GLBufferType.ElementArray, Handle);
 
-	public void SetData(int[] data, GLUsageHint hint)
+	public void SetData(Span<ushort> data, GLUsageHint hint)
 	{
 		Bind();
-		WebGL.BufferData(GLBufferType.ElementArray, data, hint);
+		WebGL.BufferData(GLBufferType.ElementArray, MemoryMarshal.AsBytes(data), hint);
 	}
 
-	// Call Implementation
-	public void Bind() => WebGL.BindBuffer(GLBufferType.ElementArray, _handle);
-
-	// Call Implementation
-	public void Unbind() => throw new NotImplementedException();
-
-	protected override void OnDispose()
-	{
-		//WebGL.DeleteBuffer();
-	}
+	protected override void OnDispose() => WebGL.DeleteBuffer(Handle);
 }

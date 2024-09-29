@@ -6,7 +6,6 @@ using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
 using Azalea.Physics;
 using System;
-using System.Diagnostics;
 using System.Numerics;
 
 namespace Azalea.Platform;
@@ -22,11 +21,11 @@ public abstract class GameHost
 	public event Action? Initialized;
 
 	public PhysicsGenerator Physics => _physics ?? throw new Exception("Game has not been started yet");
-	private PhysicsGenerator? _physics;
+	internal PhysicsGenerator? _physics;
 
 	public Composition Root => _root ?? throw new Exception("Cannot use root before the game has started.");
 
-	private Composition? _root;
+	internal Composition? _root;
 
 	public virtual void Run(AzaleaGame game)
 	{
@@ -112,11 +111,11 @@ public abstract class GameHost
 
 	public virtual void CallInitialized()
 	{
-		Debug.Assert(_root is not null);
+		//Debug.Assert(_root is not null);
 
 		Input.Initialize(_root);
 		Renderer.Initialize();
-		AudioManager.Initialize();
+		//AudioManager.Initialize();
 
 		if (_root is DebuggingOverlay debug)
 			debug.Initialize();

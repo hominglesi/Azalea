@@ -3,6 +3,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
+    <RunAOTCompilation>true</RunAOTCompilation>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Azalea.VisualTests\Azalea.VisualTests.csproj" />
     <ProjectReference Include="..\Azalea\Azalea.csproj" />
   </ItemGroup>
 </Project>

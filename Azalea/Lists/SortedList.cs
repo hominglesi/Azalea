@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Azalea.Lists;
+namespace Azalea.List;
 
 public class SortedList<T> : ICollection<T>, IReadOnlyList<T>
 {

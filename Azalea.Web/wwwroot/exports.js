@@ -1,5 +1,5 @@
 ﻿var exports;
 
 // WebEvents
-const InvokeWindowResized = () => exports.Azalea.Web.WebEvents.InvokeWindowResized(window.innerWidth, window.innerHeight);
+const UpdateClientSize = (width, heigth) => exports.Azalea.Web.WebEvents.UpdateClientSize(width, heigth);
 const InvokeAnimationFrameRequested = (framerate) => exports.Azalea.Web.WebEvents.InvokeAnimationFrameRequested();

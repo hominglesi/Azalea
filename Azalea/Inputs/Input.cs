@@ -1,5 +1,4 @@
-﻿using Azalea.Debugging;
-using Azalea.Design.Containers;
+﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
 using Azalea.Inputs.Events;
 using System;
@@ -52,6 +51,7 @@ public static class Input
 		var inputQueue = new List<GameObject>();
 		_rootObject.BuildPositionalInputQueue(position, inputQueue);
 		inputQueue.Reverse();
+
 		return inputQueue;
 	}
 
@@ -170,7 +170,8 @@ public static class Input
 
 		MousePosition = newPosition;
 
-		PerformanceTrace.RunAndTrace(updateHoveredObjects, "Hover Update");
+		updateHoveredObjects();
+		//PerformanceTrace.RunAndTrace(updateHoveredObjects, "Hover Update");
 	}
 
 	/// <summary>

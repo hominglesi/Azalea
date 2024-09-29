@@ -19,7 +19,7 @@ internal class WebGLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 	private WebGLIndexBuffer _indexBuffer;
 	private WebGLVertexBuffer _vertexBuffer;
 	private WebGLVertexArray _vertexArray;
-	private GLShader _shader;
+	private WebGLShader _shader;
 
 	private float[] _vertices;
 	private int _vertexCount;
@@ -30,15 +30,15 @@ internal class WebGLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 		_window = window;
 		AddAction = Add;
 
-		var _indices = new int[size * IRenderer.INDICES_PER_QUAD];
-		for (int i = 0, j = 0; i < size * IRenderer.VERTICES_PER_QUAD; i += IRenderer.VERTICES_PER_QUAD, j += IRenderer.INDICES_PER_QUAD)
+		var _indices = new ushort[size * IRenderer.INDICES_PER_QUAD];
+		for (ushort i = 0, j = 0; i < size * IRenderer.VERTICES_PER_QUAD; i += IRenderer.VERTICES_PER_QUAD, j += IRenderer.INDICES_PER_QUAD)
 		{
 			_indices[j] = i;
-			_indices[j + 1] = i + 1;
-			_indices[j + 2] = i + 3;
-			_indices[j + 3] = i + 2;
-			_indices[j + 4] = i + 3;
-			_indices[j + 5] = i + 1;
+			_indices[j + 1] = (ushort)(i + 1);
+			_indices[j + 2] = (ushort)(i + 3);
+			_indices[j + 3] = (ushort)(i + 2);
+			_indices[j + 4] = (ushort)(i + 3);
+			_indices[j + 5] = (ushort)(i + 1);
 		}
 
 		_indexBuffer = new WebGLIndexBuffer();
@@ -55,9 +55,9 @@ internal class WebGLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 		_vertexArray.AddBuffer(_vertexBuffer, vbLayout);
 		_vertices = new float[size * IRenderer.VERTICES_PER_QUAD * _stride];
 
-		var vertexShaderSource = Assets.GetText("Shaders/vertex_shader.glsl")!;
-		var fragmentShaderSource = Assets.GetText("Shaders/fragment_shader.glsl")!;
-		_shader = new GLShader(vertexShaderSource, fragmentShaderSource);
+		var vertexShaderSource = Assets.GetText("Shaders/webgl_vertex_shader.glsl")!;
+		var fragmentShaderSource = Assets.GetText("Shaders/webgl_fragment_shader.glsl")!;
+		_shader = new WebGLShader(vertexShaderSource, fragmentShaderSource);
 	}
 
 	public int Draw()
@@ -69,16 +69,15 @@ internal class WebGLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 		_indexBuffer.Bind();
 		_shader.Bind();
 
-		//_vertexBuffer.SetData(_vertices, _vertexCount * _stride, GLUsageHint.DynamicDraw);
+		_vertexBuffer.SetData(_vertices.AsSpan(0, _vertexCount * _stride), GLUsageHint.DynamicDraw);
 
 		var clientSize = _window.ClientSize;
 		var projectionMatrix = Matrix4x4.CreateOrthographicOffCenter(0, clientSize.X, clientSize.Y, 0, 0.1f, 100);
 		_shader.SetUniform("u_Projection", projectionMatrix);
-		_shader.SetUniform("u_Texture", 0);
+		//_shader.SetUniform("u_Texture", 0);
 
 		var drawnVertices = (_vertexCount / 4) * 6;
-		// Call Implementation
-		// GL.DrawElements(GLBeginMode.Triangles, drawnVertices, GLDataType.UnsignedInt, 0);
+		WebGL.DrawElements(GLBeginMode.Triangles, drawnVertices, GLDataType.UnsignedShort, 0);
 
 		_vertexCount = 0;
 

@@ -7,9 +7,11 @@ const { setModuleImports, getAssemblyExports, getConfig } = await dotnet
 
 setModuleImports('JSImports', {
     WebGL: {
+        ActiveTexture,
         AttachShader,
         BindBuffer,
         BindTexture,
+        BindVertexArray,
         BlendFuncSeparate,
         BufferData,
         ClearColor,
@@ -19,14 +21,18 @@ setModuleImports('JSImports', {
         CreateProgram,
         CreateShader,
         CreateTexture,
+        CreateVertexArray,
         DeleteBuffer,
         DeleteProgram,
         DeleteShader,
+        DeleteTexture,
+        DeleteVertexArray,
         Disable,
         DrawArrays,
         DrawElements,
         Enable,
         EnableVertexAttribArray,
+        GenerateMipmap,
         GetAttribLocation,
         GetBufferParameter,
         GetProgramInfoLog,
@@ -38,6 +44,8 @@ setModuleImports('JSImports', {
         LinkProgram,
         Scissor,
         ShaderSource,
+        TexImage2D,
+        TexParameteri,
         Uniform1i,
         Uniform1iv,
         Uniform4f,
@@ -48,15 +56,20 @@ setModuleImports('JSImports', {
         Viewport
     },
     WebEvents: {
-        RequestAnimationFrame
+        RequestAnimationFrame,
+        CheckClientSize,
+        GetCurrentPreciseTime
     }
 });
 
 const config = getConfig();
 exports = await getAssemblyExports(config.mainAssemblyName);
 
-InvokeWindowResized();
-window.addEventListener("resize", InvokeWindowResized);
+canvas.addEventListener("mousemove", (e) => exports.Azalea.Web.WebEvents.ReportMouseMove(e.pageX, e.pageY));
+canvas.addEventListener("mousedown", (e) => exports.Azalea.Web.WebEvents.ReportMouseDown(e.button));
+canvas.addEventListener("mouseup", (e) => exports.Azalea.Web.WebEvents.ReportMouseUp(e.button));
+canvas.addEventListener("keydown", (e) => exports.Azalea.Web.WebEvents.ReportKeyDown(e.key));
+canvas.addEventListener("keyup", (e) => exports.Azalea.Web.WebEvents.ReportKeyUp(e.key));
 
 //dotnet.run() starts the actual program main
 await dotnet.run();

@@ -41,7 +41,7 @@ internal abstract class Renderer : IRenderer
 
 	protected internal virtual void Initialize()
 	{
-		defaultQuadBatch = CreateQuadBatch(17000);
+		defaultQuadBatch = CreateQuadBatch(10000);
 		currentActiveBatch = defaultQuadBatch;
 	}
 
@@ -95,7 +95,6 @@ internal abstract class Renderer : IRenderer
 	protected internal void FlushCurrentBatch()
 	{
 		currentActiveBatch?.Draw();
-
 	}
 
 	internal bool BindTexture(Texture texture, int unit = 0)

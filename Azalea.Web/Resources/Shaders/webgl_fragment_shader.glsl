@@ -1,8 +1,13 @@
 #version 300 es
 precision mediump float;
 
-out vec4 outputColor;
+in vec4 oCol;
+in vec2 oTex;
+
+uniform sampler2D u_Texture;
+
+out vec4 FragColor;
 
 void main(){
-	outputColor = vec4(0.3, 0.0, 0.5, 1.0);
+	FragColor = texture(u_Texture, oTex) * vec4(oCol.x, oCol.y, oCol.z, oCol.w);
 }

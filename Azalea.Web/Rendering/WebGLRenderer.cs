@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics.Colors;
+using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Numerics;
@@ -8,42 +9,55 @@ namespace Azalea.Web.Rendering;
 
 internal class WebGLRenderer(IWindow window) : Renderer(window)
 {
-	// TODO: Call implementation
-	protected override void ClearImplementation(Color color)
-	{
-		throw new System.NotImplementedException();
-	}
+	protected override void SetViewportImplementation(Vector2Int size)
+		=> WebGL.Viewport(0, 0, size.X, size.Y);
 
-	//TODO
-	protected override INativeTexture CreateNativeTexture(int width, int height)
-	{
-		throw new System.NotImplementedException();
-	}
+	protected internal override void SetClearColor(Color value)
+		=> WebGL.ClearColor(value.RNormalized, value.GNormalized, value.BNormalized, value.ANormalized);
+
+	protected override void ClearImplementation(Color color)
+		=> WebGL.Clear(GLBufferBit.Color);
 
 	protected override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
 		=> new WebGLVertexBatch<TexturedVertex2D>(Window, size);
 
-	// TODO: Call implementation
+	protected override INativeTexture CreateNativeTexture(int width, int height)
+		=> new WebGLTexture(this, width, height);
+
+	protected override bool SetTextureImplementation(INativeTexture? texture, int unit)
+	{
+		if (texture is null)
+		{
+			WebGL.ActiveTexture(unit);
+			WebGL.BindTexture(GLTextureType.Texture2D, 0);
+			return true;
+		}
+
+		switch (texture)
+		{
+			case WebGLTexture webGLTexture:
+				webGLTexture.Bind();
+				break;
+		}
+
+		return true;
+	}
+
 	protected override void SetScissorTestRectangle(RectangleInt scissorRectangle)
 	{
-		throw new System.NotImplementedException();
+		if (scissorRectangle.Width < 0) scissorRectangle.Width = 0;
+		if (scissorRectangle.Height < 0) scissorRectangle.Height = 0;
+
+		var framebufferHeight = Window.ClientSize.Y;
+
+		WebGL.Scissor(scissorRectangle.X, framebufferHeight - scissorRectangle.Y - scissorRectangle.Height, scissorRectangle.Width, scissorRectangle.Height);
 	}
 
-	// TODO: Call implementation
 	protected override void SetScissorTestState(bool enabled)
 	{
-		throw new System.NotImplementedException();
-	}
-
-	// TODO: Call implementation
-	protected override bool SetTextureImplementation(INativeTexture texture, int unit)
-	{
-		throw new System.NotImplementedException();
-	}
-
-	// TODO: Call implementation
-	protected override void SetViewportImplementation(Vector2Int size)
-	{
-		throw new System.NotImplementedException();
+		if (enabled)
+			WebGL.Enable(GLCapability.ScissorTest);
+		else
+			WebGL.Disable(GLCapability.ScissorTest);
 	}
 }

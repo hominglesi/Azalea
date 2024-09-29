@@ -1,6 +1,5 @@
 ﻿using Azalea.Design.Shapes;
 using Azalea.Graphics.Colors;
-using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using System;
 
@@ -26,8 +25,8 @@ public class InputTest : TestScene
 
 	protected override void Update()
 	{
-		if (Input.GetKey(Keys.P).Down)
-			Console.WriteLine("P recieved directly");
+		//if (Input.GetKey(Keys.P).Down)
+		//Console.WriteLine("P recieved directly");
 	}
 
 	private class InputLoggingObject : Box

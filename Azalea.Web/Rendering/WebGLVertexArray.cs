@@ -1,22 +1,13 @@
 ﻿using Azalea.Graphics.OpenGL;
 using Azalea.Utils;
-using System;
 
 namespace Azalea.Web.Rendering;
 
-public class WebGLVertexArray : Disposable
+public class WebGLVertexArray : UnmanagedObject<object>
 {
-	private uint _handle;
+	protected override object CreateObject() => WebGL.CreateVertexArray();
 
-	public WebGLVertexArray()
-	{
-		_handle = GL.GenVertexArray();
-	}
-
-	// Call Implementation
-	public void Bind() => throw new NotImplementedException();
-	// Call Implementation
-	public void Unbind() => throw new NotImplementedException();
+	public void Bind() => WebGL.BindVertexArray(Handle);
 
 	public void AddBuffer(WebGLVertexBuffer buffer, GLVertexBufferLayout layout)
 	{
@@ -27,17 +18,12 @@ public class WebGLVertexArray : Disposable
 		for (uint i = 0; i < layout.Elements.Count; i++)
 		{
 			var element = layout.Elements[(int)i];
-			// Call Implementation
-			// GL.EnableVertexAttribArray(i);
-			// GL.VertexAttribPointer(i, element, layout.Stride, offset);
+			WebGL.EnableVertexAttribArray((int)i);
+			WebGL.VertexAttribPointer((int)i, element.Count, element.Type, element.Normalized, layout.Stride, offset);
 
 			offset += element.Count * GLExtentions.SizeFromGLDataType(element.Type);
 		}
 	}
 
-	protected override void OnDispose()
-	{
-		// Call Implementation
-		// GL.DeleteVertexArray(_handle);
-	}
+	protected override void OnDispose() => WebGL.DeleteVertexArray(Handle);
 }

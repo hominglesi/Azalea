@@ -6,8 +6,26 @@ namespace Azalea.Web.Platform;
 
 public class WebWindow : IWindow
 {
+	public WebWindow()
+	{
+		WebEvents.OnClientResized += (size) =>
+		{
+			_clientSize = size;
+			OnClientResized?.Invoke(size);
+		};
+	}
+
+	private Vector2Int _clientSize;
+	public Vector2Int ClientSize
+	{
+		get => _clientSize;
+		set => throw new NotSupportedException("Cannot set client size of WebWindow.");
+	}
+
+	public Action<Vector2Int>? OnClientResized { get; set; }
+
+
 	public Vector2Int Size { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	public Vector2Int ClientSize { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 	public Vector2Int Position { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 	public Vector2Int ClientPosition { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 	public WindowState State { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -20,8 +38,6 @@ public class WebWindow : IWindow
 	public bool CursorVisible { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 	public Action? Closing { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 	Vector2Int IWindow.Size { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	Vector2Int IWindow.ClientSize { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	Action<Vector2Int>? IWindow.OnClientResized { get; set; }
 	Vector2Int IWindow.Position { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 	Vector2Int IWindow.ClientPosition { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 	WindowState IWindow.State { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -39,7 +55,7 @@ public class WebWindow : IWindow
 
 	public void Center()
 	{
-		throw new NotImplementedException();
+
 	}
 
 	public void Close()
@@ -69,12 +85,7 @@ public class WebWindow : IWindow
 
 	public void SetIconFromStream(Stream? imageStream)
 	{
-		throw new NotImplementedException();
-	}
 
-	void IWindow.Center()
-	{
-		throw new NotImplementedException();
 	}
 
 	void IWindow.Close()
@@ -108,11 +119,6 @@ public class WebWindow : IWindow
 	}
 
 	void IWindow.RequestAttention()
-	{
-		throw new NotImplementedException();
-	}
-
-	void IWindow.SetIconFromStream(Stream? imageStream)
 	{
 		throw new NotImplementedException();
 	}
