@@ -11,10 +11,10 @@ public class WebGLShader : UnmanagedObject<object>
 {
 	protected override object CreateObject() => WebGL.CreateProgram();
 
-	public WebGLShader(string vertexShaderSource, string fragmentShaderSource)
+	public WebGLShader()
 	{
-		var vertexShader = compileShader(GLShaderType.Vertex, vertexShaderSource);
-		var fragmentShader = compileShader(GLShaderType.Fragment, fragmentShaderSource);
+		var vertexShader = compileShader(GLShaderType.Vertex, _vertexShaderCode);
+		var fragmentShader = compileShader(GLShaderType.Fragment, _fragmentShaderCode);
 
 		WebGL.AttachShader(Handle, vertexShader);
 		WebGL.AttachShader(Handle, fragmentShader);
@@ -92,4 +92,40 @@ public class WebGLShader : UnmanagedObject<object>
 	}
 
 	protected override void OnDispose() => WebGL.DeleteProgram(Handle);
+
+	private const string _vertexShaderCode = """
+		#version 300 es
+		precision highp float;
+
+		in vec2 vPos;
+		in vec4 vCol;
+		in vec2 vTex;
+
+		uniform mat4 u_Projection;
+
+		out vec4 oCol;
+		out vec2 oTex;
+
+		void main(){
+			gl_Position = u_Projection * vec4(vPos.x, vPos.y, 1.0, 1.0);
+			oCol = vCol;
+			oTex = vTex;
+		}
+	""";
+
+	private const string _fragmentShaderCode = """
+		#version 300 es
+		precision mediump float;
+
+		in vec4 oCol;
+		in vec2 oTex;
+
+		uniform sampler2D u_Texture;
+
+		out vec4 FragColor;
+
+		void main(){
+			FragColor = texture(u_Texture, oTex) * vec4(oCol.x, oCol.y, oCol.z, oCol.w);
+		}
+	""";
 }

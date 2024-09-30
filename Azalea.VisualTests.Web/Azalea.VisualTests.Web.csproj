@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Azalea.VisualTests\Azalea.VisualTests.csproj" />
+    <ProjectReference Include="..\Azalea.Web\Azalea.Web.csproj" />
+  </ItemGroup>
+</Project>

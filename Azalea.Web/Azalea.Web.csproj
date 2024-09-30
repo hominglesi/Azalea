@@ -1,17 +1,18 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
-    <RunAOTCompilation>true</RunAOTCompilation>
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\**\*.*" />
+    <ProjectReference Include="..\Azalea\Azalea.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Azalea.VisualTests\Azalea.VisualTests.csproj" />
-    <ProjectReference Include="..\Azalea\Azalea.csproj" />
+    <Content Include="wwwroot\**\*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Link>..\..\..\wwwroot\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
   </ItemGroup>
 </Project>

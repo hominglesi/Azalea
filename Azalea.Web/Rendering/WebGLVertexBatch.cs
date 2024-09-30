@@ -2,7 +2,6 @@
 using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
-using Azalea.IO.Resources;
 using Azalea.Platform;
 using Azalea.Utils;
 using System;
@@ -55,9 +54,7 @@ internal class WebGLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 		_vertexArray.AddBuffer(_vertexBuffer, vbLayout);
 		_vertices = new float[size * IRenderer.VERTICES_PER_QUAD * _stride];
 
-		var vertexShaderSource = Assets.GetText("Shaders/webgl_vertex_shader.glsl")!;
-		var fragmentShaderSource = Assets.GetText("Shaders/webgl_fragment_shader.glsl")!;
-		_shader = new WebGLShader(vertexShaderSource, fragmentShaderSource);
+		_shader = new WebGLShader();
 	}
 
 	public int Draw()
