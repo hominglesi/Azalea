@@ -9,10 +9,12 @@
     <ProjectReference Include="..\Azalea\Azalea.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="wwwroot\**\*.*">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <Link>..\..\..\wwwroot\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Content>
+  <ItemGroup Label="StaticFiles">
+    <Content Include="build\Azalea.Web.props" PackagePath="build" />
+    <Content Include="wwwroot\template.gitignore" PackagePath="wwwroot\.gitignore" />
+    <Content Include="wwwroot\index.html" PackagePath="wwwroot" />
+    <Content Include="wwwroot\main.js" PackagePath="wwwroot" />
+    <Content Include="wwwroot\imports.js" PackagePath="wwwroot" />
+    <Content Include="wwwroot\exports.js" PackagePath="wwwroot" />
   </ItemGroup>
 </Project>
