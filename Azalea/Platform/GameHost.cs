@@ -49,54 +49,64 @@ public abstract class GameHost
 		_physics = new PhysicsGenerator();
 		_physics.UsesGravity = false;
 
-		float accumulator = 0;
-		float targetFrameTime = 1 / (float)60;
-
 		CallInitialized();
 
-		DateTime lastFrameTime = Time.GetCurrentPreciseTime();
-		DateTime frameTime;
-		float deltaTime;
-		var firstWindowShow = false;
+		_lastFrameTime = GetCurrentTime();
 
-		//Game Loop
+		RunGameLoop();
+	}
+
+	private float _accumulator = 0;
+	private float _targetFrameTime = 1 / (float)60;
+	private DateTime _lastFrameTime;
+	private DateTime _frameTime;
+	private float _deltaTime;
+	private bool _firstWindowShow = false;
+
+	protected virtual void RunGameLoop()
+	{
 		while (Window.ShouldClose == false)
 		{
-			StartFrame();
-
-			frameTime = Time.GetCurrentPreciseTime();
-			deltaTime = (float)frameTime.Subtract(lastFrameTime).TotalSeconds;
-			lastFrameTime = frameTime;
-
-			Time.Update(deltaTime);
-
-			accumulator += deltaTime;
-
-			while (accumulator >= targetFrameTime)
-			{
-				PerformanceTrace.RunAndTrace(CallOnFixedUpdate, "FixedUpdate");
-				accumulator -= targetFrameTime;
-			}
-
-			PerformanceTrace.RunAndTrace(CallOnUpdate, "Update");
-			PerformanceTrace.RunAndTrace(CallOnRender, "Render");
-
-			if (firstWindowShow == false)
-			{
-				Window.Show(true);
-				firstWindowShow = true;
-			}
-
-			Window.ProcessEvents();
-			//PerformanceTrace.RunAndTrace(InputManager.ProcessInputs, "Input");
-
-			EndFrame();
+			ProcessGameLoop();
 		}
+
 		Window.Hide();
 
 		PerformanceTrace.SaveEventsTo("C:\\Programming\\trace.txt");
 
 		Window.Dispose();
+	}
+
+	protected virtual void ProcessGameLoop()
+	{
+		StartFrame();
+
+		_frameTime = GetCurrentTime();
+		_deltaTime = (float)_frameTime.Subtract(_lastFrameTime).TotalSeconds;
+		_lastFrameTime = _frameTime;
+
+		Time.Update(_deltaTime);
+
+		_accumulator += _deltaTime;
+
+		while (_accumulator >= _targetFrameTime)
+		{
+			PerformanceTrace.RunAndTrace(CallOnFixedUpdate, "FixedUpdate");
+			_accumulator -= _targetFrameTime;
+		}
+
+		PerformanceTrace.RunAndTrace(CallOnUpdate, "Update");
+		PerformanceTrace.RunAndTrace(CallOnRender, "Render");
+
+		if (_firstWindowShow == false)
+		{
+			Window.Show(true);
+			_firstWindowShow = true;
+		}
+
+		Window.ProcessEvents();
+
+		EndFrame();
 	}
 
 	private long _frameStart;
@@ -151,4 +161,6 @@ public abstract class GameHost
 	}
 
 	protected virtual IClipboard? CreateClipboard() => null;
+
+	public virtual DateTime GetCurrentTime() => Time.GetCurrentPreciseTime();
 }

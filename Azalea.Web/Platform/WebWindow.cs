@@ -97,5 +97,5 @@ public class WebWindow : IWindow
 
 	void IWindow.Hide() { }
 
-	void IWindow.ProcessEvents() { }
+	void IWindow.ProcessEvents() => WebEvents.HandleEvents();
 }

@@ -1,8 +1,5 @@
-﻿using Azalea.Debugging;
-using Azalea.Design.Containers;
-using Azalea.Graphics.OpenGL.Enums;
+﻿using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.Rendering;
-using Azalea.Physics;
 using Azalea.Platform;
 using Azalea.Sounds;
 using Azalea.Web.Rendering;
@@ -38,52 +35,21 @@ public class WebHost : GameHost
 		base.CallInitialized();
 	}
 
-	public override void Run(AzaleaGame game)
+	protected override void RunGameLoop()
 	{
-		if (AzaleaSettings.EnableDebugging)
-		{
-			var root = new DebuggingOverlay();
-			_root = root;
-			Editor._overlay = root;
-		}
-		else
-			_root = new Composition();
-
-		_root.Add(game);
-
-		game.SetHost(this);
-
-		_physics = new PhysicsGenerator();
-		_physics.UsesGravity = false;
-
-		CallInitialized();
-
-		lastFrameTime = WebEvents.GetCurrentPreciseTime();
-
 		WebEvents.OnAnimationFrameRequested += runGameLoop;
 		WebEvents.RequestAnimationFrame();
 	}
-
-	private DateTime lastFrameTime;
-	private DateTime frameTime;
-	private float deltaTime;
 
 	private void runGameLoop()
 	{
 		WebEvents.CheckClientSize();
 
-		frameTime = WebEvents.GetCurrentPreciseTime();
-		deltaTime = (float)frameTime.Subtract(lastFrameTime).TotalSeconds;
-		lastFrameTime = frameTime;
-
-		Time.Update(deltaTime);
-
-		WebEvents.HandleEvents();
-
-		CallOnFixedUpdate();
-		CallOnUpdate();
-		CallOnRender();
+		ProcessGameLoop();
 
 		WebEvents.RequestAnimationFrame();
 	}
+
+	public override DateTime GetCurrentTime()
+		=> WebEvents.GetCurrentPreciseTime();
 }
