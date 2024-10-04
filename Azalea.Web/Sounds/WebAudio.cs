@@ -6,7 +6,7 @@ internal static partial class WebAudio
 {
 	private const string ImportString = "JSImports";
 
-	[JSImport("WebAudio.BufferAudioData", ImportString)]
+	[JSImport("WebAudio.BufferData", ImportString)]
 	internal static partial void BufferData([JSMarshalAs<JSType.Any>] object buffer, [JSMarshalAs<JSType.MemoryView>] Span<byte> data);
 
 	[JSImport("WebAudio.Connect", ImportString)]
@@ -15,7 +15,7 @@ internal static partial class WebAudio
 	[JSImport("WebAudio.ConnectToContext", ImportString)]
 	internal static partial void ConnectToContext([JSMarshalAs<JSType.Any>] object source);
 
-	[JSImport("WebAudio.CreateAudioBuffer", ImportString)]
+	[JSImport("WebAudio.CreateBuffer", ImportString)]
 	[return: JSMarshalAs<JSType.Any>]
 	internal static partial object CreateBuffer(int channels, int size, int sampleRate);
 

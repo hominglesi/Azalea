@@ -17,10 +17,7 @@ internal class WebAudioSource : AudioSource
 	protected override void BindBufferImplementation(Sound sound)
 		=> WebAudio.SetBuffer(Handle, ((WebSound)sound).Buffer.Handle);
 
-	protected override void OnDispose()
-	{
-
-	}
+	protected override void OnDispose() { }
 
 	protected override void PlayImplementation()
 		=> WebAudio.StartSource(Handle);

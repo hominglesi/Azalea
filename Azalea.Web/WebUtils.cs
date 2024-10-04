@@ -19,11 +19,19 @@ public static class WebUtils
 		if (key.Length == 1)
 		{
 			var chr = key[0];
-			if (char.IsLetter(chr))
-				return (Keys)char.ToUpper(chr);
 
 			if (char.IsDigit(chr))
 				return (Keys)(chr + 43);
+
+			if (char.IsLetter(chr))
+			{
+				chr = char.ToUpper(chr);
+
+				if (chr < 'A' || chr > 'Z')
+					return Keys.Unknown;
+
+				return (Keys)chr;
+			}
 		}
 
 		return key switch

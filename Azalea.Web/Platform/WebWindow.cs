@@ -19,117 +19,83 @@ public class WebWindow : IWindow
 	public Vector2Int ClientSize
 	{
 		get => _clientSize;
-		set => throw new NotSupportedException("Cannot set client size of WebWindow.");
+		set { return; }
 	}
 
 	public Action<Vector2Int>? OnClientResized { get; set; }
 
-
-	public Vector2Int Size { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	public Vector2Int Position { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	public Vector2Int ClientPosition { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	public WindowState State { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	public string Title { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	public bool Resizable { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	public bool VSync { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-	public bool CanChangeVSync => throw new NotImplementedException();
-
-	public bool CursorVisible { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	public Action? Closing { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	Vector2Int IWindow.Size { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	Vector2Int IWindow.Position { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	Vector2Int IWindow.ClientPosition { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	WindowState IWindow.State { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	string IWindow.Title { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	bool IWindow.Resizable { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-	bool IWindow.VSync { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-	bool IWindow.CanChangeVSync => throw new NotImplementedException();
-
-	bool IWindow.CursorVisible { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-	bool IWindow.ShouldClose => throw new NotImplementedException();
-
-	Action? IWindow.Closing { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-	public void Center()
+	public Vector2Int Size
 	{
-
+		get => Vector2Int.Zero;
+		set { return; }
 	}
 
-	public void Close()
+	public Vector2Int Position
 	{
-		throw new NotImplementedException();
+		get => Vector2Int.Zero;
+		set { return; }
 	}
 
-	public void Dispose()
+	public Vector2Int ClientPosition
 	{
-		throw new NotImplementedException();
+		get => Vector2Int.Zero;
+		set { return; }
 	}
 
-	public void Focus()
+	public WindowState State
 	{
-		throw new NotImplementedException();
+		get => WindowState.Normal;
+		set { return; }
 	}
 
-	public void PreventClosure()
+	public string Title
 	{
-		throw new NotImplementedException();
+		get => "AzaleaGae";
+		set { return; }
 	}
 
-	public void RequestAttention()
+	public bool Resizable
 	{
-		throw new NotImplementedException();
+		get => true;
+		set { return; }
 	}
 
-	public void SetIconFromStream(Stream? imageStream)
+	public bool VSync
 	{
-
+		get => true;
+		set { return; }
 	}
 
-	void IWindow.Close()
+	public bool CanChangeVSync => false;
+
+	public bool CursorVisible
 	{
-		throw new NotImplementedException();
+		get => true;
+		set { return; }
 	}
 
-	void IDisposable.Dispose()
-	{
-		throw new NotImplementedException();
-	}
+	public Action? Closing { get; set; }
+	bool IWindow.ShouldClose => false;
 
-	void IWindow.Focus()
-	{
-		throw new NotImplementedException();
-	}
+	public void Center() { }
 
-	void IWindow.Hide()
-	{
-		throw new NotImplementedException();
-	}
+	public void Close() { }
 
-	void IWindow.PreventClosure()
-	{
-		throw new NotImplementedException();
-	}
+	public void Dispose() { }
 
-	void IWindow.ProcessEvents()
-	{
-		throw new NotImplementedException();
-	}
+	public void Focus() { }
 
-	void IWindow.RequestAttention()
-	{
-		throw new NotImplementedException();
-	}
+	public void PreventClosure() { }
 
-	void IWindow.Show(bool firstTime)
-	{
-		throw new NotImplementedException();
-	}
+	public void RequestAttention() { }
 
-	void IWindow.SwapBuffers()
-	{
-		throw new NotImplementedException();
-	}
+	public void SetIconFromStream(Stream? imageStream) { }
+
+	void IWindow.SwapBuffers() { }
+
+	void IWindow.Show(bool firstTime) { }
+
+	void IWindow.Hide() { }
+
+	void IWindow.ProcessEvents() { }
 }

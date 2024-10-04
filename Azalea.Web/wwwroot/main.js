@@ -7,72 +7,72 @@ const { setModuleImports, getAssemblyExports, getConfig } = await dotnet
 
 setModuleImports('JSImports', {
     WebGL: {
-        ActiveTexture,
-        AttachShader,
-        BindBuffer,
-        BindTexture,
-        BindVertexArray,
-        BlendFuncSeparate,
-        BufferData,
-        ClearColor,
-        Clear,
-        CompileShader,
-        CreateBuffer,
-        CreateProgram,
-        CreateShader,
-        CreateTexture,
-        CreateVertexArray,
-        DeleteBuffer,
-        DeleteProgram,
-        DeleteShader,
-        DeleteTexture,
-        DeleteVertexArray,
-        Disable,
-        DrawArrays,
-        DrawElements,
-        Enable,
-        EnableVertexAttribArray,
-        GenerateMipmap,
-        GetAttribLocation,
-        GetBufferParameter,
-        GetProgramInfoLog,
-        GetProgramParameter,
-        GetShaderInfoLog,
-        GetShaderParameter,
-        GetShaderSource,
-        GetUniformLocation,
-        LinkProgram,
-        Scissor,
-        ShaderSource,
-        TexImage2D,
-        TexParameteri,
-        Uniform1i,
-        Uniform1iv,
-        Uniform4f,
-        UniformMatrix4fv,
-        UseProgram,
-        ValidateProgram,
-        VertexAttribPointer,
-        Viewport
+        ActiveTexture: (texture) => gl.activeTexture(texture),
+        AttachShader: (program, shader) => gl.attachShader(program, shader),
+        BindBuffer: (target, buffer) => gl.bindBuffer(target, buffer),
+        BindTexture: (target, texture) => gl.bindTexture(target, texture),
+        BindVertexArray: (vertexArray) => gl.bindVertexArray(vertexArray),
+        BlendFuncSeparate: (srcRGB, dstRGB, srcAlpha, dstAlpha) => gl.blendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha),
+        BufferData: (target, size, usage) => gl.bufferData(target, size._unsafe_create_view(), usage),
+        ClearColor: (red, green, blue, alpha) => gl.clearColor(red, green, blue, alpha),
+        Clear: (mask) => gl.clear(mask),
+        CompileShader: (shader) => gl.compileShader(shader),
+        CreateBuffer: () => gl.createBuffer(),
+        CreateProgram: () => gl.createProgram(),
+        CreateShader: (type) => gl.createShader(type),
+        CreateTexture: () => gl.createTexture(),
+        CreateVertexArray: () => gl.createVertexArray(),
+        DeleteBuffer: (buffer) => gl.DeleteBuffer(buffer),
+        DeleteProgram: (program) => gl.deleteProgram(program),
+        DeleteShader: (shader) => gl.deleteShader(shader),
+        DeleteTexture: (texture) => gl.deleteTexture(texture),
+        DeleteVertexArray: (vertexArray) => gl.deleteVertexArray(vertexArray),
+        Disable: (capability) => gl.disable(capability),
+        DrawArrays: (mode, first, count) => gl.drawArrays(mode, first, count),
+        DrawElements: (mode, count, type, offset) => gl.drawElements(mode, count, type, offset),
+        Enable: (cap) => gl.enable(cap),
+        EnableVertexAttribArray: (index) => gl.enableVertexAttribArray(index),
+        GenerateMipmap: (target) => gl.generateMipmap(target),
+        GetAttribLocation: (program, name) => gl.getAttribLocation(program, name),
+        GetBufferParameter: (target, pname) => gl.getBufferParameter(target, pname),
+        GetProgramInfoLog: (program) => gl.getProgramInfoLog(program),
+        GetProgramParameter: (program, pname) => gl.getProgramParameter(program, pname),
+        GetShaderInfoLog: (shader) => gl.getShaderInfoLog(shader),
+        GetShaderParameter: (shader, pname) => gl.getShaderParameter(shader, pname),
+        GetShaderSource: (shader) => gl.getShaderSource(shader),
+        GetUniformLocation: (program, name) => gl.getUniformLocation(program, name),
+        LinkProgram: (program) => gl.linkProgram(program),
+        Scissor: (x, y, width, height) => gl.scissor(x, y, width, height),
+        ShaderSource: (shader, source) => gl.shaderSource(shader, source),
+        TexImage2D: (target, level, internalformat, width, height, border, format, type, source) => gl.texImage2D(target, level, internalformat, width, height, border, format, type, source._unsafe_create_view()),
+        TexParameteri: (target, pname, param) => gl.texParameteri(target, pname, param),
+        Uniform1i: (location, v0) => gl.uniform1i(location, v0),
+        Uniform1iv: (location, value) => gl.uniform1iv(location, value),
+        Uniform4f: (location, v0, v1, v2, v3) => gl.uniform4f(location, v0, v1, v2, v3),
+        UniformMatrix4fv: (location, transpose, value) => gl.uniformMatrix4fv(location, transpose, value),
+        UseProgram: (program) => gl.useProgram(program),
+        ValidateProgram: (program) => gl.validateProgram(program),
+        VertexAttribPointer: (index, size, type, normalized, stride, offset) => gl.vertexAttribPointer(index, size, type, normalized, stride, offset),
+        Viewport: (x, y, width, height) => gl.viewport(x, y, width, height)
     },
     WebEvents: {
-        RequestAnimationFrame,
+        RequestAnimationFrame: () => window.requestAnimationFrame(InvokeAnimationFrameRequested),
         CheckClientSize,
-        GetCurrentPreciseTime
+        GetCurrentPreciseTime: () => new Date(performance.now())
     },
     WebAudio: {
-        Connect,
-        BufferAudioData,
-        ConnectToContext,
-        CreateAudioBuffer,
-        CreateBufferSource,
-        CreateGain,
-        SetBuffer,
-        SetGain,
-        SetLoop,
-        SetMasterVolume,
-        StartSource,
-        StopSource
+        BufferData: (buffer, data) => BufferAudioData(buffer, data),
+        Connect: (source, destination) => source.connect(destination),
+        ConnectToContext: (source) => source.connect(masterVolumeGain),
+        CreateBuffer: (channels, length, sampleRate) => audio.createBuffer(channels, length, sampleRate),
+        CreateBufferSource: () => audio.createBufferSource(),
+        CreateGain: () => audio.createGain(),
+        SetBuffer: (source, buffer) => source.buffer = buffer,
+        SetGain: (gainNode, gain) => gainNode.gain.setValueAtTime(gain, audio.currentTime),
+        SetLoop: (source, loop) => source.loop = loop,
+        SetMasterVolume: (volume) => masterVolumeGain.gain.setValueAtTime(volume, audio.currentTime),
+        StartSource: (source) => source.start(0),
+        StopSource: (source) => source.stop()
     }
 });
 
@@ -81,8 +81,19 @@ exports = await getAssemblyExports("Azalea.Web");
 canvas.addEventListener("mousemove", (e) => exports.Azalea.Web.WebEvents.ReportMouseMove(e.pageX, e.pageY));
 canvas.addEventListener("mousedown", (e) => exports.Azalea.Web.WebEvents.ReportMouseDown(e.button));
 canvas.addEventListener("mouseup", (e) => exports.Azalea.Web.WebEvents.ReportMouseUp(e.button));
-canvas.addEventListener("keydown", (e) => exports.Azalea.Web.WebEvents.ReportKeyDown(e.key));
 canvas.addEventListener("keyup", (e) => exports.Azalea.Web.WebEvents.ReportKeyUp(e.key));
+canvas.addEventListener("keydown", (e) =>
+{
+    if (e.repeat)
+        exports.Azalea.Web.WebEvents.ReportKeyRepeat(e.key);
+    else
+        exports.Azalea.Web.WebEvents.ReportKeyDown(e.key);
+
+    if (e.key.length == 1 && e.ctrlKey == false) {
+        exports.Azalea.Web.WebEvents.ReportCharInput(e.key.codePointAt(0));
+    }
+        
+});
 
 //dotnet.run() starts the actual program main
 await dotnet.run();

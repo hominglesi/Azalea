@@ -36,10 +36,12 @@ internal static partial class WebEvents
 	internal static partial DateTime GetCurrentPreciseTime();
 
 	private static Vector2Int? _mouseMoveChange;
-	private static List<MouseButton> _mouseDownButtons = new();
-	private static List<MouseButton> _mouseUpButtons = new();
-	private static List<Keys> _downKeys = new();
-	private static List<Keys> _upKeys = new();
+	private static readonly List<MouseButton> _mouseDownButtons = [];
+	private static readonly List<MouseButton> _mouseUpButtons = [];
+	private static readonly List<Keys> _downKeys = [];
+	private static readonly List<Keys> _upKeys = [];
+	private static readonly List<Keys> _repeatKeys = [];
+	private static readonly List<char> _charInputs = [];
 
 	[JSExport]
 	internal static void ReportMouseMove(int x, int y)
@@ -60,6 +62,14 @@ internal static partial class WebEvents
 	[JSExport]
 	internal static void ReportKeyUp(string key)
 		=> _upKeys.Add(WebUtils.TranslateKey(key));
+
+	[JSExport]
+	internal static void ReportKeyRepeat(string key)
+		=> _repeatKeys.Add(WebUtils.TranslateKey(key));
+
+	[JSExport]
+	internal static void ReportCharInput(int chr)
+		=> _charInputs.Add((char)chr);
 
 	internal static void HandleEvents()
 	{
@@ -99,6 +109,24 @@ internal static partial class WebEvents
 				Input.ExecuteKeyboardKeyStateChange(upKey, false);
 
 			_upKeys.Clear();
+		}
+
+		if (_repeatKeys.Count > 0)
+		{
+			foreach (var repeatKey in _repeatKeys)
+				Input.ExecuteKeyboardKeyRepeat(repeatKey);
+
+			_repeatKeys.Clear();
+		}
+
+		if (_charInputs.Count > 0)
+		{
+			foreach (var charInput in _charInputs)
+			{
+				Input.ExecuteTextInput(charInput);
+			}
+
+			_charInputs.Clear();
 		}
 	}
 }
