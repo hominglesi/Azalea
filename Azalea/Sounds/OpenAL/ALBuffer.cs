@@ -1,6 +1,6 @@
 ﻿using Azalea.Utils;
 
-namespace Azalea.Audio.OpenAL;
+namespace Azalea.Sounds.OpenAL;
 internal class ALBuffer : Disposable
 {
 	public uint Handle;

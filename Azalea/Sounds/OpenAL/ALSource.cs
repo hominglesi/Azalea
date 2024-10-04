@@ -1,4 +1,4 @@
-﻿namespace Azalea.Audio.OpenAL;
+﻿namespace Azalea.Sounds.OpenAL;
 internal class ALSource : AudioSource
 {
 	public uint Handle;
@@ -17,8 +17,8 @@ internal class ALSource : AudioSource
 	protected override void PlayImplementation()
 		=> ALC.SourcePlay(Handle);
 
-	protected override void BindBufferImplementation(ALBuffer buffer)
-		=> ALC.BindBuffer(Handle, buffer.Handle);
+	protected override void BindBufferImplementation(Sound sound)
+		=> ALC.BindBuffer(Handle, ((ALSound)sound).Buffer.Handle);
 
 	protected override void StopImplementation()
 		=> ALC.SourceStop(Handle);

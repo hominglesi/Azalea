@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Azalea.Audio;
+namespace Azalea.Sounds;
 public class AudioInstance
 {
 	internal AudioSource _source;

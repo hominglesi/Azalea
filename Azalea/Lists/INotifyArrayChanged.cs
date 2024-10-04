@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Azalea.List;
+namespace Azalea.Lists;
 
 public interface INotifyArrayChanged
 {

@@ -59,10 +59,23 @@ setModuleImports('JSImports', {
         RequestAnimationFrame,
         CheckClientSize,
         GetCurrentPreciseTime
+    },
+    WebAudio: {
+        Connect,
+        BufferAudioData,
+        ConnectToContext,
+        CreateAudioBuffer,
+        CreateBufferSource,
+        CreateGain,
+        SetBuffer,
+        SetGain,
+        SetLoop,
+        SetMasterVolume,
+        StartSource,
+        StopSource
     }
 });
 
-const config = getConfig();
 exports = await getAssemblyExports("Azalea.Web");
 
 canvas.addEventListener("mousemove", (e) => exports.Azalea.Web.WebEvents.ReportMouseMove(e.pageX, e.pageY));

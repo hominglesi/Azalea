@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Azalea.Audio.OpenAL;
+namespace Azalea.Sounds.OpenAL;
 internal readonly struct ALC_Context
 {
 	public readonly IntPtr NativePointer;

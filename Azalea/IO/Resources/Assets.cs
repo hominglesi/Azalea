@@ -1,4 +1,4 @@
-﻿using Azalea.Audio;
+﻿using Azalea.Sounds;
 using Azalea.Graphics.Textures;
 using Azalea.Utils;
 using System;

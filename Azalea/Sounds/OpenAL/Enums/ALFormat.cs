@@ -1,4 +1,4 @@
-﻿namespace Azalea.Audio.OpenAL;
+﻿namespace Azalea.Sounds.OpenAL;
 internal enum ALFormat
 {
 	Mono8 = 0x1100,

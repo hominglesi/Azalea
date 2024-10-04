@@ -40,7 +40,7 @@ public class DebuggingOverlay : ContentContainer
 			BackgroundColor = new Color(82, 82, 82),
 		});
 
-		//AddInternal(new ColliderDebug());
+		AddInternal(new ColliderDebug());
 
 		DebugConsole = new DebugConsole();
 

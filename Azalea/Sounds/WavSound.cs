@@ -1,11 +1,11 @@
-﻿using Azalea.Audio.OpenAL;
-using Azalea.Extentions;
+﻿using Azalea.Extentions;
+using Azalea.Sounds.OpenAL;
 using System;
 using System.Buffers.Binary;
 using System.Diagnostics;
 using System.IO;
 
-namespace Azalea.Audio;
+namespace Azalea.Sounds;
 
 //http://soundfile.sapp.org/doc/WaveFormat/
 internal class WavSound : ISoundData
@@ -62,7 +62,9 @@ internal class WavSound : ISoundData
 			}
 			else
 			{
-				Console.WriteLine($"Unknown Section: {identifier}");
+				if (identifier != "LIST" && identifier != "id3 ")
+					Console.WriteLine($"Unknown Section: {identifier}");
+
 				index += size;
 			}
 		}
@@ -139,7 +141,8 @@ internal class WavSound : ISoundData
 	}
 
 	public ALFormat Format => _format;
-	public ReadOnlySpan<byte> Data => ((ReadOnlySpan<byte>)_wavData).Slice(_dataOffset, _size);
+	public int ChannelCount => _numChannels;
+	public Span<byte> Data => _wavData.AsSpan().Slice(_dataOffset, _size);
 	public int Size => _size;
 	public int Frequency => _sampleRate;
 }

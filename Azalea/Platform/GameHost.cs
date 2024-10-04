@@ -1,11 +1,12 @@
-﻿using Azalea.Audio;
-using Azalea.Debugging;
+﻿using Azalea.Debugging;
 using Azalea.Design.Containers;
 using Azalea.Extentions;
 using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
 using Azalea.Physics;
+using Azalea.Sounds;
 using System;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace Azalea.Platform;
@@ -14,6 +15,7 @@ public abstract class GameHost
 {
 	public abstract IWindow Window { get; }
 	public abstract IRenderer Renderer { get; }
+	public abstract IAudioManager AudioManager { get; }
 
 	public IClipboard Clipboard => _clipboard ?? throw new Exception("This GameHost does not support using the clipboard.");
 	private IClipboard? _clipboard;
@@ -95,7 +97,6 @@ public abstract class GameHost
 		PerformanceTrace.SaveEventsTo("C:\\Programming\\trace.txt");
 
 		Window.Dispose();
-		AudioManager.Dispose();
 	}
 
 	private long _frameStart;
@@ -111,11 +112,10 @@ public abstract class GameHost
 
 	public virtual void CallInitialized()
 	{
-		//Debug.Assert(_root is not null);
+		Debug.Assert(_root is not null);
 
 		Input.Initialize(_root);
 		Renderer.Initialize();
-		//AudioManager.Initialize();
 
 		if (_root is DebuggingOverlay debug)
 			debug.Initialize();

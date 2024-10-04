@@ -1,7 +1,6 @@
-﻿using Azalea.Audio.OpenAL;
-using Azalea.Utils;
+﻿using Azalea.Utils;
 
-namespace Azalea.Audio;
+namespace Azalea.Sounds;
 internal abstract class AudioSource : Disposable
 {
 	private float _gain = 1;
@@ -33,11 +32,13 @@ internal abstract class AudioSource : Disposable
 
 	private AudioInstance? _currentInstance;
 
+	protected abstract void BindBufferImplementation(Sound sound);
+	protected abstract void PlayImplementation();
 	public AudioInstance Play(Sound sound, float gain = 1, bool looping = false)
 	{
 		Stop();
 
-		BindBufferImplementation(sound.Buffer);
+		BindBufferImplementation(sound);
 		Gain = gain;
 		Looping = looping;
 
@@ -48,17 +49,16 @@ internal abstract class AudioSource : Disposable
 		return _currentInstance;
 	}
 
+	protected abstract void StopImplementation();
 	public void Stop()
 	{
-		if (_currentInstance is not null)
-			_currentInstance.Playing = false;
+		if (_currentInstance is null)
+			return;
+
+		_currentInstance.Playing = false;
 
 		StopImplementation();
 
 		_currentInstance = null;
 	}
-
-	protected abstract void BindBufferImplementation(ALBuffer buffer);
-	protected abstract void PlayImplementation();
-	protected abstract void StopImplementation();
 }

@@ -1,4 +1,4 @@
-﻿namespace Azalea.Audio.OpenAL;
+﻿namespace Azalea.Sounds.OpenAL;
 internal enum ALError
 {
 	NoError = 0,

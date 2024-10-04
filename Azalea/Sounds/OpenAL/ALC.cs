@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Azalea.Audio.OpenAL;
+namespace Azalea.Sounds.OpenAL;
 internal unsafe static class ALC
 {
 	public const string LibraryPath = "soft_oal.dll";
