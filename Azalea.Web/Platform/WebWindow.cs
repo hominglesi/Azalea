@@ -48,10 +48,18 @@ public class WebWindow : IWindow
 		set { return; }
 	}
 
+	private string _title = "AzaleaGame";
 	public string Title
 	{
-		get => "AzaleaGae";
-		set { return; }
+		get => _title;
+		set
+		{
+			if (value == _title) return;
+
+			_title = value;
+
+			WebEvents.SetTitle(_title);
+		}
 	}
 
 	public bool Resizable

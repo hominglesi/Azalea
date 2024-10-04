@@ -18,8 +18,10 @@ internal class DesktopGameHost : GameHost
 	public override IAudioManager AudioManager => _audioManager ?? throw new Exception("Cannot use AudioManager before it is initialized");
 	private ALAudioManager? _audioManager;
 
-	public DesktopGameHost(HostPreferences prefs)
+	public DesktopGameHost(HostPreferences? preferences = null)
 	{
+		HostPreferences prefs = preferences ?? new HostPreferences();
+
 		_window = new Win32Window(prefs.WindowTitle, prefs.ClientSize, prefs.WindowState, prefs.WindowVisible)
 		{
 			//These are fine just being set normaly

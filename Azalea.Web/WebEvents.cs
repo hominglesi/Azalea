@@ -35,6 +35,9 @@ internal static partial class WebEvents
 	[return: JSMarshalAs<JSType.Date>]
 	internal static partial DateTime GetCurrentPreciseTime();
 
+	[JSImport("WebEvents.SetTitle", "JSImports")]
+	internal static partial void SetTitle(string title);
+
 	private static Vector2Int? _mouseMoveChange;
 	private static readonly List<MouseButton> _mouseDownButtons = [];
 	private static readonly List<MouseButton> _mouseUpButtons = [];

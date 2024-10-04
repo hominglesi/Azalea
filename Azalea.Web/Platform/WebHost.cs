@@ -19,9 +19,14 @@ public class WebHost : GameHost
 	public override IAudioManager AudioManager => _audioManager ?? throw new Exception("Cannot use AudioManager before it is initialized");
 	private WebAudioManager? _audioManager;
 
-	public WebHost()
+	public WebHost(HostPreferences? preferences = null)
 	{
-		_window = new WebWindow();
+		HostPreferences prefs = preferences ?? new HostPreferences();
+
+		_window = new WebWindow
+		{
+			Title = prefs.WindowTitle
+		};
 	}
 
 	public override void CallInitialized()

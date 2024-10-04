@@ -56,9 +56,10 @@ setModuleImports('JSImports', {
         Viewport: (x, y, width, height) => gl.viewport(x, y, width, height)
     },
     WebEvents: {
-        RequestAnimationFrame: () => window.requestAnimationFrame(InvokeAnimationFrameRequested),
         CheckClientSize,
-        GetCurrentPreciseTime: () => new Date(performance.now())
+        GetCurrentPreciseTime: () => new Date(performance.now()),
+        RequestAnimationFrame: () => window.requestAnimationFrame(InvokeAnimationFrameRequested),
+        SetTitle: (title) => document.title = title
     },
     WebAudio: {
         BufferData: (buffer, data) => BufferAudioData(buffer, data),
@@ -92,8 +93,10 @@ canvas.addEventListener("keydown", (e) =>
     if (e.key.length == 1 && e.ctrlKey == false) {
         exports.Azalea.Web.WebEvents.ReportCharInput(e.key.codePointAt(0));
     }
-        
 });
+
+document.getElementById("LoadingText").style.display = "None";
+document.getElementById("Canvas").style.display = "Block";
 
 //dotnet.run() starts the actual program main
 await dotnet.run();
