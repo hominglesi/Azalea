@@ -1,5 +1,9 @@
 using Azalea;
 using Azalea.VisualTests;
-using Azalea.Web.Platform;
 
-new WebHost(new HostPreferences { WindowTitle = "Azalea Visual Tests" }).Run(new VisualTests());
+
+new HostBuilder()
+	.SetTitle("Azalea Visual Tests")
+	.Create()
+	.Run(new VisualTests());
+

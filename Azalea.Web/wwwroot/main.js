@@ -74,11 +74,20 @@ setModuleImports('JSImports', {
         SetMasterVolume: (volume) => masterVolumeGain.gain.setValueAtTime(volume, audio.currentTime),
         StartSource: (source) => source.start(0),
         StopSource: (source) => source.stop()
+    },
+    WebLocalStorage: {
+        Clear: () => localStorage.clear(),
+        GetItem: (key) => localStorage.getItem(key),
+        GetLength: () => localStorage.length,
+        Key: (index) => localStorage.key(index),
+        RemoveItem: (key) => localStorage.removeItem(key),
+        SetItem: (key, value) => localStorage.setItem(key, value)
     }
 });
 
 exports = await getAssemblyExports("Azalea.Web");
 
+window.addEventListener("beforeunload", (e) => exports.Azalea.Web.WebEvents.InvokeWindowClosing());
 canvas.addEventListener("wheel", (e) => { exports.Azalea.Web.WebEvents.ReportScroll(e.deltaY / 100); e.preventDefault(); });
 canvas.addEventListener("mousemove", (e) => exports.Azalea.Web.WebEvents.ReportMouseMove(e.pageX, e.pageY));
 canvas.addEventListener("mousedown", (e) => exports.Azalea.Web.WebEvents.ReportMouseDown(e.button));

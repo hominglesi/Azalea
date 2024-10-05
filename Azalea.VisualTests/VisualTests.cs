@@ -8,6 +8,7 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
+using Azalea.IO.Configs;
 using Azalea.IO.Resources;
 using Azalea.Utils;
 using System;
@@ -19,7 +20,7 @@ namespace Azalea.VisualTests;
 
 public class VisualTests : AzaleaGame
 {
-	private const string currentSceneKey = "currentScene";
+	private const string __currentSceneKey = "currentScene";
 
 #pragma warning disable CS8618
 	private List<string> _tests;
@@ -36,7 +37,7 @@ public class VisualTests : AzaleaGame
 
 		Host.Renderer.ClearColor = Palette.Flowers.Azalea;
 
-		string selectedTest = "";//Config.GetValue(currentSceneKey);
+		var selectedTest = Config.Get(__currentSceneKey);
 		if (selectedTest is null || _tests.Contains(selectedTest) == false)
 			goToSceneSelect();
 		else
@@ -57,8 +58,8 @@ public class VisualTests : AzaleaGame
 		{
 			Main.SceneManager.ChangeScene(_testSelectScene);
 			Main.Host.Renderer.ClearColor = new Color(40, 51, 60);
-			//Main.Host.Window.ClientSize = new(1280, 720);
-			//Main.Host.Window.Center();
+			Main.Host.Window.ClientSize = new(1280, 720);
+			Main.Host.Window.Center();
 		}
 
 	}
@@ -95,7 +96,7 @@ public class VisualTests : AzaleaGame
 			as TestScene;
 
 			Main.SceneManager.ChangeScene(test!);
-			//Config.SetValue(currentSceneKey, testName);
+			Config.Set(__currentSceneKey, testName);
 		}
 	}
 

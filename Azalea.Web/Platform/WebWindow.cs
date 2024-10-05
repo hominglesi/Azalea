@@ -13,6 +13,8 @@ public class WebWindow : IWindow
 			_clientSize = size;
 			OnClientResized?.Invoke(size);
 		};
+
+		WebEvents.WindowClosing += () => Closing?.Invoke();
 	}
 
 	private Vector2Int _clientSize;

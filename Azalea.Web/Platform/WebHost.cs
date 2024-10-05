@@ -1,7 +1,9 @@
 ﻿using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.Rendering;
+using Azalea.IO.Configs;
 using Azalea.Platform;
 using Azalea.Sounds;
+using Azalea.Web.IO;
 using Azalea.Web.Rendering;
 using Azalea.Web.Sounds;
 using System;
@@ -19,14 +21,28 @@ public class WebHost : GameHost
 	public override IAudioManager AudioManager => _audioManager ?? throw new Exception("Cannot use AudioManager before it is initialized");
 	private WebAudioManager? _audioManager;
 
-	public WebHost(HostPreferences? preferences = null)
+	public override IConfigProvider ConfigProvider => _configProvider;
+	private WebConfigProvider _configProvider;
+
+	internal WebHost(HostBuilder.HostPreferences prefs)
 	{
-		HostPreferences prefs = preferences ?? new HostPreferences();
+		CheckForbidden(prefs.GameSize, "Cannot set game size when running on the web.");
+		CheckForbidden(prefs.Resizable, "Cannot set resizable property when running on the web.");
+		CheckForbidden(prefs.StartingState, "Cannot set default state when running on the web.");
+		CheckForbidden(prefs.VSync, "Cannot set vsync property when running on the web.");
+		CheckForbidden(prefs.PersistentDirectory, "Cannot setup persistent directory when running on the web.");
+		CheckForbidden(prefs.ConfigName, "Config is automatically set up when running on the web.");
+
+		var title = prefs.Title ?? "AzaleaGame";
 
 		_window = new WebWindow
 		{
-			Title = prefs.WindowTitle
+			Title = title
 		};
+
+		_configProvider = new WebConfigProvider();
+
+		_window.Closing += beforeClose;
 	}
 
 	public override void CallInitialized()
@@ -53,6 +69,11 @@ public class WebHost : GameHost
 		ProcessGameLoop();
 
 		WebEvents.RequestAnimationFrame();
+	}
+
+	private void beforeClose()
+	{
+		_configProvider.Save();
 	}
 
 	public override DateTime GetCurrentTime()

@@ -38,6 +38,12 @@ internal static partial class WebEvents
 	[JSImport("WebEvents.SetTitle", "JSImports")]
 	internal static partial void SetTitle(string title);
 
+	internal static Action? WindowClosing;
+
+	[JSExport]
+	internal static void InvokeWindowClosing()
+		=> WindowClosing?.Invoke();
+
 	private static Vector2Int? _mouseMoveChange;
 	private static float _scrollChange;
 	private static readonly List<MouseButton> _mouseDownButtons = [];

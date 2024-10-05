@@ -3,6 +3,7 @@ using Azalea.Design.Containers;
 using Azalea.Extentions;
 using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
+using Azalea.IO.Configs;
 using Azalea.Physics;
 using Azalea.Sounds;
 using System;
@@ -13,9 +14,13 @@ namespace Azalea.Platform;
 
 public abstract class GameHost
 {
+	public static GameHost Main => _main ?? throw new Exception("GameHost hasn't been created yet.");
+	private static GameHost? _main;
+
 	public abstract IWindow Window { get; }
 	public abstract IRenderer Renderer { get; }
 	public abstract IAudioManager AudioManager { get; }
+	public abstract IConfigProvider ConfigProvider { get; }
 
 	public IClipboard Clipboard => _clipboard ?? throw new Exception("This GameHost does not support using the clipboard.");
 	private IClipboard? _clipboard;
@@ -26,8 +31,12 @@ public abstract class GameHost
 	internal PhysicsGenerator? _physics;
 
 	public Composition Root => _root ?? throw new Exception("Cannot use root before the game has started.");
-
 	internal Composition? _root;
+
+	protected GameHost()
+	{
+		_main ??= this;
+	}
 
 	public virtual void Run(AzaleaGame game)
 	{
@@ -163,4 +172,10 @@ public abstract class GameHost
 	protected virtual IClipboard? CreateClipboard() => null;
 
 	public virtual DateTime GetCurrentTime() => Time.GetCurrentPreciseTime();
+
+	internal void CheckForbidden(object? preference, string errorMessage)
+	{
+		if (preference is not null)
+			throw new ArgumentException(errorMessage);
+	}
 }

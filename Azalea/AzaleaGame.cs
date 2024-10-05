@@ -12,17 +12,12 @@ public abstract class AzaleaGame : Composition
 	public static AzaleaGame Main => _main ?? throw new Exception("No game has been initialized");
 	private static AzaleaGame? _main;
 
-	public GameHost Host => _host ?? throw new Exception("GameHost has not been set");
-	private GameHost? _host;
-
 	public SceneContainer SceneManager => _sceneManager ?? throw new Exception("Game has not been initialized");
 	private SceneContainer? _sceneManager;
 
 	internal virtual void SetHost(GameHost host)
 	{
 		_main ??= this;
-
-		_host = host;
 
 		Host.Initialized += CallInitialize;
 	}

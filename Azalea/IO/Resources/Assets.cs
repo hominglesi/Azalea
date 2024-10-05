@@ -1,5 +1,5 @@
-﻿using Azalea.Sounds;
-using Azalea.Graphics.Textures;
+﻿using Azalea.Graphics.Textures;
+using Azalea.Sounds;
 using Azalea.Utils;
 using System;
 using System.IO;
