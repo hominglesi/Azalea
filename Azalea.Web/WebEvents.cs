@@ -39,12 +39,17 @@ internal static partial class WebEvents
 	internal static partial void SetTitle(string title);
 
 	private static Vector2Int? _mouseMoveChange;
+	private static float _scrollChange;
 	private static readonly List<MouseButton> _mouseDownButtons = [];
 	private static readonly List<MouseButton> _mouseUpButtons = [];
 	private static readonly List<Keys> _downKeys = [];
 	private static readonly List<Keys> _upKeys = [];
 	private static readonly List<Keys> _repeatKeys = [];
 	private static readonly List<char> _charInputs = [];
+
+	[JSExport]
+	internal static void ReportScroll(float value)
+		=> _scrollChange -= value;
 
 	[JSExport]
 	internal static void ReportMouseMove(int x, int y)
@@ -76,6 +81,12 @@ internal static partial class WebEvents
 
 	internal static void HandleEvents()
 	{
+		if (_scrollChange != 0)
+		{
+			Input.ExecuteScroll(_scrollChange);
+			_scrollChange = 0;
+		}
+
 		if (_mouseMoveChange != null)
 		{
 			Input.ExecuteMousePositionChange(_mouseMoveChange.Value);

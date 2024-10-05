@@ -79,6 +79,7 @@ setModuleImports('JSImports', {
 
 exports = await getAssemblyExports("Azalea.Web");
 
+canvas.addEventListener("wheel", (e) => { exports.Azalea.Web.WebEvents.ReportScroll(e.deltaY / 100); e.preventDefault(); });
 canvas.addEventListener("mousemove", (e) => exports.Azalea.Web.WebEvents.ReportMouseMove(e.pageX, e.pageY));
 canvas.addEventListener("mousedown", (e) => exports.Azalea.Web.WebEvents.ReportMouseDown(e.button));
 canvas.addEventListener("mouseup", (e) => exports.Azalea.Web.WebEvents.ReportMouseUp(e.button));
