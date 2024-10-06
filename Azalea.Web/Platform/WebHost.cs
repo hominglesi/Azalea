@@ -58,13 +58,13 @@ public class WebHost : GameHost
 
 	protected override void RunGameLoop()
 	{
-		WebEvents.OnAnimationFrameRequested += runGameLoop;
+		WebEvents.AnimationFrameRequested += runGameLoop;
 		WebEvents.RequestAnimationFrame();
 	}
 
 	private void runGameLoop()
 	{
-		WebEvents.CheckClientSize();
+		WebEvents.CheckClientResized();
 
 		ProcessGameLoop();
 
@@ -77,5 +77,5 @@ public class WebHost : GameHost
 	}
 
 	public override DateTime GetCurrentTime()
-		=> WebEvents.GetCurrentPreciseTime();
+		=> WebFunctions.GetCurrentPreciseTime();
 }

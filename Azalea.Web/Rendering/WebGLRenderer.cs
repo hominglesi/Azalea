@@ -7,8 +7,14 @@ using Azalea.Platform;
 
 namespace Azalea.Web.Rendering;
 
-internal class WebGLRenderer(IWindow window) : Renderer(window)
+internal class WebGLRenderer : Renderer
 {
+	public WebGLRenderer(IWindow window)
+		: base(window)
+	{
+		//We need to update the viewport when starting because we don't set its size
+		SetViewport(Window.ClientSize);
+	}
 	protected override void SetViewportImplementation(Vector2Int size)
 		=> WebGL.Viewport(0, 0, size.X, size.Y);
 

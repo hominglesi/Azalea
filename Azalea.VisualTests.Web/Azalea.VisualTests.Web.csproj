@@ -7,9 +7,8 @@
     <ProjectReference Include="..\Azalea.Web\Azalea.Web.csproj" />
   </ItemGroup>
   <Target Name="CopyStaticFiles" AfterTargets="PostBuildEvent">
+    <Exec Command="copy &quot;..\Azalea.Web\wwwroot\template.gitignore&quot; &quot;wwwroot\.gitignore&quot;" />
     <Exec Command="copy &quot;..\Azalea.Web\wwwroot\index.html&quot; &quot;wwwroot&quot;" />
     <Exec Command="copy &quot;..\Azalea.Web\wwwroot\main.js&quot; &quot;wwwroot&quot;" />
-    <Exec Command="copy &quot;..\Azalea.Web\wwwroot\imports.js&quot; &quot;wwwroot&quot;" />
-    <Exec Command="copy &quot;..\Azalea.Web\wwwroot\exports.js&quot; &quot;wwwroot&quot;" />
   </Target>
 </Project>

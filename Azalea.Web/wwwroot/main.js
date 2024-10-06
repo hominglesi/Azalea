@@ -5,7 +5,61 @@ const { setModuleImports, getAssemblyExports, getConfig } = await dotnet
     .withApplicationArgumentsFromQuery()
     .create();
 
+const canvas = document.getElementById("Canvas");
+const gl = canvas.getContext("webgl2", { antialias: false, alpha: false });
+var lastWindowWidth = 0;
+var lastWindowHeight = 0;
+
+const audio = new AudioContext();
+const masterVolumeGain = audio.createGain();
+masterVolumeGain.connect(audio.destination);
+
 setModuleImports('JSImports', {
+    WebAudio: {
+        BufferData: (buffer, data) => {
+            var uInt8Array = data._unsafe_create_view();
+            var int16Array = new Int16Array(uInt8Array.buffer, uInt8Array.byteOffset, uInt8Array.length / 2);
+
+            var channelDataPointers = new Array(buffer.numberOfChannels);
+            for (let i = 0; i < buffer.numberOfChannels; i++) {
+                channelDataPointers[i] = buffer.getChannelData(i);
+            }
+
+            var c = 1 / 32768;
+
+            for (let i = 0; i < int16Array.length / buffer.numberOfChannels; i++) {
+                for (var j = 0; j < buffer.numberOfChannels; j++) {
+                    channelDataPointers[j][i] = int16Array[(i * buffer.numberOfChannels) + j] * c;
+                }
+            }
+        },
+        Connect: (source, destination) => source.connect(destination),
+        ConnectToContext: (source) => source.connect(masterVolumeGain),
+        CreateBuffer: (channels, length, sampleRate) => audio.createBuffer(channels, length, sampleRate),
+        CreateBufferSource: () => audio.createBufferSource(),
+        CreateGain: () => audio.createGain(),
+        SetBuffer: (source, buffer) => source.buffer = buffer,
+        SetGain: (gainNode, gain) => gainNode.gain.setValueAtTime(gain, audio.currentTime),
+        SetLoop: (source, loop) => source.loop = loop,
+        SetMasterVolume: (volume) => masterVolumeGain.gain.setValueAtTime(volume, audio.currentTime),
+        StartSource: (source) => source.start(0),
+        StopSource: (source) => source.stop()
+    },
+    WebEvents: {
+        CheckClientResized: () => {
+            if (lastWindowWidth == window.innerWidth && lastWindowHeight == window.innerHeight)
+                return;
+
+            canvas.width = lastWindowWidth = window.innerWidth;
+            canvas.height = lastWindowHeight = window.innerHeight;
+            webEvents.InvokeClientResized(window.innerWidth, window.innerHeight);
+        },
+        RequestAnimationFrame: () => window.requestAnimationFrame(webEvents.InvokeAnimationFrameRequested)
+    },
+    WebFunctions: {
+        GetCurrentPreciseTime: () => new Date(performance.now()),
+        SetTitle: (title) => document.title = title
+    },
     WebGL: {
         ActiveTexture: (texture) => gl.activeTexture(texture),
         AttachShader: (program, shader) => gl.attachShader(program, shader),
@@ -55,26 +109,6 @@ setModuleImports('JSImports', {
         VertexAttribPointer: (index, size, type, normalized, stride, offset) => gl.vertexAttribPointer(index, size, type, normalized, stride, offset),
         Viewport: (x, y, width, height) => gl.viewport(x, y, width, height)
     },
-    WebEvents: {
-        CheckClientSize,
-        GetCurrentPreciseTime: () => new Date(performance.now()),
-        RequestAnimationFrame: () => window.requestAnimationFrame(InvokeAnimationFrameRequested),
-        SetTitle: (title) => document.title = title
-    },
-    WebAudio: {
-        BufferData: (buffer, data) => BufferAudioData(buffer, data),
-        Connect: (source, destination) => source.connect(destination),
-        ConnectToContext: (source) => source.connect(masterVolumeGain),
-        CreateBuffer: (channels, length, sampleRate) => audio.createBuffer(channels, length, sampleRate),
-        CreateBufferSource: () => audio.createBufferSource(),
-        CreateGain: () => audio.createGain(),
-        SetBuffer: (source, buffer) => source.buffer = buffer,
-        SetGain: (gainNode, gain) => gainNode.gain.setValueAtTime(gain, audio.currentTime),
-        SetLoop: (source, loop) => source.loop = loop,
-        SetMasterVolume: (volume) => masterVolumeGain.gain.setValueAtTime(volume, audio.currentTime),
-        StartSource: (source) => source.start(0),
-        StopSource: (source) => source.stop()
-    },
     WebLocalStorage: {
         Clear: () => localStorage.clear(),
         GetItem: (key) => localStorage.getItem(key),
@@ -85,23 +119,25 @@ setModuleImports('JSImports', {
     }
 });
 
-exports = await getAssemblyExports("Azalea.Web");
+var exports = await getAssemblyExports("Azalea.Web");
+var webEvents = exports.Azalea.Web.Platform.WebEvents;
+var webInput = exports.Azalea.Web.Platform.WebInput;
 
-window.addEventListener("beforeunload", (e) => exports.Azalea.Web.WebEvents.InvokeWindowClosing());
-canvas.addEventListener("wheel", (e) => { exports.Azalea.Web.WebEvents.ReportScroll(e.deltaY / 100); e.preventDefault(); });
-canvas.addEventListener("mousemove", (e) => exports.Azalea.Web.WebEvents.ReportMouseMove(e.pageX, e.pageY));
-canvas.addEventListener("mousedown", (e) => exports.Azalea.Web.WebEvents.ReportMouseDown(e.button));
-canvas.addEventListener("mouseup", (e) => exports.Azalea.Web.WebEvents.ReportMouseUp(e.button));
-canvas.addEventListener("keyup", (e) => exports.Azalea.Web.WebEvents.ReportKeyUp(e.key));
+window.addEventListener("beforeunload", (e) => webEvents.InvokeWindowClosing());
+canvas.addEventListener("wheel", (e) => webInput.ReportScroll(e.deltaY / 100));
+canvas.addEventListener("mousemove", (e) => webInput.ReportMouseMove(e.pageX, e.pageY));
+canvas.addEventListener("mousedown", (e) => webInput.ReportMouseDown(e.button));
+canvas.addEventListener("mouseup", (e) => webInput.ReportMouseUp(e.button));
+canvas.addEventListener("keyup", (e) => webInput.ReportKeyUp(e.key));
 canvas.addEventListener("keydown", (e) =>
 {
     if (e.repeat)
-        exports.Azalea.Web.WebEvents.ReportKeyRepeat(e.key);
+        webInput.ReportKeyRepeat(e.key);
     else
-        exports.Azalea.Web.WebEvents.ReportKeyDown(e.key);
+        webInput.ReportKeyDown(e.key);
 
     if (e.key.length == 1 && e.ctrlKey == false) {
-        exports.Azalea.Web.WebEvents.ReportCharInput(e.key.codePointAt(0));
+        webInput.ReportCharInput(e.key.codePointAt(0));
     }
 });
 

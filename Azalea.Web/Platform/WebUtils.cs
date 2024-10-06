@@ -1,6 +1,6 @@
 ﻿using Azalea.Inputs;
 
-namespace Azalea.Web;
+namespace Azalea.Web.Platform;
 
 public static class WebUtils
 {

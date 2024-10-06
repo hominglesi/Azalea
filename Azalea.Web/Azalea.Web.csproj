@@ -34,7 +34,5 @@
     <Content Include="wwwroot\template.gitignore" PackagePath="wwwroot\.gitignore" />
     <Content Include="wwwroot\index.html" PackagePath="wwwroot" />
     <Content Include="wwwroot\main.js" PackagePath="wwwroot" />
-    <Content Include="wwwroot\imports.js" PackagePath="wwwroot" />
-    <Content Include="wwwroot\exports.js" PackagePath="wwwroot" />
   </ItemGroup>
 </Project>

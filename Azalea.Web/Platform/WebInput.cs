@@ -1,48 +1,11 @@
 ﻿using Azalea.Inputs;
-using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.JavaScript;
 
-namespace Azalea.Web;
-
-internal static partial class WebEvents
+namespace Azalea.Web.Platform;
+internal static partial class WebInput
 {
 	private const string ImportString = "JSImports";
-
-	internal static Vector2Int ClientSize;
-	internal static Action<Vector2Int>? OnClientResized;
-
-	[JSImport("WebEvents.CheckClientSize", ImportString)]
-	internal static partial void CheckClientSize();
-
-	[JSExport]
-	internal static void UpdateClientSize(int width, int height)
-	{
-		ClientSize = new Vector2Int(width, height);
-		OnClientResized?.Invoke(ClientSize);
-	}
-
-	internal static Action? OnAnimationFrameRequested;
-
-	[JSImport("WebEvents.RequestAnimationFrame", "JSImports")]
-	internal static partial void RequestAnimationFrame();
-
-	[JSExport]
-	internal static void InvokeAnimationFrameRequested()
-		=> OnAnimationFrameRequested?.Invoke();
-
-	[JSImport("WebEvents.GetCurrentPreciseTime", "JSImports")]
-	[return: JSMarshalAs<JSType.Date>]
-	internal static partial DateTime GetCurrentPreciseTime();
-
-	[JSImport("WebEvents.SetTitle", "JSImports")]
-	internal static partial void SetTitle(string title);
-
-	internal static Action? WindowClosing;
-
-	[JSExport]
-	internal static void InvokeWindowClosing()
-		=> WindowClosing?.Invoke();
 
 	private static Vector2Int? _mouseMoveChange;
 	private static float _scrollChange;

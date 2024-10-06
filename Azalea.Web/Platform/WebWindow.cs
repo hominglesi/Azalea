@@ -8,11 +8,12 @@ public class WebWindow : IWindow
 {
 	public WebWindow()
 	{
-		WebEvents.OnClientResized += (size) =>
+		WebEvents.ClientResized += (size) =>
 		{
 			_clientSize = size;
 			OnClientResized?.Invoke(size);
 		};
+		WebEvents.CheckClientResized();
 
 		WebEvents.WindowClosing += () => Closing?.Invoke();
 	}
@@ -60,7 +61,7 @@ public class WebWindow : IWindow
 
 			_title = value;
 
-			WebEvents.SetTitle(_title);
+			WebFunctions.SetTitle(_title);
 		}
 	}
 
@@ -107,5 +108,5 @@ public class WebWindow : IWindow
 
 	void IWindow.Hide() { }
 
-	void IWindow.ProcessEvents() => WebEvents.HandleEvents();
+	void IWindow.ProcessEvents() => WebInput.HandleEvents();
 }
