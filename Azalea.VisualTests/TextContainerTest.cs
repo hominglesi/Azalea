@@ -2,6 +2,7 @@
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
+using Azalea.Platform;
 using Azalea.Utils;
 
 namespace Azalea.VisualTests;
@@ -12,8 +13,8 @@ public class TextContainerTest : TestScene
 
 	public TextContainerTest()
 	{
-		AzaleaGame.Main.Host.Window.ClientSize = new(1680, 960);
-		AzaleaGame.Main.Host.Window.Center();
+		GameHost.Main.Window.ClientSize = new(1680, 960);
+		GameHost.Main.Window.Center();
 
 		Add(_scrollable = new ScrollableContainer()
 		{

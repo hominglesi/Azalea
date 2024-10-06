@@ -12,7 +12,11 @@ namespace Azalea.Graphics.OpenGL;
 internal class GLRenderer : Renderer
 {
 	public GLRenderer(IWindow window)
-		: base(window) { }
+		: base(window)
+	{
+		GL.Enable(GLCapability.Blend);
+		GL.BlendFunc(GLBlendFunction.SrcAlpha, GLBlendFunction.OneMinusSrcAlpha);
+	}
 
 	internal override void FinishFrame()
 	{

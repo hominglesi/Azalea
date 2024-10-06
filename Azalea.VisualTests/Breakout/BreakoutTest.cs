@@ -1,6 +1,7 @@
 ﻿using Azalea.Design.Shapes;
 using Azalea.Graphics.Colors;
 using Azalea.Numerics;
+using Azalea.Platform;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
@@ -24,8 +25,8 @@ public class BreakoutTest : TestScene
 
 	public BreakoutTest()
 	{
-		AzaleaGame.Main.Host.Renderer.ClearColor = Palette.Black;
-		var window = AzaleaGame.Main.Host.Window;
+		GameHost.Main.Renderer.ClearColor = Palette.Black;
+		var window = GameHost.Main.Window;
 		window.ClientSize = new(GameWidth, GameHeight);
 		window.Resizable = false;
 		window.Center();

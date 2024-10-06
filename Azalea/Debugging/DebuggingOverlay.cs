@@ -21,9 +21,8 @@ public class DebuggingOverlay : ContentContainer
 	public DebugInspector Inspector;
 	private DebugSceneGraph _sceneGraph;
 
-	internal void Initialize()
+	public DebuggingOverlay()
 	{
-		//We need to initialize this later because the constructor is called before the game has been initialized
 		ContentComposition.Origin = Anchor.TopRight;
 		ContentComposition.Anchor = Anchor.TopRight;
 

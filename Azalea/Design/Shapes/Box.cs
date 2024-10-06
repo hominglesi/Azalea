@@ -1,5 +1,6 @@
 ﻿using Azalea.Graphics.Sprites;
 using Azalea.Graphics.Textures;
+using Azalea.Platform;
 using System;
 
 namespace Azalea.Design.Shapes;
@@ -8,7 +9,7 @@ public class Box : Sprite
 {
 	public Box()
 	{
-		base.Texture = AzaleaGame.Main.Host.Renderer.WhitePixel;
+		base.Texture = GameHost.Main.Renderer.WhitePixel;
 	}
 
 	public override Texture? Texture

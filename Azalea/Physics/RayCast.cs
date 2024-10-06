@@ -2,6 +2,7 @@
 using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Physics.Colliders;
+using Azalea.Platform;
 using System;
 using System.Linq;
 using System.Numerics;
@@ -11,7 +12,7 @@ public class RayCast
 {
 	public static Ray Cast(Ray ray)
 	{
-		var physics = AzaleaGame.Main.Host.Physics;
+		var physics = GameHost.Main.Physics;
 		Collider collider;
 		GameObject ob = new Box();
 		collider = new CircleCollider()

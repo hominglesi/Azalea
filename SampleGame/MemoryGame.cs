@@ -17,7 +17,7 @@ public class MemoryGame : AzaleaGame
 
 	private IResourceStore? _tilesStore;
 
-	protected override void OnInitialize()
+	public MemoryGame()
 	{
 		Host.Renderer.ClearColor = new Color(189, 223, 214);
 		Host.Window.Resizable = true;
@@ -44,6 +44,7 @@ public class MemoryGame : AzaleaGame
 
 		_logic = new MemoryLogic(_field);
 	}
+
 	protected override void Update()
 	{
 		if (Input.GetKey(Keys.P).Down) _logic?.Solve();

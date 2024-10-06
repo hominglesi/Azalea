@@ -37,10 +37,7 @@ internal abstract class Renderer : IRenderer
 		Window = window;
 
 		Window.OnClientResized += SetViewport;
-	}
 
-	protected internal virtual void Initialize()
-	{
 		defaultQuadBatch = CreateQuadBatch(10000);
 		currentActiveBatch = defaultQuadBatch;
 	}
@@ -162,8 +159,6 @@ internal abstract class Renderer : IRenderer
 	protected abstract void SetScissorTestRectangle(RectangleInt scissorRectangle);
 
 	#endregion
-
-	void IRenderer.Initialize() => Initialize();
 	void IRenderer.BeginFrame() => BeginFrame();
 	void IRenderer.FinishFrame() => FinishFrame();
 	IVertexBatch<TexturedVertex2D> IRenderer.DefaultQuadBatch => defaultQuadBatch ?? throw new Exception("Cannot call DefaultQuadBatch before Initialization");

@@ -44,7 +44,7 @@ public class FrameRateTest : TestScene
 	protected override bool OnKeyDown(KeyDownEvent e)
 	{
 		if (e.Key == Keys.Space)
-			AzaleaGame.Main.Host.Window.VSync = !AzaleaGame.Main.Host.Window.VSync;
+			GameHost.Main.Window.VSync = !GameHost.Main.Window.VSync;
 
 		return base.OnKeyDown(e);
 	}

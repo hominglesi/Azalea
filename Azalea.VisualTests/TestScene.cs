@@ -4,6 +4,7 @@ using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
+using Azalea.Platform;
 using System;
 using System.Collections.Generic;
 
@@ -13,7 +14,7 @@ public class TestScene : Scene
 {
 	public TestScene()
 	{
-		AzaleaGame.Main.Host.Renderer.ClearColor = Palette.Flowers.Azalea;
+		GameHost.Main.Renderer.ClearColor = Palette.Flowers.Azalea;
 	}
 
 	protected FlexContainer CreateFullscreenVerticalFlex(GameObject[] children)

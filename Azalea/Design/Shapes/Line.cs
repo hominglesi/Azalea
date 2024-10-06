@@ -3,6 +3,7 @@ using Azalea.Graphics;
 using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering;
 using Azalea.Numerics;
+using Azalea.Platform;
 using Azalea.Utils;
 using System.Numerics;
 
@@ -29,7 +30,7 @@ public class Line : GameObject
 		MatrixExtentions.RotateFromLeft(ref matrix, rotation);
 
 		renderer.DrawQuad(
-		AzaleaGame.Main.Host.Renderer.WhitePixel,
+		GameHost.Main.Renderer.WhitePixel,
 		Quad.FromRectangle(rectangle) * matrix, //  quad * Info.Matrix,
 		DrawColorInfo);
 	}

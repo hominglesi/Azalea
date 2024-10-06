@@ -9,26 +9,18 @@ namespace Azalea;
 
 public abstract class AzaleaGame : Composition
 {
-	public static AzaleaGame Main => _main ?? throw new Exception("No game has been initialized");
-	private static AzaleaGame? _main;
-
 	public SceneContainer SceneManager => _sceneManager ?? throw new Exception("Game has not been initialized");
 	private SceneContainer? _sceneManager;
 
 	internal virtual void SetHost(GameHost host)
 	{
-		_main ??= this;
-
-		Host.Initialized += CallInitialize;
+		// Set initial host
 	}
 
 	public AzaleaGame()
 	{
 		RelativeSizeAxes = Axes.Both;
-	}
 
-	internal void CallInitialize()
-	{
 		Assets.AddFont(@"Fonts/Roboto-Regular.bin", "");
 		Assets.AddFont(@"Fonts/Roboto-Regular.bin", "Roboto-Regular");
 
@@ -36,9 +28,5 @@ public abstract class AzaleaGame : Composition
 		Host.Window.Center();
 
 		AddInternal(_sceneManager = new SceneContainer());
-
-		OnInitialize();
 	}
-
-	protected virtual void OnInitialize() { }
 }

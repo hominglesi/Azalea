@@ -122,11 +122,11 @@ public class BilliardTest : TestScene
 	public BilliardTest()
 	{
 
-		_window = AzaleaGame.Main.Host.Window;
+		_window = GameHost.Main.Window;
 		_window.ClientSize = new(panelWidth, panelHeight);
 		_window.Center();
 		this.BackgroundColor = new Graphics.Colors.Color(48, 23, 8);
-		var physics = AzaleaGame.Main.Host.Physics;
+		var physics = GameHost.Main.Physics;
 		physics.UsesGravity = false;
 		physics.IsTopDown = true;
 		Add(line = new Line()

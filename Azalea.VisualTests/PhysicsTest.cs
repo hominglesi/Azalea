@@ -6,6 +6,7 @@ using Azalea.Inputs;
 using Azalea.IO.Resources;
 using Azalea.Physics;
 using Azalea.Physics.Colliders;
+using Azalea.Platform;
 using System;
 using System.Numerics;
 
@@ -38,7 +39,7 @@ public class PhysicsTest : TestScene
 	private PhysicsGenerator _physics;
 	public PhysicsTest()
 	{
-		_physics = AzaleaGame.Main.Host.Physics;
+		_physics = GameHost.Main.Physics;
 		_physics.DebugMode = true;
 		_physics.UsesGravity = false;
 		Add(line = new Line()

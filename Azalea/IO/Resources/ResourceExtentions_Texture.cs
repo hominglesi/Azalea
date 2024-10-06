@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics.Textures;
+using Azalea.Platform;
 using System;
 
 namespace Azalea.IO.Resources;
@@ -18,7 +19,7 @@ public static partial class ResourceStoreExtentions
 			return Assets.MissingTexture ?? throw new Exception("Texture could not be found.");
 
 		var data = store.GetImage(path);
-		var texture = AzaleaGame.Main.Host.Renderer.CreateTexture(data);
+		var texture = GameHost.Main.Renderer.CreateTexture(data);
 		texture.SetFiltering(filtering, filtering);
 		_textureCache.AddValue(store, path, texture);
 

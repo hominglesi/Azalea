@@ -12,7 +12,7 @@ public class IWindowTest : TestScene
 
 	public IWindowTest()
 	{
-		_window = AzaleaGame.Main.Host.Window;
+		_window = GameHost.Main.Window;
 		_window.Closing += onWindowClosing;
 
 		AddRange(new GameObject[] {

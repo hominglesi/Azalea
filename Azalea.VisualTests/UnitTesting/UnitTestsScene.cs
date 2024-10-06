@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics;
+using Azalea.Platform;
 using System;
 
 namespace Azalea.VisualTests.UnitTesting;
@@ -14,7 +15,7 @@ public class UnitTestsScene : TestScene
 
 	public UnitTestsScene()
 	{
-		AzaleaGame.Main.Host.Renderer.ClearColor = new(255, 248, 211);
+		GameHost.Main.Renderer.ClearColor = new(255, 248, 211);
 
 		_manager = new UnitTestsManager();
 

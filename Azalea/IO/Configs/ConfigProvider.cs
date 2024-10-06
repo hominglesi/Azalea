@@ -8,7 +8,7 @@ internal abstract class ConfigProvider : IConfigProvider
 {
 	protected Dictionary<string, string> Dictionary = new();
 
-	internal abstract void Save();
+	public abstract void Save();
 
 	public bool ContainsKey(string key) => Dictionary.ContainsKey(key);
 

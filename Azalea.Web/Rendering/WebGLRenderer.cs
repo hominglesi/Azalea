@@ -14,6 +14,9 @@ internal class WebGLRenderer : Renderer
 	{
 		//We need to update the viewport when starting because we don't set its size
 		SetViewport(Window.ClientSize);
+
+		WebGL.Enable(GLCapability.Blend);
+		WebGL.BlendFuncSeparate(GLBlendFunction.SrcAlpha, GLBlendFunction.OneMinusSrcAlpha, GLBlendFunction.SrcAlpha, GLBlendFunction.OneMinusSrcAlpha);
 	}
 	protected override void SetViewportImplementation(Vector2Int size)
 		=> WebGL.Viewport(0, 0, size.X, size.Y);

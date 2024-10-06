@@ -17,7 +17,7 @@ public class PhysicsGenerator
 	public float StaticFriction { get; set; } = 0.15f;
 	public float DynamicFriction { get; set; } = 0.1f;
 	public bool DebugMode { get; set; }
-	public bool UsesGravity { get; set; } = true;
+	public bool UsesGravity { get; set; } = false;
 	public bool UsesFriction { get; set; } = true;
 	public IEnumerable<RigidBody> RigidBodies => ComponentStorage<RigidBody>.GetComponents();
 

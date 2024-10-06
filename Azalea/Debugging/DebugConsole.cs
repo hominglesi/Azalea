@@ -30,15 +30,15 @@ public class DebugConsole : TextBox
 		});
 
 		//Windowing Commands
-		AddCommand("fullscreen", args => AzaleaGame.Main.Host.Window.State = WindowState.Fullscreen);
-		AddCommand("minimize", args => AzaleaGame.Main.Host.Window.State = WindowState.Minimized);
-		AddCommand("maximize", args => AzaleaGame.Main.Host.Window.State = WindowState.Maximized);
-		AddCommand("restorewindow", args => AzaleaGame.Main.Host.Window.State = WindowState.Normal);
-		AddCommand("windowtitle", args => AzaleaGame.Main.Host.Window.Title = args.ArgumentQuery);
+		AddCommand("fullscreen", args => GameHost.Main.Window.State = WindowState.Fullscreen);
+		AddCommand("minimize", args => GameHost.Main.Window.State = WindowState.Minimized);
+		AddCommand("maximize", args => GameHost.Main.Window.State = WindowState.Maximized);
+		AddCommand("restorewindow", args => GameHost.Main.Window.State = WindowState.Normal);
+		AddCommand("windowtitle", args => GameHost.Main.Window.Title = args.ArgumentQuery);
 		AddCommand("vsync", args =>
 		{
-			if (args.ArgumentQuery.ToLower() == "on") AzaleaGame.Main.Host.Window.VSync = true;
-			else if (args.ArgumentQuery.ToLower() == "off") AzaleaGame.Main.Host.Window.VSync = false;
+			if (args.ArgumentQuery.ToLower() == "on") GameHost.Main.Window.VSync = true;
+			else if (args.ArgumentQuery.ToLower() == "off") GameHost.Main.Window.VSync = false;
 		});
 	}
 

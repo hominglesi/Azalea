@@ -4,6 +4,8 @@ using System.Numerics;
 namespace Azalea.IO.Configs;
 public interface IConfigProvider
 {
+	internal void Save();
+
 	public bool ContainsKey(string key);
 
 	public void Set(string key, string value);

@@ -1,5 +1,6 @@
 ﻿using Azalea.Debugging;
 using Azalea.Design.Containers;
+using Azalea.Design.Scenes;
 using Azalea.Extentions;
 using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
@@ -7,7 +8,6 @@ using Azalea.IO.Configs;
 using Azalea.Physics;
 using Azalea.Sounds;
 using System;
-using System.Diagnostics;
 using System.Numerics;
 
 namespace Azalea.Platform;
@@ -17,48 +17,45 @@ public abstract class GameHost
 	public static GameHost Main => _main ?? throw new Exception("GameHost hasn't been created yet.");
 	private static GameHost? _main;
 
-	public abstract IWindow Window { get; }
-	public abstract IRenderer Renderer { get; }
-	public abstract IAudioManager AudioManager { get; }
-	public abstract IConfigProvider ConfigProvider { get; }
+	public IWindow Window { get; }
+	public IRenderer Renderer { get; }
+	public IAudioManager AudioManager { get; }
+	public IConfigProvider? ConfigProvider { get; protected set; }
+	public Composition Root { get; private set; }
+	public SceneContainer SceneManager { get; }
+	public PhysicsGenerator Physics { get; }
 
 	public IClipboard Clipboard => _clipboard ?? throw new Exception("This GameHost does not support using the clipboard.");
 	private IClipboard? _clipboard;
 
-	public event Action? Initialized;
+	internal DebuggingOverlay? _editor;
+	private bool _editorEnabled;
 
-	public PhysicsGenerator Physics => _physics ?? throw new Exception("Game has not been started yet");
-	internal PhysicsGenerator? _physics;
-
-	public Composition Root => _root ?? throw new Exception("Cannot use root before the game has started.");
-	internal Composition? _root;
-
-	protected GameHost()
+	internal GameHost(HostPreferences prefs)
 	{
 		_main ??= this;
+
+		_editorEnabled = prefs.EditorEnabled;
+		Root = new Composition();
+
+		Window = CreateWindow(prefs);
+		Renderer = CreateRenderer(Window);
+		AudioManager = CreateAudioManager();
+		Physics = new PhysicsGenerator();
+		_clipboard = CreateClipboard();
+		SceneManager = new SceneContainer();
 	}
 
 	public virtual void Run(AzaleaGame game)
 	{
-		if (AzaleaSettings.EnableDebugging)
-		{
-			var root = new DebuggingOverlay();
-			_root = root;
-			Editor._overlay = root;
-		}
-		else
-			_root = new Composition();
+		if (_editorEnabled)
+			Root = Editor._overlay = _editor = new DebuggingOverlay();
 
-		_root.Add(game);
-
+		Root.Add(game);
 		game.SetHost(this);
+		game.AddInternal(SceneManager);
 
-		_clipboard = CreateClipboard();
-
-		_physics = new PhysicsGenerator();
-		_physics.UsesGravity = false;
-
-		CallInitialized();
+		Input.Initialize(Root);
 
 		_lastFrameTime = GetCurrentTime();
 
@@ -86,9 +83,10 @@ public abstract class GameHost
 		Window.Dispose();
 	}
 
+	private long _frameStart;
 	protected virtual void ProcessGameLoop()
 	{
-		StartFrame();
+		_frameStart = PerformanceTrace.StartEvent();
 
 		_frameTime = GetCurrentTime();
 		_deltaTime = (float)_frameTime.Subtract(_lastFrameTime).TotalSeconds;
@@ -115,31 +113,7 @@ public abstract class GameHost
 
 		Window.ProcessEvents();
 
-		EndFrame();
-	}
-
-	private long _frameStart;
-	internal void StartFrame()
-	{
-		_frameStart = PerformanceTrace.StartEvent();
-	}
-
-	protected void EndFrame()
-	{
 		PerformanceTrace.AddEvent(_frameStart, "Frame");
-	}
-
-	public virtual void CallInitialized()
-	{
-		Debug.Assert(_root is not null);
-
-		Input.Initialize(_root);
-		Renderer.Initialize();
-
-		if (_root is DebuggingOverlay debug)
-			debug.Initialize();
-
-		Initialized?.Invoke();
 	}
 
 	public virtual void CallOnRender()
@@ -169,7 +143,11 @@ public abstract class GameHost
 		Physics.Update();
 	}
 
+	internal abstract IWindow CreateWindow(HostPreferences preferences);
+	internal abstract IRenderer CreateRenderer(IWindow window);
+	internal abstract IAudioManager CreateAudioManager();
 	protected virtual IClipboard? CreateClipboard() => null;
+
 
 	public virtual DateTime GetCurrentTime() => Time.GetCurrentPreciseTime();
 

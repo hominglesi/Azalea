@@ -10,6 +10,7 @@ using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.IO.Configs;
 using Azalea.IO.Resources;
+using Azalea.Platform;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
@@ -22,12 +23,10 @@ public class VisualTests : AzaleaGame
 {
 	private const string __currentSceneKey = "currentScene";
 
-#pragma warning disable CS8618
 	private List<string> _tests;
 	private TestSelectScene _testSelectScene;
-#pragma warning restore CS8618
 
-	protected override void OnInitialize()
+	public VisualTests()
 	{
 		Assets.AddToMainStore(new NamespacedResourceStore(new EmbeddedResourceStore(typeof(VisualTests).Assembly), "Resources"));
 		Assets.AddFont("Fonts/TitanOne-Regular.fnt", "TitanOne");
@@ -52,16 +51,15 @@ public class VisualTests : AzaleaGame
 
 	private void goToSceneSelect()
 	{
-		var currentScene = Main.SceneManager.CurrentScene;
+		var currentScene = GameHost.Main.SceneManager.CurrentScene;
 
 		if (currentScene == null || currentScene != _testSelectScene)
 		{
-			Main.SceneManager.ChangeScene(_testSelectScene);
-			Main.Host.Renderer.ClearColor = new Color(40, 51, 60);
-			Main.Host.Window.ClientSize = new(1280, 720);
-			Main.Host.Window.Center();
+			GameHost.Main.SceneManager.ChangeScene(_testSelectScene);
+			GameHost.Main.Renderer.ClearColor = new Color(40, 51, 60);
+			GameHost.Main.Window.ClientSize = new(1280, 720);
+			GameHost.Main.Window.Center();
 		}
-
 	}
 
 	private class TestSelectScene : Scene
@@ -95,7 +93,7 @@ public class VisualTests : AzaleaGame
 			var test = Activator.CreateInstance(Assembly.GetAssembly(typeof(VisualTests))!.FullName!, testName)!.Unwrap()
 			as TestScene;
 
-			Main.SceneManager.ChangeScene(test!);
+			GameHost.Main.SceneManager.ChangeScene(test!);
 			Config.Set(__currentSceneKey, testName);
 		}
 	}

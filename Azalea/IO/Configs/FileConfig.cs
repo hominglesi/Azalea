@@ -11,11 +11,6 @@ internal class FileConfigProvider : ConfigProvider
 	{
 		_fileName = fileName;
 
-		load();
-	}
-
-	private void load()
-	{
 		Storage persistentStore;
 
 		try { persistentStore = Assets.PersistentStore; }
@@ -28,7 +23,7 @@ internal class FileConfigProvider : ConfigProvider
 		}
 	}
 
-	internal override void Save()
+	public override void Save()
 	{
 		var configString = ConfigParser.Format(Dictionary);
 		var persistentStore = Assets.PersistentStore;

@@ -1,4 +1,5 @@
-﻿using Azalea.Sounds;
+﻿using Azalea.Platform;
+using Azalea.Sounds;
 using System;
 using System.IO;
 
@@ -24,7 +25,7 @@ public static partial class ResourceStoreExtentions
 	private static Sound getSound(Stream stream)
 	{
 		var wav = new WavSound(stream);
-		var sound = AzaleaGame.Main.Host.AudioManager.CreateSound(wav);
+		var sound = GameHost.Main.AudioManager.CreateSound(wav);
 		return sound;
 	}
 }

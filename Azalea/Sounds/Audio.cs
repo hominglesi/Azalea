@@ -1,7 +1,9 @@
-﻿namespace Azalea.Sounds;
+﻿using Azalea.Platform;
+
+namespace Azalea.Sounds;
 public static class Audio
 {
-	public static IAudioManager Instance => AzaleaGame.Main.Host.AudioManager;
+	public static IAudioManager Instance => GameHost.Main.AudioManager;
 
 	public static float MasterVolume
 	{

@@ -5,11 +5,6 @@ internal class WebConfigProvider : ConfigProvider
 {
 	public WebConfigProvider()
 	{
-		load();
-	}
-
-	private void load()
-	{
 		var length = WebLocalStorage.GetLength();
 
 		for (int i = 0; i < length; i++)
@@ -21,7 +16,7 @@ internal class WebConfigProvider : ConfigProvider
 		}
 	}
 
-	internal override void Save()
+	public override void Save()
 	{
 		WebLocalStorage.Clear();
 
