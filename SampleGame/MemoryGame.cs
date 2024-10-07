@@ -1,8 +1,10 @@
 ﻿using Azalea;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
+using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
 using Azalea.IO.Resources;
+using Azalea.Platform;
 using SampleGame.Elements;
 using System;
 using System.Numerics;
@@ -19,8 +21,8 @@ public class MemoryGame : AzaleaGame
 
 	public MemoryGame()
 	{
-		Host.Renderer.ClearColor = new Color(189, 223, 214);
-		Host.Window.Resizable = true;
+		Renderer.ClearColor = new Color(189, 223, 214);
+		Window.Resizable = true;
 
 		var assemblyStore = new NamespacedResourceStore(new EmbeddedResourceStore(typeof(MemoryGame).Assembly), "Resources");
 

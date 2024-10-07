@@ -2,7 +2,7 @@
 using System;
 using System.Numerics;
 
-namespace Azalea.Physics.Colliders;
+namespace Azalea.Simulations.Colliders;
 internal static class CollisionLogic
 {
 	public static bool CircleCircleCollision(CircleCollider circle1, CircleCollider circle2, bool resolveCollision)

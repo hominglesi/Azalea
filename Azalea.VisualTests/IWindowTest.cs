@@ -6,51 +6,48 @@ using System;
 namespace Azalea.VisualTests;
 public class IWindowTest : TestScene
 {
-	private IWindow _window;
-
 	private bool _preventsClosure;
 
 	public IWindowTest()
 	{
-		_window = GameHost.Main.Window;
-		_window.Closing += onWindowClosing;
+		Window.Closing += onWindowClosing;
 
 		AddRange(new GameObject[] {
 			CreateFullscreenVerticalFlex(new GameObject[]
 			{
 				CreateActionButton(
 					"Set size to 700, 700",
-					() => _window.Size = new(700, 700)),
+					() => Window.Size = new(700, 700)),
 				CreateActionButton(
 					"Set client size to 700, 700",
-					() => _window.ClientSize = new(700, 700)),
+					() => Window.ClientSize = new(700, 700)),
 				CreateActionButton(
 					"Set WindowState to 'Normal'",
-					() => _window.State = WindowState.Normal),
+					() => Window.State = WindowState.Normal),
 				CreateActionButton(
 					"Set WindowState to 'Minimized'",
-					() => _window.State = WindowState.Minimized),
+					() => Window.State = WindowState.Minimized),
 				CreateActionButton(
 					"Set WindowState to 'Maximized'",
-					() => _window.State = WindowState.Maximized),
+					() => Window.State = WindowState.Maximized),
 				CreateActionButton(
 					"Set WindowState to 'Fullscreen'",
-					() => _window.State = WindowState.Fullscreen),
+					() => Window.State = WindowState.Fullscreen),
 				CreateActionButton(
 					"Set Resizable to 'true'",
-					() => _window.Resizable = true),
+					() => Window.Resizable = true),
 				CreateActionButton(
 					"Set Resizable to 'false'",
-					() => _window.Resizable = false),
+					() => Window.Resizable = false),
 				CreateActionButton(
 					"Set Title to 'Azalea Game'",
-					() => _window.Title = "Azalea Game"),
+					() => Window.Title = "Azalea Game"),
 				CreateActionButton(
 					"Set Title to 'Ide Gas'",
-					() => _window.Title = "Ide Gas"),
+					() => Window.Title = "Ide Gas"),
 				CreateActionButton(
 					"Set Title to ''",
-					() => _window.Title = ""),
+					() => Window.Title = ""),
 				CreateActionButton(
 					"Set this test to prevent Closing",
 					() => _preventsClosure = true),
@@ -59,40 +56,40 @@ public class IWindowTest : TestScene
 					() => _preventsClosure = false),
 				CreateActionButton(
 					"Set icon to Azalea flower",
-					() => _window.SetIconFromStream(Assets.GetStream("Textures/azalea-icon.png")!)),
+					() => Window.SetIconFromStream(Assets.GetStream("Textures/azalea-icon.png")!)),
 				CreateActionButton(
 					"Set icon to Missing texture",
-					() => _window.SetIconFromStream(Assets.GetStream("Textures/missing-texture.png")!)),
+					() => Window.SetIconFromStream(Assets.GetStream("Textures/missing-texture.png")!)),
 				CreateActionButton(
 					"Set icon to null",
-					() => _window.SetIconFromStream(null)),
+					() => Window.SetIconFromStream(null)),
 				CreateActionButton(
 					"Turn vsync on",
-					() => _window.VSync = true),
+					() => Window.VSync = true),
 				CreateActionButton(
 					"Turn vsync off",
-					() => _window.VSync = false),
+					() => Window.VSync = false),
 				CreateActionButton(
 					"Show cursor",
-					() => _window.CursorVisible = true),
+					() => Window.CursorVisible = true),
 				CreateActionButton(
 					"Hide cursor",
-					() => _window.CursorVisible = false),
+					() => Window.CursorVisible = false),
 				CreateActionButton(
 					"Set position to 0",
-					() => _window.Position = Vector2Int.Zero),
+					() => Window.Position = Vector2Int.Zero),
 				CreateActionButton(
 					"Set client position to 0",
-					() => _window.ClientPosition = Vector2Int.Zero),
+					() => Window.ClientPosition = Vector2Int.Zero),
 				CreateActionButton(
 					"Move window by (25, 25)",
-					() => _window.Position += new Vector2Int(25, 25)),
+					() => Window.Position += new Vector2Int(25, 25)),
 				CreateActionButton(
 					"Enlarge window by (25, 25)",
-					() => _window.ClientSize += new Vector2Int(25, 25)),
+					() => Window.ClientSize += new Vector2Int(25, 25)),
 				CreateActionButton(
 					"Center window",
-					() => _window.Center()),
+					() => Window.Center()),
 				CreateActionButton(
 					"Request Attention in 1.5 seconds",
 					() => {_attentionTimer = 1.5f; }),
@@ -101,39 +98,39 @@ public class IWindowTest : TestScene
 					() => _focusTimer = 1.5f),
 				CreateActionButton(
 					"Close window",
-					() => _window.Close())
+					() => Window.Close())
 			}),
 
 			CreateObservedContainer(new GameObject[]
 			{
 				CreateObservedValue("WindowState",
-					() => _window.State,
+					() => Window.State,
 					(value) => $"Window state changed to {value}"),
 				CreateObservedValue("Title",
-					() => _window.Title,
+					() => Window.Title,
 					(value) => $"Window title changed to {value}"),
 				CreateObservedValue("Resizable",
-					() => _window.Resizable,
+					() => Window.Resizable,
 					(value) => $"Window resizable changed to {value}"),
 				CreateObservedValue("Prevents Closure",
 					() => _preventsClosure,
 					(value) => value ? $"Test now prevents closure attempts" : $"Test no longer prevents closure attempts"),
 				CreateObservedValue("Position",
-					() => _window.Position,
+					() => Window.Position,
 					(value) => $"Window moved to {value}"),
 				CreateObservedValue("ClientPosition",
-					() => _window.ClientPosition),
+					() => Window.ClientPosition),
 				CreateObservedValue("Size",
-					() => _window.Size),
+					() => Window.Size),
 				CreateObservedValue("ClientSize",
-					() => _window.ClientSize,
+					() => Window.ClientSize,
 					(value) => $"Window resized to {value}"),
 				CreateObservedValue("VSync",
-					() => _window.VSync),
+					() => Window.VSync),
 				CreateObservedValue("CanChangeVSync",
-					() => _window.CanChangeVSync),
+					() => Window.CanChangeVSync),
 				CreateObservedValue("Cursor Visible",
-					() => _window.CursorVisible)
+					() => Window.CursorVisible)
 			})
 		});
 	}
@@ -148,7 +145,7 @@ public class IWindowTest : TestScene
 			_focusTimer -= Time.DeltaTime;
 			if (_focusTimer <= 0)
 			{
-				_window.Focus();
+				Window.Focus();
 			}
 		}
 
@@ -157,7 +154,7 @@ public class IWindowTest : TestScene
 			_attentionTimer -= Time.DeltaTime;
 			if (_attentionTimer <= 0)
 			{
-				_window.RequestAttention();
+				Window.RequestAttention();
 			}
 		}
 	}
@@ -167,7 +164,7 @@ public class IWindowTest : TestScene
 		if (_preventsClosure)
 		{
 			Console.WriteLine("The Window closure attempt was prevented by this Test");
-			_window.PreventClosure();
+			Window.PreventClosure();
 		}
 	}
 }

@@ -13,8 +13,8 @@ public class TextContainerTest : TestScene
 
 	public TextContainerTest()
 	{
-		GameHost.Main.Window.ClientSize = new(1680, 960);
-		GameHost.Main.Window.Center();
+		Window.ClientSize = new(1680, 960);
+		Window.Center();
 
 		Add(_scrollable = new ScrollableContainer()
 		{

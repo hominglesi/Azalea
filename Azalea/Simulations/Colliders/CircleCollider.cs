@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
 
-namespace Azalea.Physics.Colliders;
+namespace Azalea.Simulations.Colliders;
 public class CircleCollider : Collider
 {
 	public float Radius { get; set; }

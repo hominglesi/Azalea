@@ -1,7 +1,7 @@
-﻿using Azalea.Physics.Colliders;
+﻿using Azalea.Simulations.Colliders;
 using System.Numerics;
 
-namespace Azalea.Physics;
+namespace Azalea.Simulations;
 public class Ray
 {
 	public Ray(Vector2 startPosition, float angle, int range)

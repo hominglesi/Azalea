@@ -1,18 +1,16 @@
 ﻿using Azalea.Design.Components;
 using Azalea.Design.Shapes;
 using Azalea.Graphics;
-using Azalea.Physics.Colliders;
-using Azalea.Platform;
+using Azalea.Simulations.Colliders;
 using System;
 using System.Linq;
 using System.Numerics;
 
-namespace Azalea.Physics;
+namespace Azalea.Simulations;
 public class RayCast
 {
 	public static Ray Cast(Ray ray)
 	{
-		var physics = GameHost.Main.Physics;
 		Collider collider;
 		GameObject ob = new Box();
 		collider = new CircleCollider()
@@ -27,7 +25,7 @@ public class RayCast
 		collider.Position += direction * ray.MinimumRange;
 		for (int i = ray.MinimumRange; i < ray.Range; i++)
 		{
-			bool isColliding = physics.CheckCollisions(collider, ComponentStorage<RigidBody>.GetComponents().Select(x => x.Parent.GetComponent<Collider>()));
+			bool isColliding = Physics.CheckCollisions(collider, ComponentStorage<RigidBody>.GetComponents().Select(x => x.Parent.GetComponent<Collider>()!));
 			if (isColliding)
 			{
 				ray.Hit = true;

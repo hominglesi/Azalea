@@ -2,7 +2,7 @@
 using System;
 using System.Numerics;
 
-namespace Azalea.Physics.Colliders;
+namespace Azalea.Simulations.Colliders;
 public class RectCollider : Collider
 {
 	private Quad _quad;

@@ -12,7 +12,7 @@ public static class RendererExtentions
 {
 	internal static bool ClientContainsQuad(Quad quad)
 	{
-		var clientSize = GameHost.Main.Window.ClientSize;
+		var clientSize = Window.ClientSize;
 
 		var mostLeft = MathF.Min(quad.TopLeft.X, MathF.Min(quad.TopRight.X, MathF.Min(quad.BottomLeft.X, quad.BottomRight.X)));
 		var mostTop = MathF.Min(quad.TopLeft.Y, MathF.Min(quad.TopRight.Y, MathF.Min(quad.BottomLeft.Y, quad.BottomRight.Y)));
@@ -25,7 +25,7 @@ public static class RendererExtentions
 		return false;
 	}
 
-	internal static void DrawQuad(this IRenderer renderer, Texture texture, Quad vertexQuad, DrawColorInfo drawColorInfo, Rectangle? customUV = null)
+	public static void DrawQuad(this IRenderer renderer, Texture texture, Quad vertexQuad, DrawColorInfo drawColorInfo, Rectangle? customUV = null)
 	{
 		if (ClientContainsQuad(vertexQuad) == false)
 			return;
@@ -65,7 +65,7 @@ public static class RendererExtentions
 		});
 	}
 
-	internal static void DrawRectangle(this IRenderer renderer, Rectangle rect, Matrix3 drawMatrix, Boundary thickness, DrawColorInfo color, bool towardsOutside)
+	public static void DrawRectangle(this IRenderer renderer, Rectangle rect, Matrix3 drawMatrix, Boundary thickness, DrawColorInfo color, bool towardsOutside)
 	{
 
 		var texture = renderer.WhitePixel;

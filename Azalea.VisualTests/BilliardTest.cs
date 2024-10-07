@@ -5,9 +5,9 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.IO.Resources;
-using Azalea.Physics;
-using Azalea.Physics.Colliders;
 using Azalea.Platform;
+using Azalea.Simulations;
+using Azalea.Simulations.Colliders;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
@@ -118,17 +118,13 @@ public class BilliardTest : TestScene
 	bool waitingForBalls = false;
 	bool scored = false;
 
-	private IWindow _window;
 	public BilliardTest()
 	{
-
-		_window = GameHost.Main.Window;
-		_window.ClientSize = new(panelWidth, panelHeight);
-		_window.Center();
+		Window.ClientSize = new(panelWidth, panelHeight);
+		Window.Center();
 		this.BackgroundColor = new Graphics.Colors.Color(48, 23, 8);
-		var physics = GameHost.Main.Physics;
-		physics.UsesGravity = false;
-		physics.IsTopDown = true;
+		Physics.UsesGravity = false;
+		Physics.IsTopDown = true;
 		Add(line = new Line()
 		{
 			StartPoint = new(500, 40),

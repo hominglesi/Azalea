@@ -7,7 +7,7 @@ using Azalea.Platform;
 
 namespace Azalea.Web.Rendering;
 
-internal class WebGLRenderer : Renderer
+internal class WebGLRenderer : RendererBase
 {
 	public WebGLRenderer(IWindow window)
 		: base(window)
@@ -24,7 +24,7 @@ internal class WebGLRenderer : Renderer
 	protected internal override void SetClearColor(Color value)
 		=> WebGL.ClearColor(value.RNormalized, value.GNormalized, value.BNormalized, value.ANormalized);
 
-	protected override void ClearImplementation(Color color)
+	protected override void ClearImplementation()
 		=> WebGL.Clear(GLBufferBit.Color);
 
 	protected override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)

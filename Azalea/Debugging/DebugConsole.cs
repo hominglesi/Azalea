@@ -30,15 +30,15 @@ public class DebugConsole : TextBox
 		});
 
 		//Windowing Commands
-		AddCommand("fullscreen", args => GameHost.Main.Window.State = WindowState.Fullscreen);
-		AddCommand("minimize", args => GameHost.Main.Window.State = WindowState.Minimized);
-		AddCommand("maximize", args => GameHost.Main.Window.State = WindowState.Maximized);
-		AddCommand("restorewindow", args => GameHost.Main.Window.State = WindowState.Normal);
-		AddCommand("windowtitle", args => GameHost.Main.Window.Title = args.ArgumentQuery);
+		AddCommand("fullscreen", args => Window.State = WindowState.Fullscreen);
+		AddCommand("minimize", args => Window.State = WindowState.Minimized);
+		AddCommand("maximize", args => Window.State = WindowState.Maximized);
+		AddCommand("restorewindow", args => Window.State = WindowState.Normal);
+		AddCommand("windowtitle", args => Window.Title = args.ArgumentQuery);
 		AddCommand("vsync", args =>
 		{
-			if (args.ArgumentQuery.ToLower() == "on") GameHost.Main.Window.VSync = true;
-			else if (args.ArgumentQuery.ToLower() == "off") GameHost.Main.Window.VSync = false;
+			if (args.ArgumentQuery.ToLower() == "on") Window.VSync = true;
+			else if (args.ArgumentQuery.ToLower() == "off") Window.VSync = false;
 		});
 	}
 

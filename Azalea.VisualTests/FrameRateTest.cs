@@ -44,7 +44,7 @@ public class FrameRateTest : TestScene
 	protected override bool OnKeyDown(KeyDownEvent e)
 	{
 		if (e.Key == Keys.Space)
-			GameHost.Main.Window.VSync = !GameHost.Main.Window.VSync;
+			Window.VSync = !Window.VSync;
 
 		return base.OnKeyDown(e);
 	}

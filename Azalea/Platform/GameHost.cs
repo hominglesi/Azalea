@@ -5,7 +5,7 @@ using Azalea.Extentions;
 using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
 using Azalea.IO.Configs;
-using Azalea.Physics;
+using Azalea.Simulations;
 using Azalea.Sounds;
 using System;
 using System.Numerics;
@@ -50,7 +50,6 @@ public abstract class GameHost
 			Root = Editor._overlay = _editor = new DebuggingOverlay();
 
 		Root.Add(game);
-		game.SetHost(this);
 		game.AddInternal(SceneManager);
 
 		Input.Initialize(Root);
@@ -67,19 +66,7 @@ public abstract class GameHost
 	private float _deltaTime;
 	private bool _firstWindowShow = false;
 
-	protected virtual void RunGameLoop()
-	{
-		while (Window.ShouldClose == false)
-		{
-			ProcessGameLoop();
-		}
-
-		Window.Hide();
-
-		PerformanceTrace.SaveEventsTo("C:\\Programming\\trace.txt");
-
-		Window.Dispose();
-	}
+	protected abstract void RunGameLoop();
 
 	private long _frameStart;
 	protected virtual void ProcessGameLoop()

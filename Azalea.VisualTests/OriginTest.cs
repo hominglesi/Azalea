@@ -10,7 +10,7 @@ internal class OriginTest : TestScene
 {
 	private Sprite _player;
 	private Sprite _arm;
-	private Vector2 _windowCenter => GameHost.Main.Window.ClientSize / 2;
+	private Vector2 _windowCenter => Window.ClientSize / 2;
 	private Vector2 _leftHandPosition => _windowCenter - new Vector2(22, 5);
 	private Vector2 _rightHandPosition => _windowCenter + new Vector2(22, -5);
 	public OriginTest()

@@ -90,7 +90,6 @@ public class WebWindow : IWindow
 	}
 
 	public Action? Closing { get; set; }
-	bool IWindow.ShouldClose => false;
 
 	public void Center() { }
 

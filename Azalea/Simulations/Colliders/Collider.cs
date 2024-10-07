@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace Azalea.Physics.Colliders;
+namespace Azalea.Simulations.Colliders;
 public abstract class Collider : Component
 {
 	public Vector2 Position { get => GetPosition(); set => SetPosition(value); }

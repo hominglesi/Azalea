@@ -5,6 +5,7 @@ using Azalea.Design.Shapes;
 using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
+using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
@@ -34,7 +35,7 @@ public class VisualTests : AzaleaGame
 
 		_testSelectScene = new TestSelectScene(_tests);
 
-		Host.Renderer.ClearColor = Palette.Flowers.Azalea;
+		Renderer.ClearColor = Palette.Flowers.Azalea;
 
 		var selectedTest = Config.Get(__currentSceneKey);
 		if (selectedTest is null || _tests.Contains(selectedTest) == false)
@@ -51,14 +52,14 @@ public class VisualTests : AzaleaGame
 
 	private void goToSceneSelect()
 	{
-		var currentScene = GameHost.Main.SceneManager.CurrentScene;
+		var currentScene = SceneManager.CurrentScene;
 
 		if (currentScene == null || currentScene != _testSelectScene)
 		{
-			GameHost.Main.SceneManager.ChangeScene(_testSelectScene);
-			GameHost.Main.Renderer.ClearColor = new Color(40, 51, 60);
-			GameHost.Main.Window.ClientSize = new(1280, 720);
-			GameHost.Main.Window.Center();
+			SceneManager.ChangeScene(_testSelectScene);
+			Renderer.ClearColor = new Color(40, 51, 60);
+			Window.ClientSize = new(1280, 720);
+			Window.Center();
 		}
 	}
 
@@ -93,7 +94,7 @@ public class VisualTests : AzaleaGame
 			var test = Activator.CreateInstance(Assembly.GetAssembly(typeof(VisualTests))!.FullName!, testName)!.Unwrap()
 			as TestScene;
 
-			GameHost.Main.SceneManager.ChangeScene(test!);
+			SceneManager.ChangeScene(test!);
 			Config.Set(__currentSceneKey, testName);
 		}
 	}

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Design.Containers;
-public abstract class Window : Composition
+public abstract class WindowContainer : Composition
 {
 	#region Dragging
 

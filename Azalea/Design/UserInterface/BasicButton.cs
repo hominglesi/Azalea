@@ -50,7 +50,7 @@ public class BasicButton : Button
 			},
 			SpriteText = new SpriteText
 			{
-				Font = FrameworkFont.Regular,
+				Font = new("Roboto", weight: "Regular"),
 				Color = Palette.Flowers.Azalea,
 				Anchor = Anchor.Center,
 				Origin = Anchor.Center

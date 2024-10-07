@@ -362,7 +362,7 @@ public abstract class TextBoxOld : Composition
 			case PlatformAction.Copy:
 				if (string.IsNullOrEmpty(SelectedText)) return true;
 
-				GameHost.Main.Clipboard.SetText(SelectedText);
+				Clipboard.SetText(SelectedText);
 
 				if (action == PlatformAction.Cut)
 					DeleteBy(0);
@@ -370,7 +370,7 @@ public abstract class TextBoxOld : Composition
 				return true;
 
 			case PlatformAction.Paste:
-				var clipboardText = GameHost.Main.Clipboard.GetText();
+				var clipboardText = Clipboard.GetText();
 				if (clipboardText is null) return false;
 				InsertString(clipboardText);
 				return true;

@@ -1,6 +1,9 @@
 ﻿namespace Azalea.Platform;
 public static class Clipboard
 {
-	public static string? GetText() => GameHost.Main.Clipboard.GetText();
-	public static bool SetText(string text) => GameHost.Main.Clipboard.SetText(text);
+	private static IClipboard? _instance;
+	public static IClipboard Instance => _instance ??= GameHost.Main.Clipboard;
+
+	public static string? GetText() => Instance.GetText();
+	public static bool SetText(string text) => Instance.SetText(text);
 }

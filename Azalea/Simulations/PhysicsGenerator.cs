@@ -1,11 +1,11 @@
 ﻿using Azalea.Design.Components;
-using Azalea.Physics.Colliders;
+using Azalea.Simulations.Colliders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
-namespace Azalea.Physics;
+namespace Azalea.Simulations;
 public class PhysicsGenerator
 {
 	public const int UpdateRate = 60;
@@ -21,7 +21,7 @@ public class PhysicsGenerator
 	public bool UsesFriction { get; set; } = true;
 	public IEnumerable<RigidBody> RigidBodies => ComponentStorage<RigidBody>.GetComponents();
 
-	public void Update()
+	internal void Update()
 	{
 		foreach (var rb in RigidBodies)
 		{

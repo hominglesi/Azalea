@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.OpenGL;
+﻿using Azalea.Debugging;
+using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.Rendering;
 using Azalea.IO.Configs;
 using Azalea.IO.Resources;
@@ -27,6 +28,21 @@ internal class DesktopGameHost : GameHost
 
 		ConfigProvider?.Save();
 		((ALAudioManager)AudioManager)?.Dispose();
+	}
+
+	protected override void RunGameLoop()
+	{
+		var desktopWindow = (PlatformWindow)Window;
+		while (desktopWindow.ShouldClose == false)
+		{
+			ProcessGameLoop();
+		}
+
+		Window.Hide();
+
+		PerformanceTrace.SaveEventsTo("C:\\Programming\\trace.txt");
+
+		Window.Dispose();
 	}
 
 	internal override IWindow CreateWindow(HostPreferences prefs)

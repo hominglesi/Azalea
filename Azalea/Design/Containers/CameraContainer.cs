@@ -6,7 +6,7 @@ using System.Numerics;
 namespace Azalea.Design.Containers;
 public class CameraContainer : Composition
 {
-	private Vector2 _windowSize => GameHost.Main.Window.ClientSize;
+	private Vector2 _windowSize => Window.ClientSize;
 
 	public void CenterOnObject(GameObject obj)
 	{
