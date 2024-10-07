@@ -46,7 +46,8 @@ internal class DesktopGameHost : GameHost
 
 	internal override IRenderer CreateRenderer(IWindow window)
 		=> new GLRenderer(window);
-
 	internal override IAudioManager CreateAudioManager()
 		=> new ALAudioManager();
+	internal override IClipboard CreateClipboard()
+		=> new WindowsClipboard();
 }

@@ -24,9 +24,7 @@ public abstract class GameHost
 	public Composition Root { get; private set; }
 	public SceneContainer SceneManager { get; }
 	public PhysicsGenerator Physics { get; }
-
-	public IClipboard Clipboard => _clipboard ?? throw new Exception("This GameHost does not support using the clipboard.");
-	private IClipboard? _clipboard;
+	public IClipboard Clipboard { get; }
 
 	internal DebuggingOverlay? _editor;
 	private bool _editorEnabled;
@@ -41,8 +39,8 @@ public abstract class GameHost
 		Window = CreateWindow(prefs);
 		Renderer = CreateRenderer(Window);
 		AudioManager = CreateAudioManager();
+		Clipboard = CreateClipboard();
 		Physics = new PhysicsGenerator();
-		_clipboard = CreateClipboard();
 		SceneManager = new SceneContainer();
 	}
 
@@ -146,8 +144,7 @@ public abstract class GameHost
 	internal abstract IWindow CreateWindow(HostPreferences preferences);
 	internal abstract IRenderer CreateRenderer(IWindow window);
 	internal abstract IAudioManager CreateAudioManager();
-	protected virtual IClipboard? CreateClipboard() => null;
-
+	internal abstract IClipboard CreateClipboard();
 
 	public virtual DateTime GetCurrentTime() => Time.GetCurrentPreciseTime();
 

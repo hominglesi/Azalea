@@ -58,9 +58,10 @@ public class WebHost : GameHost
 
 	internal override IRenderer CreateRenderer(IWindow window)
 		=> new WebGLRenderer(window);
-
 	internal override IAudioManager CreateAudioManager()
 		=> new WebAudioManager();
+	internal override IClipboard CreateClipboard()
+		=> new WebClipboard();
 
 	public override DateTime GetCurrentTime()
 		=> WebFunctions.GetCurrentPreciseTime();
