@@ -123,7 +123,18 @@ var exports = await getAssemblyExports("Azalea.Web");
 var webEvents = exports.Azalea.Web.Platform.WebEvents;
 var webInput = exports.Azalea.Web.Platform.WebInput;
 
-window.addEventListener("beforeunload", (e) => webEvents.InvokeWindowClosing());
+window.onbeforeunload = (e) => {
+    webEvents.InvokeWindowClosing();
+
+    if (webEvents.GetShouldClose() == false) {
+        e.preventDefault();
+        e.returnValue = '';
+        return;
+    }
+
+    delete e["returnValue"];
+}
+
 canvas.addEventListener("wheel", (e) => webInput.ReportScroll(e.deltaY / 100));
 canvas.addEventListener("mousemove", (e) => webInput.ReportMouseMove(e.pageX, e.pageY));
 canvas.addEventListener("mousedown", (e) => webInput.ReportMouseDown(e.button));

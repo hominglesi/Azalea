@@ -26,8 +26,13 @@ internal static partial class WebEvents
 		=> AnimationFrameRequested?.Invoke();
 
 	internal static Action? WindowClosing;
+	internal static bool ShouldClose = true;
 
 	[JSExport]
 	internal static void InvokeWindowClosing()
 		=> WindowClosing?.Invoke();
+
+	[JSExport]
+	internal static bool GetShouldClose()
+		=> ShouldClose;
 }

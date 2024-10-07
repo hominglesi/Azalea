@@ -15,7 +15,11 @@ public class WebWindow : IWindow
 		};
 		WebEvents.CheckClientResized();
 
-		WebEvents.WindowClosing += () => Closing?.Invoke();
+		WebEvents.WindowClosing += () =>
+		{
+			WebEvents.ShouldClose = true;
+			Closing?.Invoke();
+		};
 	}
 
 	private Vector2Int _clientSize;
@@ -96,7 +100,8 @@ public class WebWindow : IWindow
 
 	public void Focus() { }
 
-	public void PreventClosure() { }
+	public void PreventClosure()
+		=> WebEvents.ShouldClose = false;
 
 	public void RequestAttention() { }
 
