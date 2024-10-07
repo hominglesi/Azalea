@@ -1,0 +1,9 @@
+﻿<Project>
+  <Target Name="CopyStaticFiles" BeforeTargets="Build">
+    <ItemGroup>
+      <StaticFiles Include="$(MSBuildThisFileDirectory)..\wwwroot\**\*.* "/>
+    </ItemGroup>
+    <Copy SourceFiles="@(StaticFiles)" 
+          DestinationFiles="@(StaticFiles -> '$(MSBuildProjectDirectory)\wwwroot\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+</Project>

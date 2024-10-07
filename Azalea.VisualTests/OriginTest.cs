@@ -1,6 +1,7 @@
 ﻿using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.IO.Resources;
+using Azalea.Platform;
 using Azalea.Utils;
 using System.Numerics;
 
@@ -9,7 +10,7 @@ internal class OriginTest : TestScene
 {
 	private Sprite _player;
 	private Sprite _arm;
-	private Vector2 _windowCenter => AzaleaGame.Main.Host.Window.ClientSize / 2;
+	private Vector2 _windowCenter => Window.ClientSize / 2;
 	private Vector2 _leftHandPosition => _windowCenter - new Vector2(22, 5);
 	private Vector2 _rightHandPosition => _windowCenter + new Vector2(22, -5);
 	public OriginTest()

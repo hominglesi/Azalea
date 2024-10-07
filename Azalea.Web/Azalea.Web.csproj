@@ -1,23 +1,38 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <StaticWebAssetBasePath>AzaleaWeb</StaticWebAssetBasePath>
-    <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
+    <Title>$(AssemblyName)</Title>
+    <Version>1.0.0-rc1</Version>
+    <Authors>hominglesi</Authors>
+    <Company>Azalea</Company>
+    <Description>Bindings for running Azalea on the web.</Description>
+    <PackageIcon>azalea-icon.png</PackageIcon>
+    <PackageIconUrl>https://i.imgur.com/UPsEzXU.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/hominglesi/Azalea</RepositoryUrl>
+    <PackageReleaseNotes>https://github.com/hominglesi/Azalea/releases</PackageReleaseNotes>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageId>$(AssemblyName)</PackageId>
+    <DebugSymbols>true</DebugSymbols>
+    <EmbedAllSources>true</EmbedAllSources>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.15" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.15"/>
-    <PackageReference Include="nkast.Wasm.Canvas" Version="6.0.3" />
-    <PackageReference Include="nkast.Wasm.Dom" Version="6.0.3" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Azalea\Azalea.csproj" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <None Include="..\Azalea\Resources\Textures\azalea-icon.png" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup Label="StaticFiles">
+    <Content Include="build\Azalea.Web.props" PackagePath="build" />
+    <Content Include="wwwroot\template.gitignore" PackagePath="wwwroot\.gitignore" />
+    <Content Include="wwwroot\index.html" PackagePath="wwwroot" />
+    <Content Include="wwwroot\main.js" PackagePath="wwwroot" />
+  </ItemGroup>
 </Project>

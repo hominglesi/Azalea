@@ -1,7 +1,7 @@
 ﻿using Azalea.Graphics.Sprites;
 using Azalea.IO.Resources;
-using Azalea.Physics;
-using Azalea.Physics.Colliders;
+using Azalea.Simulations;
+using Azalea.Simulations.Colliders;
 using Azalea.Utils;
 
 namespace Azalea.VisualTests;

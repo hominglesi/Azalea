@@ -17,7 +17,7 @@ public class GameConsoleTests : UnitTestSuite
 				InputUtils.SimulateCharInput("fullscreen");
 			});
 			AddOperation("Input enter", () => InputUtils.SimulateKeyInput(Keys.Enter));
-			AddResult("Check if window is Fullscreen", () => AzaleaGame.Main.Host.Window.State == WindowState.Fullscreen);
+			AddResult("Check if window is Fullscreen", () => Window.State == WindowState.Fullscreen);
 
 			AddOperation("Press F9 key", () => InputUtils.SimulateKeyInput(Keys.F9));
 			AddOperation("Execute 'restorewindow' command", () =>
@@ -26,9 +26,9 @@ public class GameConsoleTests : UnitTestSuite
 				InputUtils.SimulateCharInput("restorewindow");
 			});
 			AddOperation("Input enter", () => InputUtils.SimulateKeyInput(Keys.Enter));
-			AddResult("Check if window is Restored", () => AzaleaGame.Main.Host.Window.State == WindowState.Normal);
+			AddResult("Check if window is Restored", () => Window.State == WindowState.Normal);
 
-			var lastTitle = AzaleaGame.Main.Host.Window.Title;
+			var lastTitle = Window.Title;
 			AddOperation("Press F9 key", () => InputUtils.SimulateKeyInput(Keys.F9));
 			AddOperation("Execute 'windowtitle Lorem Ipsum' command", () =>
 			{
@@ -36,8 +36,8 @@ public class GameConsoleTests : UnitTestSuite
 				InputUtils.SimulateCharInput("windowtitle Lorem Ipsum");
 			});
 			AddOperation("Input enter", () => InputUtils.SimulateKeyInput(Keys.Enter));
-			AddResult("Check if WindowTitle is 'Lorem Ipsum'", () => AzaleaGame.Main.Host.Window.Title == "Lorem Ipsum");
-			AddOperation("Restore title", () => AzaleaGame.Main.Host.Window.Title = lastTitle);
+			AddResult("Check if WindowTitle is 'Lorem Ipsum'", () => Window.Title == "Lorem Ipsum");
+			AddOperation("Restore title", () => Window.Title = lastTitle);
 		}
 	}
 

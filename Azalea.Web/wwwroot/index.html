@@ -1,25 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>AzaleaGame</title>
-    <base href="./" />
-    <link href="css/app.css" rel="stylesheet" />
-    <script src="js/windowing.js"></script>
-    <script src="_content/nkast.Wasm.Dom/js/JSObject.6.0.2.js"></script>
-    <script src="_content/nkast.Wasm.Dom/js/Window.6.0.2.js"></script>
-    <script src="_content/nkast.Wasm.Dom/js/Document.6.0.2.js"></script>
-    <script src="_content/nkast.Wasm.Canvas/js/Canvas.6.0.2.js"></script>
-    <script src="_content/nkast.Wasm.Canvas/js/CanvasGLContext.6.0.2.js"></script>
-    <script src="js/WebGL.js"></script>
+    <title>Loading...</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type='module' src="./main.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
+
+        #LoadingText{
+            margin: 100px auto;
+            width: 500px;
+        }
+
+        #LoadingText h1{
+            font-weight: normal;
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="app">Loading...</div>
-
-    <script src="_framework/blazor.webassembly.js"></script>
+    <div id="LoadingText">
+        <h1>Loading Game...</h1>
+        <h1>(This may take a while)</h1>
+    </div>
+    
+    <canvas id="Canvas" oncontextmenu="return false" tabindex="0" style="display: none;"></canvas>
 </body>
 
 </html>

@@ -1,127 +1,104 @@
-﻿using Azalea.Audio;
-using Azalea.Debugging;
+﻿using Azalea.Debugging;
 using Azalea.Design.Containers;
+using Azalea.Design.Scenes;
 using Azalea.Extentions;
 using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
-using Azalea.Physics;
+using Azalea.IO.Configs;
+using Azalea.Simulations;
+using Azalea.Sounds;
 using System;
-using System.Diagnostics;
 using System.Numerics;
 
 namespace Azalea.Platform;
 
 public abstract class GameHost
 {
-	public abstract IWindow Window { get; }
-	public abstract IRenderer Renderer { get; }
+	public static GameHost Main => _main ?? throw new Exception("GameHost hasn't been created yet.");
+	private static GameHost? _main;
 
-	public IClipboard Clipboard => _clipboard ?? throw new Exception("This GameHost does not support using the clipboard.");
-	private IClipboard? _clipboard;
+	public IWindow Window { get; }
+	public IRenderer Renderer { get; }
+	public IAudioManager AudioManager { get; }
+	public IConfigProvider? ConfigProvider { get; protected set; }
+	public Composition Root { get; private set; }
+	public SceneContainer SceneManager { get; }
+	public PhysicsGenerator Physics { get; }
+	public IClipboard Clipboard { get; }
 
-	public event Action? Initialized;
+	internal DebuggingOverlay? _editor;
+	private bool _editorEnabled;
 
-	public PhysicsGenerator Physics => _physics ?? throw new Exception("Game has not been started yet");
-	private PhysicsGenerator? _physics;
+	internal GameHost(HostPreferences prefs)
+	{
+		_main ??= this;
 
-	public Composition Root => _root ?? throw new Exception("Cannot use root before the game has started.");
+		_editorEnabled = prefs.EditorEnabled;
+		Root = new Composition();
 
-	private Composition? _root;
+		Window = CreateWindow(prefs);
+		Renderer = CreateRenderer(Window);
+		AudioManager = CreateAudioManager();
+		Clipboard = CreateClipboard();
+		Physics = new PhysicsGenerator();
+		SceneManager = new SceneContainer();
+	}
 
 	public virtual void Run(AzaleaGame game)
 	{
-		if (AzaleaSettings.EnableDebugging)
-		{
-			var root = new DebuggingOverlay();
-			_root = root;
-			Editor._overlay = root;
-		}
-		else
-			_root = new Composition();
+		if (_editorEnabled)
+			Root = Editor._overlay = _editor = new DebuggingOverlay();
 
-		_root.Add(game);
+		Root.Add(game);
+		game.AddInternal(SceneManager);
 
-		game.SetHost(this);
+		Input.Initialize(Root);
 
-		_clipboard = CreateClipboard();
+		_lastFrameTime = GetCurrentTime();
 
-		_physics = new PhysicsGenerator();
-		_physics.UsesGravity = false;
-
-		float accumulator = 0;
-		float targetFrameTime = 1 / (float)60;
-
-		CallInitialized();
-
-		DateTime lastFrameTime = Time.GetCurrentPreciseTime();
-		DateTime frameTime;
-		float deltaTime;
-		var firstWindowShow = false;
-
-		//Game Loop
-		while (Window.ShouldClose == false)
-		{
-			StartFrame();
-
-			frameTime = Time.GetCurrentPreciseTime();
-			deltaTime = (float)frameTime.Subtract(lastFrameTime).TotalSeconds;
-			lastFrameTime = frameTime;
-
-			Time.Update(deltaTime);
-
-			accumulator += deltaTime;
-
-			while (accumulator >= targetFrameTime)
-			{
-				PerformanceTrace.RunAndTrace(CallOnFixedUpdate, "FixedUpdate");
-				accumulator -= targetFrameTime;
-			}
-
-			PerformanceTrace.RunAndTrace(CallOnUpdate, "Update");
-			PerformanceTrace.RunAndTrace(CallOnRender, "Render");
-
-			if (firstWindowShow == false)
-			{
-				Window.Show(true);
-				firstWindowShow = true;
-			}
-
-			Window.ProcessEvents();
-			//PerformanceTrace.RunAndTrace(InputManager.ProcessInputs, "Input");
-
-			EndFrame();
-		}
-		Window.Hide();
-
-		PerformanceTrace.SaveEventsTo("C:\\Programming\\trace.txt");
-
-		Window.Dispose();
-		AudioManager.Dispose();
+		RunGameLoop();
 	}
+
+	private float _accumulator = 0;
+	private float _targetFrameTime = 1 / (float)60;
+	private DateTime _lastFrameTime;
+	private DateTime _frameTime;
+	private float _deltaTime;
+	private bool _firstWindowShow = false;
+
+	protected abstract void RunGameLoop();
 
 	private long _frameStart;
-	internal void StartFrame()
+	protected virtual void ProcessGameLoop()
 	{
 		_frameStart = PerformanceTrace.StartEvent();
-	}
 
-	protected void EndFrame()
-	{
+		_frameTime = GetCurrentTime();
+		_deltaTime = (float)_frameTime.Subtract(_lastFrameTime).TotalSeconds;
+		_lastFrameTime = _frameTime;
+
+		Time.Update(_deltaTime);
+
+		_accumulator += _deltaTime;
+
+		while (_accumulator >= _targetFrameTime)
+		{
+			PerformanceTrace.RunAndTrace(CallOnFixedUpdate, "FixedUpdate");
+			_accumulator -= _targetFrameTime;
+		}
+
+		PerformanceTrace.RunAndTrace(CallOnUpdate, "Update");
+		PerformanceTrace.RunAndTrace(CallOnRender, "Render");
+
+		if (_firstWindowShow == false)
+		{
+			Window.Show(true);
+			_firstWindowShow = true;
+		}
+
+		Window.ProcessEvents();
+
 		PerformanceTrace.AddEvent(_frameStart, "Frame");
-	}
-
-	public virtual void CallInitialized()
-	{
-		Debug.Assert(_root is not null);
-
-		Input.Initialize(_root);
-		Renderer.Initialize();
-		AudioManager.Initialize();
-
-		if (_root is DebuggingOverlay debug)
-			debug.Initialize();
-
-		Initialized?.Invoke();
 	}
 
 	public virtual void CallOnRender()
@@ -151,5 +128,16 @@ public abstract class GameHost
 		Physics.Update();
 	}
 
-	protected virtual IClipboard? CreateClipboard() => null;
+	internal abstract IWindow CreateWindow(HostPreferences preferences);
+	internal abstract IRenderer CreateRenderer(IWindow window);
+	internal abstract IAudioManager CreateAudioManager();
+	internal abstract IClipboard CreateClipboard();
+
+	public virtual DateTime GetCurrentTime() => Time.GetCurrentPreciseTime();
+
+	internal void CheckForbidden(object? preference, string errorMessage)
+	{
+		if (preference is not null)
+			throw new ArgumentException(errorMessage);
+	}
 }

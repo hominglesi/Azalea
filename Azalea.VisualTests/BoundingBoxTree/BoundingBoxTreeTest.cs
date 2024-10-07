@@ -3,6 +3,7 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Numerics;
+using Azalea.Platform;
 using System.Numerics;
 
 namespace Azalea.VisualTests.BoundingBoxTree;
@@ -12,10 +13,9 @@ public class BoundingBoxTreeTest : TestScene
 
 	public BoundingBoxTreeTest()
 	{
-		var window = AzaleaGame.Main.Host.Window;
-		window.Resizable = false;
+		Window.Resizable = false;
 
-		Root = new BoundingBoxBranch(new Rectangle(Vector2.Zero, window.ClientSize), 9);
+		Root = new BoundingBoxBranch(new Rectangle(Vector2.Zero, Window.ClientSize), 9);
 
 		Add(_displayBox = new Box()
 		{

@@ -1,6 +1,8 @@
 ﻿using Azalea.Design.Shapes;
 using Azalea.Graphics.Colors;
+using Azalea.Graphics.Rendering;
 using Azalea.Numerics;
+using Azalea.Platform;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
@@ -24,11 +26,10 @@ public class BreakoutTest : TestScene
 
 	public BreakoutTest()
 	{
-		AzaleaGame.Main.Host.Renderer.ClearColor = Palette.Black;
-		var window = AzaleaGame.Main.Host.Window;
-		window.ClientSize = new(GameWidth, GameHeight);
-		window.Resizable = false;
-		window.Center();
+		Renderer.ClearColor = Palette.Black;
+		Window.ClientSize = new(GameWidth, GameHeight);
+		Window.Resizable = false;
+		Window.Center();
 
 		_chunkRoot = new BreakoutChunk(new Rectangle(Vector2.Zero,
 									   new Vector2(GameWidth, BlocksHeight)));

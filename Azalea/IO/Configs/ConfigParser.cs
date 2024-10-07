@@ -2,9 +2,9 @@
 using System.Text;
 
 namespace Azalea.IO.Configs;
-public static class ConfigParser
+internal static class ConfigParser
 {
-	public static string Format(Dictionary<string, string> keyValuePairs)
+	internal static string Format(Dictionary<string, string> keyValuePairs)
 	{
 		StringBuilder output = new();
 		foreach (var (key, value) in keyValuePairs)
@@ -17,9 +17,8 @@ public static class ConfigParser
 		return output.ToString();
 	}
 
-	public static Dictionary<string, string> Parse(string data)
+	internal static void Parse(string data, ref Dictionary<string, string> targetDictionary)
 	{
-		var output = new Dictionary<string, string>();
 		var lines = data.Split('\n');
 		foreach (var line in lines)
 		{
@@ -27,8 +26,7 @@ public static class ConfigParser
 				continue;
 
 			var args = line.Split('=', 2);
-			output.Add(args[0], args[1]);
+			targetDictionary.Add(args[0], args[1]);
 		}
-		return output;
 	}
 }

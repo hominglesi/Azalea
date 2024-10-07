@@ -1,35 +1,69 @@
-﻿using Azalea.Graphics.OpenGL;
-using Azalea.Graphics.OpenGL.Enums;
+﻿using Azalea.Debugging;
+using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.Rendering;
+using Azalea.IO.Configs;
+using Azalea.IO.Resources;
 using Azalea.Platform.Windows;
-using System;
+using Azalea.Sounds;
+using Azalea.Sounds.OpenAL;
 
 namespace Azalea.Platform;
 internal class DesktopGameHost : GameHost
 {
-	public override IWindow Window => _window ?? throw new Exception("Cannot use Window before it is initialized");
-	private Win32Window _window;
+	private readonly Vector2Int _defaultWindowSize = new(1280, 720);
 
-	public override IRenderer Renderer => _renderer ?? throw new Exception("Cannot use Renderer before it is initialized");
-	private GLRenderer? _renderer;
-
-	public DesktopGameHost(HostPreferences prefs)
+	internal DesktopGameHost(HostPreferences prefs)
+		: base(prefs)
 	{
-		_window = new Win32Window(prefs.WindowTitle, prefs.ClientSize, prefs.WindowState, prefs.WindowVisible)
+		if (prefs.PersistentDirectory is not null)
+			Assets.SetupPersistentStore(prefs.PersistentDirectory);
+
+		if (prefs.ConfigName is not null)
+			ConfigProvider = new FileConfigProvider(prefs.ConfigName);
+	}
+
+	public override void Run(AzaleaGame game)
+	{
+		base.Run(game);
+
+		ConfigProvider?.Save();
+		((ALAudioManager)AudioManager)?.Dispose();
+	}
+
+	protected override void RunGameLoop()
+	{
+		var desktopWindow = (PlatformWindow)Window;
+		while (desktopWindow.ShouldClose == false)
 		{
-			//These are fine just being set normaly
-			VSync = prefs.VSync,
-			Resizable = prefs.WindowResizable
+			ProcessGameLoop();
+		}
+
+		Window.Hide();
+
+		PerformanceTrace.SaveEventsTo("C:\\Programming\\trace.txt");
+
+		Window.Dispose();
+	}
+
+	internal override IWindow CreateWindow(HostPreferences prefs)
+	{
+		var windowSize = prefs.GameSize ?? _defaultWindowSize;
+		var resizable = prefs.Resizable ?? false;
+		var startingState = prefs.StartingState ?? WindowState.Normal;
+		var title = prefs.Title ?? "Azalea Game";
+		var vSync = prefs.VSync ?? true;
+
+		return new Win32Window(title, windowSize, startingState, false)
+		{
+			VSync = vSync,
+			Resizable = resizable
 		};
 	}
 
-	public override void CallInitialized()
-	{
-		GL.Enable(GLCapability.Blend);
-		GL.BlendFunc(GLBlendFunction.SrcAlpha, GLBlendFunction.OneMinusSrcAlpha);
-
-		_renderer = new GLRenderer(_window);
-
-		base.CallInitialized();
-	}
+	internal override IRenderer CreateRenderer(IWindow window)
+		=> new GLRenderer(window);
+	internal override IAudioManager CreateAudioManager()
+		=> new ALAudioManager();
+	internal override IClipboard CreateClipboard()
+		=> new WindowsClipboard();
 }
