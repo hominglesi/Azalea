@@ -1,11 +1,11 @@
 ﻿using Azalea.Debugging.Design;
 using Azalea.Design.Containers;
-using Azalea.Design.Shapes;
 using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
+using Azalea.Markup;
 using Azalea.Utils;
 using System;
 using System.IO;
@@ -79,11 +79,9 @@ public class ResourceExplorer : ScrollableContainer
 					icon.Click += _ =>
 					{
 						using var reader = new StreamReader(path);
+
 						Editor.Overlay.FocusTemplateEditor();
-						Editor.Overlay.TemplateEditor.InspectObject(new Box()
-						{
-							Size = Vector2Int.Parse(reader.ReadLine() ?? "0,0")
-						});
+						Editor.Overlay.TemplateEditor.InspectObject(TemplateConverter.Parse(reader.ReadToEnd()));
 					};
 					break;
 			}
