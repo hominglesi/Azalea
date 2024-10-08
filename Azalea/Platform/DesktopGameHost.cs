@@ -18,6 +18,9 @@ internal class DesktopGameHost : GameHost
 		if (prefs.PersistentDirectory is not null)
 			Assets.SetupPersistentStore(prefs.PersistentDirectory);
 
+		if (prefs.ReflectedDirectory is not null)
+			Assets.SetupReflectedStore(prefs.ReflectedDirectory);
+
 		if (prefs.ConfigName is not null)
 			ConfigProvider = new FileConfigProvider(prefs.ConfigName);
 	}

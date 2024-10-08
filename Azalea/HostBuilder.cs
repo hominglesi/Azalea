@@ -75,6 +75,12 @@ public class HostBuilder
 		_preferences.PersistentDirectory = folderName;
 		return this;
 	}
+
+	public HostBuilder SetupReflectedDirectory(string path)
+	{
+		_preferences.ReflectedDirectory = path;
+		return this;
+	}
 }
 internal struct HostPreferences
 {
@@ -82,6 +88,7 @@ internal struct HostPreferences
 	public bool EditorEnabled = true;
 	public Vector2Int? GameSize = null;
 	public string? PersistentDirectory = null;
+	public string? ReflectedDirectory = null;
 	public bool? Resizable = null;
 	public WindowState? StartingState = null;
 	public string? Title = null;

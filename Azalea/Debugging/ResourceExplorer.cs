@@ -15,6 +15,19 @@ public class ResourceExplorer : ScrollableContainer
 {
 	public ResourceExplorer()
 	{
+		if (Assets.ReflectedStoreExists == false)
+		{
+			Add(new SpriteText()
+			{
+				Font = FontUsage.Default.With(size: 30),
+				Text = "A reflected store has not been set up.",
+				Origin = Anchor.Center,
+				Anchor = Anchor.Center,
+				Y = 40
+			});
+			return;
+		}
+
 		RelativeSizeAxes = Axes.Both;
 		Add(new DirectoryContainer(Assets.ReflectedStore)
 		{
