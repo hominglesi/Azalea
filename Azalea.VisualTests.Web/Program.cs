@@ -1,5 +1,9 @@
-﻿using Azalea.VisualTests;
-using Azalea.Web.Platform.Blazor;
+using Azalea;
+using Azalea.VisualTests;
 
-var host = new BlazorGameHost();
-host.Run(new VisualTests());
+
+new HostBuilder()
+	.SetTitle("Azalea Visual Tests")
+	.Create()
+	.Run(new VisualTests());
+

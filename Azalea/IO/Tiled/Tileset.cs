@@ -1,5 +1,6 @@
 ﻿using Azalea.Extentions;
 using Azalea.Graphics;
+using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
 using Azalea.Numerics;
@@ -133,7 +134,7 @@ public readonly struct Tileset
 		}
 
 		// Create our Texture
-		var atlasTexture = AzaleaGame.Main.Host.Renderer.CreateTexture(atlas);
+		var atlasTexture = Renderer.CreateTexture(atlas);
 
 		// Create all texture regions
 

@@ -4,6 +4,7 @@ using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
+using Azalea.Platform;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -361,7 +362,7 @@ public abstract class TextBoxOld : Composition
 			case PlatformAction.Copy:
 				if (string.IsNullOrEmpty(SelectedText)) return true;
 
-				AzaleaGame.Main.Host.Clipboard.SetText(SelectedText);
+				Clipboard.SetText(SelectedText);
 
 				if (action == PlatformAction.Cut)
 					DeleteBy(0);
@@ -369,7 +370,7 @@ public abstract class TextBoxOld : Composition
 				return true;
 
 			case PlatformAction.Paste:
-				var clipboardText = AzaleaGame.Main.Host.Clipboard.GetText();
+				var clipboardText = Clipboard.GetText();
 				if (clipboardText is null) return false;
 				InsertString(clipboardText);
 				return true;

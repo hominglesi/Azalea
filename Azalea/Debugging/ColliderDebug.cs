@@ -4,7 +4,7 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
-using Azalea.Physics.Colliders;
+using Azalea.Simulations.Colliders;
 using System.Numerics;
 
 namespace Azalea.Debugging;

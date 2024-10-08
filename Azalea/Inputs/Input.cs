@@ -52,6 +52,7 @@ public static class Input
 		var inputQueue = new List<GameObject>();
 		_rootObject.BuildPositionalInputQueue(position, inputQueue);
 		inputQueue.Reverse();
+
 		return inputQueue;
 	}
 
@@ -66,6 +67,7 @@ public static class Input
 		var inputQueue = new List<GameObject>();
 		_rootObject.BuildNonPositionalInputQueue(inputQueue);
 		inputQueue.Reverse();
+
 		return inputQueue;
 	}
 

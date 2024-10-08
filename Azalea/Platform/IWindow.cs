@@ -92,8 +92,6 @@ public interface IWindow : IDisposable
 
 	internal void ProcessEvents();
 
-	internal bool ShouldClose { get; }
-
 	/// <summary>
 	/// Called when the window is being closed. Can be used to prevent closure.
 	/// </summary>

@@ -9,10 +9,14 @@ using Azalea.Numerics;
 using Azalea.Platform;
 
 namespace Azalea.Graphics.OpenGL;
-internal class GLRenderer : Renderer
+internal class GLRenderer : RendererBase
 {
 	public GLRenderer(IWindow window)
-		: base(window) { }
+		: base(window)
+	{
+		GL.Enable(GLCapability.Blend);
+		GL.BlendFunc(GLBlendFunction.SrcAlpha, GLBlendFunction.OneMinusSrcAlpha);
+	}
 
 	internal override void FinishFrame()
 	{
@@ -32,7 +36,7 @@ internal class GLRenderer : Renderer
 	protected internal override void SetClearColor(Color value)
 		=> GL.ClearColor(value);
 
-	protected override void ClearImplementation(Color color)
+	protected override void ClearImplementation()
 		=> GL.Clear(GLBufferBit.Color);
 
 	protected override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)

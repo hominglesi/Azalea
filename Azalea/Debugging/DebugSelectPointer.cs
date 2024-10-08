@@ -5,6 +5,7 @@ using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
+using Azalea.Platform;
 
 namespace Azalea.Debugging;
 public class DebugSelectPointer : Sprite
@@ -21,7 +22,7 @@ public class DebugSelectPointer : Sprite
 		{
 			ClickAction = (_) => onSelectClicked()
 		};
-		AzaleaGame.Main.Host.Root.AddInternal(overlay);
+		GameHost.Main.Root.AddInternal(overlay);
 		return base.OnClick(e);
 	}
 

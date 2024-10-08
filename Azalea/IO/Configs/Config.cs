@@ -1,119 +1,36 @@
-﻿using Azalea.Extentions;
-using Azalea.IO.Resources;
+﻿using Azalea.Platform;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 
 namespace Azalea.IO.Configs;
 public static class Config
 {
-	private static string configName = "config.cfg";
+	private static IConfigProvider? _instance;
+	public static IConfigProvider Instance => _instance ??= GameHost.Main.ConfigProvider
+		?? throw new Exception("Config must be set up to be able to use it.");
 
-	private static Dictionary<string, string> _dictionary;
+	public static bool ContainsKey(string key) => Instance.ContainsKey(key);
 
-	public static void Load()
-	{
-		if (Assets.PersistentStore.Exists(configName) == false)
-		{
-			_dictionary = new Dictionary<string, string>();
-			return;
-		}
+	public static void Set(string key, string value) => Instance.Set(key, value);
+	public static string? Get(string key) => Instance.Get(key);
 
-		var data = Assets.PersistentStore.GetText(configName)!;
-		_dictionary = ConfigParser.Parse(data);
-	}
+	public static void Set(string key, int value) => Instance.Set(key, value);
+	public static int? GetInt(string key) => Instance.GetInt(key);
 
-	public static void Save()
-	{
-		Assets.PersistentStore.Delete(configName);
-		var stream = Assets.PersistentStore.GetOrCreateStream(configName);
-		var writer = new StreamWriter(stream);
-		writer.Write(ConfigParser.Format(_dictionary));
-		writer.Close();
-		stream.Close();
-	}
+	public static void Set(string key, float value) => Instance.Set(key, value);
+	public static float? GetFloat(string key) => Instance.GetFloat(key);
 
-	public static bool ContainsKey(string key)
-		=> _dictionary.ContainsKey(key);
+	public static void Set(string key, bool value) => Instance.Set(key, value);
+	public static bool? GetBool(string key) => Instance.GetBool(key);
 
-	public static string? GetValue(string key)
-	{
-		if (_dictionary.ContainsKey(key) == false)
-			return null;
+	public static void Set(string key, Vector2 value) => Instance.Set(key, value);
+	public static Vector2? GetVector2(string key) => Instance.GetVector2(key);
 
-		return _dictionary[key];
-	}
+	public static void Set(string key, Vector2Int value) => Instance.Set(key, value);
+	public static Vector2Int? GetVector2Int(string key) => Instance.GetVector2Int(key);
 
-	public static void SetValue(string key, string value)
-		=> _dictionary[key] = value;
-
-	public static int? GetValueInt(string key)
-	{
-		var value = GetValue(key);
-		if (value is null) return null;
-
-		return int.Parse(value);
-	}
-
-	public static void SetValue(string key, int value)
-		=> SetValue(key, value.ToString());
-
-	public static float? GetValueFloat(string key)
-	{
-		var value = GetValue(key);
-		if (value is null) return null;
-
-		return float.Parse(value);
-	}
-
-	public static void SetValue(string key, float value)
-		=> SetValue(key, value.ToString());
-
-	public static bool? GetValueBool(string key)
-	{
-		var value = GetValue(key);
-		if (value is null) return null;
-
-		return bool.Parse(value);
-	}
-
-	public static void SetValue(string key, bool value)
-		=> SetValue(key, value.ToString());
-
-	public static Vector2? GetValueVector2(string key)
-	{
-		var value = GetValue(key);
-		if (value is null) return null;
-
-		return Vector2Extentions.Parse(value);
-	}
-
-	public static void SetValue(string key, Vector2 value)
-		=> SetValue(key, $"{value.X}:{value.Y}");
-
-	public static Vector2Int? GetValueVector2Int(string key)
-	{
-		var value = GetValue(key);
-		if (value is null) return null;
-
-		return Vector2Int.Parse(value);
-	}
-
-	public static void SetValue(string key, Vector2Int value)
-		=> SetValue(key, $"{value.X}:{value.Y}");
-
-	public static T GetValueEnum<T>(string key)
-		where T : struct, Enum
-	{
-		//We can't return null with enums so we can assume the key exists
-		//and let the user check before calling this method
-		int value = GetValueInt(key) ?? -1;
-		return Unsafe.As<int, T>(ref value);
-	}
-
-	public static void SetValue<T>(string key, T value)
-		where T : struct, Enum
-		=> SetValue(key, Unsafe.As<T, int>(ref value));
+	public static void Set<T>(string key, T value)
+		where T : struct, Enum => Instance.Set(key, value);
+	public static T? GetEnum<T>(string key)
+		where T : struct, Enum => Instance.GetEnum<T>(key);
 }

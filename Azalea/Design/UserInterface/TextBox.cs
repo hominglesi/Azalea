@@ -2,6 +2,7 @@
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
+using Azalea.Platform;
 using System;
 using System.Numerics;
 
@@ -42,6 +43,11 @@ public abstract class TextBox : TextContainer
 		if (e.Key == Keys.Enter) addCharacterAtCarat('\n');
 		if (e.Key == Keys.Left) moveCarat(-1);
 		if (e.Key == Keys.Right) moveCarat(1);
+
+		if (e.Key == Keys.V && Input.GetKey(Keys.ControlLeft).Pressed)
+			updateText(_text + Clipboard.GetText());
+		if (e.Key == Keys.C && Input.GetKey(Keys.ControlLeft).Pressed)
+			Clipboard.SetText(_text);
 
 		return base.OnKeyDown(e);
 	}

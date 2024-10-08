@@ -4,8 +4,8 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.IO.Resources;
-using Azalea.Physics;
-using Azalea.Physics.Colliders;
+using Azalea.Simulations;
+using Azalea.Simulations.Colliders;
 using System;
 using System.Numerics;
 
@@ -35,12 +35,10 @@ public class PhysicsTest : TestScene
 
 	Line line;
 	bool charging = false;
-	private PhysicsGenerator _physics;
 	public PhysicsTest()
 	{
-		_physics = AzaleaGame.Main.Host.Physics;
-		_physics.DebugMode = true;
-		_physics.UsesGravity = false;
+		Physics.DebugMode = true;
+		Physics.UsesGravity = false;
 		Add(line = new Line()
 		{
 			StartPoint = new(500, 40),
@@ -305,7 +303,7 @@ public class PhysicsTest : TestScene
 
 		if (Input.GetKey(Keys.Space).Down)
 		{
-			_physics.UsesGravity = true;
+			Physics.UsesGravity = true;
 		}
 
 		if (Input.GetKey(Keys.O).Down)

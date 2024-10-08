@@ -7,8 +7,9 @@ namespace Azalea.Platform.Windows;
 
 internal static class WinAPI
 {
-	private const string User32Path = "user32.dll";
 	private const string Gdi32Path = "gdi32.dll";
+	private const string Kernel32Path = "kernel32.dll";
+	private const string User32Path = "user32.dll";
 
 	[DllImport(User32Path, EntryPoint = "AdjustWindowRectEx")]
 	[return: MarshalAs(UnmanagedType.Bool)]
@@ -17,6 +18,12 @@ internal static class WinAPI
 	[DllImport(User32Path, EntryPoint = "BringWindowToTop")]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool BringWindowToTop(IntPtr window);
+
+	[DllImport(User32Path, EntryPoint = "CloseClipboard")]
+	public static extern bool CloseClipboard();
+
+	[DllImport(Kernel32Path, EntryPoint = "RtlCopyMemory")]
+	public static extern void CopyMemory(IntPtr destination, IntPtr source, uint length);
 
 	[DllImport(Gdi32Path, EntryPoint = "CreateBitmap")]
 	public static extern IntPtr CreateBitmap(
@@ -121,6 +128,9 @@ internal static class WinAPI
 		return rect;
 	}
 
+	[DllImport(User32Path, EntryPoint = "GetClipboardData")]
+	public static extern IntPtr GetClipboardData(uint format);
+
 	[DllImport(User32Path, EntryPoint = "GetCursorPos")]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool GetCursorPos(out Vector2Int point);
@@ -169,6 +179,18 @@ internal static class WinAPI
 		return rect;
 	}
 
+	[DllImport(Kernel32Path, EntryPoint = "GlobalAlloc")]
+	public static extern IntPtr GlobalAlloc(uint flags, UIntPtr bytes);
+
+	[DllImport(Kernel32Path, EntryPoint = "GlobalFree")]
+	public static extern IntPtr GlobalFree(IntPtr memoryObject);
+
+	[DllImport(Kernel32Path, EntryPoint = "GlobalLock")]
+	public static extern IntPtr GlobalLock(IntPtr memoryObject);
+
+	[DllImport(Kernel32Path, EntryPoint = "GlobalUnlock")]
+	public static extern bool GlobalUnlock(IntPtr memoryObject);
+
 	[DllImport(User32Path, EntryPoint = "IsDialogMessageW", CharSet = CharSet.Unicode)]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool IsDialogMessage(IntPtr window, [In] ref Message message);
@@ -178,6 +200,9 @@ internal static class WinAPI
 
 	[DllImport(User32Path, EntryPoint = "MonitorFromWindow")]
 	public static extern IntPtr MonitorFromWindow(IntPtr window, MonitorFromFlags flags);
+
+	[DllImport(User32Path, EntryPoint = "OpenClipboard")]
+	public static extern bool OpenClipboard(IntPtr newWindowOwner);
 
 	[DllImport(User32Path, EntryPoint = "PeekMessageW", CharSet = CharSet.Unicode)]
 	private static extern sbyte peekMessage(out Message message, IntPtr window, uint minFilter, uint maxFilter, uint remove);
@@ -210,6 +235,9 @@ internal static class WinAPI
 
 	[DllImport(User32Path, EntryPoint = "SetCapture")]
 	public static extern IntPtr SetCapture(IntPtr window);
+
+	[DllImport(User32Path, EntryPoint = "SetClipboardData")]
+	public static extern IntPtr SetClipboardData(uint format, IntPtr memoryObject);
 
 	[DllImport(User32Path, EntryPoint = "SetFocus")]
 	public static extern IntPtr SetFocus(IntPtr window);

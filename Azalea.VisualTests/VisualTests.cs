@@ -5,11 +5,13 @@ using Azalea.Design.Shapes;
 using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
+using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.IO.Configs;
 using Azalea.IO.Resources;
+using Azalea.Platform;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
@@ -20,14 +22,12 @@ namespace Azalea.VisualTests;
 
 public class VisualTests : AzaleaGame
 {
-	private const string currentSceneKey = "currentScene";
+	private const string __currentSceneKey = "currentScene";
 
-#pragma warning disable CS8618
 	private List<string> _tests;
 	private TestSelectScene _testSelectScene;
-#pragma warning restore CS8618
 
-	protected override void OnInitialize()
+	public VisualTests()
 	{
 		Assets.AddToMainStore(new NamespacedResourceStore(new EmbeddedResourceStore(typeof(VisualTests).Assembly), "Resources"));
 		Assets.AddFont("Fonts/TitanOne-Regular.fnt", "TitanOne");
@@ -35,7 +35,9 @@ public class VisualTests : AzaleaGame
 
 		_testSelectScene = new TestSelectScene(_tests);
 
-		var selectedTest = Config.GetValue(currentSceneKey);
+		Renderer.ClearColor = Palette.Flowers.Azalea;
+
+		var selectedTest = Config.Get(__currentSceneKey);
 		if (selectedTest is null || _tests.Contains(selectedTest) == false)
 			goToSceneSelect();
 		else
@@ -50,14 +52,14 @@ public class VisualTests : AzaleaGame
 
 	private void goToSceneSelect()
 	{
-		var currentScene = Main.SceneManager.CurrentScene;
+		var currentScene = SceneManager.CurrentScene;
 
 		if (currentScene == null || currentScene != _testSelectScene)
 		{
-			Main.SceneManager.ChangeScene(_testSelectScene);
-			Main.Host.Renderer.ClearColor = new Color(40, 51, 60);
-			Main.Host.Window.ClientSize = new(1600, 900);
-			Main.Host.Window.Center();
+			SceneManager.ChangeScene(_testSelectScene);
+			Renderer.ClearColor = new Color(40, 51, 60);
+			Window.ClientSize = new(1600, 900);
+			Window.Center();
 		}
 	}
 
@@ -92,8 +94,8 @@ public class VisualTests : AzaleaGame
 			var test = Activator.CreateInstance(Assembly.GetAssembly(typeof(VisualTests))!.FullName!, testName)!.Unwrap()
 			as TestScene;
 
-			Main.SceneManager.ChangeScene(test!);
-			Config.SetValue(currentSceneKey, testName);
+			SceneManager.ChangeScene(test!);
+			Config.Set(__currentSceneKey, testName);
 		}
 	}
 

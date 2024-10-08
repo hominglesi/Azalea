@@ -10,5 +10,5 @@ public interface IClipboard
 	/// <summary>
 	/// Copy text to clipboard
 	/// </summary>
-	public void SetText(string text);
+	public bool SetText(string text);
 }
