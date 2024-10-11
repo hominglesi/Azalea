@@ -105,6 +105,12 @@ internal static class WinAPI
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool DeleteObject(IntPtr obj);
 
+	[DllImport(Gdi32Path, EntryPoint = "DescribePixelFormat")]
+	public static extern int DescribePixelFormat(IntPtr deviceContext, int pixelFormat, uint bytes, [In, Out] ref PixelFormatDescriptor descriptor);
+
+	[DllImport(User32Path, EntryPoint = "DestroyWindow")]
+	public static extern bool DestroyWindow(IntPtr window);
+
 	[DllImport(User32Path, EntryPoint = "DispatchMessageW", CharSet = CharSet.Unicode)]
 	public static extern IntPtr DispatchMessage([In] ref Message message);
 
@@ -226,6 +232,9 @@ internal static class WinAPI
 	[DllImport(User32Path, EntryPoint = "ReleaseCapture")]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool ReleaseCapture();
+
+	[DllImport(User32Path, EntryPoint = "ReleaseDC")]
+	public static extern bool ReleaseDC(IntPtr window, IntPtr deviceContext);
 
 	[DllImport(User32Path, EntryPoint = "ScreenToClient")]
 	public static extern bool ScreenToClient(IntPtr window, ref Vector2Int point);

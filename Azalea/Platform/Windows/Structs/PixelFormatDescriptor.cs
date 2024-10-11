@@ -16,7 +16,7 @@ public struct PixelFormatDescriptor
 	byte greenShift = 0;
 	byte blueBits = 0;
 	byte blueShift = 0;
-	byte alphaBits = 0;
+	byte alphaBits = 8;
 	byte alphaShift = 0;
 	byte accumBits = 0;
 	byte accumRedBits = 0;
@@ -26,7 +26,7 @@ public struct PixelFormatDescriptor
 	byte depthBits = 24;
 	byte stencilBits = 8;
 	byte auxBuffers = 0;
-	byte layerType = 0;
+	byte layerType = 0; // PFD_MAIN_PLANE
 	byte reserved = 0;
 	int layerMask = 0;
 	int visibleMask = 0;
@@ -39,6 +39,5 @@ public struct PixelFormatDescriptor
 		flags = (int)(PFDFlags.DrawToWindow | PFDFlags.SupportOpenGL | PFDFlags.DoubleBuffer);
 		pixelType = 0;
 		colorBits = 32;
-
 	}
 }
