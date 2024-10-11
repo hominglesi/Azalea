@@ -26,12 +26,6 @@ public class HostBuilder
 		return new DesktopGameHost(_preferences);
 	}
 
-	public HostBuilder SetEditorEnabled(bool enabled)
-	{
-		_preferences.EditorEnabled = enabled;
-		return this;
-	}
-
 	public HostBuilder SetGameSize(Vector2Int size)
 	{
 		_preferences.GameSize = size;
@@ -61,15 +55,6 @@ public class HostBuilder
 		return this;
 	}
 
-	public HostBuilder SetupConfig(string configName = "config.cfg")
-	{
-		if (_preferences.PersistentDirectory is null)
-			throw new Exception("Must setup persistent directory before setting up config");
-
-		_preferences.ConfigName = configName;
-		return this;
-	}
-
 	public HostBuilder SetupPersistentDirectory(string folderName)
 	{
 		_preferences.PersistentDirectory = folderName;
@@ -81,17 +66,42 @@ public class HostBuilder
 		_preferences.ReflectedDirectory = path;
 		return this;
 	}
+
+	public HostBuilder SetupConfig(string configName = "config.cfg")
+	{
+		if (_preferences.PersistentDirectory is null)
+			throw new Exception("Must setup persistent directory before setting up config");
+
+		_preferences.ConfigName = configName;
+		return this;
+	}
+
+	public HostBuilder EnableEditor()
+	{
+		_preferences.EditorEnabled = true;
+		return this;
+	}
+
+	public HostBuilder EnableTracing()
+	{
+		if (_preferences.PersistentDirectory is null)
+			throw new Exception("Must setup persistent directory before setting up config");
+
+		_preferences.TracingEnabled = true;
+		return this;
+	}
 }
 internal struct HostPreferences
 {
 	public string? ConfigName = null;
-	public bool EditorEnabled = true;
+	public bool EditorEnabled = false;
 	public Vector2Int? GameSize = null;
 	public string? PersistentDirectory = null;
 	public string? ReflectedDirectory = null;
 	public bool? Resizable = null;
 	public WindowState? StartingState = null;
 	public string? Title = null;
+	public bool TracingEnabled = false;
 	public bool? VSync = null;
 
 	public HostPreferences() { }

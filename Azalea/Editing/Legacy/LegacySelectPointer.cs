@@ -5,12 +5,11 @@ using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
-using Azalea.Platform;
 
-namespace Azalea.Debugging;
-public class DebugSelectPointer : Sprite
+namespace Azalea.Editing.Legacy;
+public class LegacySelectPointer : Sprite
 {
-	public DebugSelectPointer()
+	public LegacySelectPointer()
 	{
 		Texture = Assets.GetTexture("Textures/bullseye-pointer.png");
 		Color = Palette.Black;
@@ -22,7 +21,7 @@ public class DebugSelectPointer : Sprite
 		{
 			ClickAction = (_) => onSelectClicked()
 		};
-		GameHost.Main.Root.AddInternal(overlay);
+		Editor.Instance.Expanded.AddInternal(overlay);
 		return base.OnClick(e);
 	}
 

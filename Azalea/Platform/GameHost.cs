@@ -1,7 +1,8 @@
-﻿using Azalea.Debugging;
-using Azalea.Design.Containers;
+﻿using Azalea.Design.Containers;
 using Azalea.Design.Scenes;
+using Azalea.Editing;
 using Azalea.Extentions;
+using Azalea.Graphics;
 using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
 using Azalea.IO.Configs;
@@ -23,20 +24,18 @@ public abstract class GameHost
 	public IRenderer Renderer { get; }
 	public IAudioManager AudioManager { get; }
 	public IConfigProvider? ConfigProvider { get; protected set; }
-	public Composition Root { get; private set; }
 	public SceneContainer SceneManager { get; }
 	public PhysicsGenerator Physics { get; }
 	public IClipboard Clipboard { get; }
 
-	internal DebuggingOverlay? _editor;
-	private bool _editorEnabled;
+	private readonly Composition _root;
+	private readonly bool _editorEnabled;
+	internal EditorContainer? EditorContainer { get; private set; }
 
 	internal GameHost(HostPreferences prefs)
 	{
-		_main ??= this;
-
 		_editorEnabled = prefs.EditorEnabled;
-		Root = new Composition();
+		_main ??= this;
 
 		Window = CreateWindow(prefs);
 		Renderer = CreateRenderer(Window);
@@ -44,17 +43,22 @@ public abstract class GameHost
 		Clipboard = CreateClipboard();
 		Physics = new PhysicsGenerator();
 		SceneManager = new SceneContainer();
+
+		_root = new Composition();
 	}
 
 	public virtual void Run(AzaleaGame game)
 	{
-		if (_editorEnabled)
-			Root = Editor._overlay = _editor = new DebuggingOverlay();
+		GameObject rootObject = game;
 
-		Root.Add(game);
+		if (_editorEnabled)
+			rootObject = EditorContainer = new EditorContainer(game);
+
+		_root.Add(rootObject);
+
 		game.AddInternal(SceneManager);
 
-		Input.Initialize(Root);
+		Input.Initialize(_root);
 		Time.Setup();
 
 		RunGameLoop();
@@ -98,24 +102,24 @@ public abstract class GameHost
 		Renderer.BeginFrame();
 		if (Renderer.AutomaticallyClear) Renderer.Clear();
 
-		Root.Draw(Renderer);
+		_root.Draw(Renderer);
 
 		Renderer.FinishFrame();
 	}
 
 	public virtual void CallOnUpdate()
 	{
-		Root.Size = new Vector2(Window.ClientSize.X, Window.ClientSize.Y);
-		Root.Size = Vector2Extentions.ComponentMax(Vector2.One, Root.Size);
+		_root.Size = new Vector2(Window.ClientSize.X, Window.ClientSize.Y);
+		_root.Size = Vector2Extentions.ComponentMax(Vector2.One, _root.Size);
 
-		Root.UpdateSubTree();
+		_root.UpdateSubTree();
 
 		Input.LateUpdate();
 	}
 
 	public virtual void CallOnFixedUpdate()
 	{
-		Root.FixedUpdateSubTree();
+		_root.FixedUpdateSubTree();
 
 		Physics.Update();
 	}
@@ -127,7 +131,7 @@ public abstract class GameHost
 
 	public virtual DateTime GetCurrentTime() => Time.GetCurrentPreciseTime();
 
-	internal void CheckForbidden(object? preference, string errorMessage)
+	internal static void CheckForbidden(object? preference, string errorMessage)
 	{
 		if (preference is not null)
 			throw new ArgumentException(errorMessage);

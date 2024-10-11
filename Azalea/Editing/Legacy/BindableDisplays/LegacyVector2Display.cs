@@ -4,13 +4,13 @@ using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using System.Numerics;
 
-namespace Azalea.Debugging.BindableDisplays;
-internal class DebugVector2Display : DebugBindableDisplay<Vector2>
+namespace Azalea.Editing.Legacy.BindableDisplays;
+internal class LegacyVector2Display : LegacyBindableDisplay<Vector2>
 {
 	private BasicFloatTextBox _Xtextbox;
 	private BasicFloatTextBox _Ytextbox;
 
-	public DebugVector2Display(object obj, string propertyName)
+	public LegacyVector2Display(object obj, string propertyName)
 		: base(obj, propertyName)
 	{
 		AddElement(new FlexContainer()

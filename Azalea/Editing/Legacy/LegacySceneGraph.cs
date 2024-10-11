@@ -5,8 +5,8 @@ using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
 using System;
 
-namespace Azalea.Debugging;
-public class DebugSceneGraph : FlexContainer
+namespace Azalea.Editing.Legacy;
+public class LegacySceneGraph : FlexContainer
 {
 	private Checkbox _checkbox;
 	private FlexContainer _content;
@@ -14,11 +14,14 @@ public class DebugSceneGraph : FlexContainer
 	private GameObject _rootObject;
 	private int _childCount;
 
-	public DebugSceneGraph(GameObject rootObject)
+	public LegacySceneGraph(GameObject rootObject)
 	{
+		RelativeSizeAxes = Axes.X;
 		_rootObject = rootObject;
 		Wrapping = FlexWrapping.NoWrapping;
 		AutoSizeAxes = Axes.Y;
+
+		ObjectSelected += obj => Editor.InspectObject(obj);
 
 		//if (_rootObject is Composition)
 		//{
@@ -62,7 +65,7 @@ public class DebugSceneGraph : FlexContainer
 			{
 				foreach (var child in comp.InternalChildren)
 				{
-					var childGraph = new DebugSceneGraph(child);
+					var childGraph = new LegacySceneGraph(child);
 					childGraph.ObjectSelected += ObjectSelected!.Invoke;
 					_content.Add(childGraph);
 				}

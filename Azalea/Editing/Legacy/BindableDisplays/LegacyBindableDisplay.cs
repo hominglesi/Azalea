@@ -3,8 +3,8 @@ using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
 using System.Collections.Generic;
 
-namespace Azalea.Debugging.BindableDisplays;
-public abstract class DebugBindableDisplay<T> : FlexContainer
+namespace Azalea.Editing.Legacy.BindableDisplays;
+public abstract class LegacyBindableDisplay<T> : FlexContainer
 {
 	private readonly object _observedObject;
 	private readonly string _observedProperty;
@@ -12,7 +12,7 @@ public abstract class DebugBindableDisplay<T> : FlexContainer
 
 	private SpriteText _propertyNameText;
 
-	public DebugBindableDisplay(object obj, string propertyName)
+	public LegacyBindableDisplay(object obj, string propertyName)
 	{
 		Direction = FlexDirection.Vertical;
 		Wrapping = FlexWrapping.NoWrapping;

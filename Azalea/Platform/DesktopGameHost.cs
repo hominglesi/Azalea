@@ -1,4 +1,4 @@
-﻿using Azalea.Debugging;
+﻿using Azalea.Editing;
 using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.Rendering;
 using Azalea.IO.Configs;
@@ -23,6 +23,9 @@ internal class DesktopGameHost : GameHost
 
 		if (prefs.ConfigName is not null)
 			ConfigProvider = new FileConfigProvider(prefs.ConfigName);
+
+		if (prefs.TracingEnabled)
+			PerformanceTrace.Enabled = true;
 	}
 
 	public override void Run(AzaleaGame game)
@@ -43,7 +46,11 @@ internal class DesktopGameHost : GameHost
 
 		Window.Hide();
 
-		PerformanceTrace.SaveEventsTo("C:\\Programming\\trace.txt");
+		if (PerformanceTrace.Enabled)
+		{
+			using var traceStream = Assets.PersistentStore.GetOrCreateStream("trace.txt");
+			PerformanceTrace.SaveEventsTo(traceStream);
+		}
 
 		Window.Dispose();
 	}

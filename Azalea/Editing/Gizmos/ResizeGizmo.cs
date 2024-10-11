@@ -6,7 +6,7 @@ using Azalea.Graphics.Sprites;
 using Azalea.IO.Resources;
 using System.Numerics;
 
-namespace Azalea.Debugging.Gizmos;
+namespace Azalea.Editing.Gizmos;
 public class ResizeGizmo : Composition
 {
 	private const float __lineWidth = 4;

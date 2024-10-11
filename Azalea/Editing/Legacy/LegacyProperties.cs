@@ -1,14 +1,14 @@
-﻿using Azalea.Debugging.BindableDisplays;
-using Azalea.Design.Containers;
+﻿using Azalea.Design.Containers;
 using Azalea.Design.UserInterface;
+using Azalea.Editing.Legacy.BindableDisplays;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using System;
 using System.Reflection;
 
-namespace Azalea.Debugging;
-public class DebugProperties : FlexContainer
+namespace Azalea.Editing.Legacy;
+public class LegacyProperties : FlexContainer
 {
 	private GameObject _observedObject;
 
@@ -17,7 +17,7 @@ public class DebugProperties : FlexContainer
 
 	private Composition _propertiesContainer;
 
-	public DebugProperties()
+	public LegacyProperties()
 	{
 		Direction = FlexDirection.Vertical;
 		Wrapping = FlexWrapping.NoWrapping;
@@ -98,11 +98,11 @@ public class DebugProperties : FlexContainer
 	{
 		return property.PropertyType.Name switch
 		{
-			"String" => new DebugStringDisplay(_observedObject, property.Name),
-			"Single" => new DebugFloatDisplay(_observedObject, property.Name),
-			"Int32" => new DebugIntDisplay(_observedObject, property.Name),
-			"Vector2" => new DebugVector2Display(_observedObject, property.Name),
-			"Boundary" => new DebugBoundaryDisplay(_observedObject, property.Name),
+			"String" => new LegacyStringDisplay(_observedObject, property.Name),
+			"Single" => new LegacyFloatDisplay(_observedObject, property.Name),
+			"Int32" => new LegacyIntDisplay(_observedObject, property.Name),
+			"Vector2" => new LegacyVector2Display(_observedObject, property.Name),
+			"Boundary" => new LegacyBoundaryDisplay(_observedObject, property.Name),
 			_ => null
 		};
 	}

@@ -1,18 +1,19 @@
-﻿using Azalea.Debugging.Gizmos;
-using Azalea.Design.Containers;
+﻿using Azalea.Design.Containers;
+using Azalea.Editing.Gizmos;
 using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
 using Azalea.IO.Resources;
 
-namespace Azalea.Debugging;
-public class DebugTemplateEditor : Composition
+namespace Azalea.Editing.Views;
+public class TemplateEditor : Composition
 {
-	private readonly SpritePattern _background;
 	private readonly ResizeGizmo _resizeGizmo;
 
-	public DebugTemplateEditor()
+	public TemplateEditor()
 	{
-		AddInternal(_background = new SpritePattern()
+		RelativeSizeAxes = Axes.Both;
+
+		AddInternal(new SpritePattern()
 		{
 			Texture = Assets.GetTexture("Textures/pattern.png"),
 			RelativeSizeAxes = Axes.Both
@@ -29,7 +30,7 @@ public class DebugTemplateEditor : Composition
 		Clear();
 		Add(gameObject);
 
-		gameObject.Position = (DrawSize / 2) - (gameObject.DrawSize / 2);
+		gameObject.Position = DrawSize / 2 - gameObject.DrawSize / 2;
 
 		if (_resizeGizmo.Parent != this)
 			AddInternal(_resizeGizmo);

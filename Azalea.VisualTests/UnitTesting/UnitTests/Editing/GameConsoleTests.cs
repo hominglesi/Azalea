@@ -1,9 +1,9 @@
-﻿using Azalea.Debugging;
+﻿using Azalea.Editing;
 using Azalea.Inputs;
 using Azalea.Platform;
 using Azalea.Utils;
 
-namespace Azalea.VisualTests.UnitTesting.UnitTests.Debugging;
+namespace Azalea.VisualTests.UnitTesting.UnitTests.Editing;
 public class GameConsoleTests : UnitTestSuite
 {
 	public class FunctionalityTest : UnitTest
@@ -13,7 +13,7 @@ public class GameConsoleTests : UnitTestSuite
 			AddOperation("Press F9 key", () => InputUtils.SimulateKeyInput(Keys.F9));
 			AddOperation("Input 'fullscreen' command", () =>
 			{
-				Input.ChangeFocus(Editor.Overlay.DebugConsole);
+				Editor.FocusConsole();
 				InputUtils.SimulateCharInput("fullscreen");
 			});
 			AddOperation("Input enter", () => InputUtils.SimulateKeyInput(Keys.Enter));
@@ -22,7 +22,7 @@ public class GameConsoleTests : UnitTestSuite
 			AddOperation("Press F9 key", () => InputUtils.SimulateKeyInput(Keys.F9));
 			AddOperation("Execute 'restorewindow' command", () =>
 			{
-				Input.ChangeFocus(Editor.Overlay.DebugConsole);
+				Editor.FocusConsole();
 				InputUtils.SimulateCharInput("restorewindow");
 			});
 			AddOperation("Input enter", () => InputUtils.SimulateKeyInput(Keys.Enter));
@@ -32,7 +32,7 @@ public class GameConsoleTests : UnitTestSuite
 			AddOperation("Press F9 key", () => InputUtils.SimulateKeyInput(Keys.F9));
 			AddOperation("Execute 'windowtitle Lorem Ipsum' command", () =>
 			{
-				Input.ChangeFocus(Editor.Overlay.DebugConsole);
+				Editor.FocusConsole();
 				InputUtils.SimulateCharInput("windowtitle Lorem Ipsum");
 			});
 			AddOperation("Input enter", () => InputUtils.SimulateKeyInput(Keys.Enter));
@@ -48,11 +48,10 @@ public class GameConsoleTests : UnitTestSuite
 		public NewCommandTest()
 		{
 			_commandRan = false;
-
 			AddOperation("Add custom command",
-				() => Editor.Overlay.DebugConsole.AddCommand(_customCommand, args => _commandRan = true));
+				() => Editor.AddConsoleCommand(_customCommand, args => _commandRan = true));
 			AddOperation("Run custom command",
-				() => Editor.Overlay.DebugConsole.ExecuteQuery(_customCommand));
+				() => Editor.ExecuteConsoleQuery(_customCommand));
 			AddResult("Check if command was ran", () => _commandRan);
 		}
 
@@ -60,7 +59,7 @@ public class GameConsoleTests : UnitTestSuite
 		{
 			base.TearDown(scene);
 
-			Editor.Overlay.DebugConsole.RemoveCommand(_customCommand);
+			Editor.RemoveConsoleCommand(_customCommand);
 		}
 	}
 }

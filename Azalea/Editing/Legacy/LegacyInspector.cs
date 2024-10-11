@@ -1,14 +1,15 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
 
-namespace Azalea.Debugging;
-public class DebugInspector : FlexContainer
+namespace Azalea.Editing.Legacy;
+public class LegacyInspector : FlexContainer
 {
 	private GameObject? _observedObject;
 
-	private DebugProperties _properties;
+	private LegacySelectPointer _selectPointer;
+	private LegacyProperties _properties;
 
-	public DebugInspector()
+	public LegacyInspector()
 	{
 		Wrapping = FlexWrapping.NoWrapping;
 		Direction = FlexDirection.Vertical;
@@ -16,7 +17,8 @@ public class DebugInspector : FlexContainer
 		AutoSizeAxes = Axes.Y;
 		AddRange(new GameObject[]
 		{
-			_properties = new DebugProperties()
+			_selectPointer = new LegacySelectPointer(),
+			_properties = new LegacyProperties()
 			{
 				RelativeSizeAxes = Axes.X,
 			}

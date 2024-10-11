@@ -7,8 +7,8 @@ using Azalea.Inputs;
 using Azalea.Simulations.Colliders;
 using System.Numerics;
 
-namespace Azalea.Debugging;
-public class ColliderDebug : GameObject
+namespace Azalea.Editing.Legacy;
+public class LegacyColliderDebug : GameObject
 {
 	public bool IsShown { get; set; }
 	private bool _isToggled = false;
@@ -18,7 +18,7 @@ public class ColliderDebug : GameObject
 		if (Input.GetKey(Keys.W).Down && Input.GetKey(Keys.ControlLeft).Pressed && Input.GetKey(Keys.ShiftLeft).Pressed)
 			_isToggled = !_isToggled;
 
-		IsShown = _isToggled || (Input.GetKey(Keys.W).Pressed && Input.GetKey(Keys.ControlLeft).Pressed);
+		IsShown = _isToggled || Input.GetKey(Keys.W).Pressed && Input.GetKey(Keys.ControlLeft).Pressed;
 	}
 
 	public override void Draw(IRenderer renderer)

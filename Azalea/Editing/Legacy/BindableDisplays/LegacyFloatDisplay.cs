@@ -2,12 +2,12 @@
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 
-namespace Azalea.Debugging.BindableDisplays;
-internal class DebugFloatDisplay : DebugBindableDisplay<float>
+namespace Azalea.Editing.Legacy.BindableDisplays;
+internal class LegacyFloatDisplay : LegacyBindableDisplay<float>
 {
 	private BasicFloatTextBox _textbox;
 
-	public DebugFloatDisplay(object obj, string propertyName)
+	public LegacyFloatDisplay(object obj, string propertyName)
 		: base(obj, propertyName)
 	{
 		AddElement(_textbox = new BasicFloatTextBox()

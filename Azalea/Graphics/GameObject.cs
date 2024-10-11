@@ -1,7 +1,7 @@
 ﻿using Azalea.Amends;
-using Azalea.Debugging;
 using Azalea.Design.Components;
 using Azalea.Design.Containers;
+using Azalea.Editing.Legacy;
 using Azalea.Extentions;
 using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics.Colors;

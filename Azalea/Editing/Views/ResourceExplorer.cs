@@ -1,6 +1,6 @@
-﻿using Azalea.Debugging.Design;
-using Azalea.Design.Containers;
+﻿using Azalea.Design.Containers;
 using Azalea.Design.UserInterface;
+using Azalea.Editing.Design;
 using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.Textures;
@@ -10,11 +10,13 @@ using Azalea.Utils;
 using System;
 using System.IO;
 
-namespace Azalea.Debugging;
+namespace Azalea.Editing.Views;
 public class ResourceExplorer : ScrollableContainer
 {
 	public ResourceExplorer()
 	{
+		RelativeSizeAxes = Axes.Both;
+
 		if (Assets.ReflectedStoreExists == false)
 		{
 			Add(new SpriteText()
@@ -36,7 +38,7 @@ public class ResourceExplorer : ScrollableContainer
 		});
 	}
 
-	protected override Slider CreateSlider() => new DebugScrollbar();
+	protected override Slider CreateSlider() => new EditorScrollbar();
 
 	private class DirectoryContainer : FlexContainer
 	{
@@ -93,8 +95,8 @@ public class ResourceExplorer : ScrollableContainer
 					{
 						using var reader = new StreamReader(path);
 
-						Editor.Overlay.FocusTemplateEditor();
-						Editor.Overlay.TemplateEditor.InspectObject(TemplateConverter.Parse(reader.ReadToEnd()));
+						Editor.FocusTemplateEditor();
+						Editor.InspectTemplate(TemplateConverter.Parse(reader.ReadToEnd()));
 					};
 					break;
 			}

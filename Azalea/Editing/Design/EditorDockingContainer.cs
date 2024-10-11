@@ -6,28 +6,30 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs.Events;
 
-namespace Azalea.Debugging.Design;
-public class DebugDockingContainer : BasicDockingContainer
+namespace Azalea.Editing.Design;
+internal class EditorDockingContainer : BasicDockingContainer
 {
 	private static Color __navigationColor = new(30);
 	private static Color __focusedColor = Palette.Gray;
 	private static Color __hoverColor = new(90);
 
-	public DebugDockingContainer()
+	public EditorDockingContainer(Boundary padding, bool backgroundHidden = false)
 	{
+		ContentBackground.Color = new Color(100);
+		ContentBackground.Alpha = backgroundHidden ? 0 : 1;
 		NavigationBackground.Color = __navigationColor;
-		ContentPadding = new(0);
+		ContentPadding = padding;
 		NavigationHeight = 22;
 	}
 
 	protected override GameObject CreateNavigationTab(string name, bool focused)
-		=> new DebugDockingContainerTab(name, focused, NavigationHeight);
+		=> new EditorDockingContainerTab(name, focused, NavigationHeight);
 
-	protected class DebugDockingContainerTab : Composition
+	protected class EditorDockingContainerTab : Composition
 	{
 		private const float __animationSpeed = 0.1f;
 		private readonly bool _focused;
-		public DebugDockingContainerTab(string title, bool focused, float heigth)
+		public EditorDockingContainerTab(string title, bool focused, float heigth)
 		{
 			_focused = focused;
 

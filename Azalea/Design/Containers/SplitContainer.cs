@@ -19,7 +19,6 @@ public class SplitContainer : Composition
 		_secondObject = secondObject;
 
 		SplitLine = CreateSplitLine();
-		//SplitLine.PositionChanged += updateLayout;
 
 		AddRange(new GameObject[] { _firstObject, _secondObject, SplitLine });
 	}

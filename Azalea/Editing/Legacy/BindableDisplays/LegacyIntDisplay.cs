@@ -2,12 +2,12 @@
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 
-namespace Azalea.Debugging.BindableDisplays;
-internal class DebugIntDisplay : DebugBindableDisplay<int>
+namespace Azalea.Editing.Legacy.BindableDisplays;
+internal class LegacyIntDisplay : LegacyBindableDisplay<int>
 {
 	private BasicIntTextBox _textbox;
 
-	public DebugIntDisplay(object obj, string propertyName)
+	public LegacyIntDisplay(object obj, string propertyName)
 		: base(obj, propertyName)
 	{
 		AddElement(_textbox = new BasicIntTextBox()

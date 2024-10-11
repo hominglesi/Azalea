@@ -5,9 +5,21 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using System.Numerics;
 
-namespace Azalea.Debugging;
-public class DebugDisplayValues : FlexContainer
+namespace Azalea.Editing;
+internal class DisplayValues : FlexContainer
 {
+	internal DisplayValues()
+	{
+		Origin = Anchor.BottomLeft;
+		Anchor = Anchor.BottomLeft;
+		Direction = FlexDirection.VerticalReverse;
+		RelativeSizeAxes = Axes.Both;
+		Wrapping = FlexWrapping.Wrap;
+		Position = new(5, -5);
+		Spacing = new(5);
+		Depth = -1000;
+	}
+
 	public void AddDisplayedValue(string name, DisplayedValueDelegate getValue)
 		=> Add(new DisplayedValue(name, getValue));
 

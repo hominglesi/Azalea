@@ -3,15 +3,15 @@ using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 
-namespace Azalea.Debugging.BindableDisplays;
-public class DebugBoundaryDisplay : DebugBindableDisplay<Boundary>
+namespace Azalea.Editing.Legacy.BindableDisplays;
+public class LegacyBoundaryDisplay : LegacyBindableDisplay<Boundary>
 {
 	private BasicFloatTextBox _TopTextbox;
 	private BasicFloatTextBox _RightTextbox;
 	private BasicFloatTextBox _BottomTextbox;
 	private BasicFloatTextBox _LeftTextbox;
 
-	public DebugBoundaryDisplay(object obj, string propertyName)
+	public LegacyBoundaryDisplay(object obj, string propertyName)
 		: base(obj, propertyName)
 	{
 		AddElement(new FlexContainer()

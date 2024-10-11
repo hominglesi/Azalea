@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 
-namespace Azalea.Debugging;
+namespace Azalea.Editing;
 public static class PerformanceTrace
 {
-	public static bool Enabled { get; set; } = false;
+	internal static bool Enabled { get; set; } = false;
 
 	private static readonly long _startTime;
 	private static readonly List<TraceEvent> _events;
@@ -59,13 +59,14 @@ public static class PerformanceTrace
 		AddEvent(start, name);
 	}
 
-
-	public static void SaveEventsTo(string path)
+	internal static void SaveEventsTo(Stream stream)
 	{
 		if (Enabled == false) return;
 
 		var json = JsonSerializer.Serialize(_events);
-		File.WriteAllText(path, json);
+
+		using StreamWriter writer = new(stream);
+		writer.Write(json);
 	}
 
 	private struct TraceEvent

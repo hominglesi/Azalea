@@ -11,13 +11,13 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace Azalea.Debugging;
-public class DebugConsole : TextBox
+namespace Azalea.Editing;
+public class EditorConsole : TextBox
 {
 	private Dictionary<string, ConsoleCommandDelegate> _commands = new();
 	private Box _carat;
 
-	public DebugConsole()
+	public EditorConsole()
 	{
 		RelativeSizeAxes = Axes.X;
 		Size = new(1, 20);
