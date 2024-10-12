@@ -6,5 +6,5 @@ public interface IResourceStore
 {
 	Stream? GetStream(string path);
 
-	IEnumerable<string> GetAvalibleResources();
+	IEnumerable<(string, bool)> GetAvalibleResources(string subPath = "");
 }

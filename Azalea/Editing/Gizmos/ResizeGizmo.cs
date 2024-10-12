@@ -134,7 +134,7 @@ public class ResizeGizmo : Composition
 		{
 			Add(_sprite = new Sprite()
 			{
-				Texture = Assets.GetTexture("Textures/resizeNode.png")
+				Texture = Assets.GetTexture("Textures/resize-node.png")
 			});
 
 			Size = _sprite.Size;

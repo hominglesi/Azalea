@@ -188,6 +188,8 @@ public static class Input
 		{
 			obj.TriggerEvent(new ScrollEvent(delta));
 		}
+
+		PerformanceTrace.RunAndTrace(updateHoveredObjects, "Hover Update");
 	}
 
 	/// <summary>

@@ -45,7 +45,9 @@ public class Storage : IResourceStore
 			File.Delete(_path + path);
 	}
 
-	public IEnumerable<string> GetContainedResources(string subPath = "")
+	private readonly static char[] _directorySeperators = new char[] { '/', '\\' };
+
+	public IEnumerable<(string, bool)> GetAvalibleResources(string subPath = "")
 	{
 		var path = FileSystemUtils.CombinePaths(_path, subPath);
 
@@ -53,14 +55,12 @@ public class Storage : IResourceStore
 		var directories = Directory.GetDirectories(path);
 
 		foreach (var directory in directories)
-			yield return directory;
+		{
+			var lastSlash = directory.LastIndexOfAny(_directorySeperators) + 1;
+			yield return (directory[lastSlash..], true);
+		}
 
 		foreach (var file in files)
-			yield return file;
-	}
-
-	public IEnumerable<string> GetAvalibleResources()
-	{
-		return GetContainedResources();
+			yield return (Path.GetFileName(file), false);
 	}
 }

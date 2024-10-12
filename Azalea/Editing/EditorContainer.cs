@@ -6,6 +6,7 @@ using Azalea.Editing.Views;
 using Azalea.Graphics;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
+using Azalea.IO.Resources;
 using Azalea.Platform;
 
 namespace Azalea.Editing;
@@ -118,7 +119,13 @@ public class EditorContainer : Composition
 			});
 			_mainDocker.AddDockable("Template Editor", TemplateEditor = new TemplateEditor());
 
-			_bottomDocker.AddDockable("Resource Explorer", new ResourceExplorer());
+			_bottomDocker.AddDockable("Game Resources", new EditorExplorer(Assets.MainStore));
+
+			if (Assets.PersistentStoreExists)
+				_bottomDocker.AddDockable("Persistent Resources", new EditorExplorer(Assets.PersistentStore));
+
+			if (Assets.ReflectedStoreExists)
+				_bottomDocker.AddDockable("Reflected Resources", new EditorExplorer(Assets.ReflectedStore));
 
 			_sideTopDocker.AddDockable("Inspector", LegacyInspector = new LegacyInspector());
 			LegacyInspector.SetObservedObject(this);

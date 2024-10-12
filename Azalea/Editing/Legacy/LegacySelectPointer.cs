@@ -5,6 +5,7 @@ using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
+using Azalea.Utils;
 
 namespace Azalea.Editing.Legacy;
 public class LegacySelectPointer : Sprite
@@ -32,6 +33,10 @@ public class LegacySelectPointer : Sprite
 		for (int i = 0; i < hoveredObjects.Count; i++)
 		{
 			var hoveredObject = hoveredObjects[i];
+
+			if (hoveredObject.HasAttribute<SelectPointerIgnoredAttribute>())
+				continue;
+
 			if (hoveredObject.Parent is not null)
 			{
 				Editor.InspectObject(hoveredObject);

@@ -26,22 +26,47 @@ public class EmbeddedResourceStore : IResourceStore
 
 	private string getResourcePath(string path)
 	{
-		//We need to convert 
-		//     Textures/Backgrounds/night-sky.png
-		//to   Assembly.Texture.Backgrounds.night-sky.png
+		// We need to convert 
+		//    Textures/Backgrounds/night-sky.png
+		// to Assembly.Texture.Backgrounds.night-sky.png
 
 		var split = path.Split('/');
 
 		return $"{_prefix}.{string.Join('.', split)}";
 	}
 
-	public IEnumerable<string> GetAvalibleResources()
+	public IEnumerable<(string, bool)> GetAvalibleResources(string subPath = "")
 	{
-		foreach (var item in _assembly.GetManifestResourceNames())
-			yield return getDirectoryPath(item);
+		List<string> directories = new();
+
+		foreach (var resourceName in _assembly.GetManifestResourceNames())
+		{
+			var resourcePath = convertResourcePath(resourceName);
+
+			if (subPath.Length > 0 && resourcePath.StartsWith(subPath) == false)
+				continue;
+
+			resourcePath = resourcePath[subPath.Length..];
+
+			var slashIndex = resourcePath.IndexOf('/');
+			if (slashIndex != -1)
+			{
+				var directory = resourcePath[0..slashIndex];
+
+				if (directories.Contains(directory))
+					continue;
+
+				directories.Add(directory);
+
+				yield return (directory, true);
+				continue;
+			}
+
+			yield return (resourcePath, false);
+		}
 	}
 
-	private string getDirectoryPath(string path)
+	private string convertResourcePath(string path)
 	{
 		if (path.StartsWith(_prefix))
 			path = path[(_prefix.Length + 1)..];

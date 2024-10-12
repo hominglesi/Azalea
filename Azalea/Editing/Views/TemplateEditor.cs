@@ -15,7 +15,7 @@ public class TemplateEditor : Composition
 
 		AddInternal(new SpritePattern()
 		{
-			Texture = Assets.GetTexture("Textures/pattern.png"),
+			Texture = Assets.GetTexture("Textures/background-pattern.png"),
 			RelativeSizeAxes = Axes.Both
 		});
 

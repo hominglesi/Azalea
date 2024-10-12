@@ -48,7 +48,6 @@ public class BasicDockingContainer : DockingContainer
 		AddInternal(NavigationBackground = new Box()
 		{
 			Color = Palette.Black,
-			Depth = 1000
 		});
 
 		AddInternal(NavigationContainer = new FlexContainer());
