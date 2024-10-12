@@ -1,5 +1,5 @@
-﻿using Azalea.Debugging;
-using Azalea.Design.Containers;
+﻿using Azalea.Design.Containers;
+using Azalea.Editing;
 using Azalea.Graphics;
 using Azalea.Inputs.Events;
 using System;
@@ -188,6 +188,8 @@ public static class Input
 		{
 			obj.TriggerEvent(new ScrollEvent(delta));
 		}
+
+		PerformanceTrace.RunAndTrace(updateHoveredObjects, "Hover Update");
 	}
 
 	/// <summary>

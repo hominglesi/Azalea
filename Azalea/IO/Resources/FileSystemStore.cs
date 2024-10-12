@@ -10,7 +10,7 @@ public class FileSystemStore : IResourceStore
 		return File.OpenRead(path);
 	}
 
-	public IEnumerable<string> GetAvalibleResources()
+	public IEnumerable<(string, bool)> GetAvalibleResources(string subPath = "")
 	{
 		throw new Exception("Cannot list all file system resources");
 	}

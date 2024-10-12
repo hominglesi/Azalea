@@ -23,10 +23,10 @@ public class ResourceStoreContainer : IResourceStore
 		return null;
 	}
 
-	public IEnumerable<string> GetAvalibleResources()
+	public IEnumerable<(string, bool)> GetAvalibleResources(string subPath = "")
 	{
 		foreach (var store in _stores)
-			foreach (var resource in store.GetAvalibleResources())
+			foreach (var resource in store.GetAvalibleResources(subPath))
 				yield return resource;
 	}
 }

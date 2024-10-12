@@ -1,5 +1,6 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.OpenGL;
+using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Inputs;
 using Azalea.Utils;
 using System;
@@ -60,18 +61,93 @@ internal class Win32Window : PlatformWindow
 		//Setup OpenGL
 		_deviceContext = WinAPI.GetDC(_window);
 
-		var pfDescriptor = new PixelFormatDescriptor();
-		var format = WinAPI.ChoosePixelFormat(_deviceContext, ref pfDescriptor);
+		initializeOpenGL();
 
-		WinAPI.SetPixelFormat(_deviceContext, format, ref pfDescriptor);
+		var pixelFormatAttribs = new int[]
+		{
+			(int)WGLAttribute.DrawToWindow, 1,
+			(int)WGLAttribute.SupportOpenGL, 1,
+			(int)WGLAttribute.DoubleBuffer, 1,
+			(int)WGLAttribute.Acceleration, (int)WGLAttribute.FullAcceleration,
+			(int)WGLAttribute.PixelType, (int)WGLAttribute.TypeRGBA,
+			(int)WGLAttribute.ColorBits, 32,
+			(int)WGLAttribute.DepthBits, 24,
+			(int)WGLAttribute.StencilBits, 8,
+			0
+		};
 
-		var glContext = GL.CreateContext(_deviceContext);
+		int pixelFormat = 0;
+		uint formatCount = 0;
+		GL.ChoosePixelFormatARB(_deviceContext, ref pixelFormatAttribs[0], IntPtr.Zero, 1, ref pixelFormat, ref formatCount);
+
+		PixelFormatDescriptor pixelFormatDescriptor = default;
+		_ = WinAPI.DescribePixelFormat(_deviceContext, pixelFormat, (uint)Marshal.SizeOf<PixelFormatDescriptor>(), ref pixelFormatDescriptor);
+		WinAPI.SetPixelFormat(_deviceContext, pixelFormat, ref pixelFormatDescriptor);
+
+		var openGLAttribs = new int[]
+		{
+			(int)WGLAttribute.ContextMajorVersion, 3,
+			(int)WGLAttribute.ContextMinorVersion, 3,
+			(int)WGLAttribute.ContextProfileMask, (int)WGLAttribute.ContextCoreProfileBit,
+			0
+		};
+
+		var glContext = GL.CreateContextAttribsARB(_deviceContext, false, ref openGLAttribs[0]);
 		GL.MakeCurrent(_deviceContext, glContext);
-		GL.ImportFunctions();
 
 		//Sync values with PlatformWindow
 		var windowSize = WinAPI.GetWindowRect(_window).Size;
 		UpdateSize(windowSize, clientSize);
+	}
+
+	private void initializeOpenGL()
+	{
+		// We need to create a dummy window to be able to load its drawing context functions
+		// because we need them when creating the real drawing context
+
+		var processHandle = System.Diagnostics.Process.GetCurrentProcess().Handle;
+
+		var dummywindowClass = new WindowClass("Dummy Window", processHandle, _windowProcedure)
+		{
+			Style = ClassStyles.HorizontalReDraw | ClassStyles.VerticalReDraw | ClassStyles.OwnDC
+		};
+
+		var atom = WinAPI.RegisterClass(ref dummywindowClass);
+		var dummyWindow = WinAPI.CreateWindow(
+			0,
+			atom,
+			"Dummy Window",
+			0,
+			(unchecked((int)0x80000000)), //CW_USEDEFAULT
+			(unchecked((int)0x80000000)), //CW_USEDEFAULT
+			(unchecked((int)0x80000000)), //CW_USEDEFAULT
+			(unchecked((int)0x80000000)), //CW_USEDEFAULT
+			IntPtr.Zero,
+			IntPtr.Zero,
+			processHandle,
+			IntPtr.Zero);
+
+		if (_window == IntPtr.Zero)
+		{
+			Console.WriteLine($"Could not create dummy window. (Error {Marshal.GetLastWin32Error()})");
+			return;
+		}
+
+		var dummyDC = WinAPI.GetDC(dummyWindow);
+		var pfDescriptor = new PixelFormatDescriptor();
+		var pixelFormat = WinAPI.ChoosePixelFormat(dummyDC, ref pfDescriptor);
+
+		WinAPI.SetPixelFormat(dummyDC, pixelFormat, ref pfDescriptor);
+
+		var dummyContext = GL.CreateContext(dummyDC);
+		GL.MakeCurrent(dummyDC, dummyContext);
+
+		GL.ImportFunctions();
+
+		GL.MakeCurrent(dummyDC, IntPtr.Zero);
+		GL.DeleteContext(dummyContext);
+		WinAPI.ReleaseDC(dummyWindow, dummyDC);
+		WinAPI.DestroyWindow(dummyWindow);
 	}
 
 	private IntPtr windowProcedure(IntPtr window, uint message, IntPtr wParam, IntPtr lParam)

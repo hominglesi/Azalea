@@ -14,6 +14,9 @@ internal static unsafe class GL
 	[DllImport(LibraryPath, EntryPoint = "wglCreateContext")]
 	public static extern IntPtr CreateContext(IntPtr deviceContext);
 
+	[DllImport(LibraryPath, EntryPoint = "wglDeleteContext")]
+	public static extern bool DeleteContext(IntPtr context);
+
 	[DllImport(LibraryPath, EntryPoint = "wglMakeCurrent")]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool MakeCurrent(IntPtr deviceContext, IntPtr glContext);
@@ -347,6 +350,20 @@ internal static unsafe class GL
 		_glDeleteVertexArrays!(1, &vertexArray);
 	}
 
+	private delegate bool ChoosePixelFormatARBDelegate(IntPtr deviceContext, ref int attributeIntList, IntPtr attributeFloatList, uint maxFormats, [In, Out] ref int formats, [In, Out] ref uint formatCount);
+	private static ChoosePixelFormatARBDelegate? _wglChoosePixelFormatARB;
+	public static bool ChoosePixelFormatARB(IntPtr deviceContext, ref int attributeIntList, IntPtr attributeFloatList, uint maxFormats, [In, Out] ref int formats, [In, Out] ref uint formatCount)
+	{
+		return _wglChoosePixelFormatARB!(deviceContext, ref attributeIntList, attributeFloatList, maxFormats, ref formats, ref formatCount);
+	}
+
+	private delegate IntPtr CreateContextAttribsARBDelegate(IntPtr deviceContext, bool shareContext, [In] ref int attributeList);
+	private static CreateContextAttribsARBDelegate? _wglCreateContextAttribsARB;
+	public static IntPtr CreateContextAttribsARB(IntPtr deviceContext, bool shareContext, [In] ref int attributeList)
+	{
+		return _wglCreateContextAttribsARB!(deviceContext, shareContext, ref attributeList);
+	}
+
 	public static void ImportFunctions()
 	{
 		_wglSwapInterval = Marshal.GetDelegateForFunctionPointer<SwapIntervalDelegate>(wglGetProcAddress("wglSwapIntervalEXT"));
@@ -380,6 +397,8 @@ internal static unsafe class GL
 		_glDeleteVertexArrays = Marshal.GetDelegateForFunctionPointer<DeleteVertexArrays>(wglGetProcAddress("glDeleteVertexArrays"));
 		_glActiveTexture = Marshal.GetDelegateForFunctionPointer<GLTextureSlotDelegate>(wglGetProcAddress("glActiveTexture"));
 		_glGenerateMipmap = Marshal.GetDelegateForFunctionPointer<GLTextureTypeDelegate>(wglGetProcAddress("glGenerateMipmap"));
+		_wglChoosePixelFormatARB = Marshal.GetDelegateForFunctionPointer<ChoosePixelFormatARBDelegate>(wglGetProcAddress("wglChoosePixelFormatARB"));
+		_wglCreateContextAttribsARB = Marshal.GetDelegateForFunctionPointer<CreateContextAttribsARBDelegate>(wglGetProcAddress("wglCreateContextAttribsARB"));
 	}
 
 	#endregion

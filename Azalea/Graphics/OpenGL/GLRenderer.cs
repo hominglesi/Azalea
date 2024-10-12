@@ -1,4 +1,4 @@
-﻿using Azalea.Debugging;
+﻿using Azalea.Editing;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.OpenGL.Batches;
 using Azalea.Graphics.OpenGL.Enums;

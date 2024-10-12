@@ -1,5 +1,6 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
+using System;
 using System.Collections.Generic;
 
 namespace Azalea.Design.Docking;
@@ -43,6 +44,20 @@ public abstract class DockingContainer : ContentContainer
 		FocusedDockable = dockable;
 
 		UpdateDockablesNavigation();
+	}
+
+	public void FocusContent(GameObject content)
+	{
+		foreach (var dockable in Dockables)
+		{
+			if (dockable.Content == content)
+			{
+				FocusDockable(dockable);
+				return;
+			}
+		}
+
+		throw new InvalidOperationException("Cannot focus content that is not already part of this docking container");
 	}
 
 	protected class Dockable

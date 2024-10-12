@@ -4,7 +4,6 @@ using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 namespace SampleGame.Elements;
 
@@ -15,7 +14,11 @@ public class ImagePool
 	public ImagePool(IResourceStore tilesStore)
 	{
 		_store = tilesStore;
-		_images = tilesStore.GetAvalibleResources().ToArray();
+		List<string> images = new();
+		foreach (var (resource, _) in tilesStore.GetAvalibleResources())
+			images.Add(resource);
+
+		_images = images.ToArray();
 	}
 
 	public List<Texture> GenerateTiles(int count)

@@ -13,8 +13,10 @@ public class WebHost : GameHost
 	internal WebHost(HostPreferences prefs)
 		: base(prefs)
 	{
-		CheckForbidden(prefs.PersistentDirectory, "Cannot setup persistent directory when running on the web.");
 		CheckForbidden(prefs.ConfigName, "Config is automatically set up when running on the web.");
+		CheckForbidden(prefs.PersistentDirectory, "Cannot setup persistent directory when running on the web.");
+		CheckForbidden(prefs.ReflectedDirectory, "Cannot setup reflected directory when running on the web.");
+		CheckForbidden(prefs.TracingEnabled, "Config is automatically set up when running on the web.");
 
 		ConfigProvider = new WebConfigProvider();
 

@@ -1,7 +1,8 @@
-﻿using Azalea.Debugging;
-using Azalea.Design.Containers;
+﻿using Azalea.Design.Containers;
 using Azalea.Design.Scenes;
+using Azalea.Editing;
 using Azalea.Extentions;
+using Azalea.Graphics;
 using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
 using Azalea.IO.Configs;
@@ -14,6 +15,8 @@ namespace Azalea.Platform;
 
 public abstract class GameHost
 {
+	private const float __fixedUpdateFrametime = 1f / 60;
+
 	public static GameHost Main => _main ?? throw new Exception("GameHost hasn't been created yet.");
 	private static GameHost? _main;
 
@@ -21,20 +24,18 @@ public abstract class GameHost
 	public IRenderer Renderer { get; }
 	public IAudioManager AudioManager { get; }
 	public IConfigProvider? ConfigProvider { get; protected set; }
-	public Composition Root { get; private set; }
 	public SceneContainer SceneManager { get; }
 	public PhysicsGenerator Physics { get; }
 	public IClipboard Clipboard { get; }
 
-	internal DebuggingOverlay? _editor;
-	private bool _editorEnabled;
+	private readonly Composition _root;
+	private readonly bool _editorEnabled;
+	internal EditorContainer? EditorContainer { get; private set; }
 
 	internal GameHost(HostPreferences prefs)
 	{
-		_main ??= this;
-
 		_editorEnabled = prefs.EditorEnabled;
-		Root = new Composition();
+		_main ??= this;
 
 		Window = CreateWindow(prefs);
 		Renderer = CreateRenderer(Window);
@@ -42,61 +43,56 @@ public abstract class GameHost
 		Clipboard = CreateClipboard();
 		Physics = new PhysicsGenerator();
 		SceneManager = new SceneContainer();
+
+		_root = new Composition();
 	}
 
 	public virtual void Run(AzaleaGame game)
 	{
-		if (_editorEnabled)
-			Root = Editor._overlay = _editor = new DebuggingOverlay();
+		GameObject rootObject = game;
 
-		Root.Add(game);
+		if (_editorEnabled)
+			rootObject = EditorContainer = new EditorContainer(game);
+
+		_root.Add(rootObject);
+
 		game.AddInternal(SceneManager);
 
-		Input.Initialize(Root);
-
-		_lastFrameTime = GetCurrentTime();
+		Input.Initialize(_root);
+		Time.Setup();
 
 		RunGameLoop();
 	}
 
-	private float _accumulator = 0;
-	private float _targetFrameTime = 1 / (float)60;
-	private DateTime _lastFrameTime;
-	private DateTime _frameTime;
-	private float _deltaTime;
-	private bool _firstWindowShow = false;
+	private bool _firstWindowShown = false;
 
 	protected abstract void RunGameLoop();
 
 	private long _frameStart;
+	private float _accumulator;
 	protected virtual void ProcessGameLoop()
 	{
 		_frameStart = PerformanceTrace.StartEvent();
 
-		_frameTime = GetCurrentTime();
-		_deltaTime = (float)_frameTime.Subtract(_lastFrameTime).TotalSeconds;
-		_lastFrameTime = _frameTime;
+		Time.UpdateDeltaTime();
+		_accumulator += Time.DeltaTime;
 
-		Time.Update(_deltaTime);
+		Window.ProcessEvents();
 
-		_accumulator += _deltaTime;
-
-		while (_accumulator >= _targetFrameTime)
+		while (_accumulator >= __fixedUpdateFrametime)
 		{
 			PerformanceTrace.RunAndTrace(CallOnFixedUpdate, "FixedUpdate");
-			_accumulator -= _targetFrameTime;
+			_accumulator -= __fixedUpdateFrametime;
 		}
 
 		PerformanceTrace.RunAndTrace(CallOnUpdate, "Update");
 		PerformanceTrace.RunAndTrace(CallOnRender, "Render");
 
-		if (_firstWindowShow == false)
+		if (_firstWindowShown == false)
 		{
 			Window.Show(true);
-			_firstWindowShow = true;
+			_firstWindowShown = true;
 		}
-
-		Window.ProcessEvents();
 
 		PerformanceTrace.AddEvent(_frameStart, "Frame");
 	}
@@ -106,24 +102,24 @@ public abstract class GameHost
 		Renderer.BeginFrame();
 		if (Renderer.AutomaticallyClear) Renderer.Clear();
 
-		Root.Draw(Renderer);
+		_root.Draw(Renderer);
 
 		Renderer.FinishFrame();
 	}
 
 	public virtual void CallOnUpdate()
 	{
-		Root.Size = new Vector2(Window.ClientSize.X, Window.ClientSize.Y);
-		Root.Size = Vector2Extentions.ComponentMax(Vector2.One, Root.Size);
+		_root.Size = new Vector2(Window.ClientSize.X, Window.ClientSize.Y);
+		_root.Size = Vector2Extentions.ComponentMax(Vector2.One, _root.Size);
 
-		Root.UpdateSubTree();
+		_root.UpdateSubTree();
 
 		Input.LateUpdate();
 	}
 
 	public virtual void CallOnFixedUpdate()
 	{
-		Root.FixedUpdateSubTree();
+		_root.FixedUpdateSubTree();
 
 		Physics.Update();
 	}
@@ -135,7 +131,7 @@ public abstract class GameHost
 
 	public virtual DateTime GetCurrentTime() => Time.GetCurrentPreciseTime();
 
-	internal void CheckForbidden(object? preference, string errorMessage)
+	internal static void CheckForbidden(object? preference, string errorMessage)
 	{
 		if (preference is not null)
 			throw new ArgumentException(errorMessage);

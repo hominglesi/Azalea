@@ -1,0 +1,4 @@
+<Azalea.Design.Containers.Composition Width="250" Height="250">
+	<Azalea.Design.Shapes.Box RelativeSizeAxes="Both" Color="#2360c2" />
+	<Azalea.Graphics.Sprites.Sprite RelativeSizeAxes="Both" Texture="Textures/azalea-icon.png" />
+</Azalea.Design.Containers.Composition>

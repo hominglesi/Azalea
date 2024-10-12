@@ -48,7 +48,6 @@ public class BasicDockingContainer : DockingContainer
 		AddInternal(NavigationBackground = new Box()
 		{
 			Color = Palette.Black,
-			Depth = 1000
 		});
 
 		AddInternal(NavigationContainer = new FlexContainer());
@@ -94,22 +93,8 @@ public class BasicDockingContainer : DockingContainer
 		}
 	}
 
-	protected GameObject CreateNavigationTab(string name, bool focused)
-	{
-		var title = new SpriteText()
-		{
-			Text = name,
-			Anchor = Anchor.Center,
-			Origin = Anchor.Center,
-		};
-
-		return new Composition()
-		{
-			Size = new(title.Width + 20, _navigationHeight),
-			BackgroundColor = focused ? Palette.Gray : Palette.Black,
-			Child = title
-		};
-	}
+	protected virtual GameObject CreateNavigationTab(string name, bool focused)
+		=> new BasicDockingContainerTab(name, focused, NavigationHeight);
 
 	protected override void UpdateContentLayout()
 	{
@@ -128,4 +113,21 @@ public class BasicDockingContainer : DockingContainer
 
 	public override void Add(GameObject gameObject)
 		=> throw new InvalidOperationException("Cannot add children directly to a DockingContainer");
+
+	protected class BasicDockingContainerTab : Composition
+	{
+		public BasicDockingContainerTab(string title, bool focused, float heigth)
+		{
+			var titleText = new SpriteText()
+			{
+				Text = title,
+				Anchor = Anchor.Center,
+				Origin = Anchor.Center,
+			};
+
+			Size = new(titleText.Width + 20, heigth);
+			BackgroundColor = focused ? Palette.Gray : Palette.Black;
+			Add(titleText);
+		}
+	}
 }

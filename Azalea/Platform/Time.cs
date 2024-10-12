@@ -22,14 +22,22 @@ public static class Time
 	public static float TimeSinceStart => _timeSinceStart;
 	public static int FpsCount => _lastFpsCount;
 
-	internal static void Update(float deltaTime)
+	private static DateTime _lastFrameTimestamp;
+	internal static void Setup()
 	{
-		_deltaTime = deltaTime;
+		_lastFrameTimestamp = GetCurrentPreciseTime();
+	}
+
+	internal static void UpdateDeltaTime()
+	{
+		var frameTimestamp = GetCurrentPreciseTime();
+		_deltaTime = (float)frameTimestamp.Subtract(_lastFrameTimestamp).TotalSeconds;
+		_lastFrameTimestamp = frameTimestamp;
 
 		_framesSinceStart++;
 		_framesSinceFpsInterval++;
-		_timeSinceStart += deltaTime;
-		_timeSinceFpsInterval += deltaTime;
+		_timeSinceStart += _deltaTime;
+		_timeSinceFpsInterval += _deltaTime;
 
 		if (_timeSinceStart > _nextFpsInterval)
 		{

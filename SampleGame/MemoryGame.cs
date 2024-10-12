@@ -6,7 +6,6 @@ using Azalea.Inputs;
 using Azalea.IO.Resources;
 using Azalea.Platform;
 using SampleGame.Elements;
-using System;
 using System.Numerics;
 
 namespace SampleGame;
@@ -28,10 +27,6 @@ public class MemoryGame : AzaleaGame
 
 		Assets.AddToMainStore(assemblyStore);
 		_tilesStore = new NamespacedResourceStore(assemblyStore, "Textures/Tiles");
-		foreach (var item in _tilesStore.GetAvalibleResources())
-		{
-			Console.WriteLine(item);
-		}
 		_images = new ImagePool(_tilesStore);
 
 		Assets.AddFont("Fonts/Roboto-Medium.fnt", "Roboto-Medium");

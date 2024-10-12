@@ -3,6 +3,7 @@ using Azalea.Sounds;
 using Azalea.Utils;
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace Azalea.IO.Resources;
 
@@ -12,21 +13,27 @@ public static partial class Assets
 	/// The main store containing all the games embedded resources.
 	/// </summary>
 	public static IResourceStore MainStore => _mainStore;
-	private static ResourceStoreContainer _mainStore;
+	private static readonly ResourceStoreContainer _mainStore;
 
 	/// <summary>
 	/// A store for accessing resources on the system with an absolute path.
 	/// </summary>
 	public static IResourceStore FileSystemStore => _fileSystemStore;
-	private static FileSystemStore _fileSystemStore;
+	private static readonly FileSystemStore _fileSystemStore;
 
 	/// <summary>
 	/// A store for storing and accessing persistent game data. Must be set-up before
 	/// using by calling the <see cref="SetupPersistentStore(string)"/> method.
 	/// </summary>
 	public static Storage PersistentStore => _persistentStore
-		?? throw new Exception("A persistent store has not been set up. Please use Assets.SetupPersistentStore before trying to use it");
+		?? throw new Exception("A persistent store has not been set up. Please use SetupPersistentDirectory when creating host.");
 	private static Storage? _persistentStore;
+	public static bool PersistentStoreExists => _persistentStore is not null;
+
+	public static Storage ReflectedStore => _reflectedStore
+		?? throw new Exception("A reflected store has not been set up. Please use SetupReflectedDirectory when creating host.");
+	private static Storage? _reflectedStore;
+	public static bool ReflectedStoreExists => _reflectedStore is not null;
 
 	static Assets()
 	{
@@ -41,11 +48,18 @@ public static partial class Assets
 	/// Specifies the folder name that is used to store game data.
 	/// For windows this is stored in the /AppData/Roaming directory.
 	/// </summary>
-	public static void SetupPersistentStore(string folderName)
+	internal static void SetupPersistentStore(string folderName)
 	{
 		var path = FileSystemUtils.CombinePaths(
 			Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), folderName);
 		_persistentStore = new Storage(path);
+	}
+
+	internal static void SetupReflectedStore(string reflectedPath)
+	{
+		var exePath = Assembly.GetEntryAssembly()!.Location;
+		var path = FileSystemUtils.CombinePaths(exePath, reflectedPath);
+		_reflectedStore = new Storage(path);
 	}
 
 	/// <summary>
