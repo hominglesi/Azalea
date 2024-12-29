@@ -96,6 +96,14 @@ internal enum WindowMessage : uint
 	/// </summary>
 	Char = 258,
 	/// <summary>
+	/// Posted to the window with the keyboard focus when the user presses the F10 key (which activates
+	/// the menu bar) or holds down the ALT key and then presses another key. It also occurs when no
+	/// window currently has the keyboard focus; in this case, the WM_SYSKEYDOWN message is sent to the
+	/// active window. The window that receives the message can distinguish between these two contexts
+	/// by checking the context code in the lParam parameter.
+	/// </summary>
+	SysKeyDown = 260,
+	/// <summary>
 	/// A window receives this message when the user chooses a command from the Window menu
 	/// (formerly known as the system or control menu) or when the user chooses the maximize button, minimize button,
 	/// restore button, or close button.

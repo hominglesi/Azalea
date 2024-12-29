@@ -1,5 +1,9 @@
 ﻿using Azalea;
 using SampleGame;
 
-var host = Host.CreateHost(new HostPreferences { ClientSize = new Vector2Int(876, 660) });
-host.Run(new MemoryGame());
+new HostBuilder()
+	.EnableEditor()
+	.SetGameSize(new Vector2Int(876, 660))
+	.SetupReflectedDirectory("../../../../")
+	.Create()
+	.Run(new MemoryGame());

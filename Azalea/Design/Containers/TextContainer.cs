@@ -33,7 +33,7 @@ public class TextContainer : FlexContainer
 		{
 			if (words[i] == "\n")
 			{
-				if (Children.Count > 0 && Children[Children.Count - 1] is FlowNewLine)
+				if (Children.Count == 0 || Children[Children.Count - 1] is FlowNewLine)
 					AddNewLine(20);
 				else
 					AddNewLine();

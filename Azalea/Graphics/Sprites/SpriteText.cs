@@ -9,7 +9,7 @@ using System.Numerics;
 
 namespace Azalea.Graphics.Sprites;
 
-public partial class SpriteText : GameObject
+public class SpriteText : GameObject
 {
 	public SpriteText()
 	{

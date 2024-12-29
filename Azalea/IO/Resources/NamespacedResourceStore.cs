@@ -21,10 +21,9 @@ public class NamespacedResourceStore : IResourceStore
 		return _wrappedStore.GetStream($"{_namespace}{path}");
 	}
 
-	public IEnumerable<string> GetAvalibleResources()
+	public IEnumerable<(string, bool)> GetAvalibleResources(string subPath = "")
 	{
-		foreach (var item in _wrappedStore.GetAvalibleResources())
-			if (item.StartsWith(_namespace))
-				yield return item.Replace(_namespace, null);
+		foreach (var resource in _wrappedStore.GetAvalibleResources(_namespace + subPath))
+			yield return resource;
 	}
 }

@@ -33,7 +33,7 @@ public partial class CompositeGameObject : GameObject
 
 	private ulong _currentChildID;
 
-	internal virtual void AddInternal(GameObject gameObject)
+	public virtual void AddInternal(GameObject gameObject)
 	{
 		if (gameObject == null)
 			throw new ArgumentNullException(nameof(gameObject), $"Cannot add null {nameof(gameObject)} to {nameof(CompositeGameObject)}.");
@@ -129,6 +129,8 @@ public partial class CompositeGameObject : GameObject
 
 	public override void UpdateSubTree()
 	{
+		if (Active == false) return;
+
 		base.UpdateSubTree();
 
 		for (int i = 0; i < _internalChildren.Count; ++i)
@@ -141,6 +143,8 @@ public partial class CompositeGameObject : GameObject
 
 	public override void FixedUpdateSubTree()
 	{
+		if (Active == false) return;
+
 		base.FixedUpdateSubTree();
 
 		for (int i = 0; i < _internalChildren.Count; ++i)
@@ -409,7 +413,7 @@ public partial class CompositeGameObject : GameObject
 
 	internal override bool BuildPositionalInputQueue(Vector2 screenSpacePos, List<GameObject> queue)
 	{
-		if (base.BuildPositionalInputQueue(screenSpacePos, queue) == false)
+		if (base.BuildPositionalInputQueue(screenSpacePos, queue) == false && Masking)
 			return false;
 
 		foreach (var child in _internalChildren)

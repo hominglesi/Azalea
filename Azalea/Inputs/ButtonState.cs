@@ -21,13 +21,9 @@ public class ButtonState
 		_pressed = pressed;
 
 		if (pressed)
-		{
 			_down = true;
-		}
 		else
-		{
 			_up = true;
-		}
 	}
 
 	internal void SetRepeat() => _repeat = true;

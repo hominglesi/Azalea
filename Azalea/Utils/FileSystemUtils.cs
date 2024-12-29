@@ -6,7 +6,7 @@ public static class FileSystemUtils
 		path1 = path1.Replace("\\", "/");
 		path2 = path2.Replace("\\", "/");
 
-		if (path1.EndsWith('/') == false)
+		if (path1.Length > 0 && path1.EndsWith('/') == false)
 			path1 += '/';
 
 		if (path2.StartsWith('/'))

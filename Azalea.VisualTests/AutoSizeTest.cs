@@ -18,12 +18,14 @@ public class AutoSizeTest : TestScene
 			Position = new(100),
 			AutoSizeAxes = Graphics.Axes.Both,
 			BorderColor = Palette.Blue,
+			BorderThickness = 2,
 			Child = _flex = new FlexContainer()
 			{
 				Direction = FlexDirection.Vertical,
 				Size = new(200),
 				AutoSizeAxes = Graphics.Axes.Y,
-				BorderColor = Palette.Green
+				BorderColor = Palette.Green,
+				BorderThickness = 2,
 			}
 		});
 

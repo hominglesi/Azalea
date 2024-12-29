@@ -50,8 +50,9 @@ public class FlexTest : TestScene
 	{
 		if (Input.GetKey(Keys.Space).DownOrRepeat)
 		{
-			var size = Input.GetKey(Keys.ShiftLeft).Pressed ? Rng.Int(50, 150) : 100;
-			_flex.Add(createBox(new(size), _flex.Children.Count));
+			var sizeX = Input.GetKey(Keys.ShiftLeft).Pressed ? Rng.Int(50, 150) : 100;
+			var sizeY = Input.GetKey(Keys.ShiftLeft).Pressed ? Rng.Int(50, 150) : 100;
+			_flex.Add(createBox(new(sizeX, sizeY), _flex.Children.Count));
 		}
 
 		if (Input.GetKey(Keys.D).Down)

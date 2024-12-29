@@ -8,6 +8,7 @@ using System;
 using System.Numerics;
 
 namespace Azalea.Graphics.OpenGL.Batches;
+
 internal class GLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 	where TVertex : unmanaged, IVertex
 {

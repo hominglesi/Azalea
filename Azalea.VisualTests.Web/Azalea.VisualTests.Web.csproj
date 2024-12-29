@@ -1,17 +1,14 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
-
+﻿<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <StaticWebAssetBasePath>AzaleaWebTests</StaticWebAssetBasePath>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Azalea.VisualTests\Azalea.VisualTests.csproj" />
     <ProjectReference Include="..\Azalea.Web\Azalea.Web.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.15" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.15" />
   </ItemGroup>
-
+  <Target Name="CopyStaticFiles" AfterTargets="PostBuildEvent">
+    <Exec Command="copy &quot;..\Azalea.Web\wwwroot\template.gitignore&quot; &quot;wwwroot\.gitignore&quot;" />
+    <Exec Command="copy &quot;..\Azalea.Web\wwwroot\index.html&quot; &quot;wwwroot&quot;" />
+    <Exec Command="copy &quot;..\Azalea.Web\wwwroot\main.js&quot; &quot;wwwroot&quot;" />
+  </Target>
 </Project>

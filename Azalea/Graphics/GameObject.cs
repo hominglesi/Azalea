@@ -1,7 +1,7 @@
 ﻿using Azalea.Amends;
-using Azalea.Debugging;
 using Azalea.Design.Components;
 using Azalea.Design.Containers;
+using Azalea.Editing.Legacy;
 using Azalea.Extentions;
 using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics.Colors;
@@ -17,7 +17,7 @@ using System.Numerics;
 
 namespace Azalea.Graphics;
 
-public abstract partial class GameObject : Amendable, IGameObject
+public partial class GameObject : Amendable, IGameObject
 {
 	public GameObject()
 	{
@@ -141,8 +141,12 @@ public abstract partial class GameObject : Amendable, IGameObject
 
 	#endregion
 
+	public bool Active { get; set; } = true;
+
 	public virtual void UpdateSubTree()
 	{
+		if (Active == false) return;
+
 		UpdateAmends();
 		Update();
 		updateComponents();
@@ -151,6 +155,8 @@ public abstract partial class GameObject : Amendable, IGameObject
 
 	public virtual void FixedUpdateSubTree()
 	{
+		if (Active == false) return;
+
 		FixedUpdate();
 	}
 
@@ -236,7 +242,21 @@ public abstract partial class GameObject : Amendable, IGameObject
 		}
 	}
 
-	public Vector2 DrawSize => ApplyRelativeAxes(RelativeSizeAxes, Size, FillMode);
+	public Vector2 _negativeSize;
+	public Vector2 NegativeSize
+	{
+		get => _negativeSize;
+		set
+		{
+			if (value == _negativeSize) return;
+
+			_negativeSize = value;
+
+			invalidateParentSizeDependencies(Invalidation.DrawSize, Axes.Both);
+		}
+	}
+
+	public Vector2 DrawSize => ApplyRelativeAxes(RelativeSizeAxes, Size, FillMode) - NegativeSize;
 
 	public float DrawWidth => DrawSize.X;
 	public float DrawHeight => DrawSize.Y;
@@ -371,7 +391,7 @@ public abstract partial class GameObject : Amendable, IGameObject
 
 			_fillMode = value;
 
-			//Invalidate(Invalidation.DrawSize);
+			Invalidate(Invalidation.DrawSize);
 		}
 	}
 
@@ -533,7 +553,7 @@ public abstract partial class GameObject : Amendable, IGameObject
 			else
 				AddComponentTreeToScene();
 
-			//Invalidate(Invalidation.Presence);
+			Invalidate(Invalidation.Presence);
 		}
 	}
 
@@ -568,9 +588,8 @@ public abstract partial class GameObject : Amendable, IGameObject
 
 			_alwaysPresent = value;
 
-			/*
-            if (IsPresent != wasPresent)
-                Invalidate(Invalidation.Presence)*/
+			if (IsPresent != wasPresent)
+				Invalidate(Invalidation.Presence);
 		}
 	}
 
@@ -583,10 +602,7 @@ public abstract partial class GameObject : Amendable, IGameObject
 	{
 		get
 		{
-			if (AzaleaSettings.DontCacheDrawInfo == true)
-				return computeDrawInfo();
-
-			if (_drawInfoBacking.IsValid == false)
+			if (_drawInfoBacking.IsValid == false || AzaleaSettings.DontCacheDrawInfo == true)
 			{
 				_drawInfo = computeDrawInfo();
 				_drawInfoBacking.Validate();
@@ -804,9 +820,10 @@ public abstract partial class GameObject : Amendable, IGameObject
 
 	internal virtual bool BuildPositionalInputQueue(Vector2 screenSpacePos, List<GameObject> queue)
 	{
-		if (DrawRectangle.Contains(ToLocalSpace(screenSpacePos)))
-			queue.Add(this);
+		if (DrawRectangle.Contains(ToLocalSpace(screenSpacePos)) == false)
+			return false;
 
+		queue.Add(this);
 		return true;
 	}
 

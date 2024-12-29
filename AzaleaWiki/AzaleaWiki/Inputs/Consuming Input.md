@@ -1,1 +1,0 @@
-All actions are called on objects starting with the front one and going backwards. Some actions like `OnClick` and `OnHover` can be "consumed", which immediately ends the chains and stops the objects below it from receiving those events. This is useful for example when there are two overlapped buttons and we only want to press the one on the top.

@@ -19,7 +19,7 @@ public class TestingTestScene : TestScene
 	private Composition _wrapper;
 	private Composition _comp;
 	private TextContainer _composition;
-	private BasicTextBox _text;
+	private BasicTextBoxOld _text;
 	private Box _cursor;
 	private Box _igrac;
 	private Sprite _sprite;
@@ -121,7 +121,7 @@ public class TestingTestScene : TestScene
 		_composition.AddText("Text3 ", t => { t.Color = Palette.Black; });
 		_composition.AddText("Text4 ");
 
-		Add(_text = new BasicTextBox()
+		Add(_text = new BasicTextBoxOld()
 		{
 			Width = 500,
 			Height = 30,
@@ -136,7 +136,7 @@ public class TestingTestScene : TestScene
 		.Loop(x => x.RepositionBy(new(0, -100), 1)
 				.Then().RepositionBy(new(0, 100), 1), 2));
 
-		Add(new BasicTextBox()
+		Add(new BasicTextBoxOld()
 		{
 			Width = 500,
 			Height = 30,

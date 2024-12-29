@@ -16,7 +16,6 @@ public interface IRenderer
 	internal IVertexBatch<TexturedVertex2D> DefaultQuadBatch { get; }
 	public Texture WhitePixel { get; }
 
-	internal void Initialize();
 	internal void BeginFrame();
 	internal void FinishFrame();
 	public void Clear();

@@ -33,8 +33,8 @@ internal class GLTexture : Disposable, INativeTexture
 		_renderer.BindTexture(this, 0);
 
 		SetFiltering(TextureFiltering.Nearest, TextureFiltering.Nearest);
-		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.WrapS, (int)GLWrapFunction.ClampToEdge);
-		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.WrapT, (int)GLWrapFunction.ClampToEdge);
+		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.WrapS, (int)GLWrapFunction.Repeat);
+		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.WrapT, (int)GLWrapFunction.Repeat);
 
 		GL.TexImage2D(GLTextureType.Texture2D, 0, GLColorFormat.RGBA,
 			_width, _height, 0, GLColorFormat.RGBA, GLDataType.UnsignedByte, image.Data);

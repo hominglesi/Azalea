@@ -14,6 +14,10 @@ public class Sprite : GameObject
 		get => _texture;
 		set
 		{
+			//Edge case where size would stay 0 even though we set a valid texture
+			if (value == Assets.MissingTexture && Size == Vector2.Zero)
+				Size = Assets.MissingTexture.Size;
+
 			if (_texture == value) return;
 			_texture = value;
 			_time = 0;
@@ -49,9 +53,9 @@ public class Sprite : GameObject
 			texture = anim.GetTextureAtTime(Time);
 		}
 
-		renderer.DrawQuad(
-			texture,
-			ScreenSpaceDrawQuad,
-			DrawColorInfo);
+		DrawTexture(renderer, texture);
 	}
+
+	protected virtual void DrawTexture(IRenderer renderer, Texture texture)
+		=> renderer.DrawQuad(texture, ScreenSpaceDrawQuad, DrawColorInfo);
 }

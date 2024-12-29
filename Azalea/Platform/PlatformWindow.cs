@@ -185,14 +185,44 @@ internal abstract class PlatformWindow : Disposable, IWindow
 
 	private bool _vSync = false;
 	protected abstract void SetVSyncImplementation(bool enabled);
+	protected abstract bool GetVSyncImplementation();
 	public bool VSync
 	{
 		get => _vSync;
 		set
 		{
 			if (_vSync == value) return;
+
 			SetVSyncImplementation(value);
-			_vSync = value;
+			_vSync = GetVSyncImplementation();
+		}
+	}
+
+	private bool? _canChangeVSync;
+	protected abstract bool GetCanChangeVSyncImplementation();
+	public bool CanChangeVSync
+	{
+		get
+		{
+			if (_canChangeVSync.HasValue)
+				return _canChangeVSync.Value;
+
+			_canChangeVSync = GetCanChangeVSyncImplementation();
+			return _canChangeVSync.Value;
+		}
+	}
+
+
+	private bool _cursorVisible = true;
+	protected abstract void SetCursorVisible(bool show);
+	public bool CursorVisible
+	{
+		get => _cursorVisible;
+		set
+		{
+			if (_cursorVisible == value) return;
+			SetCursorVisible(value);
+			_cursorVisible = value;
 		}
 	}
 

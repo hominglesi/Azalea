@@ -176,7 +176,7 @@ public class FlexContainer : FlowContainer
 
 		for (int i = startIndex; i <= endIndex; i++)
 		{
-			var offset = maxLength - children[i].LayoutRectangle.Height;
+			var offset = maxLength - getSideLength(children[i]);
 			if (Alignment == FlexAlignment.Center)
 				offset /= 2;
 			positions[i] += createSideVector(offset);

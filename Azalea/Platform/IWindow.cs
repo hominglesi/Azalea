@@ -55,6 +55,16 @@ public interface IWindow : IDisposable
 	bool VSync { get; set; }
 
 	/// <summary>
+	/// Whether the application can change VSync setting
+	/// </summary>
+	bool CanChangeVSync { get; }
+
+	/// <summary>
+	/// Whether Cursor is shown
+	/// </summary>
+	bool CursorVisible { get; set; }
+
+	/// <summary>
 	/// Centers the window on the users most overlapped monitor.
 	/// </summary>
 	void Center();
@@ -81,8 +91,6 @@ public interface IWindow : IDisposable
 	internal void Hide();
 
 	internal void ProcessEvents();
-
-	internal bool ShouldClose { get; }
 
 	/// <summary>
 	/// Called when the window is being closed. Can be used to prevent closure.

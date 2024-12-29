@@ -1,10 +1,11 @@
 ﻿using Azalea;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
+using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
 using Azalea.IO.Resources;
+using Azalea.Platform;
 using SampleGame.Elements;
-using System;
 using System.Numerics;
 
 namespace SampleGame;
@@ -17,19 +18,15 @@ public class MemoryGame : AzaleaGame
 
 	private IResourceStore? _tilesStore;
 
-	protected override void OnInitialize()
+	public MemoryGame()
 	{
-		Host.Renderer.ClearColor = new Color(189, 223, 214);
-		Host.Window.Resizable = true;
+		Renderer.ClearColor = new Color(189, 223, 214);
+		Window.Resizable = true;
 
-		var assemblyStore = new NamespacedResourceStore(new AssemblyResourceStore(typeof(MemoryGame).Assembly), "Resources");
+		var assemblyStore = new NamespacedResourceStore(new EmbeddedResourceStore(typeof(MemoryGame).Assembly), "Resources");
 
 		Assets.AddToMainStore(assemblyStore);
 		_tilesStore = new NamespacedResourceStore(assemblyStore, "Textures/Tiles");
-		foreach (var item in _tilesStore.GetAvalibleResources())
-		{
-			Console.WriteLine(item);
-		}
 		_images = new ImagePool(_tilesStore);
 
 		Assets.AddFont("Fonts/Roboto-Medium.fnt", "Roboto-Medium");
@@ -44,6 +41,7 @@ public class MemoryGame : AzaleaGame
 
 		_logic = new MemoryLogic(_field);
 	}
+
 	protected override void Update()
 	{
 		if (Input.GetKey(Keys.P).Down) _logic?.Solve();

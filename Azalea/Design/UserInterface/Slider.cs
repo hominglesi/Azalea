@@ -11,34 +11,57 @@ public abstract class Slider : Composition
 {
 	public Slider()
 	{
-		Add(_body = CreateBody());
-		Add(_head = CreateHead());
+		Add(Body = CreateBody());
+		Add(Head = CreateHead());
 
-		_head.MouseDown += onHeadMouseDown;
+		Head.MouseDown += onHeadMouseDown;
 	}
 
+	public GameObject Head { get; init; }
 	protected abstract GameObject CreateHead();
-	private GameObject _head;
-	public GameObject Head => _head;
-	private float _headLength => _direction == SliderDirection.Horizontal ? _head.DrawWidth : _head.DrawHeight;
-	protected abstract GameObject CreateBody();
-	private GameObject _body;
-	public GameObject Body => _body;
+	private float _headLength => getDirectionalValue(Head.DrawSize);
 
-	private void setHeadPosition(float pos)
+	public GameObject Body { get; init; }
+	protected abstract GameObject CreateBody();
+
+	private float _value;
+	public Action<float>? OnValueChanged;
+	public float Value
 	{
-		if (_direction == SliderDirection.Horizontal)
-			_head.Position = new Vector2(pos, DrawHeight / 2);
-		else
-			_head.Position = new Vector2(DrawWidth / 2, pos); ;
+		get => _value;
+		set
+		{
+			if (value == _value) return;
+
+			_value = value;
+
+			updateHeadPosition();
+			OnValueChanged?.Invoke(Value);
+		}
 	}
-	private float getLocalMousePosition()
+
+	private bool _sliderRangeCached = false;
+	private Vector2 _sliderRange;
+	private Vector2 SliderRange
 	{
-		var localPosition = ToLocalSpace(Input.MousePosition);
-		if (_direction == SliderDirection.Horizontal)
-			return localPosition.X;
-		else
-			return localPosition.Y;
+		get
+		{
+			if (_sliderRangeCached == true)
+				return _sliderRange;
+
+			var drawLength = getDirectionalValue(DrawSize);
+			_sliderRange = new Vector2(0, drawLength);
+
+			if (HeadInsideBody)
+			{
+				var halfHeadLength = _headLength / 2;
+				_sliderRange.X += halfHeadLength;
+				_sliderRange.Y -= halfHeadLength;
+			}
+
+			_sliderRangeCached = true;
+			return _sliderRange;
+		}
 	}
 
 	private SliderDirection _direction = SliderDirection.Horizontal;
@@ -48,101 +71,85 @@ public abstract class Slider : Composition
 		set
 		{
 			if (_direction == value) return;
-
 			_direction = value;
+			uncacheSliderRange();
 		}
 	}
 
-	public Action<float>? OnValueChanged;
-
-	public float Value
+	private bool _headInsideBody = true;
+	public bool HeadInsideBody
 	{
-		get => MathUtils.Map(SliderPosition, _sliderRange.X, _sliderRange.Y, 0, 1);
+		get => _headInsideBody;
 		set
 		{
-			var newPosition = MathUtils.Map(value, 0, 1, _sliderRange.X, _sliderRange.Y);
-			if (SliderPosition == newPosition) return;
+			if (value == _headInsideBody) return;
+			_headInsideBody = value;
 
-			SliderPosition = newPosition;
+			updateHeadPosition();
 		}
 	}
 
-	private Vector2 calculateSliderRange(float length)
+	private void uncacheSliderRange()
 	{
-		var range = new Vector2(0, length);
-		if (_ignoreHeadSize || _headLength > length) return range;
-
-		var headHalf = _headLength / 2;
-		range.X += headHalf;
-		range.Y -= headHalf;
-
-		return range;
+		_sliderRangeCached = false;
+		updateHeadPosition();
 	}
 
-	private bool _ignoreHeadSize;
-	private float _sliderPosition;
-	private Vector2 _sliderRange;
+	private void updateHeadPosition()
+	{
+		var pixelValue = MathUtils.Map(Value, 0, 1, SliderRange.X, SliderRange.Y);
+
+		if (Direction == SliderDirection.Horizontal)
+			Head.Position = new Vector2(pixelValue, DrawHeight / 2);
+		else
+			Head.Position = new Vector2(DrawWidth / 2, pixelValue); ;
+	}
+
+	private float getLocalMousePosition()
+	{
+		var localPosition = ToLocalSpace(Input.MousePosition);
+		return getDirectionalValue(localPosition);
+	}
+
+	private float getDirectionalValue(Vector2 vector)
+		=> Direction == SliderDirection.Horizontal ? vector.X : vector.Y;
+
+	public bool IsHeld { get; private set; }
 	private float _heldOffset;
-
-	private float SliderPosition
-	{
-		get => _sliderPosition;
-		set
-		{
-			setHeadPosition(value);
-
-			if (Precision.AlmostEquals(_sliderPosition, value)) return;
-
-			_sliderPosition = value;
-			OnValueChanged?.Invoke(Value);
-		}
-	}
-
-	private bool _isHeld;
 
 	protected void onHeadMouseDown(MouseDownEvent e)
 	{
-		_isHeld = true;
-		_heldOffset = SliderPosition - getLocalMousePosition();
+		IsHeld = true;
+		_heldOffset = getDirectionalValue(Head.Position) - getLocalMousePosition();
 	}
-
-	private Vector2 _lastDrawSize;
-	private float _lastSliderLength;
 
 	protected override bool OnMouseDown(MouseDownEvent e)
 	{
-		if (_isHeld) return true;
+		if (IsHeld) return true;
 
-		SliderPosition = Math.Clamp(getLocalMousePosition(), _sliderRange.X, _sliderRange.Y);
-		_isHeld = true;
+		IsHeld = true;
 		_heldOffset = 0;
 		return true;
 	}
 
+	private Vector2 _lastDrawSize;
+	private float _lastHeadLength;
 	protected override void Update()
 	{
 		if (Input.GetMouseButton(0).Released)
-			_isHeld = false;
+			IsHeld = false;
 
-		if (_lastDrawSize != DrawSize || _lastSliderLength != _headLength)
+		if (_lastDrawSize != DrawSize || _lastHeadLength != _headLength)
 		{
-			var drawLength = Direction == SliderDirection.Horizontal ? DrawSize.X : DrawSize.Y;
-			var newRange = calculateSliderRange(drawLength);
-			SliderPosition = MathUtils.Map(SliderPosition, _sliderRange.X, _sliderRange.Y, newRange.X, newRange.Y);
-
-			_sliderRange = newRange;
-
-			_lastDrawSize = DrawSize;
-			_lastSliderLength = _headLength;
+			uncacheSliderRange();
 		}
 
-		if (_isHeld)
+		if (IsHeld)
 		{
 			var newPosition = getLocalMousePosition() + _heldOffset;
+			newPosition = Math.Clamp(newPosition, SliderRange.X, SliderRange.Y);
 
-			if (newPosition == SliderPosition) return;
-
-			SliderPosition = Math.Clamp(newPosition, _sliderRange.X, _sliderRange.Y);
+			Value = MathUtils.Map(newPosition, SliderRange.X, SliderRange.Y, 0, 1);
 		}
 	}
 }

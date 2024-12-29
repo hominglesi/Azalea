@@ -1,5 +1,6 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.OpenGL;
+using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Inputs;
 using Azalea.Utils;
 using System;
@@ -64,18 +65,93 @@ internal class Win32Window : PlatformWindow
 		//Setup OpenGL
 		_deviceContext = WinAPI.GetDC(_window);
 
-		var pfDescriptor = new PixelFormatDescriptor();
-		var format = WinAPI.ChoosePixelFormat(_deviceContext, ref pfDescriptor);
+		initializeOpenGL();
 
-		WinAPI.SetPixelFormat(_deviceContext, format, ref pfDescriptor);
+		var pixelFormatAttribs = new int[]
+		{
+			(int)WGLAttribute.DrawToWindow, 1,
+			(int)WGLAttribute.SupportOpenGL, 1,
+			(int)WGLAttribute.DoubleBuffer, 1,
+			(int)WGLAttribute.Acceleration, (int)WGLAttribute.FullAcceleration,
+			(int)WGLAttribute.PixelType, (int)WGLAttribute.TypeRGBA,
+			(int)WGLAttribute.ColorBits, 32,
+			(int)WGLAttribute.DepthBits, 24,
+			(int)WGLAttribute.StencilBits, 8,
+			0
+		};
 
-		var glContext = GL.CreateContext(_deviceContext);
+		int pixelFormat = 0;
+		uint formatCount = 0;
+		GL.ChoosePixelFormatARB(_deviceContext, ref pixelFormatAttribs[0], IntPtr.Zero, 1, ref pixelFormat, ref formatCount);
+
+		PixelFormatDescriptor pixelFormatDescriptor = default;
+		_ = WinAPI.DescribePixelFormat(_deviceContext, pixelFormat, (uint)Marshal.SizeOf<PixelFormatDescriptor>(), ref pixelFormatDescriptor);
+		WinAPI.SetPixelFormat(_deviceContext, pixelFormat, ref pixelFormatDescriptor);
+
+		var openGLAttribs = new int[]
+		{
+			(int)WGLAttribute.ContextMajorVersion, 3,
+			(int)WGLAttribute.ContextMinorVersion, 3,
+			(int)WGLAttribute.ContextProfileMask, (int)WGLAttribute.ContextCoreProfileBit,
+			0
+		};
+
+		var glContext = GL.CreateContextAttribsARB(_deviceContext, false, ref openGLAttribs[0]);
 		GL.MakeCurrent(_deviceContext, glContext);
-		GL.ImportFunctions();
 
 		//Sync values with PlatformWindow
 		var windowSize = WinAPI.GetWindowRect(_window).Size;
 		UpdateSize(windowSize, clientSize);
+	}
+
+	private void initializeOpenGL()
+	{
+		// We need to create a dummy window to be able to load its drawing context functions
+		// because we need them when creating the real drawing context
+
+		var processHandle = System.Diagnostics.Process.GetCurrentProcess().Handle;
+
+		var dummywindowClass = new WindowClass("Dummy Window", processHandle, _windowProcedure)
+		{
+			Style = ClassStyles.HorizontalReDraw | ClassStyles.VerticalReDraw | ClassStyles.OwnDC
+		};
+
+		var atom = WinAPI.RegisterClass(ref dummywindowClass);
+		var dummyWindow = WinAPI.CreateWindow(
+			0,
+			atom,
+			"Dummy Window",
+			0,
+			(unchecked((int)0x80000000)), //CW_USEDEFAULT
+			(unchecked((int)0x80000000)), //CW_USEDEFAULT
+			(unchecked((int)0x80000000)), //CW_USEDEFAULT
+			(unchecked((int)0x80000000)), //CW_USEDEFAULT
+			IntPtr.Zero,
+			IntPtr.Zero,
+			processHandle,
+			IntPtr.Zero);
+
+		if (_window == IntPtr.Zero)
+		{
+			Console.WriteLine($"Could not create dummy window. (Error {Marshal.GetLastWin32Error()})");
+			return;
+		}
+
+		var dummyDC = WinAPI.GetDC(dummyWindow);
+		var pfDescriptor = new PixelFormatDescriptor();
+		var pixelFormat = WinAPI.ChoosePixelFormat(dummyDC, ref pfDescriptor);
+
+		WinAPI.SetPixelFormat(dummyDC, pixelFormat, ref pfDescriptor);
+
+		var dummyContext = GL.CreateContext(dummyDC);
+		GL.MakeCurrent(dummyDC, dummyContext);
+
+		GL.ImportFunctions();
+
+		GL.MakeCurrent(dummyDC, IntPtr.Zero);
+		GL.DeleteContext(dummyContext);
+		WinAPI.ReleaseDC(dummyWindow, dummyDC);
+		WinAPI.DestroyWindow(dummyWindow);
 	}
 
 	private IntPtr windowProcedure(IntPtr window, uint message, IntPtr wParam, IntPtr lParam)
@@ -113,127 +189,67 @@ internal class Win32Window : PlatformWindow
 
 			//Mouse Input
 			case WindowMessage.LeftButtonDown:
-				Input.HandleMouseButtonStateChange(MouseButton.Left, true);
+				Input.ExecuteMouseButtonStateChange(MouseButton.Left, true);
 				WinAPI.SetCapture(_window);
 				break;
 			case WindowMessage.LeftButtonUp:
-				Input.HandleMouseButtonStateChange(MouseButton.Left, false);
+				Input.ExecuteMouseButtonStateChange(MouseButton.Left, false);
 				WinAPI.ReleaseCapture();
 				break;
 			case WindowMessage.RightButtonDown:
-				Input.HandleMouseButtonStateChange(MouseButton.Right, true); break;
+				Input.ExecuteMouseButtonStateChange(MouseButton.Right, true); break;
 			case WindowMessage.RightButtonUp:
-				Input.HandleMouseButtonStateChange(MouseButton.Right, false); break;
+				Input.ExecuteMouseButtonStateChange(MouseButton.Right, false); break;
 			case WindowMessage.MiddleButtonDown:
-				Input.HandleMouseButtonStateChange(MouseButton.Middle, true); break;
+				Input.ExecuteMouseButtonStateChange(MouseButton.Middle, true); break;
 			case WindowMessage.MiddleButtonUp:
-				Input.HandleMouseButtonStateChange(MouseButton.Middle, false); break;
+				Input.ExecuteMouseButtonStateChange(MouseButton.Middle, false); break;
 			case WindowMessage.XButtonDown:
 				var xButtonDown = MouseButton.Middle + BitwiseUtils.GetHighOrderValue(wParam);
-				Input.HandleMouseButtonStateChange(xButtonDown, true); break;
+				Input.ExecuteMouseButtonStateChange(xButtonDown, true); break;
 			case WindowMessage.XButtonUp:
 				var xButtonUp = MouseButton.Middle + BitwiseUtils.GetHighOrderValue(wParam);
-				Input.HandleMouseButtonStateChange(xButtonUp, false); break;
+				Input.ExecuteMouseButtonStateChange(xButtonUp, false); break;
 			case WindowMessage.MouseWheel:
 				var delta = BitwiseUtils.GetHighOrderValue(wParam) / 120;
-				Input.HandleScroll(delta); break;
+				Input.ExecuteScroll(delta); break;
 
 			//Keyboad Input
 			case WindowMessage.Char:
-				Input.HandleTextInput((char)wParam); break;
+				Input.ExecuteTextInput((char)wParam); break;
 			case WindowMessage.KeyDown:
 				var isRepeat = BitwiseUtils.GetSpecificBit(lParam, 31);
-				var key = WindowsExtentions.KeycodeToKey((int)wParam);
-				if (isRepeat)
-					Input.HandleKeyboardKeyRepeat(key);
-				else
-					Input.HandleKeyboardKeyStateChange(key, true);
+				var downKey = WindowsExtentions.KeycodeToKey((int)wParam);
+				handleKeyDown(downKey, isRepeat);
 				break;
 			case WindowMessage.KeyUp:
-				Input.HandleKeyboardKeyStateChange(WindowsExtentions.KeycodeToKey((int)wParam), false); break;
+				Input.ExecuteKeyboardKeyStateChange(WindowsExtentions.KeycodeToKey((int)wParam), false); break;
+			case WindowMessage.SysKeyDown:
+				var downSysKey = WindowsExtentions.KeycodeToKey((int)wParam);
+
+				if (downSysKey == Keys.F10)
+				{
+					var downSysKeyIsRepeat = BitwiseUtils.GetSpecificBit(lParam, 31);
+					handleKeyDown(downSysKey, downSysKeyIsRepeat);
+					return IntPtr.Zero;
+				}
+
+				break;
 
 			//Raw Input
 			case WindowMessage.Input:
-
-				_rawInputManager.HandleRawInput(lParam);
-
-				/*
-				IntPtr deviceHandle = lParam;
-				uint dataSize = 0;
-				uint headerSize = (uint)Marshal.SizeOf<RawInputHeader>();
-
-				WinAPI.GetRawInputData(deviceHandle, RawInputCommand.Input, IntPtr.Zero, ref dataSize, headerSize);
-
-				IntPtr rawInputData = Marshal.AllocHGlobal((int)dataSize);
-				WinAPI.GetRawInputData(deviceHandle, RawInputCommand.Input, rawInputData, ref dataSize, headerSize);
-
-				var rawInput = Marshal.PtrToStructure<RawInput>(rawInputData);
-
-				uint preparsedDataSize = 0;
-				var z = (int)WinAPI.GetRawInputDeviceInfo(rawInput.Header.Device, RawInputDeviceInfoType.PreparsedData, IntPtr.Zero, ref preparsedDataSize);
-
-				IntPtr preparsedData = Marshal.AllocHGlobal((int)preparsedDataSize);
-				int x = (int)WinAPI.GetRawInputDeviceInfo(rawInput.Header.Device, RawInputDeviceInfoType.PreparsedData, preparsedData, ref preparsedDataSize);
-
-				HidPCaps capabilities = new();
-				var y = WinAPI.HidP_GetCaps(preparsedData, ref capabilities);
-
-				var buttonCapabilities = new HidPButtonCaps[capabilities.NumberInputButtonCaps];
-				ushort buttonCapabilitiesCount = capabilities.NumberInputButtonCaps;
-				WinAPI.HidP_GetButtonCaps(HidPReportType.Input, buttonCapabilities, ref buttonCapabilitiesCount, preparsedData);
-
-				var valueCapabilities = new HidPValueCaps[capabilities.NumberInputValueCaps];
-				ushort valueCapabilitiesCount = capabilities.NumberInputValueCaps;
-				WinAPI.HidP_GetValueCaps(HidPReportType.Input, valueCapabilities, ref valueCapabilitiesCount, preparsedData);
-
-				var inputReport = new byte[rawInput.HID.SizeHid];
-
-				for (int i = 0; i < rawInput.HID.Count; i++)
-				{
-					unsafe
-					{
-						byte* hidOffset = (byte*)rawInputData;
-						hidOffset += sizeof(RawInputHeader) + sizeof(RawHID) + (rawInput.HID.SizeHid * i);
-						void* hidData = (void*)hidOffset;
-						Marshal.Copy(new IntPtr(hidData), inputReport, 0, (int)rawInput.HID.SizeHid);
-					}
-
-					uint usageCount = 0;
-					HidUsageAndPage[] usages = null!;
-					var status = WinAPI.HidP_GetUsagesEx(HidPReportType.Input, 0, usages!, ref usageCount, preparsedData, inputReport, rawInput.HID.SizeHid);
-					if (status == HidStatus.BufferTooSmall)
-					{
-						usages = new HidUsageAndPage[usageCount];
-						WinAPI.HidP_GetUsagesEx(HidPReportType.Input, 0, usages, ref usageCount, preparsedData, inputReport, rawInput.HID.SizeHid);
-					}
-
-					if (usages != null)
-					{
-						foreach (var usage in usages)
-						{
-							Console.Write(usage.Usage + " ");
-						}
-						Console.WriteLine();
-					}
-
-					foreach (var valueCap in valueCapabilities)
-					{
-						uint usageValue = 0;
-
-						WinAPI.HidP_GetUsageValue(HidPReportType.Input, valueCap.UsagePage,
-							valueCap.LinkCollection, valueCap.NotRange.Usage, ref usageValue, preparsedData, inputReport, rawInput.HID.SizeHid);
-
-						Console.Write(valueCap.Range.UsageMin + ": " + usageValue + ", ");
-					}
-					Console.WriteLine();
-				}
-
-				Marshal.FreeHGlobal(rawInputData);
-				*/
-				break;
+				_rawInputManager.HandleRawInput(lParam); break;
 		}
 
 		return WinAPI.DefWindowProc(window, message, wParam, lParam);
+	}
+
+	private void handleKeyDown(Keys key, bool isRepeat)
+	{
+		if (isRepeat)
+			Input.ExecuteKeyboardKeyRepeat(key);
+		else
+			Input.ExecuteKeyboardKeyStateChange(key, true);
 	}
 
 	#region Implementations
@@ -300,6 +316,25 @@ internal class Win32Window : PlatformWindow
 
 	protected override void SetVSyncImplementation(bool enabled)
 		=> GL.SwapInterval(enabled ? 1 : 0);
+
+	protected override bool GetVSyncImplementation()
+		=> GL.GetSwapInterval() == 1;
+
+	protected override bool GetCanChangeVSyncImplementation()
+	{
+		var current = GetVSyncImplementation();
+
+		SetVSyncImplementation(!current);
+		var changed = current != GetVSyncImplementation();
+
+		SetVSyncImplementation(current);
+		return changed;
+	}
+
+	protected override void SetCursorVisible(bool show)
+	{
+		WinAPI.ShowCursor(show);
+	}
 
 	public override void Center()
 	{
@@ -371,7 +406,7 @@ internal class Win32Window : PlatformWindow
 		//Update mouse position
 		WinAPI.GetCursorPos(out _mousePosition);
 		WinAPI.ScreenToClient(_window, ref _mousePosition);
-		Input.HandleMousePositionChange(_mousePosition);
+		Input.ExecuteMousePositionChange(_mousePosition);
 	}
 
 	#endregion

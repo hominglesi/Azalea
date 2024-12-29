@@ -6,10 +6,10 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Title>$(AssemblyName)</Title>
-    <Version>1.5-preRelease4</Version>
+    <Version>1.5.2</Version>
     <Authors>hominglesi</Authors>
     <Company>Azalea</Company>
-    <Description>A 2D game engine.</Description>
+    <Description>A lightweight 2D game framework.</Description>
     <PackageIcon>azalea-icon.png</PackageIcon>
     <PackageIconUrl>https://i.imgur.com/UPsEzXU.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/hominglesi/Azalea</RepositoryUrl>
@@ -31,7 +31,7 @@
 	<ItemGroup>
     <EmbeddedResource Include="Resources\**\*" />
     <None Include="Resources\Textures\azalea-icon.png" Pack="true" PackagePath="\" />
-    <None Include="../README.md" Pack="true" PackagePath="\" />
+    <None Include="../README.md" Pack="true" PackagePath="\" Visible="false" />
   </ItemGroup>
 
   <ItemGroup Label="FilesToCopy">
