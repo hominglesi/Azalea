@@ -1,11 +1,12 @@
 ﻿using Azalea.Graphics;
 using Azalea.Numerics;
+using Azalea.Platform.Windows.Enums.RawInput;
 using System;
 using System.Runtime.InteropServices;
 
 namespace Azalea.Platform.Windows;
 
-internal static class WinAPI
+internal static partial class WinAPI
 {
 	private const string Gdi32Path = "gdi32.dll";
 	private const string Kernel32Path = "kernel32.dll";
@@ -163,9 +164,11 @@ internal static class WinAPI
 		return info;
 	}
 
-
 	[DllImport(User32Path, EntryPoint = "GetRawInputData")]
-	public static extern uint GetRawInputData(IntPtr rawInput, uint command, ref RawInput data, ref uint dataSize, uint headerSize);
+	public static extern uint GetRawInputData(IntPtr rawInput, RawInputCommand command, IntPtr data, ref uint dataSize, uint headerSize);
+
+	[DllImport(User32Path, EntryPoint = "GetRawInputDeviceInfoW")]
+	public static extern int GetRawInputDeviceInfo(IntPtr device, RawInputDeviceInfoType command, IntPtr data, ref uint size);
 
 	[DllImport(User32Path, EntryPoint = "GetSystemMetrics")]
 	public static extern int GetSystemMetrics(SystemMetric metric);

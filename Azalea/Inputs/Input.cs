@@ -39,6 +39,9 @@ public static class Input
 
 		foreach (var mouseButton in _mouseButtons)
 			mouseButton.Update();
+
+		foreach (var gamepad in _gamepads)
+			gamepad.Update();
 	}
 
 	/// <summary>
@@ -287,12 +290,14 @@ public static class Input
 
 	#endregion
 
-	#region Joystick
+	#region Gamepad
 
-	internal const int _joystickSlots = 8;
-	internal static IJoystick[] _joysticks = new IJoystick[_joystickSlots];
+	internal static List<IGamepad> _gamepads = new();
+	public static int GetGamepadCount() => _gamepads.Count;
+	public static IGamepad GetGamepad(int index) => _gamepads[index];
 
-	internal static IJoystick GetJoystick(int i) => _joysticks[i];
+	internal static void HandleGamepadConnected(IGamepad gamepad)
+		=> _gamepads.Add(gamepad);
 
 	#endregion
 

@@ -14,6 +14,8 @@ internal class Win32Window : PlatformWindow
 	private readonly WindowProcedure _windowProcedure;
 	private readonly WindowState _initialShowState;
 
+	private readonly WinRawInputManager _rawInputManager;
+
 	public Win32Window(string title, Vector2Int clientSize, WindowState state, bool visible)
 		: base(title, clientSize, state)
 	{
@@ -57,6 +59,8 @@ internal class Win32Window : PlatformWindow
 			Console.WriteLine($"Could not create Window. (Error {Marshal.GetLastWin32Error()})");
 			return;
 		}
+
+		_rawInputManager = new WinRawInputManager(_window);
 
 		//Setup OpenGL
 		_deviceContext = WinAPI.GetDC(_window);
@@ -232,6 +236,9 @@ internal class Win32Window : PlatformWindow
 
 				break;
 
+			//Raw Input
+			case WindowMessage.Input:
+				_rawInputManager.HandleRawInput(lParam); break;
 		}
 
 		return WinAPI.DefWindowProc(window, message, wParam, lParam);
