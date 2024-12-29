@@ -25,7 +25,6 @@ public static class Input
 			return _keyboardKeys[(int)Keys.Unknown];
 	}
 	public static ButtonState GetMouseButton(MouseButton button) => _mouseButtons[(int)button];
-	public static IJoystick GetJoystick(int i) => _joysticks[i];
 
 	public static event Action<char>? OnTextInput;
 
@@ -59,12 +58,14 @@ public static class Input
 		return Vector2.Normalize(direction);
 	}
 
+	public static int GetGamepadCount() => _gamepads.Count;
+	public static IGamepad GetGamepad(int index) => _gamepads[index];
+
 	#endregion
 
-	internal static ButtonState[] _mouseButtons = new ButtonState[1];
-	internal static ButtonState[] _keyboardKeys = new ButtonState[1];
-	internal static IJoystick[] _joysticks = new IJoystick[_joystickSlots];
-	internal const int _joystickSlots = 8;
+	internal static ButtonState[] _mouseButtons = Array.Empty<ButtonState>();
+	internal static ButtonState[] _keyboardKeys = Array.Empty<ButtonState>();
+	internal static List<IGamepad> _gamepads = new();
 
 	private static Vector2 _lastMousePosition = Vector2.Zero;
 	private static Vector2 _mousePosition = Vector2.Zero;
@@ -94,11 +95,6 @@ public static class Input
 		{
 			_keyboardKeys[i] = new ButtonState();
 		}
-
-		for (int i = 0; i < _joystickSlots; i++)
-		{
-
-		}
 	}
 
 	internal static void LateUpdate()
@@ -111,6 +107,11 @@ public static class Input
 		foreach (var mouseButton in _mouseButtons)
 		{
 			mouseButton.Update();
+		}
+
+		foreach (var gamepad in _gamepads)
+		{
+			gamepad.Update();
 		}
 
 		_mouseWheelDelta = 0;
@@ -268,6 +269,11 @@ public static class Input
 	internal static void HandleTextInput(char input)
 	{
 		OnTextInput?.Invoke(input);
+	}
+
+	internal static void HandleGamepadConnected(IGamepad gamepad)
+	{
+		_gamepads.Add(gamepad);
 	}
 
 	private static List<GameObject> buildNonPositionalInputQueue()

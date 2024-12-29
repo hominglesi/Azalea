@@ -13,6 +13,8 @@ internal class Win32Window : PlatformWindow
 	private readonly WindowProcedure _windowProcedure;
 	private readonly WindowState _initialShowState;
 
+	private readonly WinRawInputManager _rawInputManager;
+
 	public Win32Window(string title, Vector2Int clientSize, WindowState state, bool visible)
 		: base(title, clientSize, state)
 	{
@@ -57,9 +59,7 @@ internal class Win32Window : PlatformWindow
 			return;
 		}
 
-		//Setup Raw Input
-		var rawInputDevice = new RawInputDevice(1, 5, 0, _window);
-		WinAPI.RegisterRawInputDevices(ref rawInputDevice, 1, (uint)Marshal.SizeOf<RawInputDevice>());
+		_rawInputManager = new WinRawInputManager(_window);
 
 		//Setup OpenGL
 		_deviceContext = WinAPI.GetDC(_window);
@@ -155,56 +155,81 @@ internal class Win32Window : PlatformWindow
 			//Raw Input
 			case WindowMessage.Input:
 
-				uint bufferSize = 0;
-				RawInput rawInput = new();
+				_rawInputManager.HandleRawInput(lParam);
 
-				var rawInputBytes = new byte[2000];
+				/*
+				IntPtr deviceHandle = lParam;
+				uint dataSize = 0;
+				uint headerSize = (uint)Marshal.SizeOf<RawInputHeader>();
 
-				WinAPI.GetRawInputData(lParam, 0x10000003, IntPtr.Zero, ref bufferSize, (uint)Marshal.SizeOf<RawInputHeader>());
-				WinAPI.GetRawInputData(lParam, 0x10000003, ref rawInput, ref bufferSize, (uint)Marshal.SizeOf<RawInputHeader>());
+				WinAPI.GetRawInputData(deviceHandle, RawInputCommand.Input, IntPtr.Zero, ref dataSize, headerSize);
 
-				WinAPI.GetRawInputDeviceInfo(rawInput.Header.Device, 0x20000005, IntPtr.Zero, ref bufferSize);
+				IntPtr rawInputData = Marshal.AllocHGlobal((int)dataSize);
+				WinAPI.GetRawInputData(deviceHandle, RawInputCommand.Input, rawInputData, ref dataSize, headerSize);
 
-				var data = new byte[bufferSize];
-				WinAPI.GetRawInputDeviceInfo(rawInput.Header.Device, 0x20000005, ref data[0], ref bufferSize);
+				var rawInput = Marshal.PtrToStructure<RawInput>(rawInputData);
 
-				WinAPI.HidP_GetCaps(ref data[0], out HidPCaps capabilities);
+				uint preparsedDataSize = 0;
+				var z = (int)WinAPI.GetRawInputDeviceInfo(rawInput.Header.Device, RawInputDeviceInfoType.PreparsedData, IntPtr.Zero, ref preparsedDataSize);
 
-				var buttonCaps = new HidPButtonCaps[capabilities.NumberInputButtonCaps];
-				var capsLength = capabilities.NumberInputButtonCaps;
+				IntPtr preparsedData = Marshal.AllocHGlobal((int)preparsedDataSize);
+				int x = (int)WinAPI.GetRawInputDeviceInfo(rawInput.Header.Device, RawInputDeviceInfoType.PreparsedData, preparsedData, ref preparsedDataSize);
 
-				WinAPI.HidP_GetButtonCaps(HidPReportType.Input, ref buttonCaps[0], ref capsLength, ref data[0]);
+				HidPCaps capabilities = new();
+				var y = WinAPI.HidP_GetCaps(preparsedData, ref capabilities);
 
-				var numberOfButtons = buttonCaps[0].Range.UsageMax - buttonCaps[0].Range.UsageMin + 1;
+				var buttonCapabilities = new HidPButtonCaps[capabilities.NumberInputButtonCaps];
+				ushort buttonCapabilitiesCount = capabilities.NumberInputButtonCaps;
+				WinAPI.HidP_GetButtonCaps(HidPReportType.Input, buttonCapabilities, ref buttonCapabilitiesCount, preparsedData);
 
-				var valueCaps = new HidPValueCaps[capabilities.NumberInputValueCaps];
-				capsLength = capabilities.NumberInputValueCaps;
+				var valueCapabilities = new HidPValueCaps[capabilities.NumberInputValueCaps];
+				ushort valueCapabilitiesCount = capabilities.NumberInputValueCaps;
+				WinAPI.HidP_GetValueCaps(HidPReportType.Input, valueCapabilities, ref valueCapabilitiesCount, preparsedData);
 
-				WinAPI.HidP_GetValueCaps(HidPReportType.Input, valueCaps, ref capsLength, ref data[0]);
+				var inputReport = new byte[rawInput.HID.SizeHid];
 
-				var x = new ushort[1000];
-				uint length = 8;
-
-				WinAPI.HidP_GetUsages(HidPReportType.Input, capabilities.UsagePage, 0, x, ref length, ref data[0],
-					ref rawInput.HID.RawData, rawInput.HID.SizeHid);
-
-				string str = "";
-
-				for (int i = 0; i < capabilities.NumberInputValueCaps; i++)
+				for (int i = 0; i < rawInput.HID.Count; i++)
 				{
-					WinAPI.HidP_GetUsageValue(HidPReportType.Input, valueCaps[i].UsagePage, 0,
-					valueCaps[i].Range.UsageMin, out var usageValue, ref data[0],
-					ref rawInput.HID.RawData, rawInput.HID.SizeHid);
+					unsafe
+					{
+						byte* hidOffset = (byte*)rawInputData;
+						hidOffset += sizeof(RawInputHeader) + sizeof(RawHID) + (rawInput.HID.SizeHid * i);
+						void* hidData = (void*)hidOffset;
+						Marshal.Copy(new IntPtr(hidData), inputReport, 0, (int)rawInput.HID.SizeHid);
+					}
 
-					str += usageValue;
-					str += " : ";
+					uint usageCount = 0;
+					HidUsageAndPage[] usages = null!;
+					var status = WinAPI.HidP_GetUsagesEx(HidPReportType.Input, 0, usages!, ref usageCount, preparsedData, inputReport, rawInput.HID.SizeHid);
+					if (status == HidStatus.BufferTooSmall)
+					{
+						usages = new HidUsageAndPage[usageCount];
+						WinAPI.HidP_GetUsagesEx(HidPReportType.Input, 0, usages, ref usageCount, preparsedData, inputReport, rawInput.HID.SizeHid);
+					}
+
+					if (usages != null)
+					{
+						foreach (var usage in usages)
+						{
+							Console.Write(usage.Usage + " ");
+						}
+						Console.WriteLine();
+					}
+
+					foreach (var valueCap in valueCapabilities)
+					{
+						uint usageValue = 0;
+
+						WinAPI.HidP_GetUsageValue(HidPReportType.Input, valueCap.UsagePage,
+							valueCap.LinkCollection, valueCap.NotRange.Usage, ref usageValue, preparsedData, inputReport, rawInput.HID.SizeHid);
+
+						Console.Write(valueCap.Range.UsageMin + ": " + usageValue + ", ");
+					}
+					Console.WriteLine();
 				}
 
-				Console.WriteLine(str);
-
-				//Console.WriteLine(length);
-
-				//Console.WriteLine("adwdaw");
+				Marshal.FreeHGlobal(rawInputData);
+				*/
 				break;
 		}
 

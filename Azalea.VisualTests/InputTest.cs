@@ -28,6 +28,22 @@ public class InputTest : TestScene
 	{
 		if (Input.GetKey(Keys.P).Down)
 			Console.WriteLine("P recieved directly");
+
+		if (Input.GetGamepadCount() < 1)
+			return;
+
+		for (int i = 1; i <= 10; i++)
+			if (Input.GetGamepad(0).GetButton(i).Down)
+				Console.WriteLine("Button " + i + " down");
+
+		if (Input.GetGamepad(0).GetDPad().Left.Down)
+			Console.WriteLine("Left Down!");
+
+		if (Input.GetGamepad(0).GetDPad().Left.Up)
+			Console.WriteLine("Left Up!");
+
+		//Console.WriteLine(Input.GetGamepad(1).GetLeftStick().GetVectorNormalized());
+		//Console.WriteLine(Input.GetGamepad(0).GetRightStick().GetVector());
 	}
 
 	private class InputLoggingObject : Box
