@@ -11,4 +11,10 @@ public class InstantAmend<T> : Amend<T>
 		Perform();
 		Finish();
 	}
+
+	public override void Finish()
+	{
+		Perform();
+		base.Finish();
+	}
 }
