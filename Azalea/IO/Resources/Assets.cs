@@ -50,8 +50,12 @@ public static partial class Assets
 	/// </summary>
 	internal static void SetupPersistentStore(string folderName)
 	{
-		var path = FileSystemUtils.CombinePaths(
-			Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), folderName);
+		var roamingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+		var path = FileSystemUtils.CombinePaths(roamingDirectory, folderName);
+
+		if (Directory.Exists(path) == false)
+			Directory.CreateDirectory(path);
+
 		_persistentStore = new Storage(path);
 	}
 
