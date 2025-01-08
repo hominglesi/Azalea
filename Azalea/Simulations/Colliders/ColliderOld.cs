@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Simulations.Colliders;
-public abstract class Collider : Component
+public abstract class ColliderOld : Component
 {
 	public Vector2 Position { get => GetPosition(); set => SetPosition(value); }
 	internal virtual Vector2 GetPosition() => Parent.Position;
@@ -14,25 +14,25 @@ public abstract class Collider : Component
 	public float Rotation { get => Parent.Rotation; set => Parent.Rotation = value; }
 	public bool IsTrigger { get; set; }
 	public abstract float ShortestDistance { get; }
-	public List<Collider> CollidedWith { get; set; } = new List<Collider>();
-	public List<Collider> CollidingWith { get; set; } = new List<Collider>();
+	public List<ColliderOld> CollidedWith { get; set; } = new List<ColliderOld>();
+	public List<ColliderOld> CollidingWith { get; set; } = new List<ColliderOld>();
 
-	public Action<Collider>? OnCollision;
-	public Action<Collider>? OnCollisionEnter;
-	public Action<Collider>? OnCollisionExit;
-	public void OnCollide(Collider other)
+	public Action<ColliderOld>? OnCollision;
+	public Action<ColliderOld>? OnCollisionEnter;
+	public Action<ColliderOld>? OnCollisionExit;
+	public void OnCollide(ColliderOld other)
 	{
 		CollidingWith.Add(other);
 		OnCollision?.Invoke(other);
 	}
 
-	public void OnExitingCollider(Collider other)
+	public void OnExitingCollider(ColliderOld other)
 	{
 		OnCollisionExit?.Invoke(other);
 		other.OnCollisionExit?.Invoke(this);
 	}
 
-	public void OnEnteringCollider(Collider other)
+	public void OnEnteringCollider(ColliderOld other)
 	{
 		OnCollisionEnter?.Invoke(other);
 		other.OnCollisionEnter?.Invoke(this);
@@ -64,7 +64,7 @@ public abstract class Collider : Component
 	}
 	public abstract Vector2[] GetVertices();
 
-	public abstract bool ProcessCollision(Collider other, bool resolveCollision);
-	public abstract bool ProcessCollision(CircleCollider other, bool resolveCollision);
-	public abstract bool ProcessCollision(RectCollider other, bool resolveCollision);
+	public abstract bool ProcessCollision(ColliderOld other, bool resolveCollision);
+	public abstract bool ProcessCollision(CircleColliderOld other, bool resolveCollision);
+	public abstract bool ProcessCollision(RectColliderOld other, bool resolveCollision);
 }

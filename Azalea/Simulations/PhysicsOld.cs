@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Simulations;
-public static class Physics
+public static class PhysicsOld
 {
-	private static PhysicsGenerator? _instance;
-	public static PhysicsGenerator Instance => _instance ??= GameHost.Main.Physics;
+	private static PhysicsGeneratorOld? _instance;
+	public static PhysicsGeneratorOld Instance => _instance ??= GameHost.Main.Physics;
 
 	public static Vector2 GravityConstant
 	{
@@ -51,9 +51,9 @@ public static class Physics
 		set => Instance.UsesFriction = value;
 	}
 
-	public static IEnumerable<RigidBody> RigidBodies
+	public static IEnumerable<RigidBodyOld> RigidBodies
 		=> Instance.RigidBodies;
 
-	public static bool CheckCollisions(Collider currentCollider, IEnumerable<Collider> colliders, bool shouldResolveCollision = false)
+	public static bool CheckCollisions(ColliderOld currentCollider, IEnumerable<ColliderOld> colliders, bool shouldResolveCollision = false)
 		=> Instance.CheckCollisions(currentCollider, colliders, shouldResolveCollision);
 }

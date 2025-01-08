@@ -19,8 +19,8 @@ public class TriggerTest : TestScene
 	bool charging = false;
 	public TriggerTest()
 	{
-		Physics.DebugMode = false;
-		Physics.UsesGravity = false;
+		PhysicsOld.DebugMode = false;
+		PhysicsOld.UsesGravity = false;
 		Add(line = new Line()
 		{
 			StartPoint = new(500, 40),
@@ -37,13 +37,13 @@ public class TriggerTest : TestScene
 			Texture = Assets.GetTexture("Textures/Circle.png"),
 			Alpha = 150f
 		});
-		circle1.AddComponent(new RigidBody()
+		circle1.AddComponent(new RigidBodyOld()
 		{
 			Mass = 10000,
 			IsDynamic = false,
 		});
-		CircleCollider crcol;
-		circle1.AddComponent(crcol = new CircleCollider()
+		CircleColliderOld crcol;
+		circle1.AddComponent(crcol = new CircleColliderOld()
 		{
 			Radius = 70,
 			IsTrigger = true,
@@ -64,13 +64,13 @@ public class TriggerTest : TestScene
 			Color = Palette.Yellow,
 			Origin = Graphics.Anchor.Center,
 		});
-		box1.AddComponent(new RigidBody()
+		box1.AddComponent(new RigidBodyOld()
 		{
 			Mass = 10,
 			//	UsesGravity = false,
 			//AngularAcceleration = 0.0001f
 		});
-		box1.AddComponent(new RectCollider());
+		box1.AddComponent(new RectColliderOld());
 
 
 	}
@@ -84,7 +84,7 @@ public class TriggerTest : TestScene
 	{
 		if (Input.GetKey(Keys.Space).Down)
 		{
-			Physics.UsesGravity = true;
+			PhysicsOld.UsesGravity = true;
 		}
 
 		if (Input.GetKey(Keys.W).Pressed)

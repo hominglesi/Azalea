@@ -2,7 +2,7 @@
 using System.Numerics;
 
 namespace Azalea.Simulations;
-public class RigidBody : Component
+public class RigidBodyOld : Component
 {
 	public Vector2 Position { get => Parent.Position; set => Parent.Position = value; }
 	public float Rotation { get => Parent.Rotation; set => Parent.Rotation = value; }

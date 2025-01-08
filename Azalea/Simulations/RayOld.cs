@@ -2,9 +2,9 @@
 using System.Numerics;
 
 namespace Azalea.Simulations;
-public class Ray
+public class RayOld
 {
-	public Ray(Vector2 startPosition, float angle, int range)
+	public RayOld(Vector2 startPosition, float angle, int range)
 	{
 		Angle = angle;
 		Range = range;
@@ -16,8 +16,8 @@ public class Ray
 	public float Distance { get; set; }
 	public float Angle { get; set; }
 	public Vector2 StartPosition { get; set; }
-	public Collider HitCollider { get; set; }
-	public PhysicsGenerator PGen { get; }
+	public ColliderOld HitCollider { get; set; }
+	public PhysicsGeneratorOld PGen { get; }
 
 
 }

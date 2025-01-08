@@ -3,7 +3,7 @@ using System;
 using System.Numerics;
 
 namespace Azalea.Simulations.Colliders;
-public class RectCollider : Collider
+public class RectColliderOld : ColliderOld
 {
 	private Quad _quad;
 	private Vector2 _size;
@@ -72,12 +72,12 @@ public class RectCollider : Collider
 		};
 	}
 
-	public override bool ProcessCollision(Collider other, bool resolveCollision)
+	public override bool ProcessCollision(ColliderOld other, bool resolveCollision)
 		=> other.ProcessCollision(this, resolveCollision);
 
-	public override bool ProcessCollision(CircleCollider other, bool resolveCollision)
-		=> CollisionLogic.CircleRectCollision(other, this, resolveCollision);
+	public override bool ProcessCollision(CircleColliderOld other, bool resolveCollision)
+		=> CollisionLogicOld.CircleRectCollision(other, this, resolveCollision);
 
-	public override bool ProcessCollision(RectCollider other, bool resolveCollision)
-		=> CollisionLogic.RectRectCollision(this, other, resolveCollision);
+	public override bool ProcessCollision(RectColliderOld other, bool resolveCollision)
+		=> CollisionLogicOld.RectRectCollision(this, other, resolveCollision);
 }

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Numerics;
 
 namespace Azalea.Simulations;
-public class PhysicsGenerator
+public class PhysicsGeneratorOld
 {
 	public const int UpdateRate = 60;
 
@@ -19,7 +19,7 @@ public class PhysicsGenerator
 	public bool DebugMode { get; set; }
 	public bool UsesGravity { get; set; } = false;
 	public bool UsesFriction { get; set; } = true;
-	public IEnumerable<RigidBody> RigidBodies => ComponentStorage<RigidBody>.GetComponents();
+	public IEnumerable<RigidBodyOld> RigidBodies => ComponentStorage<RigidBodyOld>.GetComponents();
 
 	internal void Update()
 	{
@@ -30,7 +30,7 @@ public class PhysicsGenerator
 			applyForces(rb, RigidBodies);
 		}
 
-		foreach (var collider in RigidBodies.Select<RigidBody, Collider>(x => x.Parent!.GetComponent<Collider>()!))
+		foreach (var collider in RigidBodies.Select<RigidBodyOld, ColliderOld>(x => x.Parent!.GetComponent<ColliderOld>()!))
 		{
 			collider.CheckColliders();
 			collider.CollidedWith.Clear();
@@ -39,12 +39,12 @@ public class PhysicsGenerator
 		}
 	}
 
-	private void applyGravity(RigidBody rb)
+	private void applyGravity(RigidBodyOld rb)
 	{
 		rb.Force += rb.Mass * GravityConstant / UpdateRate;
 	}
 
-	private void applyTopDownFriction(RigidBody rb)
+	private void applyTopDownFriction(RigidBodyOld rb)
 	{
 		if (rb.Velocity.Length() <= 0)
 			return;
@@ -59,7 +59,7 @@ public class PhysicsGenerator
 		}
 	}
 
-	private void applyForces(RigidBody rb, IEnumerable<RigidBody> others)
+	private void applyForces(RigidBodyOld rb, IEnumerable<RigidBodyOld> others)
 	{
 		if (rb.IsDynamic == false)
 			return;
@@ -80,21 +80,21 @@ public class PhysicsGenerator
 
 
 
-		int numOfAttempts = 1 + (int)MathF.Ceiling(rb.Velocity.Length() / rb.Parent.GetComponent<Collider>().ShortestDistance);
+		int numOfAttempts = 1 + (int)MathF.Ceiling(rb.Velocity.Length() / rb.Parent.GetComponent<ColliderOld>().ShortestDistance);
 		for (int i = 0; i < numOfAttempts; i++)
 		{
 			rb.Position += rb.Velocity / numOfAttempts;
-			CheckCollisions(rb.Parent.GetComponent<Collider>(), others.Select(x => x.Parent.GetComponent<Collider>()), true);
+			CheckCollisions(rb.Parent.GetComponent<ColliderOld>(), others.Select(x => x.Parent.GetComponent<ColliderOld>()), true);
 		}
 		rb.Torque = new Vector2(0, 0);
 		rb.Force = new Vector2(0, 0);
 	}
 
-	public bool CheckCollisions(Collider currentCollider, IEnumerable<Collider> colliders, bool shouldResolveCollision = false)
+	public bool CheckCollisions(ColliderOld currentCollider, IEnumerable<ColliderOld> colliders, bool shouldResolveCollision = false)
 	{
 		bool isColliding = false;
 
-		foreach (Collider otherCollider in colliders)
+		foreach (ColliderOld otherCollider in colliders)
 		{
 			if (otherCollider == currentCollider)
 				continue;

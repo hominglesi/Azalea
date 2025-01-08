@@ -3,9 +3,9 @@ using System;
 using System.Numerics;
 
 namespace Azalea.Simulations.Colliders;
-internal static class CollisionLogic
+internal static class CollisionLogicOld
 {
-	public static bool CircleCircleCollision(CircleCollider circle1, CircleCollider circle2, bool resolveCollision)
+	public static bool CircleCircleCollision(CircleColliderOld circle1, CircleColliderOld circle2, bool resolveCollision)
 	{
 		float distanceOfCenters = Vector2.Distance(circle1.Position, circle2.Position);
 
@@ -14,8 +14,8 @@ internal static class CollisionLogic
 
 		if (resolveCollision)
 		{
-			RigidBody rigidBody1 = circle1.Parent!.GetComponent<RigidBody>()!;
-			RigidBody rigidBody2 = circle2.Parent!.GetComponent<RigidBody>()!;
+			RigidBodyOld rigidBody1 = circle1.Parent!.GetComponent<RigidBodyOld>()!;
+			RigidBodyOld rigidBody2 = circle2.Parent!.GetComponent<RigidBodyOld>()!;
 			float displacement = circle1.Radius + circle2.Radius - distanceOfCenters;
 			Vector2 collisionNormal = Vector2.Normalize(circle2.Position - circle1.Position);
 
@@ -45,7 +45,7 @@ internal static class CollisionLogic
 		return true;
 	}
 
-	public static bool CircleRectCollision(CircleCollider circle, RectCollider rect, bool resolveCollision)
+	public static bool CircleRectCollision(CircleColliderOld circle, RectColliderOld rect, bool resolveCollision)
 	{
 		float rectAngle = rect.Rotation / 180 * MathF.PI;
 		int rotatedCircleX = (int)((circle.Position.X - rect.Position.X) * Math.Cos(-rectAngle)
@@ -82,8 +82,8 @@ internal static class CollisionLogic
 		float penetration = (float)(circle.Radius - distance);
 		if (resolveCollision)
 		{
-			RigidBody rigidBodyCircle = circle.Parent!.GetComponent<RigidBody>()!;
-			RigidBody rigidBodyRect = rect.Parent!.GetComponent<RigidBody>()!;
+			RigidBodyOld rigidBodyCircle = circle.Parent!.GetComponent<RigidBodyOld>()!;
+			RigidBodyOld rigidBodyRect = rect.Parent!.GetComponent<RigidBodyOld>()!;
 
 			Vector2 collisionNormal = Vector2.Normalize(new Vector2(distanceX, distanceY));
 			if (float.IsNaN(collisionNormal.X) || float.IsNaN(collisionNormal.Y))
@@ -133,7 +133,7 @@ internal static class CollisionLogic
 		return true;
 	}
 
-	public static bool RectRectCollision(RectCollider rect1, RectCollider rect2, bool resolveCollision)
+	public static bool RectRectCollision(RectColliderOld rect1, RectColliderOld rect2, bool resolveCollision)
 	{
 		if (rect1.Position.X - rect1.HalfA > rect2.Position.X + rect2.HalfA ||
 		   rect1.Position.X + rect1.HalfA < rect2.Position.X - rect2.HalfA ||
@@ -146,8 +146,8 @@ internal static class CollisionLogic
 
 		if (resolveCollision)
 		{
-			RigidBody rigidBody1 = rect1.Parent!.GetComponent<RigidBody>()!;
-			RigidBody rigidBody2 = rect2.Parent!.GetComponent<RigidBody>()!;
+			RigidBodyOld rigidBody1 = rect1.Parent!.GetComponent<RigidBodyOld>()!;
+			RigidBodyOld rigidBody2 = rect2.Parent!.GetComponent<RigidBodyOld>()!;
 			float displacementX = -penetrationX;
 			float displacementY = -penetrationY;
 

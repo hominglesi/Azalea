@@ -32,8 +32,8 @@ internal class SwarmTest : TestScene
 			Size = new(60, 100);
 			Texture = Assets.GetTexture("Textures/baseSprite.png");
 
-			AddComponent(new RigidBody());
-			AddComponent(new RectCollider());
+			AddComponent(new RigidBodyOld());
+			AddComponent(new RectColliderOld());
 		}
 	}
 }

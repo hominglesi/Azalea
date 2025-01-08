@@ -25,7 +25,7 @@ public abstract class GameHost
 	public IAudioManager AudioManager { get; }
 	public IConfigProvider? ConfigProvider { get; protected set; }
 	public SceneContainer SceneManager { get; }
-	public PhysicsGenerator Physics { get; }
+	public PhysicsGeneratorOld Physics { get; }
 	public IClipboard Clipboard { get; }
 
 	private readonly Composition _root;
@@ -41,7 +41,7 @@ public abstract class GameHost
 		Renderer = CreateRenderer(Window);
 		AudioManager = CreateAudioManager();
 		Clipboard = CreateClipboard();
-		Physics = new PhysicsGenerator();
+		Physics = new PhysicsGeneratorOld();
 		SceneManager = new SceneContainer();
 
 		_root = new Composition();

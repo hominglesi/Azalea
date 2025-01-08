@@ -7,13 +7,13 @@ using System.Linq;
 using System.Numerics;
 
 namespace Azalea.Simulations;
-public class RayCast
+public class RayCastOld
 {
-	public static Ray Cast(Ray ray)
+	public static RayOld Cast(RayOld ray)
 	{
-		Collider collider;
+		ColliderOld collider;
 		GameObject ob = new Box();
-		collider = new CircleCollider()
+		collider = new CircleColliderOld()
 		{
 			Radius = 2,
 		};
@@ -25,7 +25,7 @@ public class RayCast
 		collider.Position += direction * ray.MinimumRange;
 		for (int i = ray.MinimumRange; i < ray.Range; i++)
 		{
-			bool isColliding = Physics.CheckCollisions(collider, ComponentStorage<RigidBody>.GetComponents().Select(x => x.Parent.GetComponent<Collider>()!));
+			bool isColliding = PhysicsOld.CheckCollisions(collider, ComponentStorage<RigidBodyOld>.GetComponents().Select(x => x.Parent.GetComponent<ColliderOld>()!));
 			if (isColliding)
 			{
 				ray.Hit = true;

@@ -28,7 +28,7 @@ public class LegacyColliderDebug : GameObject
 			var color = new DrawColorInfo(new Color(45, 75, 23, 80));
 			var color2 = new DrawColorInfo(new Color(84, 42, 86, 140));
 
-			foreach (var collider in ComponentStorage<RectCollider>.GetComponents())
+			foreach (var collider in ComponentStorage<RectColliderOld>.GetComponents())
 			{
 				renderer.DrawQuad(renderer.WhitePixel, collider.Quad, color);
 

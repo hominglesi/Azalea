@@ -123,8 +123,8 @@ public class BilliardTest : TestScene
 		Window.ClientSize = new(panelWidth, panelHeight);
 		Window.Center();
 		this.BackgroundColor = new Graphics.Colors.Color(48, 23, 8);
-		Physics.UsesGravity = false;
-		Physics.IsTopDown = true;
+		PhysicsOld.UsesGravity = false;
+		PhysicsOld.IsTopDown = true;
 		Add(line = new Line()
 		{
 			StartPoint = new(500, 40),
@@ -228,14 +228,14 @@ public class BilliardTest : TestScene
 			Depth = 20,
 			//Rotation = 15
 		});
-		topLeftEdge.AddComponent(new RigidBody()
+		topLeftEdge.AddComponent(new RigidBodyOld()
 		{
 			Mass = 1000000,
 			UsesGravity = false,
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		topLeftEdge.AddComponent(new RectCollider());
+		topLeftEdge.AddComponent(new RectColliderOld());
 
 		Add(topRightEdge = new Box()
 		{
@@ -246,14 +246,14 @@ public class BilliardTest : TestScene
 			Depth = 20,
 			//Rotation = 15
 		});
-		topRightEdge.AddComponent(new RigidBody()
+		topRightEdge.AddComponent(new RigidBodyOld()
 		{
 			Mass = 1000000,
 			UsesGravity = false,
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		topRightEdge.AddComponent(new RectCollider());
+		topRightEdge.AddComponent(new RectColliderOld());
 
 		Add(bottomLeftEdge = new Box()
 		{
@@ -264,14 +264,14 @@ public class BilliardTest : TestScene
 			Depth = 20,
 			//Rotation = 15
 		});
-		bottomLeftEdge.AddComponent(new RigidBody()
+		bottomLeftEdge.AddComponent(new RigidBodyOld()
 		{
 			Mass = 1000000,
 			UsesGravity = false,
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		bottomLeftEdge.AddComponent(new RectCollider());
+		bottomLeftEdge.AddComponent(new RectColliderOld());
 
 		Add(bottomRightEdge = new Box()
 		{
@@ -282,14 +282,14 @@ public class BilliardTest : TestScene
 			Depth = 20,
 			//Rotation = 15
 		});
-		bottomRightEdge.AddComponent(new RigidBody()
+		bottomRightEdge.AddComponent(new RigidBodyOld()
 		{
 			Mass = 1000000,
 			UsesGravity = false,
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		bottomRightEdge.AddComponent(new RectCollider());
+		bottomRightEdge.AddComponent(new RectColliderOld());
 
 		Add(leftEdge = new Box()
 		{
@@ -300,14 +300,14 @@ public class BilliardTest : TestScene
 			Depth = 20,
 			//Rotation = 15
 		});
-		leftEdge.AddComponent(new RigidBody()
+		leftEdge.AddComponent(new RigidBodyOld()
 		{
 			Mass = 1000000,
 			UsesGravity = false,
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		leftEdge.AddComponent(new RectCollider());
+		leftEdge.AddComponent(new RectColliderOld());
 
 		Add(rightEdge = new Box()
 		{
@@ -318,14 +318,14 @@ public class BilliardTest : TestScene
 			Depth = 20,
 			//Rotation = 15
 		});
-		rightEdge.AddComponent(new RigidBody()
+		rightEdge.AddComponent(new RigidBodyOld()
 		{
 			Mass = 1000000,
 			UsesGravity = false,
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		rightEdge.AddComponent(new RectCollider());
+		rightEdge.AddComponent(new RectColliderOld());
 	}
 	private void GenerateHoleCorners()
 	{
@@ -360,14 +360,14 @@ public class BilliardTest : TestScene
 			Depth = 19,
 			Rotation = angle
 		});
-		topLeftEdge.AddComponent(new RigidBody()
+		topLeftEdge.AddComponent(new RigidBodyOld()
 		{
 			Mass = 1000000,
 			UsesGravity = false,
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		topLeftEdge.AddComponent(new RectCollider());
+		topLeftEdge.AddComponent(new RectColliderOld());
 		return box;
 	}
 
@@ -418,13 +418,13 @@ public class BilliardTest : TestScene
 			Texture = Assets.GetTexture("Textures/Ball.png"),
 			Depth = 6
 		});
-		hole.AddComponent(new RigidBody()
+		hole.AddComponent(new RigidBodyOld()
 		{
 			Mass = 10,
 			IsDynamic = false,
 		});
-		Collider holeCollider;
-		hole.AddComponent(holeCollider = new CircleCollider()
+		ColliderOld holeCollider;
+		hole.AddComponent(holeCollider = new CircleColliderOld()
 		{
 			Radius = 8,
 			IsTrigger = true,
@@ -491,7 +491,7 @@ public class BilliardTest : TestScene
 
 		line.StartPoint = whiteBall.Position;
 		line.EndPoint = Input.MousePosition;
-		CircleCollider crCol = whiteBall.GetComponent<CircleCollider>();
+		CircleColliderOld crCol = whiteBall.GetComponent<CircleColliderOld>();
 		if (Input.MousePosition.X < whiteBall.Position.X + crCol.Radius && Input.MousePosition.X > whiteBall.Position.X - crCol.Radius
 			&& Input.MousePosition.Y < whiteBall.Position.Y + crCol.Radius && Input.MousePosition.Y > whiteBall.Position.Y - crCol.Radius)
 		{
@@ -512,7 +512,7 @@ public class BilliardTest : TestScene
 			float power = 4f;
 			float distance = Vector2.Distance(Input.MousePosition, whiteBall.Position);
 			power *= 1 + distance / 10;
-			whiteBall.GetComponent<RigidBody>().ApplyForce(directionVector, power);
+			whiteBall.GetComponent<RigidBodyOld>().ApplyForce(directionVector, power);
 			waitingForBalls = true;
 		}
 
@@ -521,11 +521,11 @@ public class BilliardTest : TestScene
 			aimLine.Alpha = 1;
 			float angle = MathF.Atan2(directionVector.Y, directionVector.X);
 			//	Console.WriteLine($"Angle: {angle}");
-			Ray ray = new Ray(whiteBall.Position, angle, 1500)
+			RayOld ray = new RayOld(whiteBall.Position, angle, 1500)
 			{
 				MinimumRange = 13,
 			};
-			ray = RayCast.Cast(ray);
+			ray = RayCastOld.Cast(ray);
 			//		if (ray.Hit)
 			//			Console.WriteLine("HIT");
 			aimLine.StartPoint = whiteBall.Position;
@@ -539,7 +539,7 @@ public class BilliardTest : TestScene
 		if (waitingForBalls)
 		{
 			bool allStopped = true;
-			foreach (RigidBody body in ComponentStorage<RigidBody>.GetComponents())
+			foreach (RigidBodyOld body in ComponentStorage<RigidBodyOld>.GetComponents())
 			{
 				if (body.Parent is SnookerBall ball && body.Velocity.Length() > 0.01 && ball.Alpha > 0.5)
 				{
@@ -556,7 +556,7 @@ public class BilliardTest : TestScene
 
 	}
 
-	private void Score(Collider holeCollider, Collider other)
+	private void Score(ColliderOld holeCollider, ColliderOld other)
 	{
 		if (other.Parent is SnookerBall ball)
 		{
@@ -564,7 +564,7 @@ public class BilliardTest : TestScene
 
 			//if not foul	if()
 			//	currentPlayer.Score += ball.PointValue;
-			ball.GetComponent<RigidBody>().Velocity = new Vector2(0, 0);
+			ball.GetComponent<RigidBodyOld>().Velocity = new Vector2(0, 0);
 			ball.Position = new(-500, -500);
 			player1Text.Text = player1.ToString();
 			player2Text.Text = player2.ToString();
@@ -587,8 +587,8 @@ public class BilliardTest : TestScene
 
 		foreach (var ball in AllBalls.Where(x => x.Alpha > 0.5))
 		{
-			ball.GetComponent<RigidBody>().Velocity = new(0, 0);
-			ball.GetComponent<RigidBody>().IsDynamic = false;
+			ball.GetComponent<RigidBodyOld>().Velocity = new(0, 0);
+			ball.GetComponent<RigidBodyOld>().IsDynamic = false;
 		}
 		foreach (var ball in AllBalls.Where(x => x.Alpha > 0.5))
 		{
@@ -596,7 +596,7 @@ public class BilliardTest : TestScene
 		}
 		foreach (var ball in AllBalls.Where(x => x.Alpha > 0.5))
 		{
-			ball.GetComponent<RigidBody>().IsDynamic = true;
+			ball.GetComponent<RigidBodyOld>().IsDynamic = true;
 		}
 
 
@@ -763,14 +763,14 @@ public class BilliardTest : TestScene
 
 				Texture = Assets.GetTexture("Textures/Ball.png"),
 			});
-			AddComponent(new RigidBody()
+			AddComponent(new RigidBodyOld()
 			{
 				Mass = 10,
 				UsesGravity = true,
 				Restitution = 0.9f,
 			});
-			Collider collider;
-			AddComponent(collider = new CircleCollider()
+			ColliderOld collider;
+			AddComponent(collider = new CircleColliderOld()
 			{
 				Radius = 10
 			});

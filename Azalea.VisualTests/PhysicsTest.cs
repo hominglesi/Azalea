@@ -37,8 +37,8 @@ public class PhysicsTest : TestScene
 	bool charging = false;
 	public PhysicsTest()
 	{
-		Physics.DebugMode = true;
-		Physics.UsesGravity = false;
+		PhysicsOld.DebugMode = true;
+		PhysicsOld.UsesGravity = false;
 		Add(line = new Line()
 		{
 			StartPoint = new(500, 40),
@@ -54,13 +54,13 @@ public class PhysicsTest : TestScene
 			Origin = Graphics.Anchor.Center,
 			Texture = Assets.GetTexture("Textures/Circle.png")
 		});
-		circle1.AddComponent(new RigidBody()
+		circle1.AddComponent(new RigidBodyOld()
 		{
 			Mass = 10,
 			UsesGravity = true,
 			Restitution = 0.6f,
 		});
-		circle1.AddComponent(new CircleCollider()
+		circle1.AddComponent(new CircleColliderOld()
 		{
 			Radius = 25
 		});
@@ -151,13 +151,13 @@ public class PhysicsTest : TestScene
 				Origin = Graphics.Anchor.CenterRight,
 			}
 		});
-		box1.AddComponent(new RigidBody()
+		box1.AddComponent(new RigidBodyOld()
 		{
 			Mass = 10,
 			//	UsesGravity = false,
 			//AngularAcceleration = 0.0001f
 		});
-		box1.AddComponent(new RectCollider());
+		box1.AddComponent(new RectColliderOld());
 
 
 
@@ -168,14 +168,14 @@ public class PhysicsTest : TestScene
 			Color = Palette.Yellow,
 			Origin = Graphics.Anchor.Center
 		});
-		box2.AddComponent(new RigidBody()
+		box2.AddComponent(new RigidBodyOld()
 		{
 			Mass = 10,
 			IsDynamic = false,
 			//	UsesGravity = false,
 			//AngularAcceleration = 0.0001f
 		});
-		box2.AddComponent(new RectCollider());
+		box2.AddComponent(new RectColliderOld());
 
 		Add(platform = new Box()
 		{
@@ -185,14 +185,14 @@ public class PhysicsTest : TestScene
 			Origin = Graphics.Anchor.Center,
 			//Rotation = 15
 		});
-		platform.AddComponent(new RigidBody()
+		platform.AddComponent(new RigidBodyOld()
 		{
 			Mass = 1000000,
 			UsesGravity = false,
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		platform.AddComponent(new RectCollider());
+		platform.AddComponent(new RectColliderOld());
 
 		Add(ceiling = new Box()
 		{
@@ -202,14 +202,14 @@ public class PhysicsTest : TestScene
 			Origin = Graphics.Anchor.Center,
 			//Rotation = 15
 		});
-		ceiling.AddComponent(new RigidBody()
+		ceiling.AddComponent(new RigidBodyOld()
 		{
 			Mass = 1000000,
 			UsesGravity = false,
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		ceiling.AddComponent(new RectCollider());
+		ceiling.AddComponent(new RectColliderOld());
 
 		Add(platform2 = new Box()
 		{
@@ -219,14 +219,14 @@ public class PhysicsTest : TestScene
 			Origin = Graphics.Anchor.Center,
 			Rotation = 120
 		});
-		platform2.AddComponent(new RigidBody()
+		platform2.AddComponent(new RigidBodyOld()
 		{
 			Mass = 1000000,
 			UsesGravity = false,
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		platform2.AddComponent(new RectCollider());
+		platform2.AddComponent(new RectColliderOld());
 
 		Add(platform3 = new Box()
 		{
@@ -236,14 +236,14 @@ public class PhysicsTest : TestScene
 			Origin = Graphics.Anchor.Center,
 			Rotation = 15
 		});
-		platform3.AddComponent(new RigidBody()
+		platform3.AddComponent(new RigidBodyOld()
 		{
 			Mass = 1000000,
 			UsesGravity = false,
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		platform3.AddComponent(new RectCollider());
+		platform3.AddComponent(new RectColliderOld());
 
 		Add(platform4 = new Box()
 		{
@@ -253,14 +253,14 @@ public class PhysicsTest : TestScene
 			Origin = Graphics.Anchor.Center,
 			Rotation = 5
 		});
-		platform4.AddComponent(new RigidBody()
+		platform4.AddComponent(new RigidBodyOld()
 		{
 			Mass = 1000000,
 			UsesGravity = false,
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		platform4.AddComponent(new RectCollider());
+		platform4.AddComponent(new RectColliderOld());
 
 		Add(wallL = new Box()
 		{
@@ -270,14 +270,14 @@ public class PhysicsTest : TestScene
 			Origin = Graphics.Anchor.Center,
 			//Rotation = 15
 		});
-		wallL.AddComponent(new RigidBody()
+		wallL.AddComponent(new RigidBodyOld()
 		{
 			Mass = 1000000,
 			UsesGravity = false,
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		wallL.AddComponent(new RectCollider());
+		wallL.AddComponent(new RectColliderOld());
 
 		Add(wallR = new Box()
 		{
@@ -287,14 +287,14 @@ public class PhysicsTest : TestScene
 			Origin = Graphics.Anchor.Center,
 			//Rotation = 15
 		});
-		wallR.AddComponent(new RigidBody()
+		wallR.AddComponent(new RigidBodyOld()
 		{
 			Mass = 1000000,
 			UsesGravity = false,
 			IsDynamic = false,
 			//AngularAcceleration = 0.0001f
 		});
-		wallR.AddComponent(new RectCollider());
+		wallR.AddComponent(new RectColliderOld());
 
 	}
 
@@ -303,7 +303,7 @@ public class PhysicsTest : TestScene
 
 		if (Input.GetKey(Keys.Space).Down)
 		{
-			Physics.UsesGravity = true;
+			PhysicsOld.UsesGravity = true;
 		}
 
 		if (Input.GetKey(Keys.O).Down)
@@ -316,12 +316,12 @@ public class PhysicsTest : TestScene
 				Origin = Graphics.Anchor.Center,
 				Texture = Assets.GetTexture("Textures/Circle.png")
 			});
-			testCircle1.AddComponent(new RigidBody()
+			testCircle1.AddComponent(new RigidBodyOld()
 			{
 				Mass = 5,
 				UsesGravity = true,
 			});
-			testCircle1.AddComponent(new CircleCollider()
+			testCircle1.AddComponent(new CircleColliderOld()
 			{
 				Radius = 15
 			});
@@ -334,12 +334,12 @@ public class PhysicsTest : TestScene
 				Origin = Graphics.Anchor.Center,
 				Texture = Assets.GetTexture("Textures/Circle.png")
 			});
-			testCircle2.AddComponent(new RigidBody()
+			testCircle2.AddComponent(new RigidBodyOld()
 			{
 				Mass = 5,
 				UsesGravity = true,
 			});
-			testCircle2.AddComponent(new CircleCollider()
+			testCircle2.AddComponent(new CircleColliderOld()
 			{
 				Radius = 15
 			});
@@ -385,7 +385,7 @@ public class PhysicsTest : TestScene
 
 		line.StartPoint = circle1.Position;
 		line.EndPoint = Input.MousePosition;
-		CircleCollider crCol = circle1.GetComponent<CircleCollider>();
+		CircleColliderOld crCol = circle1.GetComponent<CircleColliderOld>();
 		if (Input.MousePosition.X < circle1.Position.X + crCol.Radius && Input.MousePosition.X > circle1.Position.X - crCol.Radius
 			&& Input.MousePosition.Y < circle1.Position.Y + crCol.Radius && Input.MousePosition.Y > circle1.Position.Y - crCol.Radius)
 		{
@@ -405,7 +405,7 @@ public class PhysicsTest : TestScene
 			float power = 2f;
 			float distance = Vector2.Distance(Input.MousePosition, circle1.Position);
 			power *= 1 + distance / 10;
-			circle1.GetComponent<RigidBody>().ApplyForce(directionVector, power);
+			circle1.GetComponent<RigidBodyOld>().ApplyForce(directionVector, power);
 		}
 	}
 	protected override void FixedUpdate()
