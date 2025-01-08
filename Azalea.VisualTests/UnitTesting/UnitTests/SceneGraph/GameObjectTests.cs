@@ -55,6 +55,73 @@ public class GameObjectTests : UnitTestSuite
 			scene.Remove(_boxParent);
 		}
 	}
+
+	public class GameObjectInclusionTest : UnitTest
+	{
+		private Composition _parent;
+		private readonly InclusionGameObject _object;
+
+		public GameObjectInclusionTest()
+		{
+			_object = new InclusionGameObject();
+
+			AddResult("Check if object is not included", () =>
+			{
+				return _object.IsPresentInGame == false
+				&& _object.HasBeenIncluded == false
+				&& _object.HasBeedExcluded == false;
+			});
+			AddOperation("Add object to scene", () => _parent.Add(_object));
+			AddResult("Check if object is included", () =>
+			{
+				return _object.IsPresentInGame == true
+				&& _object.HasBeenIncluded == true
+				&& _object.HasBeedExcluded == false;
+			});
+			AddOperation("Reset flags", () =>
+			{
+				_object.HasBeenIncluded = false;
+				_object.HasBeedExcluded = false;
+			});
+			AddOperation("Remove object from scene", () => _parent.Remove(_object));
+			AddResult("Check if object is excluded", () =>
+			{
+				return _object.IsPresentInGame == false
+				&& _object.HasBeenIncluded == false
+				&& _object.HasBeedExcluded == true;
+			});
+		}
+
+		private class InclusionGameObject : GameObject
+		{
+			public bool HasBeenIncluded = false;
+			public bool HasBeedExcluded = false;
+
+			protected override void Included()
+			{
+				HasBeenIncluded = true;
+			}
+
+			protected override void Excluded()
+			{
+				HasBeedExcluded = true;
+			}
+		}
+
+		public override void Setup(UnitTestContainer scene)
+		{
+			base.Setup(scene);
+
+			scene.Add(_parent = new Composition());
+		}
+
+		public override void TearDown(UnitTestContainer scene)
+		{
+			base.TearDown(scene);
+
+			scene.Remove(_parent);
+		}
+	}
 }
 
 #pragma warning restore CS8602, CS8618

@@ -183,6 +183,22 @@ public partial class CompositeGameObject : GameObject
 		return base.OnInvalidate(invalidation, source);
 	}
 
+	internal override void IncludedInternal()
+	{
+		foreach (GameObject child in _internalChildren)
+			child.IncludedInternal();
+
+		base.IncludedInternal();
+	}
+
+	internal override void ExcludedInternal()
+	{
+		foreach (GameObject child in _internalChildren)
+			child.ExcludedInternal();
+
+		base.ExcludedInternal();
+	}
+
 	internal override void AddComponentTreeToScene()
 	{
 		base.AddComponentTreeToScene();

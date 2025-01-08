@@ -549,6 +549,11 @@ public partial class GameObject : Amendable, IGameObject
 			parent = value;
 
 			if (parent == null)
+				ExcludedInternal();
+			else if (this.FindClosestParent<AzaleaGame>() != null)
+				IncludedInternal();
+
+			if (parent == null)
 				RemoveComponentTreeFromScene();
 			else
 				AddComponentTreeToScene();
@@ -556,6 +561,36 @@ public partial class GameObject : Amendable, IGameObject
 			Invalidate(Invalidation.Presence);
 		}
 	}
+
+	/// <summary>
+	/// Defines if this <see cref="GameObject"/> is currently contained in an
+	/// <see cref="AzaleaGame"/>
+	/// </summary>
+	public bool IsPresentInGame { get; private set; } = false;
+
+	internal virtual void IncludedInternal()
+	{
+		IsPresentInGame = true;
+		Included();
+	}
+
+	/// <summary>
+	/// Gets called when this <see cref="GameObject"/> is added to an
+	/// <see cref="AzaleaGame"/>
+	/// </summary>
+	protected virtual void Included() { }
+
+	internal virtual void ExcludedInternal()
+	{
+		IsPresentInGame = false;
+		Excluded();
+	}
+
+	/// <summary>
+	/// Gets called when this <see cref="GameObject"/> is removed from an
+	/// <see cref="AzaleaGame"/>
+	/// </summary>
+	protected virtual void Excluded() { }
 
 	private Axes _ignoredForAutoSizeAxes;
 	public Axes IgnoredForAutoSizeAxes
