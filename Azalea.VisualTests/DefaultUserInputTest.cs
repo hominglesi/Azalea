@@ -4,6 +4,7 @@ using Azalea.Design.UserInterface;
 using Azalea.Design.UserInterface.Basic;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
+using Azalea.Graphics.Sprites;
 using System;
 
 namespace Azalea.VisualTests;
@@ -13,6 +14,7 @@ public class DefaultUserInputTest : TestScene
 	private Composition _buttonComposition;
 	private Composition _childButtonComposition;
 	private BasicTextBox _textBox;
+	private BasicDropDownMenu _dropDownMenu;
 
 	public DefaultUserInputTest()
 	{
@@ -91,6 +93,36 @@ public class DefaultUserInputTest : TestScene
 			RelativePositionAxes = Axes.Both,
 			Position = new(0.5f, 0)
 		});
+
+		Add(_dropDownMenu = new BasicDropDownMenu()
+		{
+			RelativePositionAxes = Axes.Both,
+			Position = new(0.5f, 0.2f)
+		});
+		_dropDownMenu.AddOption("Option 1");
+		_dropDownMenu.AddOption("Option 2");
+		_dropDownMenu.AddOption("Option 3");
+
+		var dropDownLabel = new SpriteText()
+		{
+			RelativePositionAxes = Axes.Both,
+			Position = new(0.75f, 0.18f),
+			Text = "Nothing Selected",
+			Color = Palette.White
+		};
+		Add(dropDownLabel);
+		Add(_dropDownMenu = new BasicDropDownMenu()
+		{
+			RelativePositionAxes = Axes.Both,
+			Position = new(0.75f, 0.2f)
+		});
+		_dropDownMenu.OnSelectedChanged += newValue => dropDownLabel.Text = newValue;
+
+		_dropDownMenu.AddOption("Item 1");
+		_dropDownMenu.AddOption("Item 2");
+		_dropDownMenu.AddOption("Item 3");
+		_dropDownMenu.AddOption("Item 4");
+		_dropDownMenu.SelectOption("Item 3");
 	}
 
 	public void Write(string text)
