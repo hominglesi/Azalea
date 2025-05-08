@@ -29,6 +29,28 @@ public class GamepadDPad
 		_vertical = vertical;
 	}
 
+	internal void SetIndividual(bool up, bool down, bool left, bool right)
+	{
+		Up.SetState(up);
+		Down.SetState(down);
+		Left.SetState(left);
+		Right.SetState(right);
+
+		if (up)
+			_vertical = -1;
+		else if (down)
+			_vertical = 1;
+		else
+			_vertical = 0;
+
+		if (left)
+			_horizontal = -1;
+		else if (right)
+			_horizontal = 1;
+		else
+			_horizontal = 0;
+	}
+
 	internal void Update()
 	{
 		Up.Update();

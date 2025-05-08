@@ -18,6 +18,9 @@ public class ButtonState
 
 	internal void SetState(bool pressed)
 	{
+		if (_pressed == pressed)
+			return;
+
 		_pressed = pressed;
 
 		if (pressed)

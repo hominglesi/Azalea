@@ -118,6 +118,7 @@ public class EditorContainer : Composition
 				RelativeSizeAxes = Axes.Both
 			});
 			_mainDocker.AddDockable("Template Editor", TemplateEditor = new TemplateEditor());
+			_mainDocker.AddDockable("Gamepad Viewer", new GamepadViewer());
 
 			_bottomDocker.AddDockable("Game Resources", new EditorExplorer(Assets.MainStore));
 

@@ -14,7 +14,7 @@ internal class Win32Window : PlatformWindow
 	private readonly WindowProcedure _windowProcedure;
 	private readonly WindowState _initialShowState;
 
-	private readonly WinRawInputManager _rawInputManager;
+	private readonly XInputManager _xInputManager;
 
 	public Win32Window(string title, Vector2Int clientSize, WindowState state, bool visible)
 		: base(title, clientSize, state)
@@ -60,7 +60,8 @@ internal class Win32Window : PlatformWindow
 			return;
 		}
 
-		_rawInputManager = new WinRawInputManager(_window);
+		_xInputManager = new XInputManager();
+		Input.SetGamepadManager(_xInputManager);
 
 		//Setup OpenGL
 		_deviceContext = WinAPI.GetDC(_window);
@@ -235,10 +236,6 @@ internal class Win32Window : PlatformWindow
 				}
 
 				break;
-
-			//Raw Input
-			case WindowMessage.Input:
-				_rawInputManager.HandleRawInput(lParam); break;
 		}
 
 		return WinAPI.DefWindowProc(window, message, wParam, lParam);
@@ -403,10 +400,13 @@ internal class Win32Window : PlatformWindow
 			WinAPI.DispatchMessage(ref message);
 		}
 
-		//Update mouse position
+		// Update mouse position
 		WinAPI.GetCursorPos(out _mousePosition);
 		WinAPI.ScreenToClient(_window, ref _mousePosition);
 		Input.ExecuteMousePositionChange(_mousePosition);
+
+		// Update (gamepads)
+		_xInputManager.Update();
 	}
 
 	#endregion

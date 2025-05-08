@@ -1,6 +1,8 @@
 ﻿using Azalea.Graphics;
 using Azalea.Numerics;
+using Azalea.Platform.Windows.Enums;
 using Azalea.Platform.Windows.Enums.RawInput;
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.Runtime.InteropServices;
 
@@ -36,6 +38,16 @@ internal static partial class WinAPI
 
 	[DllImport(Gdi32Path, EntryPoint = "CreateCompatibleBitmap")]
 	public static extern IntPtr CreateCompatibleBitmap(IntPtr deviceContext, int width, int height);
+
+	[DllImport(Kernel32Path, EntryPoint = "CreateFileW")]
+	public static extern SafeFileHandle CreateFile(
+		[MarshalAs(UnmanagedType.LPWStr)] string fileName,
+		[MarshalAs(UnmanagedType.U4)] FileAccess desiredAcces,
+		[MarshalAs(UnmanagedType.U4)] FileShare shareMode,
+		IntPtr securityAttributes,
+		[MarshalAs(UnmanagedType.U4)] CreationDisposition creationDisposition,
+		[MarshalAs(UnmanagedType.U4)] FileFlagAttributes flagsAndAttributes,
+		IntPtr templateFile);
 
 	public static IntPtr CreateIconFromImage(IntPtr deviceContext, Image image)
 	{

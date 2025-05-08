@@ -2,6 +2,7 @@
 using Azalea.Editing;
 using Azalea.Graphics;
 using Azalea.Inputs.Events;
+using Azalea.Inputs.Gamepads;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -39,9 +40,6 @@ public static class Input
 
 		foreach (var mouseButton in _mouseButtons)
 			mouseButton.Update();
-
-		foreach (var gamepad in _gamepads)
-			gamepad.Update();
 	}
 
 	/// <summary>
@@ -292,12 +290,13 @@ public static class Input
 
 	#region Gamepad
 
-	internal static List<IGamepad> _gamepads = new();
-	public static int GetGamepadCount() => _gamepads.Count;
-	public static IGamepad GetGamepad(int index) => _gamepads[index];
+	private static IGamepadManager? _gamepadManager;
 
-	internal static void HandleGamepadConnected(IGamepad gamepad)
-		=> _gamepads.Add(gamepad);
+	internal static void SetGamepadManager(IGamepadManager gamepadManager)
+		=> _gamepadManager = gamepadManager;
+
+	public static IGamepad? GetGamepad(int index)
+		=> _gamepadManager!.GetGamepad(index);
 
 	#endregion
 

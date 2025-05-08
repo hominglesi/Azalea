@@ -12,7 +12,7 @@ internal readonly struct HidPCapsNotRange
 	public readonly ushort StringIndex;
 
 	[FieldOffset(8)]
-	private readonly ushort DesignatorIndex;
+	public readonly ushort DesignatorIndex;
 
 	[FieldOffset(12)]
 	public readonly ushort DataIndex;

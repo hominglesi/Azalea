@@ -15,6 +15,12 @@ internal static unsafe partial class WinAPI
 	[DllImport(HIDPIPath, EntryPoint = "HidP_GetCaps")]
 	public static extern HidStatus HidP_GetCaps(IntPtr preparsedData, ref HidPCaps capabilities);
 
+	[DllImport(HIDPIPath, EntryPoint = "HidD_GetManufacturerString")]
+	public static extern bool HidD_GetManufacturerString(IntPtr deviceObject, IntPtr buffer, ulong bufferLength);
+
+	[DllImport(HIDPIPath, EntryPoint = "HidD_GetProductString")]
+	public static extern bool HidD_GetProductString(IntPtr deviceObject, IntPtr buffer, ulong bufferLength);
+
 	[DllImport(HIDPIPath, EntryPoint = "HidP_GetUsagesEx")]
 	public static extern HidStatus HidP_GetUsagesEx(HidPReportType reportType, ushort linkCollection,
 		[Out][MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] HidUsageAndPage[] usageList, ref uint usageLength, IntPtr preparsedData,
