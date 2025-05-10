@@ -1,5 +1,6 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.Rendering;
+using Azalea.IO.Configs;
 using System;
 
 namespace Azalea.VisualTests.UnitTesting;
@@ -35,11 +36,14 @@ public class UnitTestsScene : TestScene
 			NegativeSize = new(0, __menuBarHeight)
 		});
 
-		populateSuiteSelectMenu();
-		populateTestSelectMenu();
+		var selectedSuite = Config.GetInt("currentUnitTestSuite") ?? 0;
+		var selectedTest = Config.GetInt("currentUnitTest") ?? 0;
 
-		_sidebar.SuiteSelectMenu.SelectOption(0);
-		_sidebar.TestSelectMenu.SelectOption(0);
+		populateSuiteSelectMenu();
+		populateTestSelectMenu(selectedSuite);
+
+		_sidebar.SuiteSelectMenu.SelectOption(selectedSuite);
+		_sidebar.TestSelectMenu.SelectOption(selectedTest);
 		_sidebar.SuiteSelectMenu.OnSelectedChanged += val => selectSuite(int.Parse(val!));
 		_sidebar.TestSelectMenu.OnSelectedChanged += val => selectUnitTest(int.Parse(val!));
 
@@ -68,13 +72,13 @@ public class UnitTestsScene : TestScene
 		}
 	}
 
-	private void populateTestSelectMenu()
+	private void populateTestSelectMenu(int suite)
 	{
 		_sidebar.TestSelectMenu.ClearOptions();
 
-		for (int i = 0; i < _manager.SelectedSuite.Tests.Count; i++)
+		for (int i = 0; i < _manager.UnitTestSuites[suite].Tests.Count; i++)
 		{
-			var unitTest = _manager.SelectedSuite.Tests[i].DisplayName;
+			var unitTest = _manager.UnitTestSuites[suite].Tests[i].DisplayName;
 			_sidebar.TestSelectMenu.AddOption(unitTest, i.ToString());
 		}
 	}
@@ -97,8 +101,11 @@ public class UnitTestsScene : TestScene
 	{
 		_manager.SelectSuite(index);
 
-		populateTestSelectMenu();
+		populateTestSelectMenu(index);
 		_sidebar.TestSelectMenu.SelectOption(0);
+
+		Config.Set("currentUnitTestSuite", index);
+		Config.Set("currentUnitTest", 0);
 
 		displayUnitTest(_manager.SelectedUnitTest);
 	}
@@ -106,6 +113,9 @@ public class UnitTestsScene : TestScene
 	private void selectUnitTest(int index)
 	{
 		_manager.SelectUnitTest(index);
+
+		Config.Set("currentUnitTest", index);
+
 		displayUnitTest(_manager.SelectedUnitTest);
 	}
 
