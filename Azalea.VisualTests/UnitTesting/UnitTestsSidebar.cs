@@ -1,6 +1,7 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Design.Shapes;
 using Azalea.Design.UserInterface;
+using Azalea.Design.UserInterface.Basic;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
@@ -12,8 +13,8 @@ using System.Collections.Generic;
 namespace Azalea.VisualTests.UnitTesting;
 public class UnitTestsSidebar : Composition
 {
+	private readonly static float __dropDownHeight = 145;
 	private readonly static float __headerHeight = 65;
-	private readonly static float __suiteTitleHeight = 35;
 
 	private readonly static float __stepHeight = 35;
 	private readonly static float __stepCheckboxPadding = 5;
@@ -22,37 +23,56 @@ public class UnitTestsSidebar : Composition
 	private readonly static Color __stepTextColor = new(0, 48, 73);
 	private readonly static Color __stepCheckboxPassed = Palette.Green;
 	private readonly static Color __stepCheckboxFailed = new(214, 40, 40);
+	private readonly static Color __itemHoverColor = new(255, 248, 211);
 
+	public readonly BasicDropDownMenu SuiteSelectMenu;
+	public readonly BasicDropDownMenu TestSelectMenu;
 	private FlexContainer _headerContainer;
-	private SpriteText _suiteTitle;
 	private FlexContainer _stepContainer;
 
 	public UnitTestsSidebar()
 	{
 		BackgroundColor = new Color(0, 48, 73);
 
+		Add(customizeDropDownMenuLabal(new SpriteText()
+		{
+			Y = 20,
+			Text = "Test Suite:"
+		}));
+
+		Add(customizeDropDownMenu(SuiteSelectMenu = new BasicDropDownMenu()
+		{
+			Y = 35,
+			Depth = -1001
+		}));
+
+		Add(customizeDropDownMenuLabal(new SpriteText()
+		{
+			Y = 90,
+			Text = "Test:"
+		}));
+
+		Add(customizeDropDownMenu(TestSelectMenu = new BasicDropDownMenu()
+		{
+			Y = 105,
+			Depth = -1000
+		}));
+
 		Add(_headerContainer = new FlexContainer()
 		{
 			RelativeSizeAxes = Axes.X,
+			Y = __dropDownHeight,
 			Size = new(1, __headerHeight),
 			Justification = FlexJustification.Center,
 			Alignment = FlexAlignment.Center,
 			Wrapping = FlexWrapping.Wrap
 		});
 
-		Add(_suiteTitle = new SpriteText()
-		{
-			RelativePositionAxes = Axes.X,
-			Position = new(0.5f, __headerHeight + (__suiteTitleHeight / 3)),
-			Origin = Anchor.Center,
-			Text = "Placeholder"
-		});
-
 		Add(new ScrollableContainer()
 		{
 			RelativeSizeAxes = Axes.Both,
-			Position = new(0, __headerHeight + __suiteTitleHeight),
-			NegativeSize = new(0, __headerHeight + __suiteTitleHeight),
+			Position = new(0, __dropDownHeight + __headerHeight),
+			NegativeSize = new(0, __headerHeight),
 			Child = _stepContainer = new FlexContainer()
 			{
 				RelativeSizeAxes = Axes.X,
@@ -60,6 +80,34 @@ public class UnitTestsSidebar : Composition
 				Direction = FlexDirection.Vertical
 			}
 		});
+	}
+
+	private SpriteText customizeDropDownMenuLabal(SpriteText text)
+	{
+		text.Origin = Anchor.CenterLeft;
+		text.X = 60;
+		return text;
+	}
+
+	private BasicDropDownMenu customizeDropDownMenu(BasicDropDownMenu menu)
+	{
+		menu.RelativePositionAxes = Axes.X;
+		menu.X = 0.5f;
+		menu.Origin = Anchor.TopCenter;
+		menu.Size = new(250, 35);
+		menu.DropDownOffset = 5;
+
+		menu.Arrow.Color = __stepTextColor;
+		menu.Arrow.Size = new(16);
+		menu.Label.Color = __stepTextColor;
+		menu.Label.Font = FontUsage.Default.With(size: 20);
+		menu.ItemFont = menu.Label.Font;
+		menu.AccentColor = __stepBackgroundColor;
+		menu.ItemHeight = menu.Height;
+		menu.ItemHoverColor = __itemHoverColor;
+		menu.ItemTextColor = __stepTextColor;
+
+		return menu;
 	}
 
 	public void AddHeaderButton(string iconName, Action clickAction)
@@ -72,11 +120,6 @@ public class UnitTestsSidebar : Composition
 	private int _nextStep = 0;
 	private List<TestStep> _steps = new();
 	private List<TestStepButton> _stepButtons = new();
-
-	public void DisplaySuite(UnitTestSuite suite)
-	{
-		_suiteTitle.Text = suite.DisplayName;
-	}
 
 	public void AddSteps(List<TestStep> steps)
 	{

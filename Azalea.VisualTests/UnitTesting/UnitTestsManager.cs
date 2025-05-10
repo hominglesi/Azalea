@@ -29,6 +29,12 @@ public class UnitTestsManager
 		_selectedUnitTestIndex = 0;
 	}
 
+	public void SelectSuite(int suite)
+	{
+		_selectedSuiteIndex = suite;
+		_selectedUnitTestIndex = 0;
+	}
+
 	public void SelectNextSuite()
 	{
 		_selectedSuiteIndex++;
@@ -36,6 +42,11 @@ public class UnitTestsManager
 			_selectedSuiteIndex = 0;
 
 		_selectedUnitTestIndex = 0;
+	}
+
+	public void SelectUnitTest(int unitTest)
+	{
+		_selectedUnitTestIndex = unitTest;
 	}
 
 	public void SelectNextUnitTest()

@@ -25,8 +25,6 @@ public class UnitTestsScene : TestScene
 			Size = new(1, __menuBarHeight)
 		});
 
-		_menuBar.AddMenuButton("Next Suite", selectNextTestSuite);
-		_menuBar.AddMenuButton("Next Test", selectNextUnitTest);
 		_menuBar.AddMenuButton("Run All", runAllTests);
 
 		Add(_sidebar = new UnitTestsSidebar()
@@ -36,6 +34,14 @@ public class UnitTestsScene : TestScene
 			Size = new(__sidebarWidth, 1),
 			NegativeSize = new(0, __menuBarHeight)
 		});
+
+		populateSuiteSelectMenu();
+		populateTestSelectMenu();
+
+		_sidebar.SuiteSelectMenu.SelectOption(0);
+		_sidebar.TestSelectMenu.SelectOption(0);
+		_sidebar.SuiteSelectMenu.OnSelectedChanged += val => selectSuite(int.Parse(val!));
+		_sidebar.TestSelectMenu.OnSelectedChanged += val => selectUnitTest(int.Parse(val!));
 
 		_sidebar.AddHeaderButton("runStep", _sidebar.RunNextStep);
 		_sidebar.AddHeaderButton("runAllSteps", _sidebar.RunAllSteps);
@@ -51,6 +57,28 @@ public class UnitTestsScene : TestScene
 		displayUnitTest(_manager.SelectedUnitTest);
 	}
 
+	private void populateSuiteSelectMenu()
+	{
+		_sidebar.SuiteSelectMenu.ClearOptions();
+
+		for (int i = 0; i < _manager.UnitTestSuites.Count; i++)
+		{
+			var suite = _manager.UnitTestSuites[i].DisplayName;
+			_sidebar.SuiteSelectMenu.AddOption(suite, i.ToString());
+		}
+	}
+
+	private void populateTestSelectMenu()
+	{
+		_sidebar.TestSelectMenu.ClearOptions();
+
+		for (int i = 0; i < _manager.SelectedSuite.Tests.Count; i++)
+		{
+			var unitTest = _manager.SelectedSuite.Tests[i].DisplayName;
+			_sidebar.TestSelectMenu.AddOption(unitTest, i.ToString());
+		}
+	}
+
 	private UnitTest? _displayedUnitTest;
 	private void displayUnitTest(UnitTest unitTest)
 	{
@@ -61,20 +89,23 @@ public class UnitTestsScene : TestScene
 		if (_displayedUnitTest is null) return;
 
 		_displayedUnitTest.Setup(_testContainer);
-		_sidebar.DisplaySuite(_displayedUnitTest.Suite!);
 		_sidebar.AddSteps(_displayedUnitTest.Steps);
 		_displayedUnitTest = unitTest;
 	}
 
-	private void selectNextTestSuite()
+	private void selectSuite(int index)
 	{
-		_manager.SelectNextSuite();
+		_manager.SelectSuite(index);
+
+		populateTestSelectMenu();
+		_sidebar.TestSelectMenu.SelectOption(0);
+
 		displayUnitTest(_manager.SelectedUnitTest);
 	}
 
-	private void selectNextUnitTest()
+	private void selectUnitTest(int index)
 	{
-		_manager.SelectNextUnitTest();
+		_manager.SelectUnitTest(index);
 		displayUnitTest(_manager.SelectedUnitTest);
 	}
 

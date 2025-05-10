@@ -359,8 +359,6 @@ public partial class CompositeGameObject : GameObject
 		{
 			_isComputingChildrenSizeDependencies = false;
 		}
-
-
 	}
 
 	private void updateAutoSize()
