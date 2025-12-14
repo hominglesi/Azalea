@@ -2,7 +2,6 @@
 using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
 using Azalea.Numerics;
-using Azalea.Text.Msdf;
 using System.Collections.Generic;
 using System.Numerics;
 

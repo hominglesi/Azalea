@@ -1,5 +1,5 @@
 ﻿using Azalea.Graphics.Textures;
-using Azalea.Text.Msdf;
+using Azalea.Text;
 using System;
 
 namespace Azalea.IO.Resources;

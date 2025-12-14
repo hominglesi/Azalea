@@ -95,9 +95,4 @@ public static partial class Assets
 	/// Gets a sound from the main resource store.
 	/// </summary>
 	public static Sound GetSound(string path) => MainStore.GetSound(path);
-
-	/// <summary>
-	/// Adds a font to the main store to be used when font name is specified.
-	/// </summary>
-	public static void AddFont(string path, string fontName) => MainStore.AddFont(path, fontName);
 }

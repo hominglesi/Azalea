@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Text.RegularExpressions;
 
-namespace Azalea.Text.Msdf;
+namespace Azalea.Text;
 public class MsdfFontData
 {
 	private Texture _spriteSheet;
@@ -17,7 +17,7 @@ public class MsdfFontData
 		_spriteSheet = spriteSheet;
 
 		var csvSpan = csvData.AsSpan();
-		var csvLineCount = Regex.Matches(csvData, System.Environment.NewLine).Count;
+		var csvLineCount = Regex.Matches(csvData, Environment.NewLine).Count;
 
 		_characters = new Dictionary<char, Character>(csvLineCount);
 
