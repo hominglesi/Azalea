@@ -2,7 +2,7 @@
 
 public class ButtonState
 {
-	internal static readonly ButtonState Default = new();
+	//internal static readonly ButtonState Default = new();
 
 	private bool _pressed;
 	private bool _down;

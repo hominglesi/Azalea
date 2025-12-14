@@ -1,5 +1,4 @@
-﻿using Azalea.Graphics.Rendering;
-using Azalea.IO.Resources;
+﻿using Azalea.IO.Resources;
 using System.Collections.Generic;
 
 namespace Azalea.Graphics.Textures;

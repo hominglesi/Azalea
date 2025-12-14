@@ -6,13 +6,13 @@ using System;
 namespace Azalea.VisualTests.UnitTesting;
 public class UnitTestsScene : TestScene
 {
-	private static float __menuBarHeight = 30;
-	private static float __sidebarWidth = 340;
+	private readonly static float __menuBarHeight = 30;
+	private readonly static float __sidebarWidth = 340;
 
-	private UnitTestsManager _manager;
-	private UnitTestMenuBar _menuBar;
-	private UnitTestsSidebar _sidebar;
-	private UnitTestContainer _testContainer;
+	private readonly UnitTestsManager _manager;
+	private readonly UnitTestMenuBar _menuBar;
+	private readonly UnitTestsSidebar _sidebar;
+	private readonly UnitTestContainer _testContainer;
 
 	public UnitTestsScene()
 	{
@@ -38,6 +38,9 @@ public class UnitTestsScene : TestScene
 
 		var selectedSuite = Config.GetInt("currentUnitTestSuite") ?? 0;
 		var selectedTest = Config.GetInt("currentUnitTest") ?? 0;
+
+		_manager.SelectSuite(selectedSuite);
+		_manager.SelectUnitTest(selectedTest);
 
 		populateSuiteSelectMenu();
 		populateTestSelectMenu(selectedSuite);

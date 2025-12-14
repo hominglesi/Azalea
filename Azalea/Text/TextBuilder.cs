@@ -246,10 +246,7 @@ public class TextBuilder
 			return false;
 		}
 
-		if (_font.FixedWidth && Array.IndexOf(_neverFixedWidthCharacters, character) == -1)
-			glyph = new TextBuilderGlyph(fontStoreGlyph, _font.Size, getConstantWidth(), _useFontSizeAsHeight);
-		else
-			glyph = new TextBuilderGlyph(fontStoreGlyph, _font.Size, useFontSizeAsHeight: _useFontSizeAsHeight);
+		glyph = new TextBuilderGlyph(fontStoreGlyph, _font.Size, useFontSizeAsHeight: _useFontSizeAsHeight);
 
 		return true;
 	}

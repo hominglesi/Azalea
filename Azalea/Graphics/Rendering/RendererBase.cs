@@ -1,6 +1,8 @@
 ﻿using Azalea.Graphics.Colors;
 using Azalea.Graphics.Rendering.Vertices;
+using Azalea.Graphics.Shaders;
 using Azalea.Graphics.Textures;
+using Azalea.IO.Resources;
 using Azalea.Numerics;
 using Azalea.Platform;
 using System;
@@ -15,6 +17,11 @@ internal abstract class RendererBase : IRenderer
 
 	private readonly INativeTexture[] lastBoundTexture = new INativeTexture[16];
 	private int lastActiveTextureUnit = -1;
+
+	internal Shader? _defaultQuadShader;
+	public Shader DefaultQuadShader => _defaultQuadShader
+		?? throw new Exception("Renderer has not been initialized yet!");
+	public INativeShader? ActiveShader { get; private set; }
 
 	private Color _clearColor;
 	public Color ClearColor
@@ -37,9 +44,15 @@ internal abstract class RendererBase : IRenderer
 		Window = window;
 
 		Window.OnClientResized += SetViewport;
+	}
 
+	public void Initialize()
+	{
 		defaultQuadBatch = CreateQuadBatch(10000);
 		currentActiveBatch = defaultQuadBatch;
+
+		_defaultQuadShader = Assets.MainStore.GetShader("Shaders/quad_vertex.glsl", "Shaders/quad_fragment.glsl");
+		BindShader(_defaultQuadShader);
 	}
 
 	private Texture? _whitePixel;
@@ -51,8 +64,6 @@ internal abstract class RendererBase : IRenderer
 
 		return CreateTexture(whitePixel);
 	}
-
-	protected abstract bool SetTextureImplementation(INativeTexture? texture, int unit);
 
 	public void SetViewport(Vector2Int size)
 	{
@@ -69,6 +80,14 @@ internal abstract class RendererBase : IRenderer
 		nativeTexture.SetData(image);
 
 		return new Texture(nativeTexture);
+	}
+
+	protected abstract INativeShader CreateNativeShader(string vertexCode, string fragmentCode);
+	public Shader CreateShader(string vertexCode, string fragmentCode)
+	{
+		var nativeShader = CreateNativeShader(vertexCode, fragmentCode);
+
+		return new Shader(nativeShader);
 	}
 
 	internal virtual void BeginFrame()
@@ -99,6 +118,8 @@ internal abstract class RendererBase : IRenderer
 		return BindTexture(texture.NativeTexture, unit);
 	}
 
+	protected abstract bool SetTextureImplementation(INativeTexture? texture, int unit);
+
 	internal bool BindTexture(INativeTexture nativeTexture, int unit = 0)
 	{
 		if (lastActiveTextureUnit == unit && lastBoundTexture[unit] == nativeTexture)
@@ -112,6 +133,22 @@ internal abstract class RendererBase : IRenderer
 		lastActiveTextureUnit = unit;
 
 		return true;
+	}
+
+	public void BindShader(Shader shader)
+		=> BindShader(shader.NativeShader);
+
+	protected abstract void BindNativeShaderImplementation(INativeShader shader);
+
+	internal void BindShader(INativeShader shader)
+	{
+		if (ActiveShader == shader)
+			return;
+
+		FlushCurrentBatch();
+		BindNativeShaderImplementation(shader);
+
+		ActiveShader = shader;
 	}
 
 	#region Scissor test

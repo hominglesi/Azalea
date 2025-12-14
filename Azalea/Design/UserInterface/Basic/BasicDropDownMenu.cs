@@ -51,7 +51,7 @@ public class BasicDropDownMenu : DropDownMenu<string>
 		}
 	}
 
-	private FontUsage _itemFont = FontUsage.Default.With(size: 32);
+	private FontUsage _itemFont = FontUsage.Default.With(size: 20);
 	public FontUsage ItemFont
 	{
 		get => _itemFont;
@@ -131,8 +131,8 @@ public class BasicDropDownMenu : DropDownMenu<string>
 
 		Add(Label = new SpriteText()
 		{
+			Font = _itemFont,
 			Text = "Choose an item...",
-			Font = FontUsage.Default.With(size: 32),
 			Color = Palette.Blue,
 			Anchor = Anchor.CenterLeft,
 			Origin = Anchor.CenterLeft,

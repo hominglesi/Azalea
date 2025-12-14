@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics.Colors;
+using Azalea.Graphics.Shaders;
 using Azalea.Graphics.Textures;
 using Azalea.Platform;
 
@@ -26,4 +27,7 @@ public static class Renderer
 
 	internal static Texture CreateTexture(Image image)
 		=> Instance.CreateTexture(image);
+
+	internal static Shader CreateShader(string vertexCode, string fragmentCode)
+		=> Instance.CreateShader(vertexCode, fragmentCode);
 }

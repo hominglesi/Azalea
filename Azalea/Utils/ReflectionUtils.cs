@@ -21,6 +21,19 @@ public static class ReflectionUtils
 			.Where(t => t.IsSubclassOf(parentType));
 	}
 
+	private readonly static Dictionary<Type, FieldInfo[]> _fieldDictionary = new();
+	public static FieldInfo[] GetAllFieldsOf<T>()
+	{
+		var structType = typeof(T);
+
+		if (_fieldDictionary.TryGetValue(structType, out var fields))
+			return fields;
+
+		fields = structType.GetFields();
+		_fieldDictionary.Add(structType, fields);
+		return fields;
+	}
+
 	public static T InstantiateType<T>(string typeName, Type assemblyType)
 		=> (T)Activator.CreateInstance(assemblyType.Assembly.FullName!, typeName)!.Unwrap()!;
 

@@ -2,8 +2,11 @@
 using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
+using Azalea.Graphics.Shaders;
+using Azalea.Graphics.Textures;
 using Azalea.Numerics;
 using Azalea.Platform;
+using System;
 
 namespace Azalea.Web.Rendering;
 
@@ -51,6 +54,12 @@ internal class WebGLRenderer : RendererBase
 
 		return true;
 	}
+
+	protected override INativeShader CreateNativeShader(string vertexCode, string fragmentCode)
+		=> throw new NotImplementedException();
+
+	protected override void BindNativeShaderImplementation(INativeShader shader)
+		=> throw new NotImplementedException();
 
 	protected override void SetScissorTestRectangle(RectangleInt scissorRectangle)
 	{

@@ -2,17 +2,11 @@
 using System.Collections.Generic;
 
 namespace Azalea.VisualTests.UnitTesting;
-public abstract class UnitTest
+public abstract class UnitTest : UnitTestBase
 {
-	public string DisplayName { get; init; }
 	public UnitTestSuite? Suite { get; set; }
 	public UnitTestContainer? TestContainer { get; set; }
 	public List<TestStep> Steps { get; init; } = new();
-
-	public UnitTest()
-	{
-		DisplayName = VisualTestUtils.GetTestDisplayName(GetType());
-	}
 
 	internal void AddOperation(string name, Action action)
 		=> Steps.Add(new TestStepOperation(name, action));

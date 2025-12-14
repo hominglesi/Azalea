@@ -1,12 +1,15 @@
 ﻿using Azalea.Graphics.Colors;
 using Azalea.Graphics.OpenGL.Enums;
+using Azalea.Graphics.Shaders;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Runtime.InteropServices;
+using System.Text;
 
-namespace Azalea.Graphics.OpenGL;
-public class GLShader : Disposable
+namespace Azalea.Graphics.OpenGL.Shaders;
+public class GLShader : Disposable, INativeShader
 {
 	private uint _handle;
 
@@ -33,27 +36,27 @@ public class GLShader : Disposable
 		GL.ShaderSource(id, source);
 		GL.CompileShader(id);
 
-		/*
-		Error Checking
-		int result;
-		GL.GetShaderiv(id, GLParameterName.CompileStatus, &result);
-		if (result == 0)
+		unsafe
 		{
-
-			int length;
-			GL.GetShaderiv(id, GLParameterName.InfoLogLength, &length);
-			Console.WriteLine(length);
-			
-			var str = new StringBuilder(length);
-			for(int i = 0; i < length; i++)
+			//Error Checking
+			int result;
+			GL.GetShaderiv(id, GLParameterName.CompileStatus, &result);
+			if (result == 0)
 			{
-				str.Append((char)Marshal.ReadByte(result, i));
-			}	
-			Console.WriteLine("THERE IS AN ERROR!!!!");
-			GL.DeleteShader(id);
-			return 0;
+				int length;
+				GL.GetShaderiv(id, GLParameterName.InfoLogLength, &length);
+				Console.WriteLine(length);
+
+				var str = new StringBuilder(length);
+				for (int i = 0; i < length; i++)
+				{
+					str.Append((char)Marshal.ReadByte(result, i));
+				}
+				Console.WriteLine(str);
+				GL.DeleteShader(id);
+				return 0;
+			}
 		}
-		*/
 
 		return id;
 	}

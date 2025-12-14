@@ -52,7 +52,7 @@ public readonly struct Tilemap
 		{
 			var tilesetFirstId = tilesetNode.GetIntAttribute("firstgid");
 			var tilesetSource = tilesetNode.GetAttribute("source");
-			var tilesetPath = FileSystemUtils.CombinePaths(tilemapDirectory, tilesetSource);
+			var tilesetPath = PathUtils.CombinePaths(tilemapDirectory, tilesetSource);
 			var tileset = new TilemapSource(tilesetFirstId, store.GetTileset(tilesetPath));
 			tilesets.Add(tileset);
 		}
@@ -90,7 +90,7 @@ public readonly struct Tilemap
 
 				if (obj.Template != "")
 				{
-					var templatePath = FileSystemUtils.CombinePaths(tilemapDirectory, obj.Template);
+					var templatePath = PathUtils.CombinePaths(tilemapDirectory, obj.Template);
 					var template = store.GetTemplate(templatePath);
 					obj = TileObject.ImplementTemplate(obj, template);
 				}

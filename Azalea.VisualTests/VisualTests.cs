@@ -30,7 +30,8 @@ public class VisualTests : AzaleaGame
 	public VisualTests()
 	{
 		Assets.AddToMainStore(new NamespacedResourceStore(new EmbeddedResourceStore(typeof(VisualTests).Assembly), "Resources"));
-		Assets.AddFont("Fonts/TitanOne-Regular.fnt", "TitanOne");
+		Assets.AddFont("Fonts/TitanOne-Regular.fnt", "TitanOne-Regular");
+		Assets.MainStore.AddMsdfFont("TitanOne-Regular", "Fonts/TitanOne-Regular.csv", "Fonts/TitanOne-Regular.bmp");
 		_tests = ReflectionUtils.GetAllChildrenOf(typeof(TestScene)).Where(x => x.IsAbstract == false).Select(x => x.FullName).ToList()!;
 
 		_testSelectScene = new TestSelectScene(_tests);

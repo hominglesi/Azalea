@@ -97,7 +97,7 @@ public class TestingTestScene : TestScene
 		{
 			RelativeSizeAxes = Axes.Both,
 			Child = _composition = new TextContainer(t =>
-			{ t.Font = t.Font.With(size: 40); t.Padding = new(0, 0, 0, 0); })
+			{ t.Font = t.Font.With(size: 40); })
 			{
 				//Position = new Vector2(100, 150),
 				RelativeSizeAxes = Axes.Both,

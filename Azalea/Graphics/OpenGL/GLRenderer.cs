@@ -2,13 +2,18 @@
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.OpenGL.Batches;
 using Azalea.Graphics.OpenGL.Enums;
+using Azalea.Graphics.OpenGL.Shaders;
 using Azalea.Graphics.OpenGL.Textures;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
+using Azalea.Graphics.Shaders;
+using Azalea.Graphics.Textures;
 using Azalea.Numerics;
 using Azalea.Platform;
+using System;
 
 namespace Azalea.Graphics.OpenGL;
+
 internal class GLRenderer : RendererBase
 {
 	public GLRenderer(IWindow window)
@@ -40,7 +45,7 @@ internal class GLRenderer : RendererBase
 		=> GL.Clear(GLBufferBit.Color);
 
 	protected override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
-		=> new GLVertexBatch<TexturedVertex2D>(Window, size);
+		=> new GLVertexBatch<TexturedVertex2D>(this, Window, size);
 
 	protected override INativeTexture CreateNativeTexture(int width, int height)
 		=> new GLTexture(this, width, height);
@@ -63,6 +68,17 @@ internal class GLRenderer : RendererBase
 
 		return true;
 	}
+
+	protected override void BindNativeShaderImplementation(INativeShader shader)
+	{
+		if (shader is not GLShader glShader)
+			throw new ArgumentException(null, nameof(shader));
+
+		glShader.Bind();
+	}
+
+	protected override INativeShader CreateNativeShader(string vertexCode, string fragmentCode)
+		=> new GLShader(vertexCode, fragmentCode);
 
 	protected override void SetScissorTestRectangle(RectangleInt scissorRectangle)
 	{

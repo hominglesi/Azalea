@@ -51,7 +51,7 @@ public static partial class Assets
 	internal static void SetupPersistentStore(string folderName)
 	{
 		var roamingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-		var path = FileSystemUtils.CombinePaths(roamingDirectory, folderName);
+		var path = PathUtils.CombinePaths(roamingDirectory, folderName);
 
 		if (Directory.Exists(path) == false)
 			Directory.CreateDirectory(path);
@@ -62,7 +62,7 @@ public static partial class Assets
 	internal static void SetupReflectedStore(string reflectedPath)
 	{
 		var exePath = Assembly.GetEntryAssembly()!.Location;
-		var path = FileSystemUtils.CombinePaths(exePath, reflectedPath);
+		var path = PathUtils.CombinePaths(exePath, reflectedPath);
 		_reflectedStore = new Storage(path);
 	}
 

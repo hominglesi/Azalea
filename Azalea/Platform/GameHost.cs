@@ -50,6 +50,7 @@ public abstract class GameHost
 	public virtual void Run(AzaleaGame game)
 	{
 		GameObject rootObject = game;
+		Renderer.Initialize();
 
 		if (_editorEnabled)
 			rootObject = EditorContainer = new EditorContainer(game);

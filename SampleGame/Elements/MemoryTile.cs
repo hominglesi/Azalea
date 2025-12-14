@@ -51,7 +51,7 @@ public class MemoryTile : Composition
 						Origin = Anchor.Center,
 						Position = new Vector2(0.5f, 0.5f),
 						RelativePositionAxes = Axes.Both,
-						Font = new FontUsage(family: "Roboto", size: 140, weight: "Medium"),
+						Font = new FontUsage(family: "Roboto", size: 120, weight: "Medium"),
 						Color = new Color(201, 132, 146)
 					}
 				}

@@ -1,5 +1,4 @@
-﻿using Azalea.Graphics.Rendering;
-using Azalea.Utils;
+﻿using Azalea.Utils;
 using System;
 using System.Numerics;
 using Rect = Azalea.Numerics.Rectangle;

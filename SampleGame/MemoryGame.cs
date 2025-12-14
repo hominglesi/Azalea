@@ -30,6 +30,7 @@ public class MemoryGame : AzaleaGame
 		_images = new ImagePool(_tilesStore);
 
 		Assets.AddFont("Fonts/Roboto-Medium.fnt", "Roboto-Medium");
+		Assets.MainStore.AddMsdfFont("Roboto-Medium", "Fonts/Roboto-Medium.csv", "Fonts/Roboto-Medium.bmp");
 
 		Add(_field = new MemoryField(new Vector2(0.72f, 0.98f), new Vector2Int(4, 4), _images)
 		{

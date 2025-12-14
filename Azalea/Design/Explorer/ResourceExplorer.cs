@@ -75,7 +75,7 @@ internal abstract class ResourceExplorer : FlexContainer
 
 	private void itemSelected(string path, bool isDirectory)
 	{
-		var fullPath = FileSystemUtils.CombinePaths(SubPath, path);
+		var fullPath = PathUtils.CombinePaths(SubPath, path);
 
 		if (isDirectory)
 			ShowDirectory(fullPath + "/");

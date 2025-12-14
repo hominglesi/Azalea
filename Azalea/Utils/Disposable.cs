@@ -11,20 +11,15 @@ public abstract class Disposable : IDisposable
 		GC.SuppressFinalize(this);
 	}
 
-	private void dispose(bool disposing)
+	private void dispose(bool manualDispose)
 	{
 		if (Disposed) return;
 
-		if (disposing)
-		{
-			OnDispose();
-		}
-		else
-		{
-			Console.WriteLine($"The object '{this}' was garbage collected before being properly disposed.");
-		}
-
+		OnDispose();
 		Disposed = true;
+
+		if (manualDispose == false)
+			Console.WriteLine($"The object '{this}' was garbage collected before being manualy disposed.");
 	}
 
 	protected abstract void OnDispose();

@@ -1,7 +1,7 @@
-﻿using Azalea.Graphics.Textures;
+﻿using Azalea.Graphics.Rendering;
 using System;
 
-namespace Azalea.Graphics.Rendering;
+namespace Azalea.Graphics.Textures;
 
 internal interface INativeTexture : IDisposable
 {

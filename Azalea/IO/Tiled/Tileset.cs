@@ -46,7 +46,7 @@ public readonly struct Tileset
 		{
 			var image = imageNodes[i]!;
 			var imagePath = image.GetAttribute("source");
-			var imageData = store.GetImage(FileSystemUtils.CombinePaths(Path.GetDirectoryName(path)!, imagePath));
+			var imageData = store.GetImage(PathUtils.CombinePaths(Path.GetDirectoryName(path)!, imagePath));
 
 			sources[i] = imageData;
 		}

@@ -49,7 +49,7 @@ public class Storage : IResourceStore
 
 	public IEnumerable<(string, bool)> GetAvalibleResources(string subPath = "")
 	{
-		var path = FileSystemUtils.CombinePaths(_path, subPath);
+		var path = PathUtils.CombinePaths(_path, subPath);
 
 		var files = Directory.GetFiles(path);
 		var directories = Directory.GetDirectories(path);

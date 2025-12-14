@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Title>$(AssemblyName)</Title>
-    <Version>1.6-alpha02</Version>
+    <Version>1.6-alpha03</Version>
     <Authors>hominglesi</Authors>
     <Company>Azalea</Company>
     <Description>A lightweight 2D game framework.</Description>

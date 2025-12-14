@@ -20,12 +20,12 @@ public class ResourceCache<T>
 		return false;
 	}
 
-	public void AddValue(IResourceStore store, string path, T texture)
+	public void AddValue(IResourceStore store, string path, T resource)
 	{
 		if (_cache.ContainsKey(store) == false)
 			_cache[store] = new Dictionary<string, T>();
 
-		_cache[store][path] = texture;
+		_cache[store][path] = resource;
 	}
 
 	public IEnumerable<T> GetAllStoreValues(IResourceStore store)
