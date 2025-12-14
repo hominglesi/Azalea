@@ -63,4 +63,12 @@ public class TextureAnimation : Texture
 			AddFrame(texture, time);
 		}
 	}
+
+	// TODO: Since the texture passed to the TextureAnimation is a Texture itself
+	// both will try to dispose the texture. The TextureAnimation probably shouldn't
+	// inherit from Texture
+	protected override void OnDispose()
+	{
+
+	}
 }
