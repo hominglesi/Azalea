@@ -7,5 +7,5 @@ public static class SceneManager
 	public static SceneContainer Instance => _instance ??= GameHost.Main.SceneManager;
 
 	public static Scene? CurrentScene => Instance.CurrentScene;
-	public static void ChangeScene(Scene newScene) => Instance.ChangeScene(newScene);
+	public static void ChangeScene(Scene? newScene) => Instance.ChangeScene(newScene);
 }

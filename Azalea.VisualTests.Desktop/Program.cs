@@ -1,7 +1,13 @@
 ﻿using Azalea;
-using Azalea.VisualTests;
+using Azalea.Editor;
+using System;
 
-new HostBuilder()
+internal class Program
+{
+	[STAThread]
+	private static void Main(string[] args)
+	{
+		new HostBuilder()
 	.EnableEditor()
 	.SetTitle("Azalea Visual Tests")
 	.SetGameSize(new Vector2Int(1600, 900))
@@ -10,4 +16,8 @@ new HostBuilder()
 	.SetupReflectedDirectory("../../../../../../Azalea.VisualTests/")
 	.SetupConfig()
 	.Create()
-	.Run(new VisualTests());
+.Run(new EditorWrapper(null));
+	}
+}
+//.Run(new EditorWrapper(new VisualTests()));
+//.Run(new VisualTests());

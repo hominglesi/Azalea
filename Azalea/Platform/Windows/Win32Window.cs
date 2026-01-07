@@ -2,6 +2,7 @@
 using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Inputs;
+using Azalea.Platform.Windows.ComInterfaces;
 using Azalea.Utils;
 using System;
 using System.Runtime.InteropServices;
@@ -15,6 +16,11 @@ internal class Win32Window : PlatformWindow
 	private readonly WindowState _initialShowState;
 
 	private readonly XInputManager _xInputManager;
+	private readonly DropTarget _dropTarget;
+
+	private readonly nint _normalPointer;
+	private readonly nint _blockedPointer;
+	private readonly nint _handPointer;
 
 	public Win32Window(string title, Vector2Int clientSize, WindowState state, bool visible)
 		: base(title, clientSize, state)
@@ -22,11 +28,15 @@ internal class Win32Window : PlatformWindow
 		_initialShowState = state;
 		var processHandle = System.Diagnostics.Process.GetCurrentProcess().Handle;
 
+		_normalPointer = WinAPI.LoadCursor(IntPtr.Zero, 32512);
+		_blockedPointer = WinAPI.LoadCursor(IntPtr.Zero, 32648);
+		_handPointer = WinAPI.LoadCursor(IntPtr.Zero, 32649);
+
 		_windowProcedure = windowProcedure;
 		var wndClass = new WindowClass("Azalea Window", processHandle, _windowProcedure)
 		{
 			Style = ClassStyles.OwnDC,
-			Cursor = WinAPI.LoadCursor(IntPtr.Zero, 32512)
+			Cursor = _normalPointer
 		};
 
 		WinRectangle windowRect = new(100, 100, clientSize.X, clientSize.Y);
@@ -35,7 +45,7 @@ internal class Win32Window : PlatformWindow
 
 		if (visible) style |= WindowStyles.Visible;
 
-		var styleEx = WindowStylesEx.AppWindow;
+		var styleEx = WindowStylesEx.AppWindow | WindowStylesEx.AcceptFiles;
 
 		WinAPI.AdjustWindowRect(ref windowRect, style, false, styleEx);
 
@@ -62,6 +72,11 @@ internal class Win32Window : PlatformWindow
 
 		_xInputManager = new XInputManager();
 		Input.SetGamepadManager(_xInputManager);
+
+		if (WinAPI.OleInitialize(0) == 0)
+			_ = WinAPI.RegisterDragDrop(_window, _dropTarget = new DropTarget(this));
+		else
+			Console.WriteLine("The Main method has not been marked with an [STAThread] attribute. You may experience some strange behaviours.");
 
 		//Setup OpenGL
 		_deviceContext = WinAPI.GetDC(_window);
@@ -103,6 +118,7 @@ internal class Win32Window : PlatformWindow
 		//Sync values with PlatformWindow
 		var windowSize = WinAPI.GetWindowRect(_window).Size;
 		UpdateSize(windowSize, clientSize);
+		SetAcceptFiles(AcceptFiles);
 	}
 
 	private void initializeOpenGL()
@@ -241,6 +257,35 @@ internal class Win32Window : PlatformWindow
 		return WinAPI.DefWindowProc(window, message, wParam, lParam);
 	}
 
+	[ComVisible(true)]
+	[Guid("00000122-0000-0000-C000-000000000046")]
+	private class DropTarget(Win32Window window) : IDropTarget
+	{
+		private readonly Win32Window _window = window;
+
+		public int DragEnter(nint dataObject, uint keyState, Vector2Int point, ref uint effect)
+		{
+			return 0;
+		}
+
+		public int DragLeave()
+		{
+			return 0;
+		}
+
+		public int DragOver(uint keyState, Vector2Int point, ref uint effect)
+		{
+			effect = _window.AcceptFiles ? 1u : 0u;
+
+			return 0;
+		}
+
+		public int Drop(nint dataObject, uint keyState, Vector2Int point, ref uint effect)
+		{
+			return 0;
+		}
+	}
+
 	private void handleKeyDown(Keys key, bool isRepeat)
 	{
 		if (isRepeat)
@@ -328,10 +373,8 @@ internal class Win32Window : PlatformWindow
 		return changed;
 	}
 
-	protected override void SetCursorVisible(bool show)
-	{
-		WinAPI.ShowCursor(show);
-	}
+	protected override void SetCursorVisible(bool show) => WinAPI.ShowCursor(show);
+	protected override void SetAcceptFiles(bool show) => WinAPI.DragAcceptFiles(_window, show);
 
 	public override void Center()
 	{

@@ -215,4 +215,9 @@ internal enum WindowMessage : uint
 	/// A window receives this message through its <see cref="WindowProcedure"/> function.
 	/// </summary>
 	XButtonDoubleClick = 525,
+	/// <summary>
+	/// Sent when the user drops a file on the window of an application that
+	/// has registered itself as a recipient of dropped files.
+	/// </summary>
+	DropFiles = 563
 }

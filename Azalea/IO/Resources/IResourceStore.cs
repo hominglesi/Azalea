@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Azalea.IO.Resources;
@@ -7,4 +8,6 @@ public interface IResourceStore
 	Stream? GetStream(string path);
 
 	IEnumerable<(string, bool)> GetAvalibleResources(string subPath = "");
+
+	IEnumerable<string> GetItems(string path = "") => throw new NotImplementedException();
 }

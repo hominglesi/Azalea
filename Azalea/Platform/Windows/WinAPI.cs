@@ -1,5 +1,6 @@
 ﻿using Azalea.Graphics;
 using Azalea.Numerics;
+using Azalea.Platform.Windows.ComInterfaces;
 using Azalea.Platform.Windows.Enums;
 using Azalea.Platform.Windows.Enums.RawInput;
 using Microsoft.Win32.SafeHandles;
@@ -12,6 +13,8 @@ internal static partial class WinAPI
 {
 	private const string Gdi32Path = "gdi32.dll";
 	private const string Kernel32Path = "kernel32.dll";
+	private const string Ole32Path = "ole32.dll";
+	private const string Shell32Path = "shell32.dll";
 	private const string User32Path = "user32.dll";
 
 	[DllImport(User32Path, EntryPoint = "AdjustWindowRectEx")]
@@ -127,6 +130,9 @@ internal static partial class WinAPI
 	[DllImport(User32Path, EntryPoint = "DispatchMessageW", CharSet = CharSet.Unicode)]
 	public static extern IntPtr DispatchMessage([In] ref Message message);
 
+	[DllImport(Shell32Path, EntryPoint = "DragAcceptFiles")]
+	public static extern void DragAcceptFiles(IntPtr window, bool accept);
+
 	[DllImport(User32Path, EntryPoint = "EnableWindow")]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool EnableWindow(IntPtr window, bool enable);
@@ -222,6 +228,9 @@ internal static partial class WinAPI
 	[DllImport(User32Path, EntryPoint = "MonitorFromWindow")]
 	public static extern IntPtr MonitorFromWindow(IntPtr window, MonitorFromFlags flags);
 
+	[DllImport(Ole32Path, EntryPoint = "OleInitialize")]
+	public static extern uint OleInitialize(nint reserved);
+
 	[DllImport(User32Path, EntryPoint = "OpenClipboard")]
 	public static extern bool OpenClipboard(IntPtr newWindowOwner);
 
@@ -239,6 +248,9 @@ internal static partial class WinAPI
 
 	[DllImport(User32Path, EntryPoint = "RegisterClassExW", CharSet = CharSet.Unicode)]
 	public static extern ushort RegisterClass([In] ref WindowClass windowClass);
+
+	[DllImport(Ole32Path, EntryPoint = "RegisterDragDrop")]
+	public static extern uint RegisterDragDrop(IntPtr window, IDropTarget dropTarget);
 
 	[DllImport(User32Path, EntryPoint = "RegisterRawInputDevices", SetLastError = true)]
 	[return: MarshalAs(UnmanagedType.Bool)]

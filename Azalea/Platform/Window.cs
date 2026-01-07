@@ -64,6 +64,12 @@ public static class Window
 		set => Instance.CursorVisible = value;
 	}
 
+	public static bool AcceptFiles
+	{
+		get => Instance.AcceptFiles;
+		set => Instance.AcceptFiles = value;
+	}
+
 	public static void Center() => Instance.Center();
 	public static void Focus() => Instance.Focus();
 	public static void RequestAttention() => Instance.RequestAttention();

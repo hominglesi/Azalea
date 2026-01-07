@@ -212,7 +212,6 @@ internal abstract class PlatformWindow : Disposable, IWindow
 		}
 	}
 
-
 	private bool _cursorVisible = true;
 	protected abstract void SetCursorVisible(bool show);
 	public bool CursorVisible
@@ -223,6 +222,19 @@ internal abstract class PlatformWindow : Disposable, IWindow
 			if (_cursorVisible == value) return;
 			SetCursorVisible(value);
 			_cursorVisible = value;
+		}
+	}
+
+	private bool _acceptFiles = false;
+	protected abstract void SetAcceptFiles(bool show);
+	public bool AcceptFiles
+	{
+		get => _acceptFiles;
+		set
+		{
+			if (_acceptFiles == value) return;
+			SetAcceptFiles(value);
+			_acceptFiles = value;
 		}
 	}
 

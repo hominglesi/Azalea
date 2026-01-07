@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace Azalea;
 
+[StructLayout(LayoutKind.Sequential)]
 public struct Vector2Int : IEquatable<Vector2Int>
 {
 	public int X;

@@ -54,15 +54,16 @@ internal class ResourceExplorerIcons : ResourceExplorer
 
 			Width = __itemWidth;
 			Height = __itemHeight;
-			Children = new GameObject[]
-			{
+			Children = [
 				new Sprite()
 				{
 					Anchor = Anchor.TopCenter,
 					Origin = Anchor.TopCenter,
 					Y = 4,
 					Size = new(92),
-					Texture = Assets.GetTexture($"Textures/{(isDirectory ? "directory" : "file")}-icon.png")
+					Texture = Assets.MainStore.GetTexture(
+						$"Textures/{(isDirectory ? "directory" : "file")}-icon.png",
+						Graphics.Textures.TextureFiltering.Linear)
 				},
 				new SpriteTextTruncating()
 				{
@@ -72,7 +73,7 @@ internal class ResourceExplorerIcons : ResourceExplorer
 					Origin = Anchor.BottomCenter,
 					Text = path
 				}
-			};
+			];
 		}
 
 		protected override bool OnClick(ClickEvent e)
