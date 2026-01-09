@@ -25,17 +25,7 @@ public class FileInputControl : AbstractFileInput
 			Wrapping = FlexWrapping.NoWrapping,
 			Alignment = FlexAlignment.Center,
 			Children = [
-				new BasicButton(){
-					Size = new(106, 1),
-					BackgroundColor = new Color(233, 236, 239),
-					HoveredColor = new Color(221, 224, 227),
-					RelativeSizeAxes = Axes.Y,
-					BorderColor = new Color(206, 212, 218),
-					BorderThickness = 1,
-					Text = "Choose File",
-					FontSize = 16,
-					TextColor = ControlPalette.DarkTextColor
-				},
+				new SelectFileButton(this),
 				new GameObject(){
 					Width = 12,
 				},
@@ -60,5 +50,36 @@ public class FileInputControl : AbstractFileInput
 			_chosenFileText.Text = $"{SelectedFilePaths.Count} Items";
 
 		return output;
+	}
+
+	private class SelectFileButton : BasicButton
+	{
+		private readonly AbstractFileInput _parent;
+
+		public SelectFileButton(AbstractFileInput parent)
+		{
+			_parent = parent;
+
+			Size = new(106, 1);
+			BackgroundColor = new Color(233, 236, 239);
+			//HoveredColor = new Color(221, 224, 227);
+			// We keep the hovered color the same since opening the file
+			// dialog is not supported
+			HoveredColor = BackgroundColor;
+			RelativeSizeAxes = Axes.Y;
+			BorderColor = new Color(206, 212, 218);
+			BorderThickness = 1;
+			Text = "Choose File";
+			FontSize = 16;
+			TextColor = ControlPalette.DarkTextColor;
+		}
+
+		public override bool AcceptsFiles => true;
+		protected override bool OnFileDropped(FileDroppedEvent e)
+		{
+			_parent.TriggerEvent(e);
+
+			return true;
+		}
 	}
 }
