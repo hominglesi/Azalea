@@ -10,4 +10,13 @@
     <ProjectReference Include="..\Azalea\Azalea.csproj" />
   </ItemGroup>
 
+  <ItemGroup Label="FilesToCopy">
+    <Content Include="..\build\Native\msdf-atlas-gen.exe" Pack="true" PackagePath="native">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <TargetPath>bin/msdf-gen.exe</TargetPath>
+      <Visible>false</Visible>
+    </Content>
+  </ItemGroup>
+
 </Project>

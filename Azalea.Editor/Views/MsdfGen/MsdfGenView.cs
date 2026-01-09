@@ -4,6 +4,7 @@ using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
+using Azalea.IO.Resources;
 using System.Diagnostics;
 using System.Text;
 
@@ -43,29 +44,39 @@ internal class MsdfGenView : Composition
 					Text = "Generate",
 					ClickAction = _ => generate(_fontInputControl.SelectedPath,
 						_outputDirectoryControl.SelectedPath, _size)
+				},
+				new Sprite(){
+					Texture = Assets.GetTexture(".Fake/azalea-icon.png")
 				}
 			]
 		});
 	}
 
-	private static void generate(string? fontPath, string? outputPath, int size)
+	private static void generate(string? fontPath, string? outputPath, int size, string? outputFileName = null)
 	{
+		Debug.Assert(fontPath is not null);
+
+		outputPath ??= Path.GetDirectoryName(fontPath);
+		outputFileName ??= Path.GetFileNameWithoutExtension(fontPath);
+
 		var args = new StringBuilder();
 
-		Debug.Assert(fontPath is not null);
 		args.Append("-font ");
 		args.Append(fontPath);
 		args.Append(' ');
 
 		args.Append("-allchars ");
 
-		Debug.Assert(outputPath is not null);
 		args.Append("-imageout ");
 		args.Append(outputPath);
+		args.Append('/');
+		args.Append(outputFileName);
 		args.Append(".bmp ");
 
 		args.Append("-csv ");
 		args.Append(outputPath);
+		args.Append('/');
+		args.Append(outputFileName);
 		args.Append(".csv ");
 
 		args.Append("-size ");
@@ -75,7 +86,7 @@ internal class MsdfGenView : Composition
 		args.Append("-yorigin top");
 
 		Process.Start(
-			@"D:\Programming\Azalea\Azalea.VisualTests.Desktop\bin\Debug\net8.0\win-x64\bin\msdf-atlas-gen.exe",
+			@"bin\msdf-gen.exe",
 			args.ToString());
 	}
 

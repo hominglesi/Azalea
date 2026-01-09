@@ -15,9 +15,6 @@ public class EditorResourceExplorer : Composition
 
 	private readonly IResourceStore _store;
 
-	private readonly HeaderButton _previousButton;
-	private readonly HeaderButton _nextButton;
-
 	private readonly HeaderButton _detailsButton;
 	private readonly HeaderButton _largeIconsButton;
 	private HeaderButton _pressedHeader;
@@ -43,9 +40,9 @@ public class EditorResourceExplorer : Composition
 						Width = __headerHeight * 2,
 						Height = __headerHeight,
 						Children = [
-							_previousButton = new HeaderButton("left", __headerHeight,
+							new HeaderButton("left", __headerHeight,
 								_ => getViewFromButton(_pressedHeader!).MoveBackward()),
-							_nextButton = new HeaderButton("right", __headerHeight,
+							new HeaderButton("right", __headerHeight,
 								_ => getViewFromButton(_pressedHeader!).MoveForward())
 						]
 					},
