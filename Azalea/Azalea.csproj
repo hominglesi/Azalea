@@ -27,7 +27,8 @@
   </ItemGroup>
 	
 	<ItemGroup>
-    <EmbeddedResource Include="Resources\**\*" />
+    <EmbeddedResource Include="Resources\**\*"/>
+    <EmbeddedResource Remove="**\__*" />
     <None Include="Resources\Textures\azalea-icon.png" Pack="true" PackagePath="\" />
     <None Include="../README.md" Pack="true" PackagePath="\" Visible="false" />
   </ItemGroup>
