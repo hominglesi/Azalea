@@ -1,17 +1,15 @@
 ﻿using Azalea.Design.Containers;
+using Azalea.Design.Controls;
 using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
-using Azalea.Inputs.Events;
 using System.Diagnostics;
 using System.Text;
 
 namespace Azalea.Editor.Views.MsdfGen;
 internal class MsdfGenView : Composition
 {
-	public static Color TextColor => new(53, 58, 61);
-
 	private int _size = 48;
 
 	private FileInputControl _fontInputControl;
@@ -28,15 +26,12 @@ internal class MsdfGenView : Composition
 				new LabelControl(){
 					Text = "Input font:"
 				},
-				_fontInputControl = new FileInputControl(){
-					RelativeSizeAxes = Axes.X
-				},
+				_fontInputControl = new FileInputControl(),
 				new LabelControl(){
 					Text = "Output directory:"
 				},
 				_outputDirectoryControl = new FileInputControl(){
-					RelativeSizeAxes = Axes.X,
-					AcceptedFiles = FileInputControl.AcceptedFileFlags.Directory
+					AcceptedFiles = AcceptedFileFlags.Directory
 				},
 				new LabelControl(){
 					Text = $"Size: {_size}"
@@ -84,122 +79,12 @@ internal class MsdfGenView : Composition
 			args.ToString());
 	}
 
-	private class FileInputControl : FlexContainer
-	{
-		public AcceptedFileFlags AcceptedFiles { get; set; } = AcceptedFileFlags.File;
-
-		private List<string> _selectedFilePaths = [];
-
-		public string? SelectedPath
-		{
-			get
-			{
-				if (_selectedFilePaths.Count > 0)
-					return _selectedFilePaths[0];
-
-				return null;
-			}
-		}
-
-		public IEnumerable<string> SelectedPaths
-		{
-			get
-			{
-				foreach (var filePath in _selectedFilePaths)
-					yield return filePath;
-			}
-		}
-
-		private readonly SpriteText _chosenFileText;
-
-		public FileInputControl()
-		{
-			BorderColor = new Color(206, 212, 218);
-			BorderThickness = 1;
-			Wrapping = FlexWrapping.NoWrapping;
-			Alignment = FlexAlignment.Center;
-			Height = 36;
-			Masking = true;
-
-			AddRange([
-				new BasicButton(){
-					Size = new(106, 1),
-					BackgroundColor = new Color(233, 236, 239),
-					HoveredColor = new Color(221, 224, 227),
-					RelativeSizeAxes = Axes.Y,
-					BorderColor = new Color(206, 212, 218),
-					BorderThickness = 1,
-					Text = "Choose File",
-					FontSize = 16,
-					TextColor = MsdfGenView.TextColor
-				},
-				new GameObject(){
-					Width = 12,
-				},
-				_chosenFileText = new SpriteText(){
-					Font = FontUsage.Default.With(size: 16),
-					Color = MsdfGenView.TextColor,
-					Text = "No file chosen"
-				}
-			]);
-		}
-
-		public override bool AcceptsFiles => true;
-		protected override bool OnFileDropped(FileDroppedEvent e)
-		{
-			_selectedFilePaths.Clear();
-
-			if (e.FilePaths.Length > 0)
-			{
-				for (int i = 0; i < e.FilePaths.Length; i++)
-				{
-					var path = e.FilePaths[i];
-
-					if (File.Exists(path))
-					{
-						if (AcceptedFiles.HasFlag(AcceptedFileFlags.MultipleFiles) ||
-							(AcceptedFiles.HasFlag(AcceptedFileFlags.File) && i == 0))
-						{
-							_selectedFilePaths.Add(path);
-						}
-					}
-					else if (Directory.Exists(path))
-					{
-						if (AcceptedFiles.HasFlag(AcceptedFileFlags.MultipleDirectories) ||
-							(AcceptedFiles.HasFlag(AcceptedFileFlags.Directory) && i == 0))
-						{
-							_selectedFilePaths.Add(path);
-						}
-					}
-				}
-			}
-
-			if (_selectedFilePaths.Count == 0)
-				_chosenFileText.Text = "No file chosen";
-			else if (_selectedFilePaths.Count == 1)
-				_chosenFileText.Text = _selectedFilePaths[0];
-			else
-				_chosenFileText.Text = $"{_selectedFilePaths.Count} Items";
-
-			return true;
-		}
-
-		[Flags]
-		public enum AcceptedFileFlags
-		{
-			File = 1,
-			MultipleFiles = 2,
-			Directory = 4,
-			MultipleDirectories = 8
-		}
-	}
-
 	private class LabelControl : SpriteText
 	{
 		public LabelControl()
 		{
 			Font = FontUsage.Default.With(size: 16);
-			Color = MsdfGenView.TextColor;
+			Color = ControlPalette.DarkTextColor;
 			Margin = new Boundary(20, 0, 14, 0);
 		}
 	}
