@@ -65,11 +65,6 @@ public interface IWindow : IDisposable
 	bool CursorVisible { get; set; }
 
 	/// <summary>
-	/// Whether the window accepts files dropped over it
-	/// </summary>
-	bool AcceptFiles { get; set; }
-
-	/// <summary>
 	/// Centers the window on the users most overlapped monitor.
 	/// </summary>
 	void Center();

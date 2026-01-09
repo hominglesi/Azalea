@@ -6,6 +6,8 @@ using Azalea.Platform.Windows.ComInterfaces;
 using Azalea.Utils;
 using System;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
+using System.Text;
 
 namespace Azalea.Platform.Windows;
 internal class Win32Window : PlatformWindow
@@ -16,11 +18,6 @@ internal class Win32Window : PlatformWindow
 	private readonly WindowState _initialShowState;
 
 	private readonly XInputManager _xInputManager;
-	private readonly DropTarget _dropTarget;
-
-	private readonly nint _normalPointer;
-	private readonly nint _blockedPointer;
-	private readonly nint _handPointer;
 
 	public Win32Window(string title, Vector2Int clientSize, WindowState state, bool visible)
 		: base(title, clientSize, state)
@@ -28,15 +25,11 @@ internal class Win32Window : PlatformWindow
 		_initialShowState = state;
 		var processHandle = System.Diagnostics.Process.GetCurrentProcess().Handle;
 
-		_normalPointer = WinAPI.LoadCursor(IntPtr.Zero, 32512);
-		_blockedPointer = WinAPI.LoadCursor(IntPtr.Zero, 32648);
-		_handPointer = WinAPI.LoadCursor(IntPtr.Zero, 32649);
-
 		_windowProcedure = windowProcedure;
 		var wndClass = new WindowClass("Azalea Window", processHandle, _windowProcedure)
 		{
 			Style = ClassStyles.OwnDC,
-			Cursor = _normalPointer
+			Cursor = WinAPI.LoadCursor(IntPtr.Zero, 32512)
 		};
 
 		WinRectangle windowRect = new(100, 100, clientSize.X, clientSize.Y);
@@ -45,7 +38,7 @@ internal class Win32Window : PlatformWindow
 
 		if (visible) style |= WindowStyles.Visible;
 
-		var styleEx = WindowStylesEx.AppWindow | WindowStylesEx.AcceptFiles;
+		var styleEx = WindowStylesEx.AppWindow;
 
 		WinAPI.AdjustWindowRect(ref windowRect, style, false, styleEx);
 
@@ -74,7 +67,7 @@ internal class Win32Window : PlatformWindow
 		Input.SetGamepadManager(_xInputManager);
 
 		if (WinAPI.OleInitialize(0) == 0)
-			_ = WinAPI.RegisterDragDrop(_window, _dropTarget = new DropTarget(this));
+			_ = WinAPI.RegisterDragDrop(_window, new DropTarget(this));
 		else
 			Console.WriteLine("The Main method has not been marked with an [STAThread] attribute. You may experience some strange behaviours.");
 
@@ -118,7 +111,6 @@ internal class Win32Window : PlatformWindow
 		//Sync values with PlatformWindow
 		var windowSize = WinAPI.GetWindowRect(_window).Size;
 		UpdateSize(windowSize, clientSize);
-		SetAcceptFiles(AcceptFiles);
 	}
 
 	private void initializeOpenGL()
@@ -257,31 +249,50 @@ internal class Win32Window : PlatformWindow
 		return WinAPI.DefWindowProc(window, message, wParam, lParam);
 	}
 
-	[ComVisible(true)]
-	[Guid("00000122-0000-0000-C000-000000000046")]
 	private class DropTarget(Win32Window window) : IDropTarget
 	{
-		private readonly Win32Window _window = window;
-
-		public int DragEnter(nint dataObject, uint keyState, Vector2Int point, ref uint effect)
-		{
-			return 0;
-		}
-
-		public int DragLeave()
-		{
-			return 0;
-		}
+		public int DragEnter(nint dataObject, uint keyState, Vector2Int point, ref uint effect) => 0;
+		public int DragLeave() => 0;
 
 		public int DragOver(uint keyState, Vector2Int point, ref uint effect)
 		{
-			effect = _window.AcceptFiles ? 1u : 0u;
+			effect = Input.OverDroppableFile ? 1u : 0u;
 
 			return 0;
 		}
 
-		public int Drop(nint dataObject, uint keyState, Vector2Int point, ref uint effect)
+		public int Drop(IDataObject dataObject, uint keyState, Vector2Int point, ref uint effect)
 		{
+			var format = new FORMATETC()
+			{
+				cfFormat = 15, // CF_HDROP
+				dwAspect = DVASPECT.DVASPECT_CONTENT,
+				tymed = TYMED.TYMED_HGLOBAL
+			};
+
+			string[] files;
+			dataObject.GetData(ref format, out STGMEDIUM medium);
+
+			try
+			{
+				IntPtr dropHandle = medium.unionmember;
+				int fileCount = WinAPI.DragQueryFile(dropHandle, uint.MaxValue, null, 0);
+				files = new string[fileCount];
+				for (uint x = 0; x < fileCount; ++x)
+				{
+					int size = WinAPI.DragQueryFile(dropHandle, x, null, 0);
+					if (size > 0)
+					{
+						StringBuilder fileName = new StringBuilder(size + 1);
+						if (WinAPI.DragQueryFile(dropHandle, x, fileName, (uint)fileName.Capacity) > 0)
+							files[x] = fileName.ToString();
+					}
+				}
+			}
+			finally { WinAPI.ReleaseStgMedium(ref medium); }
+
+			Input.ExecuteFileDropped(files);
+
 			return 0;
 		}
 	}
@@ -374,7 +385,6 @@ internal class Win32Window : PlatformWindow
 	}
 
 	protected override void SetCursorVisible(bool show) => WinAPI.ShowCursor(show);
-	protected override void SetAcceptFiles(bool show) => WinAPI.DragAcceptFiles(_window, show);
 
 	public override void Center()
 	{

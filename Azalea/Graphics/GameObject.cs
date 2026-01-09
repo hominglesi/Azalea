@@ -880,6 +880,11 @@ public partial class GameObject : Amendable, IGameObject
 	public virtual bool AcceptsFocus => false;
 
 	/// <summary>
+	/// Controls if this <see cref="GameObject"/> should accept files droped over it
+	/// </summary>
+	public virtual bool AcceptsFiles => false;
+
+	/// <summary>
 	/// Check if this <see cref="GameObject"/> is hovered
 	/// </summary>
 	public bool Hovered { get; internal set; }
@@ -931,6 +936,10 @@ public partial class GameObject : Amendable, IGameObject
 				OnFocusLost(focusLost);
 				FocusLost?.Invoke(focusLost);
 				return false;
+			case FileDroppedEvent fileDropped:
+				var fdResult = OnFileDropped(fileDropped);
+				FileDropped?.Invoke(fileDropped);
+				return fdResult;
 			default:
 				return Handle(e);
 		}
@@ -957,6 +966,8 @@ public partial class GameObject : Amendable, IGameObject
 	public event Action<FocusEvent>? Focus;
 	protected virtual void OnFocusLost(FocusLostEvent e) => Handle(e);
 	public event Action<FocusLostEvent>? FocusLost;
+	protected virtual bool OnFileDropped(FileDroppedEvent e) => Handle(e);
+	public event Action<FileDroppedEvent>? FileDropped;
 
 	#endregion
 

@@ -4,6 +4,7 @@ using Azalea.Design.Scenes;
 using Azalea.Editor.Views.MsdfGen;
 using Azalea.Editor.Views.ResourceExploring;
 using Azalea.Graphics;
+using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.IO.Resources;
 
@@ -13,7 +14,7 @@ public class EditorWrapper : AzaleaGame
 {
 	private readonly AzaleaGame? _wrappedGame;
 
-	private readonly DockingContainer _mainContainer;
+	private readonly BasicDockingContainer _mainContainer;
 
 	public EditorWrapper(AzaleaGame? wrappedGame)
 	{
@@ -22,8 +23,9 @@ public class EditorWrapper : AzaleaGame
 
 		Add(_mainContainer = new BasicDockingContainer()
 		{
-			RelativeSizeAxes = Axes.Both,
+			RelativeSizeAxes = Axes.Both
 		});
+		_mainContainer.ContentBackground.Color = Palette.White;
 
 		_mainContainer.AddDockable("Game", _wrappedGame is not null ? _wrappedGame : new MissingGameDisplay()
 		{
@@ -32,6 +34,7 @@ public class EditorWrapper : AzaleaGame
 		_mainContainer.AddDockable("Resource Explorer", new EditorResourceExplorer(Assets.FileSystemStore)
 		{
 			RelativeSizeAxes = Axes.Both,
+			BackgroundColor = Palette.Gray
 		});
 		_mainContainer.AddDockable("Msdf Generator", new MsdfGenView()
 		{

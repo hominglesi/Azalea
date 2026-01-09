@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace Azalea.Platform.Windows.ComInterfaces;
 
@@ -18,5 +19,5 @@ internal interface IDropTarget
 	int DragLeave();
 
 	[PreserveSig]
-	int Drop(nint dataObject, uint keyState, Vector2Int point, ref uint effect);
+	int Drop(IDataObject dataObject, uint keyState, Vector2Int point, ref uint effect);
 }

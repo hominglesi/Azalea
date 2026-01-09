@@ -6,6 +6,8 @@ using Azalea.Platform.Windows.Enums.RawInput;
 using Microsoft.Win32.SafeHandles;
 using System;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
+using System.Text;
 
 namespace Azalea.Platform.Windows;
 
@@ -132,6 +134,9 @@ internal static partial class WinAPI
 
 	[DllImport(Shell32Path, EntryPoint = "DragAcceptFiles")]
 	public static extern void DragAcceptFiles(IntPtr window, bool accept);
+
+	[DllImport(Shell32Path, EntryPoint = "DragQueryFileW", CharSet = CharSet.Unicode)]
+	public static extern int DragQueryFile(IntPtr drop, uint file, [Out] StringBuilder fileName, uint fileNameLength);
 
 	[DllImport(User32Path, EntryPoint = "EnableWindow")]
 	[return: MarshalAs(UnmanagedType.Bool)]
@@ -262,6 +267,9 @@ internal static partial class WinAPI
 
 	[DllImport(User32Path, EntryPoint = "ReleaseDC")]
 	public static extern bool ReleaseDC(IntPtr window, IntPtr deviceContext);
+
+	[DllImport(Ole32Path, EntryPoint = "ReleaseStgMedium")]
+	public static extern bool ReleaseStgMedium(ref STGMEDIUM medium);
 
 	[DllImport(User32Path, EntryPoint = "ScreenToClient")]
 	public static extern bool ScreenToClient(IntPtr window, ref Vector2Int point);

@@ -225,19 +225,6 @@ internal abstract class PlatformWindow : Disposable, IWindow
 		}
 	}
 
-	private bool _acceptFiles = false;
-	protected abstract void SetAcceptFiles(bool show);
-	public bool AcceptFiles
-	{
-		get => _acceptFiles;
-		set
-		{
-			if (_acceptFiles == value) return;
-			SetAcceptFiles(value);
-			_acceptFiles = value;
-		}
-	}
-
 	#endregion
 
 	#region Methods
