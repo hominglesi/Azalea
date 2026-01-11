@@ -12,10 +12,10 @@ public class FileInputControl : AbstractFileInput
 
 	public FileInputControl()
 	{
-		Size = new(1, 36);
+		Size = new(1, ControlConstants.InputControlHeight);
 		RelativeSizeAxes = Axes.X;
 
-		BorderColor = new Color(206, 212, 218);
+		BorderColor = ControlConstants.DarkControlColor;
 		BorderThickness = 1;
 		Masking = true;
 
@@ -30,8 +30,8 @@ public class FileInputControl : AbstractFileInput
 					Width = 12,
 				},
 				_chosenFileText = new SpriteText(){
-					Font = FontUsage.Default.With(size: 16),
-					Color = ControlPalette.DarkTextColor,
+					Font = ControlConstants.NormalFont,
+					Color = ControlConstants.DarkTextColor,
 					Text = "No file chosen"
 				}
 			]
@@ -71,7 +71,7 @@ public class FileInputControl : AbstractFileInput
 			BorderThickness = 1;
 			Text = "Choose File";
 			FontSize = 16;
-			TextColor = ControlPalette.DarkTextColor;
+			TextColor = ControlConstants.DarkTextColor;
 		}
 
 		public override bool AcceptsFiles => true;

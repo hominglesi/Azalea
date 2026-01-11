@@ -14,6 +14,7 @@ internal class MsdfGenView : Composition
 
 	private FileInputControl _fontInputControl;
 	private FileInputControl _outputDirectoryControl;
+	private DropDownMenuControl _modeControl;
 
 	private FlexContainer _outputTextContainer;
 
@@ -26,41 +27,62 @@ internal class MsdfGenView : Composition
 			Padding = new(20),
 			Children = [
 				new LabelControl(){
-					Text = "Input font:"
+					Text = "Input font:",
+					Depth = 0,
 				},
-				_fontInputControl = new FileInputControl(),
+				_fontInputControl = new FileInputControl(){
+					Depth = 1,
+				},
 				new FormTextControl(){
-					Text = "Drag a file over the control to select it."
+					Text = "Drag a file over the control to select it.",
+					Depth = 2
 				},
 				new LabelControl(){
-					Text = "Output directory:"
+					Text = "Output directory:",
+					Depth = 3
 				},
 				_outputDirectoryControl = new FileInputControl(){
-					AcceptedFiles = AcceptedFileFlags.Directory
+					AcceptedFiles = AcceptedFileFlags.Directory,
+					Depth = 4
 				},
 				new FormTextControl(){
-					Text = "Drag a directory over the control to select it."
+					Text = "Drag a directory over the control to select it.",
+					Depth = 5
 				},
 				new LabelControl(){
-					Text = $"Size: {_size}"
+					Text = $"Mode:",
+					Depth = 6
+				},
+				_modeControl = new DropDownMenuControl(){
+					RelativeSizeAxes = Axes.None,
+					Width = 300,
+					Values = ["Hardmask", "Softmask", "Sdf", "Pdsf", "Msdf", "Mtsdf"],
+					SelectedValue = "Msdf",
+					Depth = 7
+				},
+				new LabelControl(){
+					Text = $"Size: {_size}",
+					Depth = 8
 				},
 				new ButtonControl(){
 					Text = "Generate",
 					ClickAction = _ => generate(_fontInputControl.SelectedPath,
-						_outputDirectoryControl.SelectedPath, _size),
-					Margin = new(16, 0, 16, 0)
+						_outputDirectoryControl.SelectedPath, _size, _modeControl.SelectedValue),
+					Margin = new(16, 0, 16, 0),
+					Depth = 9
 				},
 				_outputTextContainer = new FlexContainer(){
 					RelativeSizeAxes = Axes.X,
 					AutoSizeAxes = Axes.Y,
 					Margin = new(16, 0, 0, 0),
-					Direction = FlexDirection.Vertical
+					Direction = FlexDirection.Vertical,
+					Depth = 10
 				}
 			]
 		});
 	}
 
-	private void generate(string? fontPath, string? outputPath, int size, string? outputFileName = null)
+	private void generate(string? fontPath, string? outputPath, int size, string mode, string? outputFileName = null)
 	{
 		_outputTextContainer.Clear();
 
@@ -77,20 +99,88 @@ internal class MsdfGenView : Composition
 			Directory.CreateDirectory(outputPath!);
 
 		var args = new StringBuilder();
+		#region MsdfGen
+		if (fontPath.EndsWith(".tff"))
+		{
+			args.Append("-font ");
+			args.Append(fontPath);
+			args.Append(' ');
+		}
+		else if (fontPath.EndsWith(".svg"))
+		{
+			args.Append("-svg ");
+			args.Append(fontPath);
+			args.Append(' ');
+		}
+		else
+		{
+			outputString("Unknown input format!");
+			return;
+		}
 
-		args.Append("-font ");
-		args.Append(fontPath);
+		args.Append(mode.ToLower());
+		args.Append(' ');
+
+		args.Append("-o ");
+		args.Append(outputPath);
+		args.Append('\\');
+		args.Append(outputFileName);
+		args.Append(".bmp ");
+
+		args.Append("-size ");
+		args.Append(size);
+		args.Append(' ');
+		args.Append(size);
+		args.Append(' ');
+
+		args.Append("-pxrange 4 ");
+
+		var process = new Process()
+		{
+			StartInfo = new()
+			{
+				FileName = @"bin\msdfgen.exe",
+				Arguments = args.ToString(),
+				UseShellExecute = false,
+				RedirectStandardOutput = true,
+				RedirectStandardError = true,
+				CreateNoWindow = true
+			}
+		};
+		#endregion
+		#region MsdfAtlasGen
+		/*
+		if (fontPath.EndsWith(".tff"))
+		{
+			args.Append("-font ");
+			args.Append(fontPath);
+			args.Append(' ');
+		}
+		else if (fontPath.EndsWith(".svg"))
+		{
+			args.Append("-svg ");
+			args.Append(fontPath);
+			args.Append(' ');
+		}
+		else
+		{
+			outputString("Unknown input format!");
+			return;
+		}
+
+		args.Append("-type ");
+		args.Append(mode.ToLower());
 		args.Append(' ');
 
 		args.Append("-imageout ");
 		args.Append(outputPath);
-		args.Append('/');
+		args.Append('\\');
 		args.Append(outputFileName);
 		args.Append(".bmp ");
 
 		args.Append("-csv ");
 		args.Append(outputPath);
-		args.Append('/');
+		args.Append('\\');
 		args.Append(outputFileName);
 		args.Append(".csv ");
 
@@ -111,7 +201,8 @@ internal class MsdfGenView : Composition
 				RedirectStandardError = true,
 				CreateNoWindow = true
 			}
-		};
+		};*/
+		#endregion
 
 		process.Start();
 
@@ -159,7 +250,7 @@ internal class MsdfGenView : Composition
 		public LabelControl()
 		{
 			Font = FontUsage.Default.With(size: 16);
-			Color = ControlPalette.DarkTextColor;
+			Color = ControlConstants.DarkTextColor;
 			Margin = new Boundary(20, 0, 14, 0);
 		}
 	}

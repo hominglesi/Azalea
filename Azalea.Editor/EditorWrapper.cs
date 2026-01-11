@@ -1,4 +1,5 @@
 ﻿using Azalea.Design.Containers;
+using Azalea.Design.Controls;
 using Azalea.Design.Docking;
 using Azalea.Design.Scenes;
 using Azalea.Editor.Views.MsdfGen;
@@ -49,6 +50,7 @@ public class EditorWrapper : AzaleaGame
 			Add(new SpriteText()
 			{
 				Text = "No game provided for editor.",
+				Color = ControlConstants.DarkTextColor,
 				Anchor = Anchor.Center,
 				Origin = Anchor.Center
 			});
