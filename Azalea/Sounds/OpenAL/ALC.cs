@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azalea.Sounds.OpenAL.Enums;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Azalea.Sounds.OpenAL;
@@ -112,6 +113,9 @@ internal unsafe static class ALC
 	[DllImport(LibraryPath, EntryPoint = "alSourcei")]
 	private static extern void sourcei(uint source, int param, int value);
 
+	[DllImport(LibraryPath, EntryPoint = "alGetSourcei")]
+	private static extern void getSourcei(uint source, int param, [Out] int* value);
+
 	public static void BindBuffer(uint source, uint buffer)
 	{
 		//AL_BUFFER = 0x1009
@@ -137,6 +141,40 @@ internal unsafe static class ALC
 	{
 		//0x1007 = AL_LOOPING
 		sourcei(source, 0x1007, looping ? 1 : 0);
+	}
+
+	public static int GetBuffersProcessed(uint source)
+	{
+		//0x1016 = AL_BUFFERS_PROCESSED
+		int buffersProcessed;
+		getSourcei(source, 0x1016, &buffersProcessed);
+		return buffersProcessed;
+	}
+
+	public static ALSourceState GetSourceState(uint source)
+	{
+		//0x1010 = AL_SOURCE_STATE
+		int sourceState;
+		getSourcei(source, 0x1010, &sourceState);
+		return (ALSourceState)sourceState;
+	}
+
+	[DllImport(LibraryPath, EntryPoint = "alSourceQueueBuffers")]
+	private static extern void sourceQueueBuffers(uint source, int size, uint* buffers);
+
+	public static void SourceQueueBuffer(uint source, uint buffer)
+	{
+		sourceQueueBuffers(source, 1, &buffer);
+	}
+
+	[DllImport(LibraryPath, EntryPoint = "alSourceUnqueueBuffers")]
+	private static extern void sourceUnqueueBuffers(uint source, int size, uint* buffers);
+
+	public static uint SourceUnqueueBuffer(uint source)
+	{
+		uint buffer;
+		sourceUnqueueBuffers(source, 1, &buffer);
+		return buffer;
 	}
 
 	#endregion

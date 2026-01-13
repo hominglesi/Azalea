@@ -10,4 +10,5 @@ public interface IAudioManager
 	internal AudioInstance PlayInternal(Sound sound, float gain = 1, bool looping = false);
 
 	internal Sound CreateSound(ISoundData data);
+	internal void Update();
 }

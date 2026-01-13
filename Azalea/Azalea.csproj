@@ -22,6 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FFmpeg.AutoGen" Version="8.0.0" />
     <PackageReference Include="StbImageSharp" Version="2.30.15" />
   </ItemGroup>
 	

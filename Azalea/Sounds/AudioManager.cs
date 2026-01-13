@@ -22,4 +22,5 @@ internal abstract class AudioManager : Disposable, IAudioManager
 	public abstract AudioInstance Play(Sound sound, float gain = 1, bool looping = false);
 	public abstract AudioInstance PlayVital(Sound sound, float gain = 1, bool looping = false);
 	public abstract AudioInstance PlayInternal(Sound sound, float gain = 1, bool looping = false);
+	public virtual void Update() { }
 }

@@ -15,6 +15,8 @@ internal class AudioTest : TestScene
 
 	public AudioTest()
 	{
+		Audio.TestFunction();
+
 		_goodkid = Assets.GetSound("Audio/goodkid.wav");
 		_hitnormal = Assets.GetSound("Audio/hitnormal.wav");
 

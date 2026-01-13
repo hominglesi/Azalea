@@ -73,7 +73,6 @@ internal class WavSound : ISoundData
 
 		_lengthInSamples = _size * 8 / (_numChannels * _bitsPerSample);
 		_length = _lengthInSamples / (float)_sampleRate;
-
 	}
 
 	private short _audioFormat;

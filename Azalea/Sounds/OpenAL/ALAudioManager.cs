@@ -1,4 +1,7 @@
-﻿using System.Diagnostics;
+﻿using Azalea.Sounds.OpenAL.Enums;
+using System.Collections.Generic;
+using System.Diagnostics;
+using static Azalea.Sounds.Audio;
 
 namespace Azalea.Sounds.OpenAL;
 internal class ALAudioManager : AudioManager
@@ -61,6 +64,66 @@ internal class ALAudioManager : AudioManager
 			_currentAudioChannel = _vitalChannels;
 
 		return played;
+	}
+
+	private readonly List<StreamInstance> _streamInstances = [];
+	public void Stream(FFmpegStreamReader reader)
+	{
+		var instance = new StreamInstance(_sources[25], reader);
+		_streamInstances.Add(instance);
+	}
+
+	class StreamInstance
+	{
+		private const int __bufferCount = 8;
+
+		private ALSource _source;
+		private FFmpegStreamReader _reader;
+		private ALBuffer[] _buffers = new ALBuffer[__bufferCount];
+
+		public StreamInstance(ALSource source, FFmpegStreamReader reader)
+		{
+			_source = source;
+			_reader = reader;
+
+			for (int i = 0; i < __bufferCount; i++)
+				_buffers[i] = new ALBuffer();
+
+			for (int i = 0; i < __bufferCount; i++)
+			{
+				reader.ReadChunk(out var pcm, out var sampleRate);
+				ALC.BufferData(_buffers[i].Handle, ALFormat.Stereo16, pcm, pcm.Length, sampleRate);
+				ALC.SourceQueueBuffer(_source.Handle, _buffers[i].Handle);
+			}
+
+			ALC.SourcePlay(_source.Handle);
+		}
+
+		public void Update()
+		{
+			int processed = ALC.GetBuffersProcessed(_source.Handle);
+			while (processed-- > 0)
+			{
+				var buffer = ALC.SourceUnqueueBuffer(_source.Handle);
+
+				_reader.ReadChunk(out var pcm, out var sampleRate);
+
+				ALC.BufferData(buffer, ALFormat.Stereo16, pcm, pcm.Length, sampleRate);
+				ALC.SourceQueueBuffer(_source.Handle, buffer);
+			}
+
+			if (ALC.GetSourceState(_source.Handle) != ALSourceState.Playing)
+				ALC.SourcePlay(_source.Handle);
+		}
+	}
+
+	public override void Update()
+	{
+		foreach (var source in _sources)
+			source.Update();
+
+		foreach (var streamInstance in _streamInstances)
+			streamInstance.Update();
 	}
 
 	protected override void OnDispose()

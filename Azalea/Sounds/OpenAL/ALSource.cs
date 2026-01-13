@@ -8,6 +8,11 @@ internal class ALSource : AudioSource
 		Handle = ALC.GenSource();
 	}
 
+	public void Update()
+	{
+
+	}
+
 	protected override void SetGainImplementation(float gain)
 		=> ALC.SetSourceGain(Handle, gain);
 
