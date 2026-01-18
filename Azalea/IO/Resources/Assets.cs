@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics.Textures;
+using Azalea.IO.ObservedDirectories;
 using Azalea.Sounds;
 using Azalea.Utils;
 using System;
@@ -95,4 +96,10 @@ public static partial class Assets
 	/// Gets a sound from the main resource store.
 	/// </summary>
 	public static Sound GetSound(string path) => MainStore.GetSound(path);
+
+	public static ObservedDirectory CreateObservedDirectory(string[] paths, string cachePath) =>
+		new(paths, cachePath);
+
+	public static ObservedDirectory CreateObservedDirectory(string path, string cachePath) =>
+		new([path], cachePath);
 }
