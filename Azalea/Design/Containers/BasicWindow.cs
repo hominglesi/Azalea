@@ -3,7 +3,7 @@ using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 
 namespace Azalea.Design.Containers;
-public class BasicWindow : WindowContainer
+public class BasicWindow : BasicWindowContainer
 {
 	private Composition _contentContainer;
 	public BasicWindow()

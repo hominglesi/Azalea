@@ -1,16 +1,23 @@
-﻿using Azalea.Sounds.OpenAL.Enums;
-using System.Collections.Generic;
-using System.Diagnostics;
-using static Azalea.Sounds.Audio;
+﻿using System;
 
 namespace Azalea.Sounds.OpenAL;
 internal class ALAudioManager : AudioManager
 {
-	protected const int SourceCount = 32;
+	// These should add up to 32
+	protected const int AudioSourceCount = 4;
+	protected const int AudioByteSourceCount = 24;
+	protected const int AudioByteSourceInternalCount = 4;
 
 	private readonly ALC_Device _device;
 	private readonly ALC_Context _context;
-	private readonly ALSource[] _sources;
+
+	private readonly ALAudioSource[] _audioSources;
+	private readonly ALAudioByteSource[] _audioByteSources;
+	private readonly ALAudioByteSource[] _audioByteSourcesInternal;
+
+	public override IAudioSource[] AudioChannels => _audioSources;
+	public override int AudioByteChannels => AudioByteSourceCount;
+	public override int AudioByteInternalChannels => AudioByteSourceInternalCount;
 
 	public ALAudioManager()
 	{
@@ -18,112 +25,67 @@ internal class ALAudioManager : AudioManager
 		_context = ALC.CreateContext(_device);
 		ALC.MakeContextCurrent(_context);
 
-		_sources = new ALSource[SourceCount];
-		for (int i = 0; i < SourceCount; i++)
-		{
-			_sources[i] = new ALSource();
-		}
+		_audioSources = new ALAudioSource[AudioSourceCount];
+		for (int i = 0; i < AudioSourceCount; i++)
+			_audioSources[i] = new ALAudioSource();
+
+		_audioByteSources = new ALAudioByteSource[AudioByteSourceCount];
+		for (int i = 0; i < AudioByteSourceCount; i++)
+			_audioByteSources[i] = new ALAudioByteSource();
+
+		_audioByteSourcesInternal = new ALAudioByteSource[AudioByteSourceInternalCount];
+		for (int i = 0; i < AudioByteSourceInternalCount; i++)
+			_audioByteSourcesInternal[i] = new ALAudioByteSource();
 	}
 
-	public override Sound CreateSound(ISoundData data)
+	public override SoundByte CreateSoundByte(ISoundData data)
 		=> new ALSound(data);
 	protected override void SetMasterVolumeImplementation(float volume)
 		=> ALC.SetListenerGain(volume);
 
-	private AudioInstance playOnChannel(int channel, Sound sound, float gain, bool looping)
-	{
-		Debug.Assert(sound is not null);
+	public override AudioInstanceLegacyAudio PlayInternalLegacyAudio(SoundByte sound, float gain = 1, bool looping = false)
+		=> throw new NotImplementedException();
 
-		return _sources[channel].Play(sound, gain, looping);
+	public override AudioInstanceLegacyAudio PlayVitalLegacyAudio(SoundByte sound, float gain = 1, bool looping = false)
+		=> throw new NotImplementedException();
+
+	public override AudioInstanceLegacyAudio PlayLegacyAudio(SoundByte sound, float gain = 1, bool looping = false)
+		=> throw new NotImplementedException();
+
+	private int _currentAudioSource = 0;
+	public override IAudioInstance PlayAudio(Sound sound, float gain = 1, bool looping = false)
+	{
+		var audioSource = _audioSources[_currentAudioSource];
+
+		_currentAudioSource = (_currentAudioSource + 1) % AudioSourceCount;
+
+		return audioSource.Play(sound, gain, looping);
 	}
 
-	public override AudioInstance PlayInternal(Sound sound, float gain = 1, bool looping = false)
-		=> playOnChannel(SourceCount - 1, sound, gain, looping);
-
-	private const int _vitalChannels = 4;
-	private int _currentVitalChannel = 0;
-	public override AudioInstance PlayVital(Sound sound, float gain = 1, bool looping = false)
+	private int _currentAudioByteSource = 0;
+	public override IAudioInstance PlayAudioByte(SoundByte soundByte, float gain = 1, bool looping = false)
 	{
-		var played = playOnChannel(_currentVitalChannel, sound, gain, looping);
+		var audioByteSource = _audioByteSources[_currentAudioByteSource];
 
-		_currentVitalChannel += 1;
-		if (_currentVitalChannel >= _vitalChannels)
-			_currentVitalChannel = 0;
+		_currentAudioByteSource = (_currentAudioByteSource + 1) % AudioByteSourceCount;
 
-		return played;
+		return audioByteSource.Play(soundByte, gain, looping);
 	}
 
-	private const int _audioChannels = SourceCount - _vitalChannels - 1;
-	private int _currentAudioChannel = _vitalChannels;
-	public override AudioInstance Play(Sound sound, float gain = 1, bool looping = false)
+	private int _currentAudioByteSourceInternal = 0;
+	public override IAudioInstance PlayAudioByteInternal(SoundByte soundByte, float gain = 1, bool looping = false)
 	{
-		var played = playOnChannel(_currentAudioChannel, sound, gain, looping);
+		var audioByteSource = _audioByteSourcesInternal[_currentAudioByteSourceInternal];
 
-		_currentAudioChannel += 1;
-		if (_currentAudioChannel >= _audioChannels)
-			_currentAudioChannel = _vitalChannels;
+		_currentAudioByteSourceInternal = (_currentAudioByteSourceInternal + 1) % AudioByteSourceInternalCount;
 
-		return played;
-	}
-
-	private readonly List<StreamInstance> _streamInstances = [];
-	public void Stream(FFmpegStreamReader reader)
-	{
-		var instance = new StreamInstance(_sources[25], reader);
-		_streamInstances.Add(instance);
-	}
-
-	class StreamInstance
-	{
-		private const int __bufferCount = 8;
-
-		private ALSource _source;
-		private FFmpegStreamReader _reader;
-		private ALBuffer[] _buffers = new ALBuffer[__bufferCount];
-
-		public StreamInstance(ALSource source, FFmpegStreamReader reader)
-		{
-			_source = source;
-			_reader = reader;
-
-			for (int i = 0; i < __bufferCount; i++)
-				_buffers[i] = new ALBuffer();
-
-			for (int i = 0; i < __bufferCount; i++)
-			{
-				reader.ReadChunk(out var pcm, out var sampleRate);
-				ALC.BufferData(_buffers[i].Handle, ALFormat.Stereo16, pcm, pcm.Length, sampleRate);
-				ALC.SourceQueueBuffer(_source.Handle, _buffers[i].Handle);
-			}
-
-			ALC.SourcePlay(_source.Handle);
-		}
-
-		public void Update()
-		{
-			int processed = ALC.GetBuffersProcessed(_source.Handle);
-			while (processed-- > 0)
-			{
-				var buffer = ALC.SourceUnqueueBuffer(_source.Handle);
-
-				_reader.ReadChunk(out var pcm, out var sampleRate);
-
-				ALC.BufferData(buffer, ALFormat.Stereo16, pcm, pcm.Length, sampleRate);
-				ALC.SourceQueueBuffer(_source.Handle, buffer);
-			}
-
-			if (ALC.GetSourceState(_source.Handle) != ALSourceState.Playing)
-				ALC.SourcePlay(_source.Handle);
-		}
+		return audioByteSource.Play(soundByte, gain, looping);
 	}
 
 	public override void Update()
 	{
-		foreach (var source in _sources)
+		foreach (var source in _audioSources)
 			source.Update();
-
-		foreach (var streamInstance in _streamInstances)
-			streamInstance.Update();
 	}
 
 	protected override void OnDispose()

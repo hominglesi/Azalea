@@ -1,5 +1,5 @@
 ﻿namespace Azalea.Sounds.OpenAL;
-internal class ALSound : Sound
+internal class ALSound : SoundByte
 {
 	internal ALBuffer Buffer;
 

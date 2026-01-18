@@ -122,6 +122,9 @@ internal unsafe static class ALC
 		sourcei(source, 0x1009, (int)buffer);
 	}
 
+	[DllImport(LibraryPath, EntryPoint = "alSourcePause")]
+	public static extern void SourcePause(uint source);
+
 	[DllImport(LibraryPath, EntryPoint = "alSourcePlay")]
 	public static extern void SourcePlay(uint source);
 
@@ -148,6 +151,14 @@ internal unsafe static class ALC
 		//0x1016 = AL_BUFFERS_PROCESSED
 		int buffersProcessed;
 		getSourcei(source, 0x1016, &buffersProcessed);
+		return buffersProcessed;
+	}
+
+	public static int GetBuffersQueued(uint source)
+	{
+		//0x1015 = AL_BUFFERS_QUEUED
+		int buffersProcessed;
+		getSourcei(source, 0x1015, &buffersProcessed);
 		return buffersProcessed;
 	}
 

@@ -30,11 +30,11 @@ internal abstract class AudioSource : Disposable
 	}
 	protected abstract void SetLoopingImplementation(bool looping);
 
-	private AudioInstance? _currentInstance;
+	private AudioInstanceLegacyAudio? _currentInstance;
 
-	protected abstract void BindBufferImplementation(Sound sound);
+	protected abstract void BindBufferImplementation(SoundByte sound);
 	protected abstract void PlayImplementation();
-	public AudioInstance Play(Sound sound, float gain = 1, bool looping = false)
+	public AudioInstanceLegacyAudio Play(SoundByte sound, float gain = 1, bool looping = false)
 	{
 		Stop();
 
@@ -44,7 +44,7 @@ internal abstract class AudioSource : Disposable
 
 		PlayImplementation();
 
-		_currentInstance = new AudioInstance(this, sound);
+		_currentInstance = new AudioInstanceLegacyAudio(this, sound);
 		_currentInstance.Playing = true;
 		return _currentInstance;
 	}

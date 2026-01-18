@@ -4,10 +4,10 @@ using System.Diagnostics;
 namespace Azalea.Web.Sounds;
 internal class WebAudioManager : AudioManager
 {
-	public override Sound CreateSound(ISoundData data)
+	public override SoundByte CreateSoundByte(ISoundData data)
 		=> new WebSound(data);
 
-	public override AudioInstance Play(Sound sound, float gain = 1, bool looping = false)
+	public override AudioInstanceLegacyAudio PlayLegacyAudio(SoundByte sound, float gain = 1, bool looping = false)
 	{
 		Debug.Assert(sound is not null);
 
@@ -15,11 +15,11 @@ internal class WebAudioManager : AudioManager
 		return source.Play(sound, gain, looping);
 	}
 
-	public override AudioInstance PlayVital(Sound sound, float gain = 1, bool looping = false)
-		=> Play(sound, gain, looping);
+	public override AudioInstanceLegacyAudio PlayVitalLegacyAudio(SoundByte sound, float gain = 1, bool looping = false)
+		=> PlayLegacyAudio(sound, gain, looping);
 
-	public override AudioInstance PlayInternal(Sound sound, float gain = 1, bool looping = false)
-		=> Play(sound, gain, looping);
+	public override AudioInstanceLegacyAudio PlayInternalLegacyAudio(SoundByte sound, float gain = 1, bool looping = false)
+		=> PlayLegacyAudio(sound, gain, looping);
 
 	protected override void SetMasterVolumeImplementation(float volume)
 		=> WebAudio.SetMasterVolume(volume);

@@ -1,14 +1,14 @@
 ﻿using System;
 
 namespace Azalea.Sounds;
-public class AudioInstance
+public class AudioInstanceLegacyAudio
 {
 	internal AudioSource _source;
-	internal Sound _sound;
+	internal SoundByte _sound;
 
 	public bool Playing { get; internal set; }
 
-	internal AudioInstance(AudioSource source, Sound sound)
+	internal AudioInstanceLegacyAudio(AudioSource source, SoundByte sound)
 	{
 		_source = source;
 		_sound = sound;
