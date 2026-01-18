@@ -1,6 +1,5 @@
 ﻿using Azalea.Sounds;
 using System;
-using System.IO;
 
 namespace Azalea.IO.Resources;
 public static partial class ResourceStoreExtentions
@@ -27,32 +26,11 @@ public static partial class ResourceStoreExtentions
 		using var stream = store.GetStream(path)
 			?? throw new Exception("Sound could not be found.");
 
-		var sound = getSound(stream);
+		var wav = new WavSound(stream);
+		var sound = Audio.CreateSound(wav.Data, wav.Format, wav.Frequency);
+
 		_soundByteCache.AddValue(store, path, sound);
 
-		return sound;
-	}
-
-	private static ResourceCache<SoundByte> _audioCacheLegacyAudio = new();
-
-	public static SoundByte GetSoundLegacyAudio(this IResourceStore store, string path)
-	{
-		if (_audioCacheLegacyAudio.TryGetValue(store, path, out var cached))
-			return cached;
-
-		using var stream = store.GetStream(path)
-			?? throw new Exception("Sound could not be found.");
-
-		var sound = getSound(stream);
-		_audioCacheLegacyAudio.AddValue(store, path, sound);
-
-		return sound;
-	}
-
-	private static SoundByte getSound(Stream stream)
-	{
-		var wav = new WavSound(stream);
-		var sound = Audio.CreateSound(wav);
 		return sound;
 	}
 }

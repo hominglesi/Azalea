@@ -94,8 +94,10 @@ public static partial class Assets
 	/// <summary>
 	/// Gets a sound from the main resource store.
 	/// </summary>
-	public static SoundByte GetSoundLegacyAudio(string path) => MainStore.GetSoundLegacyAudio(path);
-
 	public static Sound GetSound(string path) => MainStore.GetSound(path);
+
+	/// <summary>
+	/// Gets a short sound byte from the main resource store.
+	/// </summary>
 	public static SoundByte GetSoundByte(string path) => MainStore.GetSoundByte(path);
 }

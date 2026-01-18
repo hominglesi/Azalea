@@ -1,5 +1,7 @@
-﻿namespace Azalea.Sounds.OpenAL;
-internal class ALSource : AudioSource
+﻿using Azalea.Utils;
+
+namespace Azalea.Sounds.OpenAL;
+internal class ALSource : Disposable
 {
 	public uint Handle;
 
@@ -8,20 +10,40 @@ internal class ALSource : AudioSource
 		Handle = ALC.GenSource();
 	}
 
-	protected override void SetGainImplementation(float gain)
-		=> ALC.SetSourceGain(Handle, gain);
+	private float _gain = 1;
+	public float Gain
+	{
+		get => _gain;
+		set
+		{
+			if (_gain == value) return;
+			ALC.SetSourceGain(Handle, value);
+			_gain = value;
+		}
+	}
 
-	protected override void SetLoopingImplementation(bool looping)
-		=> ALC.SetSourceLooping(Handle, looping);
+	private bool _looping = false;
+	public bool Looping
+	{
+		get => _looping;
+		set
+		{
+			if (_looping == value) return;
+			ALC.SetSourceLooping(Handle, value);
+			_looping = value;
+		}
+	}
 
-	protected override void PlayImplementation()
-		=> ALC.SourcePlay(Handle);
+	public void Play() => ALC.SourcePlay(Handle);
+	public void Pause() => ALC.SourcePause(Handle);
+	public void Stop() => ALC.SourceStop(Handle);
 
-	protected override void BindBufferImplementation(SoundByte sound)
-		=> ALC.BindBuffer(Handle, ((ALSound)sound).Buffer.Handle);
-
-	protected override void StopImplementation()
-		=> ALC.SourceStop(Handle);
+	public void BindBuffer(ALBuffer buffer) => ALC.BindBuffer(Handle, buffer.Handle);
+	public int GetBuffersProcessed() => ALC.GetBuffersProcessed(Handle);
+	public int GetBuffersQueued() => ALC.GetBuffersQueued(Handle);
+	public void QueueBuffer(uint handle) => ALC.SourceQueueBuffer(Handle, handle);
+	public void QueueBuffer(ALBuffer buffer) => QueueBuffer(buffer.Handle);
+	public uint UnqueueBuffer() => ALC.SourceUnqueueBuffer(Handle);
 
 	protected override void OnDispose()
 		=> ALC.DeleteSource(Handle);

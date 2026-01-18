@@ -30,35 +30,8 @@ internal abstract class AudioSource : Disposable
 	}
 	protected abstract void SetLoopingImplementation(bool looping);
 
-	private AudioInstanceLegacyAudio? _currentInstance;
-
 	protected abstract void BindBufferImplementation(SoundByte sound);
 	protected abstract void PlayImplementation();
-	public AudioInstanceLegacyAudio Play(SoundByte sound, float gain = 1, bool looping = false)
-	{
-		Stop();
-
-		BindBufferImplementation(sound);
-		Gain = gain;
-		Looping = looping;
-
-		PlayImplementation();
-
-		_currentInstance = new AudioInstanceLegacyAudio(this, sound);
-		_currentInstance.Playing = true;
-		return _currentInstance;
-	}
 
 	protected abstract void StopImplementation();
-	public void Stop()
-	{
-		if (_currentInstance is null)
-			return;
-
-		_currentInstance.Playing = false;
-
-		StopImplementation();
-
-		_currentInstance = null;
-	}
 }

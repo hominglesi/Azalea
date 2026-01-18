@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Azalea.Sounds.OpenAL;
+﻿namespace Azalea.Sounds.OpenAL;
 internal class ALAudioManager : AudioManager
 {
 	// These should add up to 32
@@ -38,19 +36,10 @@ internal class ALAudioManager : AudioManager
 			_audioByteSourcesInternal[i] = new ALAudioByteSource();
 	}
 
-	public override SoundByte CreateSoundByte(ISoundData data)
-		=> new ALSound(data);
+	public override SoundByte CreateSoundByte(byte[] data, ALFormat format, int frequency)
+		=> new ALSound(data, format, frequency);
 	protected override void SetMasterVolumeImplementation(float volume)
 		=> ALC.SetListenerGain(volume);
-
-	public override AudioInstanceLegacyAudio PlayInternalLegacyAudio(SoundByte sound, float gain = 1, bool looping = false)
-		=> throw new NotImplementedException();
-
-	public override AudioInstanceLegacyAudio PlayVitalLegacyAudio(SoundByte sound, float gain = 1, bool looping = false)
-		=> throw new NotImplementedException();
-
-	public override AudioInstanceLegacyAudio PlayLegacyAudio(SoundByte sound, float gain = 1, bool looping = false)
-		=> throw new NotImplementedException();
 
 	private int _currentAudioSource = 0;
 	public override IAudioInstance PlayAudio(Sound sound, float gain = 1, bool looping = false)

@@ -5,18 +5,17 @@ internal class ALBuffer : Disposable
 {
 	public uint Handle;
 
-	public ALBuffer()
+	public ALBuffer(uint handle)
 	{
-		Handle = ALC.GenBuffer();
+		Handle = handle;
 	}
 
-	public void SetData(ISoundData data)
-	{
-		ALC.BufferData(Handle, data);
-	}
+	public ALBuffer()
+		: this(ALC.GenBuffer()) { }
+
+	public void SetData(byte[] data, ALFormat format, int frequency)
+		=> ALC.BufferData(Handle, format, data, data.Length, frequency);
 
 	protected override void OnDispose()
-	{
-		ALC.DeleteBuffer(Handle);
-	}
+		=> ALC.DeleteBuffer(Handle);
 }

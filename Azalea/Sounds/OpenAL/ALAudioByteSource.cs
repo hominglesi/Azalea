@@ -17,11 +17,11 @@ internal class ALAudioByteSource
 
 		// TODO: Stop playing
 
-		ALC.BindBuffer(_source.Handle, alSound.Buffer.Handle);
+		_source.BindBuffer(alSound.Buffer);
 
 		CurrentInstance = new SoundByteInstance();
 
-		ALC.SourcePlay(_source.Handle);
+		_source.Play();
 
 		return CurrentInstance;
 	}

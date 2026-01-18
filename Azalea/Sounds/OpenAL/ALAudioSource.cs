@@ -10,8 +10,12 @@ internal class ALAudioSource : IAudioSource
 	private const int __bufferCount = 8;
 	private readonly ALSource _source;
 	private readonly ALBuffer[] _buffers;
+	private readonly float[] _bufferStartTimes;
+	private int _currentBufferStartTime;
+	private int _nextBufferStartTime;
 
 	public IAudioInstance? CurrentInstance { get; private set; }
+	public float CurrentTimestamp => _bufferStartTimes[_currentBufferStartTime];
 
 	private Stream? _currentStream;
 	private FFmpegStreamReader? _currentReader;
@@ -23,6 +27,9 @@ internal class ALAudioSource : IAudioSource
 		_buffers = new ALBuffer[__bufferCount];
 		for (int i = 0; i < _buffers.Length; i++)
 			_buffers[i] = new ALBuffer();
+
+		_bufferStartTimes = new float[__bufferCount];
+		_currentBufferStartTime = 0;
 	}
 
 	private AudioSourceState _state = AudioSourceState.Stopped;
@@ -42,6 +49,12 @@ internal class ALAudioSource : IAudioSource
 	public Action<AudioSourceState>? StateUpdated { get; set; }
 	private void invokeStateUpdated() => StateUpdated?.Invoke(State);
 
+	private void resetStartTimes()
+	{
+		_nextBufferStartTime = 0;
+		_currentBufferStartTime = 0;
+	}
+
 	public IAudioInstance? Play(Sound sound, float gain, bool looping)
 	{
 		if (State == AudioSourceState.Playing || State == AudioSourceState.Paused)
@@ -53,36 +66,29 @@ internal class ALAudioSource : IAudioSource
 
 		_currentStream = stream;
 		_currentReader = new FFmpegStreamReader(_currentStream);
-		CurrentInstance = new SoundInstance();
+		CurrentInstance = new SoundInstance(this, _currentReader.TotalDuration);
 
 		for (int i = 0; i < __bufferCount; i++)
 		{
-			_currentReader.ReadChunk(out var pcm, out var sampleRate);
-			ALC.BufferData(_buffers[i].Handle, ALFormat.Stereo16, pcm, pcm.Length, sampleRate);
-			ALC.SourceQueueBuffer(_source.Handle, _buffers[i].Handle);
+			if (_currentReader.ReadChunk(out var pcm, out var sampleRate, out var startTime))
+			{
+				_buffers[i].SetData(pcm, ALFormat.Stereo16, sampleRate);
+				_source.QueueBuffer(_buffers[i]);
+				_bufferStartTimes[_nextBufferStartTime] = startTime;
+				_nextBufferStartTime = (_nextBufferStartTime + 1) % __bufferCount;
+			}
 		}
 
 		Volume = gain;
-		ALC.SourcePlay(_source.Handle);
+		_source.Play();
 
 		State = AudioSourceState.Playing;
 		return CurrentInstance;
 	}
-
-	private float _volume = 1.0f;
 	public float Volume
 	{
-		get => _volume;
-		set
-		{
-			if (_volume == value)
-				return;
-
-			ALC.SetSourceGain(_source.Handle, value);
-
-			_volume = value;
-			invokeStateUpdated();
-		}
+		get => _source.Gain;
+		set => _source.Gain = value;
 	}
 
 	public void Pause()
@@ -90,7 +96,7 @@ internal class ALAudioSource : IAudioSource
 		if (State != AudioSourceState.Playing)
 			return;
 
-		ALC.SourcePause(_source.Handle);
+		_source.Pause();
 		State = AudioSourceState.Paused;
 	}
 
@@ -99,7 +105,7 @@ internal class ALAudioSource : IAudioSource
 		if (State != AudioSourceState.Paused)
 			return;
 
-		ALC.SourcePlay(_source.Handle);
+		_source.Pause();
 		State = AudioSourceState.Playing;
 	}
 
@@ -108,17 +114,46 @@ internal class ALAudioSource : IAudioSource
 		if (State != AudioSourceState.Playing && State != AudioSourceState.Paused)
 			return;
 
-		ALC.SourceStop(_source.Handle);
+		_source.Stop();
 
-		var queued = ALC.GetBuffersProcessed(_source.Handle);
+		var queued = _source.GetBuffersProcessed();
 		while (queued-- > 0)
-			ALC.SourceUnqueueBuffer(_source.Handle);
+			_source.UnqueueBuffer();
+		resetStartTimes();
 
 		_currentReader?.Dispose();
-		//_currentStream?.Dispose();
+		_currentStream?.Dispose();
 		CurrentInstance = null;
 
 		State = AudioSourceState.Stopped;
+	}
+
+	public void Seek(float timestamp)
+	{
+		if (State == AudioSourceState.Stopped)
+			return;
+
+		_source.Stop();
+
+		var queued = _source.GetBuffersProcessed();
+		while (queued-- > 0)
+			_source.UnqueueBuffer();
+		resetStartTimes();
+
+		_currentReader!.Seek(timestamp);
+		for (int i = 0; i < __bufferCount; i++)
+		{
+			if (_currentReader.ReadChunk(out var pcm, out var sampleRate, out var startTime))
+			{
+				_buffers[i].SetData(pcm, ALFormat.Stereo16, sampleRate);
+				_source.QueueBuffer(_buffers[i]);
+				_bufferStartTimes[_nextBufferStartTime] = startTime;
+				_nextBufferStartTime = (_nextBufferStartTime + 1) % __bufferCount;
+			}
+		}
+
+		if (State == AudioSourceState.Playing)
+			_source.Play();
 	}
 
 	public void Update()
@@ -128,18 +163,25 @@ internal class ALAudioSource : IAudioSource
 
 		Debug.Assert(_currentReader is not null);
 
-		int processed = ALC.GetBuffersProcessed(_source.Handle);
+		int processed = _source.GetBuffersProcessed();
 		while (processed-- > 0)
 		{
-			var buffer = ALC.SourceUnqueueBuffer(_source.Handle);
+			var buffer = _source.UnqueueBuffer();
+			_currentBufferStartTime = (_nextBufferStartTime + 1) % __bufferCount;
 
-			_currentReader.ReadChunk(out var pcm, out var sampleRate);
-
-			ALC.BufferData(buffer, ALFormat.Stereo16, pcm, pcm.Length, sampleRate);
-			ALC.SourceQueueBuffer(_source.Handle, buffer);
+			if (_currentReader.ReadChunk(out var pcm, out var sampleRate, out var startTime))
+			{
+				ALC.BufferData(buffer, ALFormat.Stereo16, pcm, pcm.Length, sampleRate);
+				_source.QueueBuffer(buffer);
+				_bufferStartTimes[_nextBufferStartTime] = startTime;
+				_nextBufferStartTime = (_nextBufferStartTime + 1) % __bufferCount;
+			}
 		}
 
 		if (ALC.GetSourceState(_source.Handle) != ALSourceState.Playing)
 			ALC.SourcePlay(_source.Handle);
+
+		if (State == AudioSourceState.Playing && _source.GetBuffersQueued() == 0)
+			State = AudioSourceState.Paused;
 	}
 }

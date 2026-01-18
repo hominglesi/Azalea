@@ -76,11 +76,6 @@ internal unsafe static class ALC
 		}
 	}
 
-	public static void BufferData(uint buffer, ISoundData sound)
-	{
-		BufferData(buffer, sound.Format, sound.Data, sound.Size, sound.Frequency);
-	}
-
 	#endregion
 
 	#region Sources

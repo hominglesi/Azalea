@@ -3,10 +3,10 @@ internal class ALSound : SoundByte
 {
 	internal ALBuffer Buffer;
 
-	public ALSound(ISoundData data)
+	public ALSound(byte[] data, ALFormat format, int frequency)
 	{
 		Buffer = new ALBuffer();
-		Buffer.SetData(data);
+		Buffer.SetData(data, format, frequency);
 	}
 
 	protected override void OnDispose()

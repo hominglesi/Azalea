@@ -8,16 +8,18 @@ using System.IO;
 namespace Azalea.Sounds;
 
 //http://soundfile.sapp.org/doc/WaveFormat/
-internal class WavSound : ISoundData
+internal class WavSound
 {
-	private byte[] _wavData;
+	public byte[] Data { get; private set; }
+	public ALFormat Format { get; private set; }
+	public int Frequency { get; private set; }
 
 	public WavSound(Stream stream)
 	{
 		//We save the original wav file data and later slice it to prevent additional memory allocations
-		_wavData = stream.ReadAllBytesToArray();
+		Data = stream.ReadAllBytesToArray();
 
-		ReadOnlySpan<byte> wav = _wavData;
+		ReadOnlySpan<byte> wav = Data;
 		var index = 0;
 		if (wav[index++] != 'R' || wav[index++] != 'I' || wav[index++] != 'F' || wav[index++] != 'F')
 		{
@@ -72,17 +74,15 @@ internal class WavSound : ISoundData
 		Debug.Assert(_dataOffset != 0);
 
 		_lengthInSamples = _size * 8 / (_numChannels * _bitsPerSample);
-		_length = _lengthInSamples / (float)_sampleRate;
+		_length = _lengthInSamples / (float)Frequency;
 	}
 
 	private short _audioFormat;
 	private short _numChannels;
-	private int _sampleRate;
 	private int _byteRate;
 	private short _blockAlign;
 	private short _bitsPerSample;
 
-	private ALFormat _format;
 	private int _dataOffset;
 	private int _size;
 	private int _lengthInSamples;
@@ -101,7 +101,7 @@ internal class WavSound : ISoundData
 		{
 			_numChannels = BinaryPrimitives.ReadInt16LittleEndian(data.Slice(offset, 2));
 			offset += 2;
-			_sampleRate = BinaryPrimitives.ReadInt32LittleEndian(data.Slice(offset, 4));
+			Frequency = BinaryPrimitives.ReadInt32LittleEndian(data.Slice(offset, 4));
 			offset += 4;
 			_byteRate = BinaryPrimitives.ReadInt32LittleEndian(data.Slice(offset, 4));
 			offset += 4;
@@ -113,9 +113,9 @@ internal class WavSound : ISoundData
 			if (_numChannels == 1)
 			{
 				if (_bitsPerSample == 8)
-					_format = ALFormat.Mono8;
+					Format = ALFormat.Mono8;
 				else if (_bitsPerSample == 16)
-					_format = ALFormat.Mono16;
+					Format = ALFormat.Mono16;
 				else
 				{
 					Console.WriteLine($"Can't Play mono {_bitsPerSample} sound.");
@@ -124,9 +124,9 @@ internal class WavSound : ISoundData
 			else if (_numChannels == 2)
 			{
 				if (_bitsPerSample == 8)
-					_format = ALFormat.Stereo8;
+					Format = ALFormat.Stereo8;
 				else if (_bitsPerSample == 16)
-					_format = ALFormat.Stereo16;
+					Format = ALFormat.Stereo16;
 				else
 				{
 					Console.WriteLine($"Can't Play stereo {_bitsPerSample} sound.");
@@ -138,10 +138,4 @@ internal class WavSound : ISoundData
 			}
 		}
 	}
-
-	public ALFormat Format => _format;
-	public int ChannelCount => _numChannels;
-	public Span<byte> Data => _wavData.AsSpan().Slice(_dataOffset, _size);
-	public int Size => _size;
-	public int Frequency => _sampleRate;
 }

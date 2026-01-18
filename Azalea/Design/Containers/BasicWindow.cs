@@ -22,7 +22,8 @@ public class BasicWindow : BasicWindowContainer
 		AddInternal(_contentContainer = new Composition()
 		{
 			Position = new(0, 40),
-			Size = new(500, 400),
+			RelativeSizeAxes = Axes.Both,
+			NegativeSize = new(0, 40),
 			BackgroundColor = Palette.White,
 		});
 

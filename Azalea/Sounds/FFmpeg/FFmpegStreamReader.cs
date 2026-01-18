@@ -10,6 +10,8 @@ internal unsafe class FFmpegStreamReader : Disposable
 {
 	const int __ioBufferSize = 4096;
 
+	public readonly float TotalDuration;
+
 	private readonly byte* _ioBuffer;
 	private readonly int _audioStreamIndex = -1;
 	private readonly GCHandle _streamHandle;
@@ -47,6 +49,9 @@ internal unsafe class FFmpegStreamReader : Disposable
 
 		ffmpeg.avformat_find_stream_info(formatCtx, null);
 
+		TotalDuration = formatCtx->duration / (float)ffmpeg.AV_TIME_BASE;
+		if (TotalDuration < 0) TotalDuration = -1;
+
 		for (int i = 0; i < formatCtx->nb_streams; i++)
 		{
 			if (formatCtx->streams[i]->codecpar->codec_type == AVMediaType.AVMEDIA_TYPE_AUDIO)
@@ -61,6 +66,7 @@ internal unsafe class FFmpegStreamReader : Disposable
 
 		_codecContext = ffmpeg.avcodec_alloc_context3(codec);
 		ffmpeg.avcodec_parameters_to_context(_codecContext, codecPar);
+		_codecContext->pkt_timebase = formatCtx->streams[_audioStreamIndex]->time_base;
 		ffmpeg.avcodec_open2(_codecContext, codec, null);
 
 		AVChannelLayout outLayout;
@@ -96,47 +102,76 @@ internal unsafe class FFmpegStreamReader : Disposable
 		_swr = swr;
 	}
 
-	private readonly Queue<byte[]> _pendingChunks = [];
+	private readonly Queue<(byte[], float)> _pendingChunks = [];
 
-	public bool ReadChunk(out byte[] pcm, out int sampleRate)
+	public bool ReadChunk(out byte[] pcm, out int sampleRate, out float startTime)
 	{
 		if (_pendingChunks.Count > 0)
 		{
-			pcm = _pendingChunks.Dequeue();
+			(pcm, startTime) = _pendingChunks.Dequeue();
 			sampleRate = _codecContext->sample_rate;
 			return true;
 		}
 
-		if (ffmpeg.av_read_frame(_formatContext, _packet) < 0)
+		double frameSeconds = 0;
+		do
 		{
-			pcm = [];
-			sampleRate = -1;
-			return false;
+			var result = ffmpeg.av_read_frame(_formatContext, _packet);
+
+			if (result < 0)
+			{
+				pcm = [];
+				sampleRate = -1;
+				startTime = -1;
+				return false;
+			}
+
+			frameSeconds = (ulong)_packet->pts * ffmpeg.av_q2d(_formatContext->streams[_audioStreamIndex]->time_base);
 		}
+		while (frameSeconds < _seekSeconds);
 
 		if (_packet->stream_index == _audioStreamIndex)
 		{
 			ffmpeg.avcodec_send_packet(_codecContext, _packet);
 
 			while (ffmpeg.avcodec_receive_frame(_codecContext, _frame) == 0)
-				_pendingChunks.Enqueue(convertFrameToPcm(_frame, _swr));
+			{
+				var start = _frame->pts != ffmpeg.AV_NOPTS_VALUE
+					? _frame->pts * (float)ffmpeg.av_q2d(_formatContext->streams[_audioStreamIndex]->time_base)
+					: -1;
+
+				_pendingChunks.Enqueue((convertFrameToPcm(_frame, _swr), start));
+			}
 		}
 
 		ffmpeg.av_packet_unref(_packet);
 
 		if (_pendingChunks.Count > 0)
 		{
-			pcm = _pendingChunks.Dequeue();
+			(pcm, startTime) = _pendingChunks.Dequeue();
 			sampleRate = _codecContext->sample_rate;
 			return true;
 		}
 		else
 		{
-			pcm = [];
-			sampleRate = _codecContext->sample_rate;
-			return false;
-		}
+			var result = ReadChunk(out pcm, out sampleRate, out startTime);
 
+			return result;
+		}
+	}
+
+	private float _seekSeconds;
+
+	public void Seek(float seconds)
+	{
+		_pendingChunks.Clear();
+
+		_seekSeconds = seconds;
+		var seekTimestamp = seconds * ffmpeg.AV_TIME_BASE;
+
+		ffmpeg.av_seek_frame(_formatContext, -1, (long)seekTimestamp, ffmpeg.AV_TIME_BASE);
+
+		ffmpeg.avcodec_flush_buffers(_codecContext);
 	}
 
 	protected override void OnDispose()
@@ -161,7 +196,10 @@ internal unsafe class FFmpegStreamReader : Disposable
 		}
 
 		_streamHandle.Free();
-		//ffmpeg.av_free(_ioBuffer);
+
+		// Freeing the buffer results in a crash
+		// We are currently just tanking the leak
+		// ffmpeg.av_free(_ioBuffer);
 	}
 
 	private static byte[] convertFrameToPcm(AVFrame* frame, SwrContext* swr)

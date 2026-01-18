@@ -1,7 +1,5 @@
-﻿using Azalea.Sounds.OpenAL;
-using System;
-
-namespace Azalea.Sounds;
+﻿namespace Azalea.Sounds;
+/*
 internal interface ISoundData
 {
 	internal ALFormat Format { get; }
@@ -9,4 +7,4 @@ internal interface ISoundData
 	internal Span<byte> Data { get; }
 	internal int Size { get; }
 	internal int Frequency { get; }
-}
+}*/
