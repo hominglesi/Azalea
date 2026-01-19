@@ -1,10 +1,11 @@
 ﻿using Azalea.IO.Resources;
+using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
 namespace Azalea.IO.ObservedDirectories;
-public class ObservedDirectory
+public class ObservedDirectory : Disposable
 {
 	List<FileSystemWatcher> watchers;
 	public Dictionary<string, string> CurrentFiles = new Dictionary<string, string>();
@@ -14,6 +15,10 @@ public class ObservedDirectory
 	{
 		_cachePath = cachePath;
 		SerializeFileMethod = serializeMethod;
+
+		foreach (var path in paths)
+			if (Directory.Exists(path) == false)
+				throw new Exception("The provided directory does not exists");
 
 		var stream = Assets.PersistentStore.GetOrCreateStream(_cachePath);
 		StreamReader reader = new StreamReader(stream);
@@ -105,7 +110,8 @@ public class ObservedDirectory
 
 	}
 
-
+	public void Start() { }
+	protected override void OnDispose() { }
 	public void AddPath(string path) => throw new NotImplementedException();
 	public void RemovePath(string path) => throw new NotImplementedException();
 
