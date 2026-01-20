@@ -85,7 +85,7 @@ public class ObservedDirectoryTests : UnitTestSuite
 		public LoadCachedFilesTest()
 		{
 			AddOperation("Prepare cache", prepareCache);
-
+			string path = Assets.PersistentStore.Path + "Temp/Dir";
 			AddOperation("Create ObservedDirectory", createObservedDirectory);
 
 			AddResult("Was the correct data loaded", () => LoadedEvents!.Count == 3 &&
@@ -94,6 +94,72 @@ public class ObservedDirectoryTests : UnitTestSuite
 				LoadedEvents![2].Item2 == "file3.txt");
 
 			AddResult("Were 3 loaded events fired", () => checkEventCount(0, 3, 0, 0));
+		}
+
+		public override void TearDown(UnitTestContainer scene) => tearDown();
+	}
+
+	public class MultiplePathsTest : UnitTest
+	{
+		public MultiplePathsTest()
+		{
+			var directory1 = Assets.PersistentStore.Path + "Temp/Dir1/";
+			AddOperation("Create 3 files in first directory", () =>
+			{
+				createTestFileInDirectory(directory1, "file1.txt");
+				createTestFileInDirectory(directory1, "file2.txt");
+				createTestFileInDirectory(directory1, "file3.txt");
+			});
+			var directory2 = Assets.PersistentStore.Path + "Temp/Dir2/";
+			AddOperation("Create 3 files in second directory", () =>
+			{
+				createTestFileInDirectory(directory2, "file1.txt");
+				createTestFileInDirectory(directory2, "file2.txt");
+				createTestFileInDirectory(directory2, "file3.txt");
+			});
+
+			AddOperation("Create ObservedDirectory", () => createObservedDirectory([directory1, directory2]));
+
+			AddResult("Were 6 created events fired", () => checkEventCount(6, 0, 0, 0));
+		}
+
+		public override void TearDown(UnitTestContainer scene) => tearDown();
+	}
+
+	public class PathAddedTest : UnitTest
+	{
+		public PathAddedTest()
+		{
+			var directory1 = Assets.PersistentStore.Path + "Temp/Dir1/";
+			AddOperation("Create 3 files in first directory", () =>
+			{
+				createTestFileInDirectory(directory1, "file1.txt");
+				createTestFileInDirectory(directory1, "file2.txt");
+				createTestFileInDirectory(directory1, "file3.txt");
+			});
+
+			AddOperation("Create ObservedDirectory", () => createObservedDirectory([directory1]));
+
+			AddResult("Were 3 created events fired", () => checkEventCount(3, 0, 0, 0));
+
+			AddResult("Were all events reset", () => checkEventCount(0, 0, 0, 0));
+
+
+			var directory2 = Assets.PersistentStore.Path + "Temp/Dir2/";
+			AddOperation("Create 3 files in a new directory", () =>
+			{
+				createTestFileInDirectory(directory2, "file1.txt");
+				createTestFileInDirectory(directory2, "file2.txt");
+				createTestFileInDirectory(directory2, "file3.txt");
+			});
+
+
+			AddOperation("Add a new path to observed directory", () => addNewDirectory(directory2));
+
+			AddResult("Were 3 new created events fired", () => checkEventCount(3, 0, 0, 0));
+
+			AddOperation("Saving data to cache", () => saveCache());
+
 		}
 
 		public override void TearDown(UnitTestContainer scene) => tearDown();
@@ -110,6 +176,32 @@ public class ObservedDirectoryTests : UnitTestSuite
 		file.Close();
 	}
 
+	private static void createTestFileInDirectory(string path, string name)
+	{
+		var directory = path;
+
+		if (Directory.Exists(directory) == false)
+			Directory.CreateDirectory(directory);
+
+		var file = File.Create(directory + name);
+		file.Close();
+	}
+
+	private static void createMultipleTestFiles(string[] paths, string name)
+	{
+		foreach (var path in paths)
+		{
+
+			if (Directory.Exists(path) == false)
+				Directory.CreateDirectory(path);
+
+			var file = File.Create(path + name);
+			file.Close();
+
+		}
+	}
+
+
 	private static void deleteTestFile(string name)
 	{
 		File.Delete(Assets.PersistentStore.Path + "Temp/Dir/" + name);
@@ -124,8 +216,36 @@ public class ObservedDirectoryTests : UnitTestSuite
 
 		var path = Assets.PersistentStore.Path + "Temp/Dir";
 
+
 		Directory.CreateDirectory(path);
+
+
 		ObservedDirectory = new ObservedDirectory([path],
+					"Temp/cache.txt", path => path[(path.LastIndexOf('\\') + 1)..]);
+
+		ObservedDirectory.OnCreated += path => CreatedEvents.Add(path);
+		ObservedDirectory.OnLoaded += (path, data) => LoadedEvents.Add((path, data));
+		ObservedDirectory.OnModified += path => ModifiedEvents.Add(path);
+		ObservedDirectory.OnDeleted += path => DeletedEvents.Add(path);
+
+		ObservedDirectory.Start();
+	}
+
+	private static void createObservedDirectory(string[] paths)
+	{
+		CreatedEvents = [];
+		LoadedEvents = [];
+		ModifiedEvents = [];
+		DeletedEvents = [];
+
+		//var path = Assets.PersistentStore.Path + "Temp/Dir";
+
+		foreach (var path in paths)
+		{
+			Directory.CreateDirectory(path);
+		}
+
+		ObservedDirectory = new ObservedDirectory(paths,
 					"Temp/cache.txt", path => path[(path.LastIndexOf('\\') + 1)..]);
 
 		ObservedDirectory.OnCreated += path => CreatedEvents.Add(path);
@@ -157,15 +277,25 @@ public class ObservedDirectoryTests : UnitTestSuite
 		return correct;
 	}
 
+	private static void addNewDirectory(string path)
+	{
+		ObservedDirectory!.AddPath(path);
+	}
+
 	private static void prepareCache()
 	{
 		createTestFile("file1.txt");
 		createTestFile("file2.txt");
 		createTestFile("file3.txt");
 
-		createObservedDirectory();
+
+		string path = Assets.PersistentStore.Path + "Temp/Dir";
+		createObservedDirectory([path]);
 
 		ObservedDirectory!.SaveCache();
 
 	}
+
+	private static void saveCache() { ObservedDirectory!.SaveCache(); }
+
 }

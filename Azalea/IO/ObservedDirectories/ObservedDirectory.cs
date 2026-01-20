@@ -29,6 +29,8 @@ public class ObservedDirectory : Disposable
 
 		_isRunning = true;
 
+		watchers = new List<FileSystemWatcher>();
+
 		foreach (var path in _allPaths)
 			if (Directory.Exists(path) == false)
 				throw new Exception("The provided directory does not exists");
@@ -47,7 +49,16 @@ public class ObservedDirectory : Disposable
 		}
 		reader.Close();
 
-		foreach (string path in _allPaths)
+		ProcessPaths(_allPaths);
+
+
+	}
+
+
+	private void ProcessPaths(IEnumerable<string> paths)
+	{
+
+		foreach (string path in paths)
 		{
 			foreach (string file in GetItems(path))
 			{
@@ -57,6 +68,16 @@ public class ObservedDirectory : Disposable
 
 		}
 
+		UpdateCacheInMemory();
+
+		foreach (string path in paths)
+		{
+			CreateWatcherOnPath(path);
+		}
+	}
+
+	private void UpdateCacheInMemory()
+	{
 		foreach (var (metaData, data) in CurrentFiles)
 		{
 			if (!CacheFiles.ContainsKey(metaData))
@@ -74,71 +95,65 @@ public class ObservedDirectory : Disposable
 				CacheFiles.Remove(metaData);
 			}
 		}
+	}
+	private void CreateWatcherOnPath(string path)
+	{
+		FileSystemWatcher watcher = new FileSystemWatcher(path);
+		watcher.NotifyFilter = NotifyFilters.Attributes
+									 | NotifyFilters.CreationTime
+									 | NotifyFilters.DirectoryName
+									 | NotifyFilters.FileName
+									 | NotifyFilters.LastWrite
+									 | NotifyFilters.Size;
 
-		watchers = new List<FileSystemWatcher>();
-		foreach (string path in _allPaths)
+		watcher.IncludeSubdirectories = true;
+
+		watcher.Created += (ob, args) =>
 		{
-			FileSystemWatcher watcher = new FileSystemWatcher(path);
-			watcher.NotifyFilter = NotifyFilters.Attributes
-										 | NotifyFilters.CreationTime
-										 | NotifyFilters.DirectoryName
-										 | NotifyFilters.FileName
-										 | NotifyFilters.LastWrite
-										 | NotifyFilters.Size;
 
-			watcher.IncludeSubdirectories = true;
-
-			watcher.Created += (ob, args) =>
+			DirectoryFileData metaData;
+			metaData.Path = args.FullPath;
+			metaData.DateTime = File.GetLastWriteTime(args.FullPath);
+			if (SerializeFileMethod != null)
 			{
+				CurrentFiles.Add(metaData, SerializeFileMethod(GetPathFromFullPath(metaData.Path)));
+				Console.WriteLine($"Kreiran fajl u direktorijumu {args.Name}");
+			}
+			OnCreated?.Invoke(metaData.Path);
+		};
 
-				DirectoryFileData metaData;
-				metaData.Path = args.FullPath;
-				metaData.DateTime = File.GetLastWriteTime(args.FullPath);
-				if (SerializeFileMethod != null)
-				{
-					CurrentFiles.Add(metaData, SerializeFileMethod(GetPathFromFullPath(metaData.Path)));
-					Console.WriteLine($"Kreiran fajl u direktorijumu {args.Name}");
-				}
-				OnCreated?.Invoke(metaData.Path);
-			};
+		watcher.Changed += (ob, args) =>
+		{
 
-			watcher.Changed += (ob, args) =>
+			if (Directory.Exists(args.FullPath))
+				return;
+
+			DirectoryFileData metaData;
+			metaData.Path = args.FullPath;
+			metaData.DateTime = File.GetLastWriteTime(args.FullPath);
+
+			if (SerializeFileMethod != null)
 			{
+				CurrentFiles[metaData] = SerializeFileMethod(GetPathFromFullPath(args.FullPath));
+				Console.WriteLine($"Promenjen fajl u direktorijumu {args.Name}");
+			}
+			OnModified?.Invoke(metaData.Path);
+		};
 
-				if (Directory.Exists(args.FullPath))
-					return;
+		watcher.Deleted += (ob, args) =>
+		{
+			DirectoryFileData metaData;
+			metaData.Path = args.FullPath;
+			metaData.DateTime = File.GetLastWriteTime(args.FullPath);
 
-				DirectoryFileData metaData;
-				metaData.Path = args.FullPath;
-				metaData.DateTime = File.GetLastWriteTime(args.FullPath);
+			CurrentFiles.Remove(metaData);
+			Console.WriteLine($"Obrisan fajl u direktorijumu {args.Name}");
 
-				if (SerializeFileMethod != null)
-				{
-					CurrentFiles[metaData] = SerializeFileMethod(GetPathFromFullPath(args.FullPath));
-					Console.WriteLine($"Promenjen fajl u direktorijumu {args.Name}");
-				}
-				OnModified?.Invoke(metaData.Path);
-			};
+			OnDeleted?.Invoke(metaData.Path);
+		};
 
-			watcher.Deleted += (ob, args) =>
-			{
-				DirectoryFileData metaData;
-				metaData.Path = args.FullPath;
-				metaData.DateTime = File.GetLastWriteTime(args.FullPath);
-
-				CurrentFiles.Remove(metaData);
-				Console.WriteLine($"Obrisan fajl u direktorijumu {args.Name}");
-
-				OnDeleted?.Invoke(metaData.Path);
-			};
-
-			watcher.EnableRaisingEvents = true;
-			watchers.Add(watcher);
-
-		}
-
-
-
+		watcher.EnableRaisingEvents = true;
+		watchers.Add(watcher);
 	}
 
 	private string GetPathFromFullPath(string fullPath)
@@ -163,7 +178,10 @@ public class ObservedDirectory : Disposable
 		}
 		watchers.Clear();
 	}
-	public void AddPath(string path) => throw new NotImplementedException();
+	public void AddPath(string path)
+	{
+		ProcessPaths([path]);
+	}
 	public void RemovePath(string path) => throw new NotImplementedException();
 
 	/// <summary>
