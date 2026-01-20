@@ -8,15 +8,28 @@ namespace Azalea.IO.ObservedDirectories;
 public class ObservedDirectory : Disposable
 {
 	List<FileSystemWatcher> watchers;
-	public Dictionary<string, string> CurrentFiles = new Dictionary<string, string>();
-	public Dictionary<string, string> CacheFiles = new Dictionary<string, string>();
+	public Dictionary<DirectoryFileData, string> CurrentFiles = new Dictionary<DirectoryFileData, string>();
+	public Dictionary<DirectoryFileData, string> CacheFiles = new Dictionary<DirectoryFileData, string>();
 	private string _cachePath;
+	private bool _isRunning = false;
+	List<string> _allPaths = new List<string>();
 	public ObservedDirectory(string[] paths, string cachePath, SerializeFileDelegate? serializeMethod)
 	{
 		_cachePath = cachePath;
 		SerializeFileMethod = serializeMethod;
+		_allPaths.AddRange(paths);
 
-		foreach (var path in paths)
+
+	}
+
+	public void Start()
+	{
+		if (_isRunning)
+			return;
+
+		_isRunning = true;
+
+		foreach (var path in _allPaths)
 			if (Directory.Exists(path) == false)
 				throw new Exception("The provided directory does not exists");
 
@@ -24,28 +37,46 @@ public class ObservedDirectory : Disposable
 		StreamReader reader = new StreamReader(stream);
 		while (reader.Peek() != -1)
 		{
-			CacheFiles.Add(reader.ReadLine(), reader.ReadLine());
+
+			string metaData = reader.ReadLine();
+			string path = metaData.Split('|')[0];
+			DateTime dateTime = DateTime.Parse(metaData.Split("|")[1]);
+			string data = reader.ReadLine();
+			CacheFiles.Add(new(path, dateTime), data);
+			OnLoaded?.Invoke(path, data);
 		}
 		reader.Close();
 
-		foreach (var (path, data) in CurrentFiles)
+		foreach (string path in _allPaths)
 		{
-			if (!CacheFiles.ContainsKey(path))
+			foreach (string file in GetItems(path))
 			{
-				CacheFiles.Add(path, data);
+
+				CurrentFiles.Add(GetMetaDataFromPath(file), SerializeFileMethod is not null ? SerializeFileMethod(GetPathFromFullPath(file)) : "");
+			}
+
+		}
+
+		foreach (var (metaData, data) in CurrentFiles)
+		{
+			if (!CacheFiles.ContainsKey(metaData))
+			{
+				OnCreated?.Invoke(metaData.Path);
+				CacheFiles.Add(metaData, data);
 			}
 		}
 
-		foreach (var (path, data) in CacheFiles)
+		foreach (var (metaData, data) in CacheFiles)
 		{
-			if (!CurrentFiles.ContainsKey(path))
+			if (!CurrentFiles.ContainsKey(metaData))
 			{
-				CacheFiles.Remove(path);
+				OnDeleted?.Invoke(metaData.Path);
+				CacheFiles.Remove(metaData);
 			}
 		}
 
 		watchers = new List<FileSystemWatcher>();
-		foreach (string path in paths)
+		foreach (string path in _allPaths)
 		{
 			FileSystemWatcher watcher = new FileSystemWatcher(path);
 			watcher.NotifyFilter = NotifyFilters.Attributes
@@ -59,32 +90,46 @@ public class ObservedDirectory : Disposable
 
 			watcher.Created += (ob, args) =>
 			{
-				Console.WriteLine($"Kreiran fajl u direktorijumu {args.Name}");
+
+				DirectoryFileData metaData;
+				metaData.Path = args.FullPath;
+				metaData.DateTime = File.GetLastWriteTime(args.FullPath);
 				if (SerializeFileMethod != null)
 				{
-					CurrentFiles.Add(args.FullPath, SerializeFileMethod(args.FullPath));
+					CurrentFiles.Add(metaData, SerializeFileMethod(GetPathFromFullPath(metaData.Path)));
+					Console.WriteLine($"Kreiran fajl u direktorijumu {args.Name}");
 				}
-				OnCreated?.Invoke(args.FullPath);
+				OnCreated?.Invoke(metaData.Path);
 			};
 
 			watcher.Changed += (ob, args) =>
 			{
+
 				if (Directory.Exists(args.FullPath))
 					return;
 
-				Console.WriteLine($"Promenjen fajl u direktorijumu {args.Name}");
+				DirectoryFileData metaData;
+				metaData.Path = args.FullPath;
+				metaData.DateTime = File.GetLastWriteTime(args.FullPath);
+
 				if (SerializeFileMethod != null)
 				{
-					CurrentFiles[args.FullPath] = SerializeFileMethod(args.FullPath);
+					CurrentFiles[metaData] = SerializeFileMethod(GetPathFromFullPath(args.FullPath));
+					Console.WriteLine($"Promenjen fajl u direktorijumu {args.Name}");
 				}
-				OnModified?.Invoke(args.FullPath);
+				OnModified?.Invoke(metaData.Path);
 			};
 
 			watcher.Deleted += (ob, args) =>
 			{
+				DirectoryFileData metaData;
+				metaData.Path = args.FullPath;
+				metaData.DateTime = File.GetLastWriteTime(args.FullPath);
+
+				CurrentFiles.Remove(metaData);
 				Console.WriteLine($"Obrisan fajl u direktorijumu {args.Name}");
-				CurrentFiles.Remove(args.FullPath);
-				OnDeleted?.Invoke(args.FullPath);
+
+				OnDeleted?.Invoke(metaData.Path);
 			};
 
 			watcher.EnableRaisingEvents = true;
@@ -92,30 +137,35 @@ public class ObservedDirectory : Disposable
 
 		}
 
-		foreach (string path in paths)
-		{
-			foreach (string file in GetItems(path))
-			{
-				CurrentFiles.Add(file, SerializeFileMethod is not null ? SerializeFileMethod(file) : "");
-			}
-
-		}
-
-		foreach (KeyValuePair<string, string> file in CurrentFiles)
-		{
-			Console.WriteLine(file.Key);
-			Console.WriteLine(file.Value);
-		}
 
 
 	}
 
-	public void Start() { }
-	protected override void OnDispose() { }
+	private string GetPathFromFullPath(string fullPath)
+	{
+		string gas = fullPath.Split('|')[0];
+		return gas;
+
+	}
+
+	private DirectoryFileData GetMetaDataFromPath(string fullPath)
+	{
+		return new(fullPath.Split('|')[0], DateTime.Parse(fullPath.Split('|')[1]));
+	}
+
+	protected override void OnDispose()
+	{
+		if (watchers == null)
+			return;
+		foreach (var watcher in watchers)
+		{
+			watcher.Dispose();
+		}
+		watchers.Clear();
+	}
 	public void AddPath(string path) => throw new NotImplementedException();
 	public void RemovePath(string path) => throw new NotImplementedException();
 
-	List<string> _allPaths;
 	/// <summary>
 	/// Called when a file we have not seen before is created.
 	/// </summary>
@@ -145,9 +195,9 @@ public class ObservedDirectory : Disposable
 	{
 		var stream = Assets.PersistentStore.GetOrCreateStream(_cachePath);
 		StreamWriter writer = new StreamWriter(stream);
-		foreach (var (path, data) in CurrentFiles)
+		foreach (var (metaData, data) in CurrentFiles)
 		{
-			writer.WriteLine(path);
+			writer.WriteLine(metaData.Path + "|" + metaData.DateTime);
 			writer.WriteLine(data);
 		}
 		writer.Close();

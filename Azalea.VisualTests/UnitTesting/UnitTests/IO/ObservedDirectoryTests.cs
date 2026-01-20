@@ -1,6 +1,6 @@
 ﻿using Azalea.IO.ObservedDirectories;
 using Azalea.IO.Resources;
-using Azalea.Utils;
+using Azalea.Platform;
 using System.Collections.Generic;
 using System.IO;
 
@@ -126,7 +126,7 @@ public class ObservedDirectoryTests : UnitTestSuite
 
 		Directory.CreateDirectory(path);
 		ObservedDirectory = new ObservedDirectory([path],
-					"Temp/cache.txt", path => PathUtils.GetFileFromPath(path));
+					"Temp/cache.txt", path => path[(path.LastIndexOf('\\') + 1)..]);
 
 		ObservedDirectory.OnCreated += path => CreatedEvents.Add(path);
 		ObservedDirectory.OnLoaded += (path, data) => LoadedEvents.Add((path, data));
@@ -144,6 +144,8 @@ public class ObservedDirectoryTests : UnitTestSuite
 
 	private static bool checkEventCount(int created, int loaded, int modified, int deleted)
 	{
+		var bruh = Time.GetCurrentPreciseTime().AddSeconds(0.1f);
+		while (Time.GetCurrentPreciseTime() < bruh) { }
 		var correct = CreatedEvents!.Count == created && LoadedEvents!.Count == loaded
 		&& ModifiedEvents!.Count == modified && DeletedEvents!.Count == deleted;
 
