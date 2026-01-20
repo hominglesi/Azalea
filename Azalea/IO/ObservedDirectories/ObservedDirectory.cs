@@ -3,6 +3,7 @@ using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Azalea.IO.ObservedDirectories;
 public class ObservedDirectory : Disposable
@@ -58,8 +59,12 @@ public class ObservedDirectory : Disposable
 	private void ProcessPaths(IEnumerable<string> paths)
 	{
 
+
 		foreach (string path in paths)
 		{
+			if (!_allPaths.Contains(path))
+				_allPaths.Add(path);
+
 			foreach (string file in GetItems(path))
 			{
 
@@ -180,9 +185,38 @@ public class ObservedDirectory : Disposable
 	}
 	public void AddPath(string path)
 	{
+
 		ProcessPaths([path]);
 	}
-	public void RemovePath(string path) => throw new NotImplementedException();
+	public void RemovePath(string path)
+	{
+		_allPaths.Remove(path);
+		Console.WriteLine("Test: " + path);
+		foreach (var file in CurrentFiles)
+		{
+			Console.WriteLine(file.Key.Path);
+		}
+
+		var keys = CurrentFiles
+			.Where(x => x.Key.Path.Contains(path.Replace('/', '\\')))
+			.Select(x => x.Key)
+			.ToList();
+
+		foreach (var key in keys)
+		{
+			CurrentFiles.Remove(key);
+		}
+
+		UpdateCacheInMemory();
+
+		var toRemove = watchers.Where(x => x.Path.Contains(path)).ToList();
+
+		foreach (var watcher in toRemove)
+			watcher.Dispose();
+
+		watchers.RemoveAll(x => x.Path.Contains(path));
+	}
+
 
 	/// <summary>
 	/// Called when a file we have not seen before is created.

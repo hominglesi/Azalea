@@ -165,6 +165,44 @@ public class ObservedDirectoryTests : UnitTestSuite
 		public override void TearDown(UnitTestContainer scene) => tearDown();
 	}
 
+	public class PathRemovedTest : UnitTest
+	{
+		public PathRemovedTest()
+		{
+			var directory1 = Assets.PersistentStore.Path + "Temp/Dir1/";
+			AddOperation("Create 3 files in first directory", () =>
+			{
+				createTestFileInDirectory(directory1, "file1.txt");
+				createTestFileInDirectory(directory1, "file2.txt");
+				createTestFileInDirectory(directory1, "file3.txt");
+			});
+
+
+			var directory2 = Assets.PersistentStore.Path + "Temp/Dir2/";
+			AddOperation("Create 3 files in a new directory", () =>
+			{
+				createTestFileInDirectory(directory2, "file1.txt");
+				createTestFileInDirectory(directory2, "file2.txt");
+				createTestFileInDirectory(directory2, "file3.txt");
+			});
+
+			AddOperation("Create ObservedDirectory", () => createObservedDirectory([directory1, directory2]));
+
+			AddResult("Were 6 created events fired", () => checkEventCount(6, 0, 0, 0));
+
+
+			AddOperation("Remove directory from observed directory", () => removeDirectory(directory2));
+
+			AddResult("Were 3 deleted events fired", () => checkEventCount(0, 0, 0, 3));
+
+			AddOperation("Saving data to cache", () => saveCache());
+
+		}
+
+		public override void TearDown(UnitTestContainer scene) => tearDown();
+	}
+
+
 	private static void createTestFile(string name)
 	{
 		var directory = Assets.PersistentStore.Path + "Temp/Dir/";
@@ -280,6 +318,11 @@ public class ObservedDirectoryTests : UnitTestSuite
 	private static void addNewDirectory(string path)
 	{
 		ObservedDirectory!.AddPath(path);
+	}
+
+	private static void removeDirectory(string path)
+	{
+		ObservedDirectory!.RemovePath(path);
 	}
 
 	private static void prepareCache()
