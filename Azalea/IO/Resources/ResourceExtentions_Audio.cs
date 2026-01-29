@@ -26,7 +26,10 @@ public static partial class ResourceStoreExtentions
 		using var stream = store.GetStream(path)
 			?? throw new Exception("Sound could not be found.");
 
-		var wav = new WavSound(stream);
+		WavSound wav;
+		try { wav = new WavSound(stream); }
+		catch (ArgumentException) { throw new ArgumentException("Sound Bytes only support .wav files"); }
+
 		var sound = Audio.CreateSound(wav.Data, wav.Format, wav.Frequency);
 
 		_soundByteCache.AddValue(store, path, sound);

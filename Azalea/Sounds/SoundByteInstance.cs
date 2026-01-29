@@ -1,14 +1,20 @@
 ﻿namespace Azalea.Sounds;
 internal class SoundByteInstance : IAudioInstance
 {
-	public float TotalDuration => throw new System.NotImplementedException();
+	private readonly IAudioSource _source;
+	public float TotalDuration { get; init; }
 
-	public float CurrentTimestamp => throw new System.NotImplementedException();
+	public SoundByteInstance(IAudioSource source, float duration)
+	{
+		_source = source;
+		TotalDuration = duration;
+	}
+
+	public float CurrentTimestamp => _source.CurrentTimestamp;
 
 	public void Stop()
 	{
-		throw new System.NotImplementedException();
+		if (_source.CurrentInstance == this)
+			_source.Stop();
 	}
-
-
 }

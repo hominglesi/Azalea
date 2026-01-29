@@ -1,7 +1,7 @@
 ﻿namespace Azalea.Sounds;
 internal class SoundInstance : IAudioInstance
 {
-	private IAudioSource _source;
+	private readonly IAudioSource _source;
 	public float TotalDuration { get; init; }
 
 	public SoundInstance(IAudioSource source, float duration)

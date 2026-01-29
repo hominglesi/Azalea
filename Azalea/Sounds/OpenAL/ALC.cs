@@ -48,8 +48,6 @@ internal unsafe static class ALC
 		fixed (uint* p = buffers)
 			genBuffers(count, p);
 
-
-
 		return buffers;
 	}
 
@@ -129,6 +127,9 @@ internal unsafe static class ALC
 	[DllImport(LibraryPath, EntryPoint = "alSourcef")]
 	private static extern void sourcef(uint source, int param, float value);
 
+	[DllImport(LibraryPath, EntryPoint = "alGetSourcef")]
+	private static extern void getSourcef(uint source, int param, [Out] float* value);
+
 	public static void SetSourceGain(uint source, float gain)
 	{
 		//0x100A = GL_GAIN
@@ -139,6 +140,12 @@ internal unsafe static class ALC
 	{
 		//0x1007 = AL_LOOPING
 		sourcei(source, 0x1007, looping ? 1 : 0);
+	}
+
+	public static void SetSecOffset(uint source, float offset)
+	{
+		//0x1024 = AL_SEC_OFFSET
+		sourcef(source, 0x1024, offset);
 	}
 
 	public static int GetBuffersProcessed(uint source)
@@ -163,6 +170,14 @@ internal unsafe static class ALC
 		int sourceState;
 		getSourcei(source, 0x1010, &sourceState);
 		return (ALSourceState)sourceState;
+	}
+
+	public static float GetSecOffset(uint source)
+	{
+		//0x1024 = AL_SEC_OFFSET
+		float secOffset;
+		getSourcef(source, 0x1024, &secOffset);
+		return secOffset;
 	}
 
 	[DllImport(LibraryPath, EntryPoint = "alSourceQueueBuffers")]
@@ -201,5 +216,16 @@ internal unsafe static class ALC
 	#region Errors
 	[DllImport(LibraryPath, EntryPoint = "alGetError")]
 	public static extern ALError GetError();
+
+	public static void PrintErrors()
+	{
+		var error = ALC.GetError();
+		while (error != ALError.NoError)
+		{
+			Console.WriteLine("OpenAL Error: " + error);
+			error = ALC.GetError();
+		}
+
+	}
 	#endregion
 }

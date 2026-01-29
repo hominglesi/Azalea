@@ -1,4 +1,5 @@
 ﻿using Azalea.Utils;
+using System;
 
 namespace Azalea.Sounds.OpenAL;
 internal class ALBuffer : Disposable
@@ -13,7 +14,7 @@ internal class ALBuffer : Disposable
 	public ALBuffer()
 		: this(ALC.GenBuffer()) { }
 
-	public void SetData(byte[] data, ALFormat format, int frequency)
+	public void SetData(ReadOnlySpan<byte> data, ALFormat format, int frequency)
 		=> ALC.BufferData(Handle, format, data, data.Length, frequency);
 
 	protected override void OnDispose()

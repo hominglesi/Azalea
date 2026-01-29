@@ -10,29 +10,27 @@ namespace Azalea.Sounds;
 //http://soundfile.sapp.org/doc/WaveFormat/
 internal class WavSound
 {
-	public byte[] Data { get; private set; }
+	private readonly byte[] _wavBytes;
+
+	public Span<byte> Data => _wavBytes.AsSpan().Slice(_dataOffset, _dataLength);
 	public ALFormat Format { get; private set; }
 	public int Frequency { get; private set; }
 
 	public WavSound(Stream stream)
 	{
 		//We save the original wav file data and later slice it to prevent additional memory allocations
-		Data = stream.ReadAllBytesToArray();
+		_wavBytes = stream.ReadAllBytesToArray();
 
-		ReadOnlySpan<byte> wav = Data;
+		ReadOnlySpan<byte> wav = _wavBytes;
 		var index = 0;
 		if (wav[index++] != 'R' || wav[index++] != 'I' || wav[index++] != 'F' || wav[index++] != 'F')
-		{
-			throw new Exception("Given file is not in RIFF format");
-		}
+			throw new ArgumentException("Given stream is not of a valid .wav file");
 
 		int chunkSize = BinaryPrimitives.ReadInt32LittleEndian(wav.Slice(index, 4));
 		index += 4;
 
 		if (wav[index++] != 'W' || wav[index++] != 'A' || wav[index++] != 'V' || wav[index++] != 'E')
-		{
-			throw new Exception("Given file is not in WAVE format");
-		}
+			throw new ArgumentException("Given stream is not of a valid .wav file");
 
 		while (index + 4 < wav.Length)
 		{
@@ -59,7 +57,7 @@ internal class WavSound
 					throw new Exception("This wav file contains multiple 'data' sections. Please report this issue so it can be resolved");
 				}
 				_dataOffset = index;
-				_size = size;
+				_dataLength = size;
 				index += size;
 			}
 			else
@@ -73,7 +71,7 @@ internal class WavSound
 
 		Debug.Assert(_dataOffset != 0);
 
-		_lengthInSamples = _size * 8 / (_numChannels * _bitsPerSample);
+		_lengthInSamples = _dataLength * 8 / (_numChannels * _bitsPerSample);
 		_length = _lengthInSamples / (float)Frequency;
 	}
 
@@ -84,7 +82,7 @@ internal class WavSound
 	private short _bitsPerSample;
 
 	private int _dataOffset;
-	private int _size;
+	private int _dataLength;
 	private int _lengthInSamples;
 	private float _length;
 

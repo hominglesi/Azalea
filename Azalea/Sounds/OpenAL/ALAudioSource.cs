@@ -8,9 +8,9 @@ namespace Azalea.Sounds.OpenAL;
 internal class ALAudioSource : IAudioSource
 {
 	private const int __bufferCount = 8;
-	private readonly ALSource _source;
-	private readonly ALBuffer[] _buffers;
-	private readonly float[] _bufferStartTimes;
+	private readonly ALSource _source = new();
+	private readonly ALBuffer[] _buffers = new ALBuffer[__bufferCount];
+	private readonly float[] _bufferStartTimes = new float[__bufferCount];
 	private int _currentBufferStartTime;
 	private int _nextBufferStartTime;
 
@@ -22,14 +22,8 @@ internal class ALAudioSource : IAudioSource
 
 	public ALAudioSource()
 	{
-		_source = new ALSource();
-
-		_buffers = new ALBuffer[__bufferCount];
 		for (int i = 0; i < _buffers.Length; i++)
 			_buffers[i] = new ALBuffer();
-
-		_bufferStartTimes = new float[__bufferCount];
-		_currentBufferStartTime = 0;
 	}
 
 	private AudioSourceState _state = AudioSourceState.Stopped;
@@ -105,7 +99,6 @@ internal class ALAudioSource : IAudioSource
 		if (State != AudioSourceState.Paused)
 			return;
 
-		_source.Pause();
 		State = AudioSourceState.Playing;
 	}
 
@@ -119,11 +112,14 @@ internal class ALAudioSource : IAudioSource
 		var queued = _source.GetBuffersProcessed();
 		while (queued-- > 0)
 			_source.UnqueueBuffer();
-		resetStartTimes();
 
 		_currentReader?.Dispose();
 		_currentStream?.Dispose();
 		CurrentInstance = null;
+
+		resetStartTimes();
+		for (int i = 0; i < _bufferStartTimes.Length; i++)
+			_bufferStartTimes[i] = 0;
 
 		State = AudioSourceState.Stopped;
 	}
@@ -156,7 +152,7 @@ internal class ALAudioSource : IAudioSource
 			_source.Play();
 	}
 
-	public void Update()
+	internal void Update()
 	{
 		if (CurrentInstance is null || State != AudioSourceState.Playing)
 			return;

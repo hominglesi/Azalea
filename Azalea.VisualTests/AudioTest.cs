@@ -12,17 +12,20 @@ namespace Azalea.VisualTests;
 internal class AudioTest : TestScene
 {
 	private Sound _goodkid;
+	private SoundByte _goodkidByte;
+
 	private Sound _harbor;
 	private SoundByte _hitnormal;
 
 	private IAudioInstance _instance;
-	private Button _hitnormalButton;
 
 	public AudioTest()
 	{
 		_goodkid = Assets.GetSound("Audio/goodkid.wav");
-		_hitnormal = Assets.GetSoundByte("Audio/hitnormal.wav");
+		_goodkidByte = Assets.GetSoundByte("Audio/goodkidByte.wav");
+
 		//_harbor = Assets.FileSystemStore.GetSound(@"E:\Music\Alohaii\Virtual Paradise\\10 - Harbor (feat. Kaneko Lumi).flac");
+		_hitnormal = Assets.GetSoundByte("Audio/hitnormal.wav");
 		_harbor = Assets.FileSystemStore.GetSound(@"E:\cut small.mp3");
 
 		AddRange(new GameObject[] {
@@ -34,9 +37,12 @@ internal class AudioTest : TestScene
 				CreateActionButton(
 					"'Harbor (feat. Kaneko Lumi)' at 0.1f",
 					() => _instance = Audio.PlayAudio(_harbor, 0.1f)),
-				_hitnormalButton = CreateActionButton(
+				CreateActionButton(
 					"'hitnormal.wav' at 0.1f",
 					() => _instance = Audio.PlayAudioByte(_hitnormal, 0.1f)),
+				CreateActionButton(
+					"'goodkid.wav' as Byte at 0.1f",
+					() => _instance = Audio.PlayAudioByte(_goodkidByte, 0.1f)),
 				CreateActionButton(
 					"Stress test audio playback",
 					() => Add(new AudioRunner(_harbor))),
@@ -80,20 +86,13 @@ internal class AudioTest : TestScene
 		});
 	}
 
-	class AudioRunner : GameObject
+	class AudioRunner(Sound sound) : GameObject
 	{
 		private const int _runs = 100_000;
 
-		private readonly Sound _sound;
+		private readonly Sound _sound = sound;
 		private int _remainingRuns = _runs;
 		private IAudioInstance? _instance;
-
-		public AudioRunner(Sound sound)
-		{
-			_sound = sound;
-			_remainingRuns = _runs;
-		}
-
 		bool playing = false;
 
 		protected override void Update()
@@ -142,16 +141,23 @@ internal class AudioTest : TestScene
 			foreach (var source in _audioManager.AudioChannels)
 				Add(new IAudioSourceDetailsView(source));
 
-			AddRange([
-				new SpriteText(){
-					Text = "Total audio byte channels: " + _audioManager.AudioByteChannels,
-					Color = Palette.Gray
-				},
-				new SpriteText(){
-					Text = "Total internal audio byte channels: " + _audioManager.AudioByteInternalChannels,
-					Color = Palette.Gray
-				},
-			]);
+			Add(new SpriteText()
+			{
+				Text = "Total audio byte channels: " + _audioManager.AudioByteChannels.Length,
+				Color = Palette.Gray
+			});
+
+			foreach (var source in _audioManager.AudioByteChannels)
+				Add(new IAudioSourceDetailsView(source));
+
+			Add(new SpriteText()
+			{
+				Text = "Total internal audio byte channels: " + _audioManager.AudioByteInternalChannels.Length,
+				Color = Palette.Gray
+			});
+
+			foreach (var source in _audioManager.AudioByteInternalChannels)
+				Add(new IAudioSourceDetailsView(source));
 		}
 
 		class IAudioSourceDetailsView : FlexContainer
@@ -234,6 +240,8 @@ internal class AudioTest : TestScene
 					var seconds = (int)Math.Round(duration % 60);
 					_durationDisplay.Text = $"Duration: {minutes}:{seconds}";
 				}
+				else
+					_durationDisplay.Text = $"Duration: *:**";
 			}
 
 			private void onSeekSet(float value)
@@ -249,9 +257,10 @@ internal class AudioTest : TestScene
 			protected override void Update()
 			{
 				if (_audioSource.CurrentInstance is null)
-					return;
+					_timestampDisplay.Text = "Timestamp: *:**";
+				else
+					_timestampDisplay.Text = "Timestamp: " + _audioSource.CurrentInstance.CurrentTimestamp;
 
-				_timestampDisplay.Text = "Timestamp: " + _audioSource.CurrentInstance.CurrentTimestamp;
 			}
 		}
 	}

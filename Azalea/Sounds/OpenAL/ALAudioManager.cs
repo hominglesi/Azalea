@@ -1,4 +1,6 @@
-﻿namespace Azalea.Sounds.OpenAL;
+﻿using System;
+
+namespace Azalea.Sounds.OpenAL;
 internal class ALAudioManager : AudioManager
 {
 	// These should add up to 32
@@ -14,8 +16,8 @@ internal class ALAudioManager : AudioManager
 	private readonly ALAudioByteSource[] _audioByteSourcesInternal;
 
 	public override IAudioSource[] AudioChannels => _audioSources;
-	public override int AudioByteChannels => AudioByteSourceCount;
-	public override int AudioByteInternalChannels => AudioByteSourceInternalCount;
+	public override IAudioSource[] AudioByteChannels => _audioByteSources;
+	public override IAudioSource[] AudioByteInternalChannels => _audioByteSourcesInternal;
 
 	public ALAudioManager()
 	{
@@ -36,7 +38,7 @@ internal class ALAudioManager : AudioManager
 			_audioByteSourcesInternal[i] = new ALAudioByteSource();
 	}
 
-	public override SoundByte CreateSoundByte(byte[] data, ALFormat format, int frequency)
+	public override SoundByte CreateSoundByte(ReadOnlySpan<byte> data, ALFormat format, int frequency)
 		=> new ALSound(data, format, frequency);
 	protected override void SetMasterVolumeImplementation(float volume)
 		=> ALC.SetListenerGain(volume);
@@ -74,6 +76,9 @@ internal class ALAudioManager : AudioManager
 	public override void Update()
 	{
 		foreach (var source in _audioSources)
+			source.Update();
+
+		foreach (var source in _audioByteSources)
 			source.Update();
 	}
 

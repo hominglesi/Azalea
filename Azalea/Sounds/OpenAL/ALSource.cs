@@ -1,4 +1,5 @@
-﻿using Azalea.Utils;
+﻿using Azalea.Sounds.OpenAL.Enums;
+using Azalea.Utils;
 
 namespace Azalea.Sounds.OpenAL;
 internal class ALSource : Disposable
@@ -44,6 +45,9 @@ internal class ALSource : Disposable
 	public void QueueBuffer(uint handle) => ALC.SourceQueueBuffer(Handle, handle);
 	public void QueueBuffer(ALBuffer buffer) => QueueBuffer(buffer.Handle);
 	public uint UnqueueBuffer() => ALC.SourceUnqueueBuffer(Handle);
+
+	public ALSourceState GetState() => ALC.GetSourceState(Handle);
+	public float GetSecOffset() => ALC.GetSecOffset(Handle);
 
 	protected override void OnDispose()
 		=> ALC.DeleteSource(Handle);
