@@ -39,6 +39,18 @@ public class UnitTestsScene : TestScene
 		var selectedSuite = Config.GetInt("currentUnitTestSuite") ?? 0;
 		var selectedTest = Config.GetInt("currentUnitTest") ?? 0;
 
+		// Changing branches could result in tests not existing anymore
+		// TODO (Easy): We should probably save the name of the tests instead of their numbers
+		// for this reason.
+		if (selectedSuite >= _manager.UnitTestSuites.Count
+			|| selectedTest >= _manager.UnitTestSuites[selectedSuite].Tests.Count)
+		{
+			selectedSuite = 0;
+			selectedTest = 0;
+			Config.Set("currentUnitTestSuite", 0);
+			Config.Set("currentUnitTest", 0);
+		}
+
 		_manager.SelectSuite(selectedSuite);
 		_manager.SelectUnitTest(selectedTest);
 

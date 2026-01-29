@@ -31,6 +31,9 @@ public class UnitTestsManager
 
 	public void SelectSuite(int suite)
 	{
+		if (suite >= UnitTestSuites.Count)
+			suite = 0;
+
 		_selectedSuiteIndex = suite;
 		_selectedUnitTestIndex = 0;
 	}
@@ -38,14 +41,16 @@ public class UnitTestsManager
 	public void SelectNextSuite()
 	{
 		_selectedSuiteIndex++;
-		if (_selectedSuiteIndex >= UnitTestSuites.Count)
-			_selectedSuiteIndex = 0;
+		_selectedSuiteIndex %= UnitTestSuites.Count;
 
 		_selectedUnitTestIndex = 0;
 	}
 
 	public void SelectUnitTest(int unitTest)
 	{
+		if (unitTest >= SelectedSuite.Tests.Count)
+			unitTest = 0;
+
 		_selectedUnitTestIndex = unitTest;
 	}
 
