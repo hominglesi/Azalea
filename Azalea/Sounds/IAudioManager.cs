@@ -9,9 +9,9 @@ public interface IAudioManager
 	public IAudioSource[] AudioByteChannels { get; }
 	public IAudioSource[] AudioByteInternalChannels { get; }
 
-	public IAudioInstance PlayAudio(Sound sound, float gain = 1, bool looping = false);
-	public IAudioInstance PlayAudioByte(SoundByte soundByte, float gain = 1, bool looping = false);
-	internal IAudioInstance PlayAudioByteInternal(SoundByte soundByte, float gain = 1, bool looping = false);
+	public IAudioInstance Play(Sound sound, float gain = 1, bool looping = false);
+	public IAudioInstance PlayByte(SoundByte soundByte, float gain = 1, bool looping = false);
+	internal IAudioInstance PlayByteInternal(SoundByte soundByte, float gain = 1, bool looping = false);
 	internal SoundByte CreateSoundByte(ReadOnlySpan<byte> data, ALFormat format, int frequency);
 
 	internal void Update();

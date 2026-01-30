@@ -6,6 +6,8 @@ public interface IAudioInstance
 	public float TotalDuration { get; }
 	public float CurrentTimestamp { get; }
 	public float Volume { get; set; }
+	public float Pitch { get; set; }
+	public bool Looping { get; set; }
 
 	public void Pause();
 	public void Unpause();

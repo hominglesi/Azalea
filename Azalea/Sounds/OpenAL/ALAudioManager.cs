@@ -44,33 +44,33 @@ internal class ALAudioManager : AudioManager
 		=> ALC.SetListenerGain(volume);
 
 	private int _currentAudioSource = 0;
-	public override IAudioInstance PlayAudio(Sound sound, float gain = 1, bool looping = false)
+	public override IAudioInstance Play(Sound sound, float gain = 1, bool looping = false)
 	{
 		var audioSource = _audioSources[_currentAudioSource];
 
 		_currentAudioSource = (_currentAudioSource + 1) % AudioSourceCount;
 
-		return audioSource.Play(sound, gain, looping);
+		return audioSource.Play(sound, gain, looping)!;
 	}
 
 	private int _currentAudioByteSource = 0;
-	public override IAudioInstance PlayAudioByte(SoundByte soundByte, float gain = 1, bool looping = false)
+	public override IAudioInstance PlayByte(SoundByte soundByte, float gain = 1, bool looping = false)
 	{
 		var audioByteSource = _audioByteSources[_currentAudioByteSource];
 
 		_currentAudioByteSource = (_currentAudioByteSource + 1) % AudioByteSourceCount;
 
-		return audioByteSource.Play(soundByte, gain, looping);
+		return audioByteSource.Play(soundByte, gain, looping)!;
 	}
 
 	private int _currentAudioByteSourceInternal = 0;
-	public override IAudioInstance PlayAudioByteInternal(SoundByte soundByte, float gain = 1, bool looping = false)
+	public override IAudioInstance PlayByteInternal(SoundByte soundByte, float gain = 1, bool looping = false)
 	{
 		var audioByteSource = _audioByteSourcesInternal[_currentAudioByteSourceInternal];
 
 		_currentAudioByteSourceInternal = (_currentAudioByteSourceInternal + 1) % AudioByteSourceInternalCount;
 
-		return audioByteSource.Play(soundByte, gain, looping);
+		return audioByteSource.Play(soundByte, gain, looping)!;
 	}
 
 	public override void Update()

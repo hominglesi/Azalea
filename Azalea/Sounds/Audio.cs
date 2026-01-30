@@ -14,14 +14,14 @@ public static class Audio
 		set => Instance.MasterVolume = value;
 	}
 
-	public static IAudioInstance PlayAudio(Sound sound, float gain = 1, bool looping = false)
-		=> Instance.PlayAudio(sound, gain, looping);
+	public static IAudioInstance Play(Sound sound, float gain = 1, bool looping = false)
+		=> Instance.Play(sound, gain, looping);
 
-	public static IAudioInstance PlayAudioByte(SoundByte soundByte, float gain = 1, bool looping = false)
-		=> Instance.PlayAudioByte(soundByte, gain, looping);
+	public static IAudioInstance PlayByte(SoundByte soundByte, float gain = 1, bool looping = false)
+		=> Instance.PlayByte(soundByte, gain, looping);
 
-	internal static IAudioInstance PlayAudioByteInternal(SoundByte soundByte, float gain = 1, bool looping = false)
-		=> Instance.PlayAudioByteInternal(soundByte, gain, looping);
+	internal static IAudioInstance PlayByteInternal(SoundByte soundByte, float gain = 1, bool looping = false)
+		=> Instance.PlayByteInternal(soundByte, gain, looping);
 
 	internal static SoundByte CreateSound(ReadOnlySpan<byte> data, ALFormat format, int frequency)
 		=> Instance.CreateSoundByte(data, format, frequency);

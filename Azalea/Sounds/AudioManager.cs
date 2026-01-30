@@ -24,9 +24,9 @@ internal abstract class AudioManager : Disposable, IAudioManager
 	public abstract IAudioSource[] AudioByteChannels { get; }
 	public abstract IAudioSource[] AudioByteInternalChannels { get; }
 
-	public abstract IAudioInstance PlayAudio(Sound sound, float gain = 1, bool looping = false);
-	public abstract IAudioInstance PlayAudioByte(SoundByte soundByte, float gain = 1, bool looping = false);
-	public abstract IAudioInstance PlayAudioByteInternal(SoundByte soundByte, float gain = 1, bool looping = false);
+	public abstract IAudioInstance Play(Sound sound, float gain = 1, bool looping = false);
+	public abstract IAudioInstance PlayByte(SoundByte soundByte, float gain = 1, bool looping = false);
+	public abstract IAudioInstance PlayByteInternal(SoundByte soundByte, float gain = 1, bool looping = false);
 	public abstract SoundByte CreateSoundByte(ReadOnlySpan<byte> data, ALFormat format, int frequency);
 
 	public virtual void Update() { }

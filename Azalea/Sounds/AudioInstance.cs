@@ -13,6 +13,18 @@ internal class AudioInstance(IAudioSource source, float duration) : IAudioInstan
 		set { if (Source is not null) Source.Volume = value; }
 	}
 
+	public float Pitch
+	{
+		get => Source is not null ? Source.Pitch : 0;
+		set { if (Source is not null) Source.Pitch = value; }
+	}
+
+	public bool Looping
+	{
+		get => Source is not null ? Source.Looping : false;
+		set { if (Source is not null) Source.Looping = value; }
+	}
+
 	public void Pause() => Source?.Pause();
 	public void Unpause() => Source?.Unpause();
 	public void Stop() => Source?.Stop();

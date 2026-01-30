@@ -15,6 +15,7 @@ internal class AudioTest : TestScene
 	private SoundByte _goodkidByte;
 
 	private Sound _harbor;
+	private Sound _navia;
 	private SoundByte _hitnormal;
 
 	private IAudioInstance _instance;
@@ -24,58 +25,33 @@ internal class AudioTest : TestScene
 		_goodkid = Assets.GetSound("Audio/goodkid.wav");
 		_goodkidByte = Assets.GetSoundByte("Audio/goodkidByte.wav");
 
-		//_harbor = Assets.FileSystemStore.GetSound(@"E:\Music\Alohaii\Virtual Paradise\\10 - Harbor (feat. Kaneko Lumi).flac");
+		_harbor = Assets.FileSystemStore.GetSound(@"E:\Music\Alohaii\Virtual Paradise\\10 - Harbor (feat. Kaneko Lumi).flac");
 		_hitnormal = Assets.GetSoundByte("Audio/hitnormal.wav");
-		_harbor = Assets.FileSystemStore.GetSound(@"E:\cut small.mp3");
+		_navia = Assets.FileSystemStore.GetSound(@"E:\cut small.mp3");
 
-		AddRange(new GameObject[] {
+		Add(
 			CreateFullscreenVerticalFlex(new GameObject[]
 			{
 				CreateActionButton(
 					"'goodkid.wav' at 0.1f",
-					() => _instance = Audio.PlayAudio(_goodkid, 0.1f)),
+					() => _instance = Audio.Play(_goodkid, 0.1f)),
 				CreateActionButton(
 					"'Harbor (feat. Kaneko Lumi)' at 0.1f",
-					() => _instance = Audio.PlayAudio(_harbor, 0.1f)),
+					() => _instance = Audio.Play(_harbor, 0.1f)),
+				CreateActionButton(
+					"'Navia Song' at 0.1f",
+					() => _instance = Audio.Play(_navia, 0.1f)),
 				CreateActionButton(
 					"'hitnormal.wav' at 0.1f",
-					() => _instance = Audio.PlayAudioByte(_hitnormal, 0.1f)),
+					() => _instance = Audio.PlayByte(_hitnormal, 0.1f)),
 				CreateActionButton(
 					"'goodkid.wav' as Byte at 0.1f",
-					() => _instance = Audio.PlayAudioByte(_goodkidByte, 0.1f)),
+					() => _instance = Audio.PlayByte(_goodkidByte, 0.1f)),
 				CreateActionButton(
 					"Stress test audio playback",
 					() => Add(new AudioRunner(_harbor))),
-				/*
-				CreateActionButton(
-					"Set _instance gain to 0.1f",
-					() => { if (_instance is not null) _instance.Gain = 0.1f; }),
-				CreateActionButton(
-					"Set _instance gain to 0.6f",
-					() => { if (_instance is not null) _instance.Gain = 0.6f; }),
-				CreateActionButton(
-					"Set master volume to 1f",
-					() => Audio.MasterVolume = 1f),
-				CreateActionButton(
-					"Set  master volume to 0.5f",
-					() => Audio.MasterVolume = 0.5f),
-				CreateActionButton(
-					"Stop _instance",
-					() => { _instance?.Stop(); }),
-				CreateActionButton(
-					"Garbage collect",
-					() => GC.Collect())
-				*/
-			}),
-			/*
-			CreateObservedContainer(new GameObject[]
-			{
-				CreateObservedValue("_instance Playing",
-					() => _instance is not null ? _instance.Playing : false),
-				CreateObservedValue("_instance Gain",
-					() => _instance is not null && _instance.Playing ? _instance.Gain : -1)
-			})*/
-		});
+			})
+		);
 
 		Add(new BasicWindow()
 		{
@@ -106,7 +82,7 @@ internal class AudioTest : TestScene
 
 			if (playing == false)
 			{
-				_instance = Audio.PlayAudio(_sound);
+				_instance = Audio.Play(_sound);
 				playing = true;
 			}
 			else
