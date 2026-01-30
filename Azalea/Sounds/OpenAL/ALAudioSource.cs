@@ -60,7 +60,7 @@ internal class ALAudioSource : IAudioSource
 
 		_currentStream = stream;
 		_currentReader = new FFmpegStreamReader(_currentStream);
-		CurrentInstance = new SoundInstance(this, _currentReader.TotalDuration);
+		CurrentInstance = new AudioInstance(this, _currentReader.TotalDuration);
 
 		for (int i = 0; i < __bufferCount; i++)
 		{

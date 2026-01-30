@@ -35,7 +35,7 @@ internal class ALAudioByteSource : IAudioSource
 
 		_source.BindBuffer(alSound.Buffer);
 
-		CurrentInstance = new SoundByteInstance(this, alSound.Duration);
+		CurrentInstance = new AudioInstance(this, alSound.Duration);
 
 		Volume = gain;
 		_source.Play();
