@@ -23,6 +23,18 @@ internal class ALSource : Disposable
 		}
 	}
 
+	public float _pitch = 1;
+	public float Pitch
+	{
+		get => _pitch;
+		set
+		{
+			if (_pitch == value) return;
+			ALC.SetSourcePitch(Handle, value);
+			_pitch = value;
+		}
+	}
+
 	private bool _looping = false;
 	public bool Looping
 	{

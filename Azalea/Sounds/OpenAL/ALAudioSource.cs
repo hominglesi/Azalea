@@ -74,6 +74,7 @@ internal class ALAudioSource : IAudioSource
 		}
 
 		Volume = gain;
+		Looping = looping;
 		_source.Play();
 
 		State = AudioSourceState.Playing;
@@ -84,6 +85,14 @@ internal class ALAudioSource : IAudioSource
 		get => _source.Gain;
 		set => _source.Gain = value;
 	}
+
+	public float Pitch
+	{
+		get => _source.Pitch;
+		set => _source.Pitch = value;
+	}
+
+	public bool Looping { get; set; }
 
 	public void Pause()
 	{
@@ -178,6 +187,24 @@ internal class ALAudioSource : IAudioSource
 			ALC.SourcePlay(_source.Handle);
 
 		if (State == AudioSourceState.Playing && _source.GetBuffersQueued() == 0)
-			State = AudioSourceState.Paused;
+		{
+			if (Looping == false)
+				State = AudioSourceState.Paused;
+			else
+			{
+				_currentReader!.Seek(0);
+				for (int i = 0; i < __bufferCount; i++)
+				{
+					if (_currentReader.ReadChunk(out var pcm, out var sampleRate, out var startTime))
+					{
+						_buffers[i].SetData(pcm, ALFormat.Stereo16, sampleRate);
+						_source.QueueBuffer(_buffers[i]);
+						_bufferStartTimes[_nextBufferStartTime] = startTime;
+						_nextBufferStartTime = (_nextBufferStartTime + 1) % __bufferCount;
+					}
+				}
+			}
+		}
+
 	}
 }

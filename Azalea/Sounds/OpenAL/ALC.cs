@@ -132,8 +132,14 @@ internal unsafe static class ALC
 
 	public static void SetSourceGain(uint source, float gain)
 	{
-		//0x100A = GL_GAIN
+		//0x100A = AL_GAIN
 		sourcef(source, 0x100A, gain);
+	}
+
+	public static void SetSourcePitch(uint source, float pitch)
+	{
+		//0x1003 = AL_PITCH
+		sourcef(source, 0x1003, pitch);
 	}
 
 	public static void SetSourceLooping(uint source, bool looping)

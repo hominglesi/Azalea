@@ -79,9 +79,9 @@ internal class AudioTest : TestScene
 
 		Add(new BasicWindow()
 		{
-			X = 600,
+			X = 500,
 			Y = 50,
-			Width = 1000,
+			Width = 1100,
 			Child = new AudioManagerDetailsView(Audio.Instance)
 		});
 	}
@@ -169,6 +169,8 @@ internal class AudioTest : TestScene
 			private readonly SpriteText _timestampDisplay;
 			private readonly BasicSlider _volumeSlider;
 			private readonly BasicSlider _seekSlider;
+			private readonly Checkbox _loopingCheckbox;
+			private readonly BasicSlider _pitchSlider;
 
 			public IAudioSourceDetailsView(IAudioSource audioSource)
 			{
@@ -215,6 +217,16 @@ internal class AudioTest : TestScene
 					_seekSlider = new BasicSlider(){
 						Size = new(100, 40)
 					},
+					new SpriteText()
+					{
+						Text = "Looping: ",
+						Color = Palette.Gray
+					},
+					_loopingCheckbox = new Checkbox(),
+					_pitchSlider = new BasicSlider(){
+						Size = new(100, 40),
+						Value = 0.5f
+					},
 					_timestampDisplay = new SpriteText()
 					{
 						Text = "Timestamp: *:**",
@@ -224,8 +236,11 @@ internal class AudioTest : TestScene
 
 				_volumeSlider.Body.Color = Palette.Black;
 				_seekSlider.Body.Color = Palette.Black;
+				_pitchSlider.Body.Color = Palette.Black;
 				_volumeSlider.OnValueChanged += value => _audioSource.Volume = value;
 				_seekSlider.OnValueSet += onSeekSet;
+				_loopingCheckbox.Toggled += isChecked => _audioSource.Looping = isChecked;
+				_pitchSlider.OnValueChanged += value => _audioSource.Pitch = 0.5f + value;
 			}
 
 			private void onStateUpdated(AudioSourceState state)
@@ -259,8 +274,12 @@ internal class AudioTest : TestScene
 				if (_audioSource.CurrentInstance is null)
 					_timestampDisplay.Text = "Timestamp: *:**";
 				else
-					_timestampDisplay.Text = "Timestamp: " + _audioSource.CurrentInstance.CurrentTimestamp;
-
+				{
+					var duration = _audioSource.CurrentInstance.CurrentTimestamp;
+					var minutes = (int)Math.Round(duration) / 60;
+					var seconds = (int)Math.Round(duration % 60);
+					_timestampDisplay.Text = $"Timestamp: {minutes}:{seconds}";
+				}
 			}
 		}
 	}

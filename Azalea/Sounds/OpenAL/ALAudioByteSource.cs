@@ -38,6 +38,7 @@ internal class ALAudioByteSource : IAudioSource
 		CurrentInstance = new AudioInstance(this, alSound.Duration);
 
 		Volume = gain;
+		Looping = looping;
 		_source.Play();
 
 		State = AudioSourceState.Playing;
@@ -48,6 +49,18 @@ internal class ALAudioByteSource : IAudioSource
 	{
 		get => _source.Gain;
 		set => _source.Gain = value;
+	}
+
+	public float Pitch
+	{
+		get => _source.Pitch;
+		set => _source.Pitch = value;
+	}
+
+	public bool Looping
+	{
+		get => _source.Looping;
+		set => _source.Looping = value;
 	}
 
 	public void Pause()
