@@ -1,2 +1,0 @@
-﻿namespace Azalea.IO.ObservedDirectories;
-
