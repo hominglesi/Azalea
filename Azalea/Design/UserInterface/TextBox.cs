@@ -28,8 +28,11 @@ public abstract class TextBox : TextContainer
 			_text = value;
 
 			updateText(_text);
+			OnTextChanged?.Invoke(_text);
 		}
 	}
+
+	public Action<string>? OnTextChanged;
 
 	public override bool AcceptsFocus => true;
 

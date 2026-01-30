@@ -1,36 +1,32 @@
-﻿using System;
-
-namespace Azalea.Sounds;
-public class AudioInstance
+﻿namespace Azalea.Sounds;
+internal class AudioInstance(IAudioSource source, float duration) : IAudioInstance
 {
-	internal AudioSource _source;
-	internal Sound _sound;
+	private readonly IAudioSource _source = source;
+	public IAudioSource? Source => _source.CurrentInstance == this ? _source : null;
 
-	public bool Playing { get; internal set; }
+	public float TotalDuration { get; } = duration;
+	public float CurrentTimestamp => Source is not null ? Source.CurrentTimestamp : 0;
 
-	internal AudioInstance(AudioSource source, Sound sound)
+	public float Volume
 	{
-		_source = source;
-		_sound = sound;
+		get => Source is not null ? Source.Volume : 0;
+		set { if (Source is not null) Source.Volume = value; }
 	}
 
-	public float Gain
+	public float Pitch
 	{
-		get => checkIfPlaying() ? _source.Gain : 0;
-		set { if (checkIfPlaying()) _source.Gain = value; }
+		get => Source is not null ? Source.Pitch : 0;
+		set { if (Source is not null) Source.Pitch = value; }
 	}
 
-	public void Stop()
+	public bool Looping
 	{
-		if (checkIfPlaying())
-			_source.Stop();
+		get => Source is not null ? Source.Looping : false;
+		set { if (Source is not null) Source.Looping = value; }
 	}
 
-	private bool checkIfPlaying()
-	{
-		if (Playing == false)
-			Console.WriteLine("Tried to access an AudioInstance that has finished playing");
-
-		return Playing;
-	}
+	public void Pause() => Source?.Pause();
+	public void Unpause() => Source?.Unpause();
+	public void Stop() => Source?.Stop();
+	public void Seek(float timestamp) => Source?.Seek(timestamp);
 }

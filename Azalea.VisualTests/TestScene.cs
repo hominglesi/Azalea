@@ -34,7 +34,7 @@ public class TestScene : Scene
 		return new BasicButton()
 		{
 			Text = text,
-			Width = 300,
+			Width = 400,
 			Action = action
 		};
 	}

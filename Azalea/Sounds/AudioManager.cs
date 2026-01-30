@@ -1,4 +1,6 @@
-﻿using Azalea.Utils;
+﻿using Azalea.Sounds.OpenAL;
+using Azalea.Utils;
+using System;
 
 namespace Azalea.Sounds;
 internal abstract class AudioManager : Disposable, IAudioManager
@@ -18,8 +20,14 @@ internal abstract class AudioManager : Disposable, IAudioManager
 		}
 	}
 
-	public abstract Sound CreateSound(ISoundData data);
-	public abstract AudioInstance Play(Sound sound, float gain = 1, bool looping = false);
-	public abstract AudioInstance PlayVital(Sound sound, float gain = 1, bool looping = false);
-	public abstract AudioInstance PlayInternal(Sound sound, float gain = 1, bool looping = false);
+	public abstract IAudioSource[] AudioChannels { get; }
+	public abstract IAudioSource[] AudioByteChannels { get; }
+	public abstract IAudioSource[] AudioByteInternalChannels { get; }
+
+	public abstract IAudioInstance Play(Sound sound, float gain = 1, bool looping = false);
+	public abstract IAudioInstance PlayByte(SoundByte soundByte, float gain = 1, bool looping = false);
+	public abstract IAudioInstance PlayByteInternal(SoundByte soundByte, float gain = 1, bool looping = false);
+	public abstract SoundByte CreateSoundByte(ReadOnlySpan<byte> data, ALFormat format, int frequency);
+
+	public virtual void Update() { }
 }

@@ -1,4 +1,6 @@
 ﻿using Azalea.Platform;
+using Azalea.Sounds.OpenAL;
+using System;
 
 namespace Azalea.Sounds;
 public static class Audio
@@ -12,15 +14,15 @@ public static class Audio
 		set => Instance.MasterVolume = value;
 	}
 
-	public static AudioInstance Play(Sound sound, float gain = 1, bool looping = false)
+	public static IAudioInstance Play(Sound sound, float gain = 1, bool looping = false)
 		=> Instance.Play(sound, gain, looping);
 
-	public static AudioInstance PlayVital(Sound sound, float gain = 1, bool looping = false)
-		=> Instance.PlayVital(sound, gain, looping);
+	public static IAudioInstance PlayByte(SoundByte soundByte, float gain = 1, bool looping = false)
+		=> Instance.PlayByte(soundByte, gain, looping);
 
-	internal static AudioInstance PlayInternal(Sound sound, float gain = 1, bool looping = false)
-		=> Instance.PlayInternal(sound, gain, looping);
+	internal static IAudioInstance PlayByteInternal(SoundByte soundByte, float gain = 1, bool looping = false)
+		=> Instance.PlayByteInternal(soundByte, gain, looping);
 
-	internal static Sound CreateSound(ISoundData data)
-		=> Instance.CreateSound(data);
+	internal static SoundByte CreateSound(ReadOnlySpan<byte> data, ALFormat format, int frequency)
+		=> Instance.CreateSoundByte(data, format, frequency);
 }

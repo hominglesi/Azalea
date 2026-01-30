@@ -3,7 +3,7 @@ using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 
 namespace Azalea.Design.Containers;
-public class BasicWindow : WindowContainer
+public class BasicWindow : BasicWindowContainer
 {
 	private Composition _contentContainer;
 	public BasicWindow()
@@ -22,7 +22,8 @@ public class BasicWindow : WindowContainer
 		AddInternal(_contentContainer = new Composition()
 		{
 			Position = new(0, 40),
-			Size = new(500, 400),
+			RelativeSizeAxes = Axes.Both,
+			NegativeSize = new(0, 40),
 			BackgroundColor = Palette.White,
 		});
 
