@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Title>$(AssemblyName)</Title>
-    <Version>1.6-alpha03</Version>
+    <Version>1.6-alpha04</Version>
     <Authors>hominglesi</Authors>
     <Company>Azalea</Company>
     <Description>A lightweight 2D game framework.</Description>
@@ -35,6 +35,11 @@
   <ItemGroup Label="FilesToCopy">
     <Content Include="..\build\Azalea.targets" PackagePath="build\Azalea.targets" Visible="false" />
     <Content Include="..\build\Native\soft_oal.dll" Pack="true" PackagePath="native">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <Visible>false</Visible>
+    </Content>
+    <Content Include="..\build\Native\ffmpeg\*" Pack="true" PackagePath="native\ffmpeg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <Visible>false</Visible>
