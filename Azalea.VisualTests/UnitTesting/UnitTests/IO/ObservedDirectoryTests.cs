@@ -154,7 +154,7 @@ public class ObservedDirectoryTests : UnitTestSuite
 			});
 
 
-			AddOperation("Add a new path to observed directory", () => addNewDirectory(directory2));
+			AddOperation("Add a new path to observed directory", () => ObservedDirectory!.AddPath(directory2));
 
 			AddResult("Were 3 new created events fired", () => checkEventCount(3, 0, 0, 0));
 
@@ -191,7 +191,7 @@ public class ObservedDirectoryTests : UnitTestSuite
 			AddResult("Were 6 created events fired", () => checkEventCount(6, 0, 0, 0));
 
 
-			AddOperation("Remove directory from observed directory", () => removeDirectory(directory2));
+			AddOperation("Remove directory from observed directory", () => ObservedDirectory!.RemovePath(directory2));
 
 			AddResult("Were 3 deleted events fired", () => checkEventCount(0, 0, 0, 3));
 
@@ -257,9 +257,10 @@ public class ObservedDirectoryTests : UnitTestSuite
 
 		Directory.CreateDirectory(path);
 
-
-		ObservedDirectory = new ObservedDirectory([path],
-					"Temp/cache.txt", path => path[(path.LastIndexOf('\\') + 1)..]);
+		ObservedDirectory = new ObservedDirectory([path], "Temp/cache.txt")
+		{
+			SerializeFileMethod = path => path[(path.LastIndexOf('\\') + 1)..]
+		};
 
 		ObservedDirectory.OnCreated += path => CreatedEvents.Add(path);
 		ObservedDirectory.OnLoaded += (path, data) => LoadedEvents.Add((path, data));
@@ -276,15 +277,13 @@ public class ObservedDirectoryTests : UnitTestSuite
 		ModifiedEvents = [];
 		DeletedEvents = [];
 
-		//var path = Assets.PersistentStore.Path + "Temp/Dir";
-
 		foreach (var path in paths)
-		{
 			Directory.CreateDirectory(path);
-		}
 
-		ObservedDirectory = new ObservedDirectory(paths,
-					"Temp/cache.txt", path => path[(path.LastIndexOf('\\') + 1)..]);
+		ObservedDirectory = new ObservedDirectory(paths, "Temp/cache.txt")
+		{
+			SerializeFileMethod = path => path[(path.LastIndexOf('\\') + 1)..]
+		};
 
 		ObservedDirectory.OnCreated += path => CreatedEvents.Add(path);
 		ObservedDirectory.OnLoaded += (path, data) => LoadedEvents.Add((path, data));
@@ -315,30 +314,17 @@ public class ObservedDirectoryTests : UnitTestSuite
 		return correct;
 	}
 
-	private static void addNewDirectory(string path)
-	{
-		ObservedDirectory!.AddPath(path);
-	}
-
-	private static void removeDirectory(string path)
-	{
-		ObservedDirectory!.RemovePath(path);
-	}
-
 	private static void prepareCache()
 	{
 		createTestFile("file1.txt");
 		createTestFile("file2.txt");
 		createTestFile("file3.txt");
 
-
 		string path = Assets.PersistentStore.Path + "Temp/Dir";
 		createObservedDirectory([path]);
 
 		ObservedDirectory!.SaveCache();
-
 	}
 
 	private static void saveCache() { ObservedDirectory!.SaveCache(); }
-
 }

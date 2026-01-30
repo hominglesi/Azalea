@@ -8,152 +8,116 @@ using System.Linq;
 namespace Azalea.IO.ObservedDirectories;
 public class ObservedDirectory : Disposable
 {
-	List<FileSystemWatcher> watchers;
-	public Dictionary<DirectoryFileData, string> CurrentFiles = new Dictionary<DirectoryFileData, string>();
-	public Dictionary<DirectoryFileData, string> CacheFiles = new Dictionary<DirectoryFileData, string>();
-	private string _cachePath;
-	private bool _isRunning = false;
-	List<string> _allPaths = new List<string>();
-	public ObservedDirectory(string[] paths, string cachePath, SerializeFileDelegate? serializeMethod)
+	private readonly List<FileSystemWatcher> watchers = [];
+	private readonly Dictionary<DirectoryFileData, string> _currentFiles = [];
+	private readonly Dictionary<DirectoryFileData, string> _cacheFiles = [];
+	private readonly List<string> _allPaths = [];
+	private readonly string _cachePath;
+	private bool _started = false;
+
+	public ObservedDirectory(IEnumerable<string> paths, string cachePath)
 	{
 		_cachePath = cachePath;
-		SerializeFileMethod = serializeMethod;
 		_allPaths.AddRange(paths);
-
-
 	}
 
 	public void Start()
 	{
-		if (_isRunning)
-			return;
-
-		_isRunning = true;
-
-		watchers = new List<FileSystemWatcher>();
+		if (_started) return;
+		_started = true;
 
 		foreach (var path in _allPaths)
 			if (Directory.Exists(path) == false)
 				throw new Exception("The provided directory does not exists");
 
 		var stream = Assets.PersistentStore.GetOrCreateStream(_cachePath);
-		StreamReader reader = new StreamReader(stream);
+		using var reader = new StreamReader(stream);
 		while (reader.Peek() != -1)
 		{
+			var metadataLine = reader.ReadLine();
+			var data = reader.ReadLine();
+			if (metadataLine is null || data is null)
+				return;
 
-			string metaData = reader.ReadLine();
-			string path = metaData.Split('|')[0];
-			DateTime dateTime = DateTime.Parse(metaData.Split("|")[1]);
-			string data = reader.ReadLine();
-			CacheFiles.Add(new(path, dateTime), data);
-			OnLoaded?.Invoke(path, data);
+			var metadata = parseMetadata(metadataLine);
+
+			_cacheFiles.Add(new(metadata.Path, metadata.DateTime), data);
+			OnLoaded?.Invoke(metadata.Path, data);
 		}
-		reader.Close();
 
-		ProcessPaths(_allPaths);
+		processPaths(_allPaths);
 
-
+		foreach (var cacheFile in _cacheFiles)
+			if (_currentFiles.ContainsKey(cacheFile.Key) == false)
+				OnDeleted?.Invoke(cacheFile.Key.Path);
 	}
 
 
-	private void ProcessPaths(IEnumerable<string> paths)
+	private void processPaths(IEnumerable<string> paths)
 	{
-
-
 		foreach (string path in paths)
 		{
 			if (!_allPaths.Contains(path))
 				_allPaths.Add(path);
 
-			foreach (string file in GetItems(path))
+			foreach (string metadataLine in getMetadataItems(path))
 			{
+				var metadata = parseMetadata(metadataLine);
 
-				CurrentFiles.Add(GetMetaDataFromPath(file), SerializeFileMethod is not null ? SerializeFileMethod(GetPathFromFullPath(file)) : "");
+				_currentFiles.Add(metadata, getSerializedData(metadata.Path));
+
+				if (_cacheFiles.ContainsKey(metadata) == false)
+					OnCreated?.Invoke(metadata.Path);
 			}
 
-		}
-
-		UpdateCacheInMemory();
-
-		foreach (string path in paths)
-		{
-			CreateWatcherOnPath(path);
+			createWatcherOnPath(path);
 		}
 	}
 
-	private void UpdateCacheInMemory()
+	private void createWatcherOnPath(string path)
 	{
-		foreach (var (metaData, data) in CurrentFiles)
-		{
-			if (!CacheFiles.ContainsKey(metaData))
-			{
-				OnCreated?.Invoke(metaData.Path);
-				CacheFiles.Add(metaData, data);
-			}
-		}
-
-		foreach (var (metaData, data) in CacheFiles)
-		{
-			if (!CurrentFiles.ContainsKey(metaData))
-			{
-				OnDeleted?.Invoke(metaData.Path);
-				CacheFiles.Remove(metaData);
-			}
-		}
-	}
-	private void CreateWatcherOnPath(string path)
-	{
-		FileSystemWatcher watcher = new FileSystemWatcher(path);
+		var watcher = new FileSystemWatcher(path);
 		watcher.NotifyFilter = NotifyFilters.Attributes
-									 | NotifyFilters.CreationTime
-									 | NotifyFilters.DirectoryName
-									 | NotifyFilters.FileName
-									 | NotifyFilters.LastWrite
-									 | NotifyFilters.Size;
+								| NotifyFilters.CreationTime
+								| NotifyFilters.DirectoryName
+								| NotifyFilters.FileName
+								| NotifyFilters.LastWrite
+								| NotifyFilters.Size;
 
 		watcher.IncludeSubdirectories = true;
 
 		watcher.Created += (ob, args) =>
 		{
+			var metaData = new DirectoryFileData(args.FullPath, File.GetLastWriteTime(args.FullPath));
 
-			DirectoryFileData metaData;
-			metaData.Path = args.FullPath;
-			metaData.DateTime = File.GetLastWriteTime(args.FullPath);
-			if (SerializeFileMethod != null)
-			{
-				CurrentFiles.Add(metaData, SerializeFileMethod(GetPathFromFullPath(metaData.Path)));
-				Console.WriteLine($"Kreiran fajl u direktorijumu {args.Name}");
-			}
+			_currentFiles.Add(metaData, getSerializedData(args.FullPath));
 			OnCreated?.Invoke(metaData.Path);
 		};
 
 		watcher.Changed += (ob, args) =>
 		{
-
+			// We don't care if a directory is changed
 			if (Directory.Exists(args.FullPath))
 				return;
 
-			DirectoryFileData metaData;
-			metaData.Path = args.FullPath;
-			metaData.DateTime = File.GetLastWriteTime(args.FullPath);
+			foreach (var file in _currentFiles)
+				if (file.Key.Path == args.FullPath)
+				{
+					_currentFiles.Remove(file.Key);
+					break;
+				}
 
-			if (SerializeFileMethod != null)
-			{
-				CurrentFiles[metaData] = SerializeFileMethod(GetPathFromFullPath(args.FullPath));
-				Console.WriteLine($"Promenjen fajl u direktorijumu {args.Name}");
-			}
+			var metaData = new DirectoryFileData(args.FullPath, File.GetLastWriteTime(args.FullPath));
+
+			_currentFiles[metaData] = getSerializedData(args.FullPath);
 			OnModified?.Invoke(metaData.Path);
 		};
 
 		watcher.Deleted += (ob, args) =>
 		{
-			DirectoryFileData metaData;
-			metaData.Path = args.FullPath;
-			metaData.DateTime = File.GetLastWriteTime(args.FullPath);
+			var metaData = new DirectoryFileData(args.FullPath, File.GetLastWriteTime(args.FullPath));
 
-			CurrentFiles.Remove(metaData);
-			Console.WriteLine($"Obrisan fajl u direktorijumu {args.Name}");
-
+			_currentFiles.Remove(metaData);
 			OnDeleted?.Invoke(metaData.Path);
 		};
 
@@ -161,60 +125,43 @@ public class ObservedDirectory : Disposable
 		watchers.Add(watcher);
 	}
 
-	private string GetPathFromFullPath(string fullPath)
-	{
-		string gas = fullPath.Split('|')[0];
-		return gas;
-
-	}
-
-	private DirectoryFileData GetMetaDataFromPath(string fullPath)
-	{
-		return new(fullPath.Split('|')[0], DateTime.Parse(fullPath.Split('|')[1]));
-	}
+	private static DirectoryFileData parseMetadata(string metadata)
+		=> new(metadata.Split('|')[0], DateTime.Parse(metadata.Split('|')[1]));
 
 	protected override void OnDispose()
 	{
-		if (watchers == null)
-			return;
 		foreach (var watcher in watchers)
-		{
 			watcher.Dispose();
-		}
+
 		watchers.Clear();
 	}
-	public void AddPath(string path)
-	{
 
-		ProcessPaths([path]);
-	}
+	public void AddPath(string path) => processPaths([path]);
 	public void RemovePath(string path)
 	{
-		_allPaths.Remove(path);
-		Console.WriteLine("Test: " + path);
-		foreach (var file in CurrentFiles)
-		{
-			Console.WriteLine(file.Key.Path);
-		}
+		if (_allPaths.Contains(path) == false)
+			return;
 
-		var keys = CurrentFiles
-			.Where(x => x.Key.Path.Contains(path.Replace('/', '\\')))
+		_allPaths.Remove(path);
+
+		var keys = _currentFiles
+			.Where(x => x.Key.Path.StartsWith(path.Replace('/', '\\')))
 			.Select(x => x.Key)
 			.ToList();
 
 		foreach (var key in keys)
 		{
-			CurrentFiles.Remove(key);
+			_currentFiles.Remove(key);
+			OnDeleted?.Invoke(key.Path);
 		}
 
-		UpdateCacheInMemory();
-
-		var toRemove = watchers.Where(x => x.Path.Contains(path)).ToList();
-
-		foreach (var watcher in toRemove)
-			watcher.Dispose();
-
-		watchers.RemoveAll(x => x.Path.Contains(path));
+		foreach (var watcher in watchers)
+			if (watcher.Path == path)
+			{
+				watchers.Remove(watcher);
+				watcher.Dispose();
+				break;
+			}
 	}
 
 
@@ -243,52 +190,48 @@ public class ObservedDirectory : Disposable
 	public SerializeFileDelegate? SerializeFileMethod;
 	public delegate string SerializeFileDelegate(string path);
 
+	private string getSerializedData(string path)
+		=> SerializeFileMethod is not null ? SerializeFileMethod(path) : "";
+
 	public void SaveCache()
 	{
 		var stream = Assets.PersistentStore.GetOrCreateStream(_cachePath);
-		StreamWriter writer = new StreamWriter(stream);
-		foreach (var (metaData, data) in CurrentFiles)
+		using var writer = new StreamWriter(stream);
+		foreach (var (metaData, data) in _currentFiles)
 		{
 			writer.WriteLine(metaData.Path + "|" + metaData.DateTime);
 			writer.WriteLine(data);
 		}
-		writer.Close();
 	}
 
-
-	public IEnumerable<string> GetItems(string path = "")
+	private IEnumerable<string> getMetadataItems(string path = "")
 	{
-		if (path == "")
+		var directoryInfo = new DirectoryInfo(path);
+		bool readable = true;
+
+		try
 		{
-			foreach (var drive in DriveInfo.GetDrives())
-			{
-				if (drive.IsReady)
-					yield return drive.Name;
-			}
+			directoryInfo.EnumerateFiles();
 		}
-		else
+		catch (UnauthorizedAccessException)
 		{
-			var directoryInfo = new DirectoryInfo(path);
-			bool readable = true;
-
-			try
-			{
-				directoryInfo.EnumerateFiles();
-			}
-			catch (UnauthorizedAccessException)
-			{
-				readable = false;
-			}
-
-			if (readable)
-			{
-				foreach (var directory in directoryInfo.EnumerateDirectories())
-					foreach (var file in GetItems(directory.FullName))
-						yield return file;
-
-				foreach (var file in directoryInfo.EnumerateFiles())
-					yield return $"{file.FullName}|{file.LastWriteTime}";
-			}
+			readable = false;
 		}
+
+		if (readable)
+		{
+			foreach (var directory in directoryInfo.EnumerateDirectories())
+				foreach (var file in getMetadataItems(directory.FullName))
+					yield return file;
+
+			foreach (var file in directoryInfo.EnumerateFiles())
+				yield return $"{file.FullName}|{file.LastWriteTime}";
+		}
+	}
+
+	private struct DirectoryFileData(string path, DateTime dateTime)
+	{
+		public string Path = path;
+		public DateTime DateTime = dateTime;
 	}
 }
