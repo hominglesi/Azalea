@@ -15,7 +15,8 @@ internal class ALAudioSource : IAudioSource
 	private int _nextBufferStartTime;
 
 	public IAudioInstance? CurrentInstance { get; private set; }
-	public float CurrentTimestamp => _bufferStartTimes[_currentBufferStartTime];
+	public float CurrentTimestamp => _bufferStartTimes[_currentBufferStartTime] + _sourceOffset;
+	private float _sourceOffset;
 
 	private Stream? _currentStream;
 	private FFmpegStreamReader? _currentReader;
@@ -206,5 +207,6 @@ internal class ALAudioSource : IAudioSource
 			}
 		}
 
+		_sourceOffset = _source.GetSecOffset();
 	}
 }

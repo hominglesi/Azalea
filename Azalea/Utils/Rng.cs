@@ -115,4 +115,21 @@ public static class Rng
 
 		return list[Int(list.Count)];
 	}
+
+	/// <summary>
+	/// Returns a random object from a Dictionary collection
+	/// </summary>
+	public static (T1, T2) Random<T1, T2>(this IDictionary<T1, T2> dictionary)
+	{
+		var index = Int(dictionary.Count);
+		var keyEnumerator = dictionary.Keys.GetEnumerator();
+		keyEnumerator.MoveNext();
+
+		for (var i = 0; i < index; i++)
+			keyEnumerator.MoveNext();
+
+		var key = keyEnumerator.Current;
+		var value = dictionary[key];
+		return (key, value);
+	}
 }

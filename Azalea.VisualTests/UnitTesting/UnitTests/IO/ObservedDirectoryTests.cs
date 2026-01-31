@@ -9,10 +9,10 @@ public class ObservedDirectoryTests : UnitTestSuite
 {
 	protected static ObservedDirectory? ObservedDirectory;
 
-	protected static List<string>? CreatedEvents;
-	protected static List<(string, string)>? LoadedEvents;
-	protected static List<string>? ModifiedEvents;
-	protected static List<string>? DeletedEvents;
+	protected static List<ObservedDirectory.FileData>? CreatedEvents;
+	protected static List<ObservedDirectory.FileData>? LoadedEvents;
+	protected static List<ObservedDirectory.FileData>? ModifiedEvents;
+	protected static List<ObservedDirectory.FileData>? DeletedEvents;
 
 	public class ReadExistingFilesTest : UnitTest
 	{
@@ -47,6 +47,32 @@ public class ObservedDirectoryTests : UnitTestSuite
 			});
 
 			AddResult("Were 3 created events fired", () => checkEventCount(3, 0, 0, 0));
+		}
+
+		public override void TearDown(UnitTestContainer scene) => tearDown();
+	}
+
+	public class ReadNewFilesFilteredTest : UnitTest
+	{
+		public ReadNewFilesFilteredTest()
+		{
+			AddOperation("Create ObservedDirectory", createObservedDirectory);
+
+			AddOperation("Add filter for .txt files", () => ObservedDirectory!.FileFilter = (path) => path.EndsWith(".txt"));
+
+			AddOperation("Create 2 .txt files", () =>
+			{
+				createTestFile("file1.txt");
+				createTestFile("file2.txt");
+			});
+
+			AddOperation("Create 2 .cfg files", () =>
+			{
+				createTestFile("file1.cfg");
+				createTestFile("file2.cfg");
+			});
+
+			AddResult("Were 2 created events fired", () => checkEventCount(2, 0, 0, 0));
 		}
 
 		public override void TearDown(UnitTestContainer scene) => tearDown();
@@ -89,9 +115,9 @@ public class ObservedDirectoryTests : UnitTestSuite
 			AddOperation("Create ObservedDirectory", createObservedDirectory);
 
 			AddResult("Was the correct data loaded", () => LoadedEvents!.Count == 3 &&
-				LoadedEvents![0].Item2 == "file1.txt" &&
-				LoadedEvents![1].Item2 == "file2.txt" &&
-				LoadedEvents![2].Item2 == "file3.txt");
+				LoadedEvents![0].Data == "file1.txt" &&
+				LoadedEvents![1].Data == "file2.txt" &&
+				LoadedEvents![2].Data == "file3.txt");
 
 			AddResult("Were 3 loaded events fired", () => checkEventCount(0, 3, 0, 0));
 		}
@@ -262,10 +288,10 @@ public class ObservedDirectoryTests : UnitTestSuite
 			SerializeFileMethod = path => path[(path.LastIndexOf('\\') + 1)..]
 		};
 
-		ObservedDirectory.OnCreated += path => CreatedEvents.Add(path);
-		ObservedDirectory.OnLoaded += (path, data) => LoadedEvents.Add((path, data));
-		ObservedDirectory.OnModified += path => ModifiedEvents.Add(path);
-		ObservedDirectory.OnDeleted += path => DeletedEvents.Add(path);
+		ObservedDirectory.OnCreated += fileData => CreatedEvents.Add(fileData);
+		ObservedDirectory.OnLoaded += fileData => LoadedEvents.Add(fileData);
+		ObservedDirectory.OnModified += fileData => ModifiedEvents.Add(fileData);
+		ObservedDirectory.OnDeleted += fileData => DeletedEvents.Add(fileData);
 
 		ObservedDirectory.Start();
 	}
@@ -285,10 +311,10 @@ public class ObservedDirectoryTests : UnitTestSuite
 			SerializeFileMethod = path => path[(path.LastIndexOf('\\') + 1)..]
 		};
 
-		ObservedDirectory.OnCreated += path => CreatedEvents.Add(path);
-		ObservedDirectory.OnLoaded += (path, data) => LoadedEvents.Add((path, data));
-		ObservedDirectory.OnModified += path => ModifiedEvents.Add(path);
-		ObservedDirectory.OnDeleted += path => DeletedEvents.Add(path);
+		ObservedDirectory.OnCreated += fileData => CreatedEvents.Add(fileData);
+		ObservedDirectory.OnLoaded += fileData => LoadedEvents.Add(fileData);
+		ObservedDirectory.OnModified += fileData => ModifiedEvents.Add(fileData);
+		ObservedDirectory.OnDeleted += fileData => DeletedEvents.Add(fileData);
 
 		ObservedDirectory.Start();
 	}

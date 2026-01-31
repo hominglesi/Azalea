@@ -255,6 +255,7 @@ internal class AudioTest : TestScene
 					var minutes = (int)Math.Round(duration) / 60;
 					var seconds = (int)Math.Round(duration % 60);
 					_timestampDisplay.Text = $"Timestamp: {minutes}:{seconds}";
+					Console.WriteLine(_audioSource.CurrentInstance.CurrentTimestamp);
 				}
 			}
 		}

@@ -32,24 +32,32 @@ public class ObservedDirectory : Disposable
 
 		var stream = Assets.PersistentStore.GetOrCreateStream(_cachePath);
 		using var reader = new StreamReader(stream);
-		while (reader.Peek() != -1)
+		if (reader.Peek() != -1)
 		{
-			var metadataLine = reader.ReadLine();
-			var data = reader.ReadLine();
-			if (metadataLine is null || data is null)
-				return;
+			var version = reader.ReadLine()!;
+			if (version == CacheVersion)
+			{
+				while (reader.Peek() != -1)
+				{
+					var metadataLine = reader.ReadLine();
+					var data = reader.ReadLine();
+					if (metadataLine is null || data is null)
+						return;
 
-			var metadata = parseMetadata(metadataLine);
+					var metadata = parseMetadata(metadataLine);
 
-			_cacheFiles.Add(new(metadata.Path, metadata.DateTime), data);
-			OnLoaded?.Invoke(metadata.Path, data);
+					// We trust that if a file is cached it should pass the filter as well
+					_cacheFiles.Add(new(metadata.Path, metadata.DateTime), data);
+					OnLoaded?.Invoke(new(metadata.Path, data));
+				}
+			}
 		}
 
 		processPaths(_allPaths);
 
 		foreach (var cacheFile in _cacheFiles)
 			if (_currentFiles.ContainsKey(cacheFile.Key) == false)
-				OnDeleted?.Invoke(cacheFile.Key.Path);
+				OnDeleted?.Invoke(new(cacheFile.Key.Path, cacheFile.Value));
 	}
 
 
@@ -64,10 +72,15 @@ public class ObservedDirectory : Disposable
 			{
 				var metadata = parseMetadata(metadataLine);
 
-				_currentFiles.Add(metadata, getSerializedData(metadata.Path));
+				if (isFileConsidered(metadata.Path) == false)
+					continue;
+
+				var data = getSerializedData(metadata.Path);
+
+				_currentFiles.Add(metadata, data);
 
 				if (_cacheFiles.ContainsKey(metadata) == false)
-					OnCreated?.Invoke(metadata.Path);
+					OnCreated?.Invoke(new(metadata.Path, data));
 			}
 
 			createWatcherOnPath(path);
@@ -76,28 +89,37 @@ public class ObservedDirectory : Disposable
 
 	private void createWatcherOnPath(string path)
 	{
-		var watcher = new FileSystemWatcher(path);
-		watcher.NotifyFilter = NotifyFilters.Attributes
+		var watcher = new FileSystemWatcher(path)
+		{
+			IncludeSubdirectories = true,
+			NotifyFilter = NotifyFilters.Attributes
 								| NotifyFilters.CreationTime
 								| NotifyFilters.DirectoryName
 								| NotifyFilters.FileName
 								| NotifyFilters.LastWrite
-								| NotifyFilters.Size;
-
-		watcher.IncludeSubdirectories = true;
+								| NotifyFilters.Size
+		};
 
 		watcher.Created += (ob, args) =>
 		{
+			if (isFileConsidered(args.FullPath) == false)
+				return;
+
 			var metaData = new DirectoryFileData(args.FullPath, File.GetLastWriteTime(args.FullPath));
 
-			_currentFiles.Add(metaData, getSerializedData(args.FullPath));
-			OnCreated?.Invoke(metaData.Path);
+			var data = getSerializedData(args.FullPath);
+
+			_currentFiles.Add(metaData, data);
+			OnCreated?.Invoke(new(metaData.Path, data));
 		};
 
 		watcher.Changed += (ob, args) =>
 		{
 			// We don't care if a directory is changed
 			if (Directory.Exists(args.FullPath))
+				return;
+
+			if (isFileConsidered(args.FullPath) == false)
 				return;
 
 			foreach (var file in _currentFiles)
@@ -110,15 +132,32 @@ public class ObservedDirectory : Disposable
 			var metaData = new DirectoryFileData(args.FullPath, File.GetLastWriteTime(args.FullPath));
 
 			_currentFiles[metaData] = getSerializedData(args.FullPath);
-			OnModified?.Invoke(metaData.Path);
+			OnModified?.Invoke(new(metaData.Path, _currentFiles[metaData]));
 		};
 
 		watcher.Deleted += (ob, args) =>
 		{
-			var metaData = new DirectoryFileData(args.FullPath, File.GetLastWriteTime(args.FullPath));
+			if (isFileConsidered(args.FullPath) == false)
+				return;
 
-			_currentFiles.Remove(metaData);
-			OnDeleted?.Invoke(metaData.Path);
+			// Since the file is deleted we can't check when the last write time was.
+			// Insted we find the file purely by the path
+			KeyValuePair<DirectoryFileData, string>? foundFile = null;
+			foreach (var file in _currentFiles)
+				if (file.Key.Path == args.FullPath)
+				{
+					foundFile = file;
+					break;
+				}
+
+			if (foundFile is null)
+				return;
+
+			var metadata = foundFile.Value.Key;
+			var data = foundFile.Value.Value;
+
+			_currentFiles.Remove(metadata);
+			OnDeleted?.Invoke(new(metadata.Path, data));
 		};
 
 		watcher.EnableRaisingEvents = true;
@@ -151,8 +190,9 @@ public class ObservedDirectory : Disposable
 
 		foreach (var key in keys)
 		{
+			var data = _currentFiles[key];
 			_currentFiles.Remove(key);
-			OnDeleted?.Invoke(key.Path);
+			OnDeleted?.Invoke(new(key.Path, data));
 		}
 
 		foreach (var watcher in watchers)
@@ -168,19 +208,19 @@ public class ObservedDirectory : Disposable
 	/// <summary>
 	/// Called when a file we have not seen before is created.
 	/// </summary>
-	public Action<string>? OnCreated;
+	public Action<FileData>? OnCreated;
 	/// <summary>
 	/// Called when a file we have seen before is read from the cache. Prvi string je path do tog fajla, bez timestamp. Drugi je data.
 	/// </summary>
-	public Action<string, string>? OnLoaded;
+	public Action<FileData>? OnLoaded;
 	/// <summary>
 	/// Called when a file that is currently in memory is changed
 	/// </summary>
-	public Action<string>? OnModified;
+	public Action<FileData>? OnModified;
 	/// <summary>
 	/// Called when a file currently in memory is deleted
 	/// </summary>
-	public Action<string>? OnDeleted;
+	public Action<FileData>? OnDeleted;
 
 	/// <summary>
 	/// This method tells the <see cref="ObservedDirectory"/> how it
@@ -193,10 +233,25 @@ public class ObservedDirectory : Disposable
 	private string getSerializedData(string path)
 		=> SerializeFileMethod is not null ? SerializeFileMethod(path) : "";
 
+	/// <summary>
+	/// Most up to date cache version. If a cache file that has a different version is
+	/// encountered it is ignored.
+	/// </summary>
+	public string CacheVersion = "v1";
+
+	/// <summary>
+	/// Method that filters what files are actually considered for the directory.
+	/// </summary>
+	public FileFilterDelegate? FileFilter;
+	public delegate bool FileFilterDelegate(string path);
+
+	private bool isFileConsidered(string path) => FileFilter is null ? true : FileFilter(path);
+
 	public void SaveCache()
 	{
 		var stream = Assets.PersistentStore.GetOrCreateStream(_cachePath);
 		using var writer = new StreamWriter(stream);
+		writer.WriteLine(CacheVersion);
 		foreach (var (metaData, data) in _currentFiles)
 		{
 			writer.WriteLine(metaData.Path + "|" + metaData.DateTime);
@@ -233,5 +288,11 @@ public class ObservedDirectory : Disposable
 	{
 		public string Path = path;
 		public DateTime DateTime = dateTime;
+	}
+
+	public struct FileData(string path, string data)
+	{
+		public string Path = path;
+		public string Data = data;
 	}
 }
