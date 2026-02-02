@@ -21,6 +21,9 @@ public static partial class Assets
 	public static IResourceStore FileSystemStore => _fileSystemStore;
 	private static readonly FileSystemStore _fileSystemStore;
 
+	public static IResourceStore WebStore => _webStore;
+	private static readonly WebStore _webStore;
+
 	/// <summary>
 	/// A store for storing and accessing persistent game data. Must be set-up before
 	/// using by calling the <see cref="SetupPersistentStore(string)"/> method.
@@ -42,6 +45,7 @@ public static partial class Assets
 			new EmbeddedResourceStore(typeof(AzaleaGame).Assembly), "Resources"));
 
 		_fileSystemStore = new FileSystemStore();
+		_webStore = new WebStore();
 	}
 
 	/// <summary>
