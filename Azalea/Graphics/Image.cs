@@ -2,7 +2,6 @@
 using StbImageSharp;
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 
 namespace Azalea.Graphics;
 
@@ -54,25 +53,21 @@ public class Image
 
 	public unsafe static Image FromStream(Stream stream)
 	{
-		byte* ptr = null;
-		try
-		{
-			int width = 0;
-			int height = 0;
-			int comp = 0;
-			ptr = StbImage.stbi__load_and_postprocess_8bit(
-				new StbImage.stbi__context(stream), &width, &height, &comp, (int)ColorComponents.RedGreenBlueAlpha);
+		ImageResult? image = null;
 
-			byte[] data = new byte[width * height * (int)ColorComponents.RedGreenBlueAlpha];
-			Marshal.Copy(new IntPtr(ptr), data, 0, data.Length);
-			return new Image(width, height, data);
-		}
-		finally
+		if (stream.CanSeek)
+			image = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
+		else
 		{
-			if (ptr != null)
-			{
-				Marshal.FreeHGlobal(new IntPtr(ptr));
-			}
+			// StbImageSharp requires that all streams are seekable so
+			// in case they arent we save the stream in memory and pass that
+			using var memoryStream = new MemoryStream();
+			stream.CopyTo(memoryStream);
+			var data = memoryStream.ToArray();
+
+			image = ImageResult.FromMemory(data, ColorComponents.RedGreenBlueAlpha);
 		}
+
+		return new Image(image.Width, image.Height, image.Data);
 	}
 }

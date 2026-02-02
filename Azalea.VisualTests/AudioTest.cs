@@ -15,6 +15,7 @@ internal class AudioTest : TestScene
 	private SoundByte _goodkidByte;
 
 	private Sound _harbor;
+	private Sound _naviaWeb;
 	private Sound _navia;
 	private SoundByte _hitnormal;
 
@@ -28,6 +29,7 @@ internal class AudioTest : TestScene
 		_harbor = Assets.FileSystemStore.GetSound(@"E:\Music\Alohaii\Virtual Paradise\\10 - Harbor (feat. Kaneko Lumi).flac");
 		_hitnormal = Assets.GetSoundByte("Audio/hitnormal.wav");
 		_navia = Assets.FileSystemStore.GetSound(@"E:\cut small.mp3");
+		_naviaWeb = Assets.WebStore.GetSound("https://cdn.discordapp.com/attachments/403993461684043776/1467983957810352220/cut_3.mp3?ex=69825e19&is=69810c99&hm=dc96bf622cb1ade23ddf37d948e8bf093f05c55c28cc5637a759c3bd8e237944&");
 
 		Add(
 			CreateFullscreenVerticalFlex(new GameObject[]
@@ -50,6 +52,9 @@ internal class AudioTest : TestScene
 				CreateActionButton(
 					"Stress test audio playback",
 					() => Add(new AudioRunner(_harbor))),
+				CreateActionButton(
+					"'Navia song' from the web at 0.1f",
+					() => _instance = Audio.Play(_naviaWeb, 0.1f)),
 			})
 		);
 
@@ -255,7 +260,6 @@ internal class AudioTest : TestScene
 					var minutes = (int)Math.Round(duration) / 60;
 					var seconds = (int)Math.Round(duration % 60);
 					_timestampDisplay.Text = $"Timestamp: {minutes}:{seconds}";
-					Console.WriteLine(_audioSource.CurrentInstance.CurrentTimestamp);
 				}
 			}
 		}
