@@ -82,7 +82,7 @@ public class SchemesTest : TestScene
 
 		return new SpriteText()
 		{
-			Margin = new(30, 0, 0, 40),
+			Margin = new(top: 30, left: 40),
 			Text = text,
 			Font = FontUsage.Default.With(size: 42)
 		};
@@ -98,7 +98,7 @@ public class SchemesTest : TestScene
 		return new SpriteText()
 		{
 			Text = text,
-			Margin = new(30, 0, 0, 40),
+			Margin = new(top: 30, left: 40),
 			Font = FontUsage.Default.With(size: 32)
 		};
 	}
@@ -109,7 +109,7 @@ public class SchemesTest : TestScene
 		{
 			Size = new(900, 1),
 			Color = new Color(70, 66, 81),
-			Margin = new(40, 0, 0, 40),
+			Margin = new(top: 40, left: 40),
 		};
 	}
 
@@ -118,7 +118,7 @@ public class SchemesTest : TestScene
 		var container = new FlexContainer()
 		{
 			Direction = FlexDirection.Vertical,
-			Margin = new(30, 0, 0, 40),
+			Margin = new(top: 30, left: 40),
 			Width = 900,
 			AutoSizeAxes = Axes.Y,
 		};
@@ -144,7 +144,7 @@ public class SchemesTest : TestScene
 			});
 
 			obj.Width = 875;
-			obj.Margin = new(0, 0, 0, 25);
+			obj.Margin = new(left: 25);
 		}
 
 		return container;
@@ -163,7 +163,7 @@ public class SchemesTest : TestScene
 		{
 			Size = new(900, 900 * aspectRatio),
 			Texture = texture,
-			Margin = new(20, 0, 0, 40),
+			Margin = new(top: 20, left: 40),
 		};
 	}
 
@@ -191,7 +191,7 @@ public class SchemesTest : TestScene
 		return new TextContainer(t => t.Font = FontUsage.Default.With(size: 24))
 		{
 			Text = text,
-			Margin = new(30, 0, 0, 40),
+			Margin = new(top: 30, left: 40),
 			Width = 900,
 			AutoSizeAxes = Axes.Y
 		};
@@ -202,7 +202,7 @@ public class SchemesTest : TestScene
 		var container = new FlexContainer()
 		{
 			Direction = FlexDirection.Vertical,
-			Margin = new(20, 0, 0, 0),
+			Margin = new(top: 20),
 			AutoSizeAxes = Axes.Y,
 			RelativeSizeAxes = Axes.X,
 			BorderThickness = new(1),

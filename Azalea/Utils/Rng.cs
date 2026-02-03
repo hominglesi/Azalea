@@ -121,6 +121,8 @@ public static class Rng
 	/// </summary>
 	public static (T1, T2) Random<T1, T2>(this IDictionary<T1, T2> dictionary)
 	{
+		if (dictionary.Count <= 0) throw new ArgumentException("Cannot get a random value from an empty dictionary");
+
 		var index = Int(dictionary.Count);
 		var keyEnumerator = dictionary.Keys.GetEnumerator();
 		keyEnumerator.MoveNext();

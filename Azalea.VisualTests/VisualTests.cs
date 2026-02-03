@@ -131,7 +131,7 @@ public class VisualTests : AzaleaGame
 			{
 				Origin = Anchor.CenterLeft,
 				Anchor = Anchor.CenterLeft,
-				Margin = new(0, 0, 0, 10),
+				Margin = new(left: 10),
 				Font = FontUsage.Default.With(size: 28, family: "TitanOne")
 			});
 		}
