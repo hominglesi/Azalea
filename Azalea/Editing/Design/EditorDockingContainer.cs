@@ -1,6 +1,7 @@
 ﻿using Azalea.Amends;
 using Azalea.Design.Containers;
 using Azalea.Design.Docking;
+using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
@@ -29,29 +30,37 @@ internal class EditorDockingContainer : BasicDockingContainer
 	{
 		private const float __animationSpeed = 0.1f;
 		private readonly bool _focused;
+
+		private readonly Box _backgroundObject;
+		private readonly SpriteText _titleText;
+
 		public EditorDockingContainerTab(string title, bool focused, float heigth)
 		{
 			_focused = focused;
 
-			var titleText = new SpriteText()
-			{
-				Font = FontUsage.Default.With(size: 18),
-				Text = title,
-				Anchor = Anchor.Center,
-				Origin = Anchor.Center,
-			};
+			AddRange([
+				_backgroundObject = new Box(){
+					RelativeSizeAxes = Axes.Both,
+					Color = focused ? __focusedColor : __navigationColor
+				},
+				_titleText = new SpriteText()
+				{
+					Font = FontUsage.Default.With(size: 18),
+					Text = title,
+					Anchor = Anchor.Center,
+					Origin = Anchor.Center,
+				}
+			]);
 
-			Size = new(titleText.Width + 30, heigth);
-			BackgroundColor = focused ? __focusedColor : __navigationColor;
-			Add(titleText);
+			Size = new(_titleText.Width + 30, heigth);
 		}
 
 		protected override bool OnHover(HoverEvent e)
 		{
 			if (_focused) return false;
 
-			BackgroundObject!.FinishAmends();
-			BackgroundObject!.RecolorTo(__hoverColor, __animationSpeed);
+			_backgroundObject.FinishAmends();
+			_backgroundObject.RecolorTo(__hoverColor, __animationSpeed);
 
 			return true;
 		}
@@ -60,8 +69,8 @@ internal class EditorDockingContainer : BasicDockingContainer
 		{
 			if (_focused) return;
 
-			BackgroundObject!.FinishAmends();
-			BackgroundObject!.RecolorTo(__navigationColor, __animationSpeed);
+			_backgroundObject.FinishAmends();
+			_backgroundObject.RecolorTo(__navigationColor, __animationSpeed);
 		}
 	}
 }

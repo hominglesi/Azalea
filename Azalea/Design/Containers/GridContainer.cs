@@ -10,7 +10,7 @@ using System.Numerics;
 
 namespace Azalea.Design.Containers;
 
-public class GridContainer : CompositeGameObject
+public class GridContainer : Composition
 {
 	public GridContainer()
 	{

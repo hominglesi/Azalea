@@ -61,7 +61,7 @@ public class LegacySceneGraph : FlexContainer
 
 		if (shown)
 		{
-			if (_rootObject is CompositeGameObject comp)
+			if (_rootObject is Composition comp)
 			{
 				foreach (var child in comp.InternalChildren)
 				{

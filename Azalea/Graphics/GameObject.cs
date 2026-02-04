@@ -524,16 +524,16 @@ public partial class GameObject : Amendable, IGameObject
 			if (IsPartOfComposite)
 			{
 				throw new InvalidOperationException(
-					$"May not change {nameof(Depth)} while inside a parent {nameof(CompositeGameObject)}.");
+					$"May not change {nameof(Depth)} while inside a parent {nameof(Composition)}.");
 			}
 
 			depth = value;
 		}
 	}
 
-	private CompositeGameObject? parent;
+	private Composition? parent;
 
-	public CompositeGameObject? Parent
+	public Composition? Parent
 	{
 		get => parent;
 		set
@@ -777,7 +777,7 @@ public partial class GameObject : Amendable, IGameObject
 		if (invalidation == Invalidation.None)
 			return false;
 
-		if (propagateToParent && (source == InvalidationSource.Self || GetType() == typeof(CompositeGameObject)))
+		if (propagateToParent && (source == InvalidationSource.Self || GetType() == typeof(Composition)))
 			Parent?.Invalidate(invalidation, InvalidationSource.Child);
 
 		if (invalidationList.Invalidate(source, invalidation) == false)

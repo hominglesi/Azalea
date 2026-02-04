@@ -5,11 +5,11 @@ using System.Numerics;
 namespace Azalea.Design.Containers;
 public class ContentContainer : Composition
 {
-	protected CompositeGameObject ContentComposition { get; init; }
+	protected Composition ContentComposition { get; init; }
 
 	public ContentContainer()
 	{
-		AddInternal(ContentComposition = new CompositeGameObject());
+		AddInternal(ContentComposition = new Composition());
 	}
 
 	private Vector2 _lastDrawSize = new(-1);
@@ -32,7 +32,7 @@ public class ContentContainer : Composition
 		=> ContentComposition.Size = DrawSize;
 
 
-	protected override IReadOnlyList<GameObject> PublicChildren => ContentComposition.InternalChildren;
+	public override IReadOnlyList<GameObject> Children => ContentComposition.InternalChildren;
 	public override void Add(GameObject gameObject) => ContentComposition.AddInternal(gameObject);
 	public override bool Remove(GameObject gameObject) => ContentComposition.RemoveInternal(gameObject);
 	public override void Clear() => ContentComposition.ClearInternal();

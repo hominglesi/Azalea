@@ -65,14 +65,29 @@ public static class RendererExtentions
 		});
 	}
 
-	public static void DrawRectangle(this IRenderer renderer, Rectangle rect, Matrix3 drawMatrix, Boundary thickness, DrawColorInfo color, bool towardsOutside)
+	public static void DrawRectangle(this IRenderer renderer, Rectangle rect, Matrix3 drawMatrix, Boundary thickness, DrawColorInfo color, BorderAlignment alignment)
 	{
-
 		var texture = renderer.WhitePixel;
 
-		var topRect = towardsOutside ?
-			new Rectangle(rect.Top - thickness.Top, rect.Left - thickness.Left, rect.Width + thickness.Left, thickness.Top) :
-			new Rectangle(rect.Top, rect.Left, rect.Width - thickness.Right, thickness.Top);
+		var topRect = alignment switch
+		{
+			BorderAlignment.Outer => new Rectangle(
+				rect.Left - thickness.Left,
+				rect.Top - thickness.Top,
+				rect.Width + thickness.Left,
+				thickness.Top),
+			BorderAlignment.Inner => new Rectangle(
+				rect.Top,
+				rect.Left,
+				rect.Width - thickness.Right,
+				thickness.Top),
+			/* BorderAlignment.Center */
+			_ => new Rectangle(
+				rect.Left - (thickness.Left / 2),
+				rect.Top - (thickness.Top / 2),
+				rect.Width - (thickness.Right / 2) + (thickness.Left / 2),
+				thickness.Top),
+		};
 
 		var topColor = new ColorQuad(
 			color.Color.TopLeft,
@@ -80,9 +95,25 @@ public static class RendererExtentions
 			color.Color.TopRight,
 			color.Color.TopRight);
 
-		var rightRect = towardsOutside ?
-			new Rectangle(rect.Width, rect.Top - thickness.Top, thickness.Right, rect.Height + thickness.Top) :
-			new Rectangle(rect.Width - thickness.Right, rect.Top, thickness.Right, rect.Height - thickness.Bottom);
+		var rightRect = alignment switch
+		{
+			BorderAlignment.Outer => new Rectangle(
+				rect.Width,
+				rect.Top - thickness.Top,
+				thickness.Right,
+				rect.Height + thickness.Top),
+			BorderAlignment.Inner => new Rectangle(
+				rect.Width - thickness.Right,
+				rect.Top,
+				thickness.Right,
+				rect.Height - thickness.Bottom),
+			/* BorderAlignment.Center */
+			_ => new Rectangle(
+				rect.Width - (thickness.Right / 2),
+				rect.Top - (thickness.Top / 2),
+				thickness.Right,
+				rect.Height - (thickness.Bottom / 2) + (thickness.Top / 2)),
+		};
 
 		var rightColor = new ColorQuad(
 			color.Color.TopRight,
@@ -90,9 +121,25 @@ public static class RendererExtentions
 			color.Color.BottomRight,
 			color.Color.TopRight);
 
-		var bottomRect = towardsOutside ?
-			new Rectangle(rect.Left, rect.Height, rect.Width + thickness.Right, thickness.Bottom) :
-			new Rectangle(rect.Left + thickness.Left, rect.Height - thickness.Bottom, rect.Width - thickness.Left, thickness.Bottom);
+		var bottomRect = alignment switch
+		{
+			BorderAlignment.Outer => new Rectangle(
+				rect.Left,
+				rect.Height,
+				rect.Width + thickness.Right,
+				thickness.Bottom),
+			BorderAlignment.Inner => new Rectangle(
+				rect.Left + thickness.Left,
+				rect.Height - thickness.Bottom,
+				rect.Width - thickness.Left,
+				thickness.Bottom),
+			/* BorderAlignment.Center */
+			_ => new Rectangle(
+				rect.Left + (thickness.Left / 2),
+				rect.Height - (thickness.Bottom / 2),
+				rect.Width - (thickness.Left / 2) + (thickness.Right / 2),
+				thickness.Bottom),
+		};
 
 		var bottomColor = new ColorQuad(
 			color.Color.BottomLeft,
@@ -100,9 +147,25 @@ public static class RendererExtentions
 			color.Color.BottomRight,
 			color.Color.BottomRight);
 
-		var leftRect = towardsOutside ?
-			new Rectangle(rect.Left - thickness.Left, rect.Top, thickness.Left, rect.Height + thickness.Bottom) :
-			new Rectangle(rect.Left, rect.Top + thickness.Top, thickness.Left, rect.Height - thickness.Bottom);
+		var leftRect = alignment switch
+		{
+			BorderAlignment.Outer => new Rectangle(
+				rect.Left - thickness.Left,
+				rect.Top,
+				thickness.Left,
+				rect.Height + thickness.Bottom),
+			BorderAlignment.Inner => new Rectangle(
+				rect.Left,
+				rect.Top + thickness.Top,
+				thickness.Left,
+				rect.Height - thickness.Top),
+			/* BorderAlignment.Center */
+			_ => new Rectangle(
+				rect.Left - (thickness.Left / 2),
+				rect.Top + (thickness.Top / 2),
+				thickness.Left,
+				rect.Height + (thickness.Bottom / 2) - (thickness.Top / 2)),
+		};
 
 		var leftColor = new ColorQuad(
 			color.Color.TopLeft,
