@@ -10,7 +10,7 @@ public struct Boundary : IEquatable<Boundary>
 	public float Bottom;
 	public float Right;
 
-	public Boundary(float top, float right, float bottom, float left)
+	public Boundary(float top = 0, float right = 0, float bottom = 0, float left = 0)
 	{
 		Top = top;
 		Right = right;

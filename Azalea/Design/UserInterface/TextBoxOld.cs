@@ -244,8 +244,8 @@ public abstract class TextBoxOld : Composition
 		string removedText = _text.Substring(removeStart, removeCount);
 		_text = _text.Remove(removeStart, removeCount);
 
-		for (int i = removeStart; i < TextFlow.Count; i++)
-			TextFlow.ChangeChildDepth(TextFlow[i], getDepthForCharacterIndex(i));
+		for (int i = removeStart; i < TextFlow.Children.Count; i++)
+			TextFlow.ChangeChildDepth(TextFlow.Children[i], getDepthForCharacterIndex(i));
 
 		_selectionStart = _selectionEnd = removeStart;
 

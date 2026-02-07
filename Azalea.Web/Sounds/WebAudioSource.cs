@@ -14,7 +14,7 @@ internal class WebAudioSource : AudioSource
 		WebAudio.ConnectToContext(_gainNode);
 	}
 
-	protected override void BindBufferImplementation(Sound sound)
+	protected override void BindBufferImplementation(SoundByte sound)
 		=> WebAudio.SetBuffer(Handle, ((WebSound)sound).Buffer.Handle);
 
 	protected override void OnDispose() { }

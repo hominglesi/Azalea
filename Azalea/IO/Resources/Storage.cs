@@ -5,14 +5,14 @@ using System.IO;
 namespace Azalea.IO.Resources;
 public class Storage : IResourceStore
 {
-	private string _path;
+	public string Path { get; init; }
 
 	public Storage(string path)
 	{
-		_path = path;
+		Path = path;
 
-		if (_path.EndsWith('/') == false)
-			_path += '/';
+		if (Path.EndsWith('/') == false)
+			Path += '/';
 	}
 
 	public Stream? GetStream(string path)
@@ -20,13 +20,13 @@ public class Storage : IResourceStore
 		if (Exists(path) == false)
 			return null;
 
-		return File.OpenRead(_path + path);
+		return File.OpenRead(Path + path);
 	}
 
 	public Stream GetOrCreateStream(string path)
 	{
-		var fullPath = _path + path;
-		var directoryPath = Path.GetDirectoryName(fullPath)!;
+		var fullPath = Path + path;
+		var directoryPath = System.IO.Path.GetDirectoryName(fullPath)!;
 
 		if (Directory.Exists(directoryPath) == false)
 			Directory.CreateDirectory(directoryPath);
@@ -36,20 +36,25 @@ public class Storage : IResourceStore
 
 	public bool Exists(string path)
 	{
-		return File.Exists(_path + path);
+		return File.Exists(Path + path);
 	}
 
 	public void Delete(string path)
 	{
-		if (Exists(path))
-			File.Delete(_path + path);
+		var fullPath = Path + path;
+
+		if (Directory.Exists(fullPath))
+			Directory.Delete(fullPath, true);
+
+		else if (Exists(path))
+			File.Delete(fullPath);
 	}
 
-	private readonly static char[] _directorySeperators = new char[] { '/', '\\' };
+	private readonly static char[] _directorySeperators = ['/', '\\'];
 
 	public IEnumerable<(string, bool)> GetAvalibleResources(string subPath = "")
 	{
-		var path = PathUtils.CombinePaths(_path, subPath);
+		var path = PathUtils.CombinePaths(Path, subPath);
 
 		var files = Directory.GetFiles(path);
 		var directories = Directory.GetDirectories(path);
@@ -61,6 +66,6 @@ public class Storage : IResourceStore
 		}
 
 		foreach (var file in files)
-			yield return (Path.GetFileName(file), false);
+			yield return (System.IO.Path.GetFileName(file), false);
 	}
 }

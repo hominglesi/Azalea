@@ -1,8 +1,12 @@
 <Project>
   <ItemGroup>
     <SoftAL Include="$(MSBuildThisFileDirectory)\..\native\soft_oal.dll" />
+	<FFMpeg Include="$(MSBuildThisFileDirectory)\..\native\ffmpeg\*" />
   </ItemGroup>
   <Target Name="CopySoftAL" BeforeTargets="Build">
     <Copy SourceFiles="@(SoftAL)" DestinationFolder="$(TargetDir)" />
+  </Target>
+  <Target Name="CopyFFmpeg" BeforeTargets="Build">
+    <Copy SourceFiles="@(FFMpeg)" DestinationFolder="$(TargetDir)" />
   </Target>
 </Project>

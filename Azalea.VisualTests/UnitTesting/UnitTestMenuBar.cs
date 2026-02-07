@@ -50,20 +50,20 @@ public class UnitTestMenuBar : FlexContainer
 			HoveredBackground.Color = __hoveredColor;
 			BorderColor = __hoveredBorderColor;
 			BorderThickness = 1;
-			BorderObject!.OutsideContent = false;
-			BorderObject!.Alpha = 0;
+			BorderAlignment = BorderAlignment.Outer;
+			BorderAlpha = 0;
 		}
 
 		protected override bool OnHover(HoverEvent e)
 		{
-			BorderObject!.Alpha = 1;
+			BorderAlpha = 1;
 
 			return base.OnHover(e);
 		}
 
 		protected override void OnHoverLost(HoverLostEvent e)
 		{
-			BorderObject!.Alpha = 0;
+			BorderAlpha = 0;
 
 			base.OnHoverLost(e);
 		}

@@ -25,11 +25,25 @@ public abstract class TextBox : TextContainer
 		{
 			if (value == _text) return;
 
-			_text = value;
+			var caratAtEnd = _caratPosition == _text.Length;
 
-			updateText(_text);
+			_text = value;
+			base.Text = _text;
+
+			if (caratAtEnd)
+				_caratPosition = _text.Length;
+			else if (_caratPosition > _text.Length)
+				_caratPosition = _text.Length;
+
+			PerformLayout();
+
+			updateCaratPosition();
+
+			OnTextChanged?.Invoke(_text);
 		}
 	}
+
+	public Action<string>? OnTextChanged;
 
 	public override bool AcceptsFocus => true;
 
@@ -45,7 +59,13 @@ public abstract class TextBox : TextContainer
 		if (e.Key == Keys.Right) moveCarat(1);
 
 		if (e.Key == Keys.V && Input.GetKey(Keys.ControlLeft).Pressed)
-			updateText(_text + Clipboard.GetText());
+		{
+			var clipboardText = Clipboard.GetText() ?? "";
+			var newText = _text.Insert(_caratPosition, clipboardText);
+			_caratPosition += clipboardText.Length;
+			Text = newText;
+		}
+
 		if (e.Key == Keys.C && Input.GetKey(Keys.ControlLeft).Pressed)
 			Clipboard.SetText(_text);
 
@@ -73,7 +93,7 @@ public abstract class TextBox : TextContainer
 		var newText = _text.Insert(_caratPosition, chr.ToString());
 		_caratPosition++;
 
-		updateText(newText);
+		Text = newText;
 	}
 
 	protected virtual bool IsCharacterAllowed(char chr) => true;
@@ -89,7 +109,7 @@ public abstract class TextBox : TextContainer
 
 		_caratPosition--;
 
-		updateText(newText);
+		Text = newText;
 	}
 
 	private void moveCarat(int change)
@@ -109,19 +129,6 @@ public abstract class TextBox : TextContainer
 
 	protected abstract void OnCaratPositionChanged(Vector2 position);
 
-	private void updateText(string newText)
-	{
-		_text = newText;
-		base.Text = _text;
-
-		if (_caratPosition > _text.Length)
-			_caratPosition = _text.Length;
-
-		PerformLayout();
-
-		updateCaratPosition();
-	}
-
 	private void updateCaratPosition()
 	{
 		int caratIndex = 0;
@@ -137,7 +144,6 @@ public abstract class TextBox : TextContainer
 				{
 					childPosition = (float)(_caratPosition - caratIndex) / text.Text.Length;
 				}
-
 
 				caratIndex += text.Text.Length;
 			}

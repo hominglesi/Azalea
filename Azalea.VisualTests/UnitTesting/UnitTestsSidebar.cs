@@ -195,7 +195,7 @@ public class UnitTestsSidebar : Composition
 
 		public HeaderButton(string iconName)
 		{
-			Margin = new(15, 5, 15, 5);
+			Margin = new(top: 15, right: 5, bottom: 15, left: 5);
 			Size = new(__headerHeight - 30);
 
 			Add(_backgroundSprite = new Sprite()

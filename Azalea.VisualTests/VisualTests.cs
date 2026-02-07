@@ -131,7 +131,7 @@ public class VisualTests : AzaleaGame
 			{
 				Origin = Anchor.CenterLeft,
 				Anchor = Anchor.CenterLeft,
-				Margin = new(0, 0, 0, 10),
+				Margin = new(left: 10),
 				Font = FontUsage.Default.With(size: 28, family: "TitanOne")
 			});
 		}
@@ -140,7 +140,6 @@ public class VisualTests : AzaleaGame
 		{
 			this.ResizeBy(new(8), 0.15f);
 			this.ChangeBoundaryPropertyTo("Margin", Boundary.Zero, 0.15f);
-			BorderObject!.RecolorTo(Palette.White, 0.15f);
 			_whiteOverlay.ChangeAlphaTo(0.1f, 0.15f);
 			return true;
 		}
@@ -148,14 +147,11 @@ public class VisualTests : AzaleaGame
 		protected override void OnHoverLost(HoverLostEvent e)
 		{
 			RemoveAmends();
-			BorderObject!.RemoveAmends();
 			_whiteOverlay.RemoveAmends();
 
 			this.ResizeTo(new(320, 65), 0.07f);
 			this.ChangeBoundaryPropertyTo("Margin", new(4), 0.07f);
-			BorderObject!.RecolorTo(new Color(59, 70, 81), 0.07f);
 			_whiteOverlay.ChangeAlphaTo(0f, 0.15f);
-
 		}
 
 		public string Text

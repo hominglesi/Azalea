@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace Azalea.Design.UserInterface;
 
-public abstract class Caret : CompositeGameObject
+public abstract class Caret : Composition
 {
 	public abstract void DisplayAt(Vector2 position, float? selectionWidth);
 }

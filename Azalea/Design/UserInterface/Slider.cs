@@ -40,6 +40,8 @@ public abstract class Slider : Composition
 		}
 	}
 
+	public Action<float>? OnValueSet;
+
 	private bool _sliderRangeCached = false;
 	private Vector2 _sliderRange;
 	private Vector2 SliderRange
@@ -137,7 +139,13 @@ public abstract class Slider : Composition
 	protected override void Update()
 	{
 		if (Input.GetMouseButton(0).Released)
+		{
+			if (IsHeld)
+				OnValueSet?.Invoke(Value);
+
 			IsHeld = false;
+		}
+
 
 		if (_lastDrawSize != DrawSize || _lastHeadLength != _headLength)
 		{

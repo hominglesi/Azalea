@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azalea.Sounds.OpenAL.Enums;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Azalea.Sounds.OpenAL;
@@ -47,8 +48,6 @@ internal unsafe static class ALC
 		fixed (uint* p = buffers)
 			genBuffers(count, p);
 
-
-
 		return buffers;
 	}
 
@@ -73,11 +72,6 @@ internal unsafe static class ALC
 		{
 			bufferData(buffer, format, p, size, frequency);
 		}
-	}
-
-	public static void BufferData(uint buffer, ISoundData sound)
-	{
-		BufferData(buffer, sound.Format, sound.Data, sound.Size, sound.Frequency);
 	}
 
 	#endregion
@@ -112,11 +106,17 @@ internal unsafe static class ALC
 	[DllImport(LibraryPath, EntryPoint = "alSourcei")]
 	private static extern void sourcei(uint source, int param, int value);
 
+	[DllImport(LibraryPath, EntryPoint = "alGetSourcei")]
+	private static extern void getSourcei(uint source, int param, [Out] int* value);
+
 	public static void BindBuffer(uint source, uint buffer)
 	{
 		//AL_BUFFER = 0x1009
 		sourcei(source, 0x1009, (int)buffer);
 	}
+
+	[DllImport(LibraryPath, EntryPoint = "alSourcePause")]
+	public static extern void SourcePause(uint source);
 
 	[DllImport(LibraryPath, EntryPoint = "alSourcePlay")]
 	public static extern void SourcePlay(uint source);
@@ -127,16 +127,81 @@ internal unsafe static class ALC
 	[DllImport(LibraryPath, EntryPoint = "alSourcef")]
 	private static extern void sourcef(uint source, int param, float value);
 
+	[DllImport(LibraryPath, EntryPoint = "alGetSourcef")]
+	private static extern void getSourcef(uint source, int param, [Out] float* value);
+
 	public static void SetSourceGain(uint source, float gain)
 	{
-		//0x100A = GL_GAIN
+		//0x100A = AL_GAIN
 		sourcef(source, 0x100A, gain);
+	}
+
+	public static void SetSourcePitch(uint source, float pitch)
+	{
+		//0x1003 = AL_PITCH
+		sourcef(source, 0x1003, pitch);
 	}
 
 	public static void SetSourceLooping(uint source, bool looping)
 	{
 		//0x1007 = AL_LOOPING
 		sourcei(source, 0x1007, looping ? 1 : 0);
+	}
+
+	public static void SetSecOffset(uint source, float offset)
+	{
+		//0x1024 = AL_SEC_OFFSET
+		sourcef(source, 0x1024, offset);
+	}
+
+	public static int GetBuffersProcessed(uint source)
+	{
+		//0x1016 = AL_BUFFERS_PROCESSED
+		int buffersProcessed;
+		getSourcei(source, 0x1016, &buffersProcessed);
+		return buffersProcessed;
+	}
+
+	public static int GetBuffersQueued(uint source)
+	{
+		//0x1015 = AL_BUFFERS_QUEUED
+		int buffersProcessed;
+		getSourcei(source, 0x1015, &buffersProcessed);
+		return buffersProcessed;
+	}
+
+	public static ALSourceState GetSourceState(uint source)
+	{
+		//0x1010 = AL_SOURCE_STATE
+		int sourceState;
+		getSourcei(source, 0x1010, &sourceState);
+		return (ALSourceState)sourceState;
+	}
+
+	public static float GetSecOffset(uint source)
+	{
+		//0x1024 = AL_SEC_OFFSET
+		float secOffset;
+		getSourcef(source, 0x1024, &secOffset);
+		return secOffset;
+	}
+
+	[DllImport(LibraryPath, EntryPoint = "alSourceQueueBuffers")]
+	private static extern void sourceQueueBuffers(uint source, int size, uint* buffers);
+
+	public static void SourceQueueBuffer(uint source, uint buffer)
+	{
+		sourceQueueBuffers(source, 1, &buffer);
+	}
+
+	[DllImport(LibraryPath, EntryPoint = "alSourceUnqueueBuffers")]
+	private static extern void sourceUnqueueBuffers(uint source, int size, uint* buffers);
+
+	public static uint SourceUnqueueBuffer(uint source)
+	{
+		uint buffer;
+		sourceUnqueueBuffers(source, 1, &buffer);
+		return buffer;
 	}
 
 	#endregion
@@ -157,5 +222,16 @@ internal unsafe static class ALC
 	#region Errors
 	[DllImport(LibraryPath, EntryPoint = "alGetError")]
 	public static extern ALError GetError();
+
+	public static void PrintErrors()
+	{
+		var error = ALC.GetError();
+		while (error != ALError.NoError)
+		{
+			Console.WriteLine("OpenAL Error: " + error);
+			error = ALC.GetError();
+		}
+
+	}
 	#endregion
 }

@@ -1,7 +1,7 @@
 ﻿using Azalea.Sounds;
 
 namespace Azalea.Web.Sounds;
-internal class WebSound : Sound
+internal class WebSound : SoundByte
 {
 	public WebAudioBuffer Buffer { get; }
 

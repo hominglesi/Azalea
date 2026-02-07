@@ -160,19 +160,16 @@ internal class EditorExplorer : Composition
 			if (pressed)
 			{
 				BackgroundColor = EditorPallete.HoverBackground;
-				BackgroundObject!.Alpha = 1;
+				BackgroundAlpha = 1;
 				BorderColor = EditorPallete.HoverBorderBackground;
 				BorderThickness = 1;
-				BorderObject!.Alpha = 1;
+				BorderAlpha = 1;
 
 			}
 			else
 			{
-				if (BackgroundObject is not null)
-					BackgroundObject.Alpha = 0;
-
-				if (BorderObject is not null)
-					BorderObject.Alpha = 0;
+				BackgroundAlpha = 0;
+				BorderAlpha = 0;
 			}
 		}
 

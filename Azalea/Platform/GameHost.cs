@@ -79,6 +79,7 @@ public abstract class GameHost
 		_accumulator += Time.DeltaTime;
 
 		Window.ProcessEvents();
+		AudioManager.Update();
 
 		while (_accumulator >= __fixedUpdateFrametime)
 		{

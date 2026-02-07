@@ -63,7 +63,7 @@ public class BasicDockingContainer : DockingContainer
 			Thickness = 0,
 			Color = Palette.Black,
 			Depth = 999,
-			OutsideContent = false
+			Alignment = BorderAlignment.Inner
 		});
 	}
 
