@@ -18,9 +18,7 @@ internal class Program
 			.SetupReflectedDirectory("../../../../../../Azalea.VisualTests/")
 			.SetupConfig()
 			.Create()
-		//.Run(new EditorWrapper(null));
-		.Run(new EditorWrapper(new VisualTests()));
-		//.Run(new VisualTests());
+			.Run(new EditorWrapper(new VisualTests()));
 	}
 }
 
