@@ -85,12 +85,12 @@ internal class LargeIconsExplorerView : ResourceExplorer
 			_isDirectory = isDirectory;
 
 			BackgroundColor = EditorPallete.HoverBackground;
-			BackgroundObject!.Alpha = 0;
+			BackgroundAlpha = 0;
 
 			BorderColor = EditorPallete.HoverBorderBackground;
 			BorderThickness = 1;
-			BorderObject!.OutsideContent = false;
-			BorderObject!.Alpha = 0;
+			BorderAlignment = BorderAlignment.Inner;
+			BorderAlpha = 0;
 
 			Width = __itemWidth;
 			Height = __itemHeight;
@@ -139,16 +139,16 @@ internal class LargeIconsExplorerView : ResourceExplorer
 
 		protected override bool OnHover(HoverEvent e)
 		{
-			BackgroundObject!.Alpha = 1;
-			BorderObject!.Alpha = 1;
+			BackgroundAlpha = 1;
+			BorderAlpha = 1;
 
 			return base.OnHover(e);
 		}
 
 		protected override void OnHoverLost(HoverLostEvent e)
 		{
-			BackgroundObject!.Alpha = 0;
-			BorderObject!.Alpha = 0;
+			BackgroundAlpha = 0;
+			BorderAlpha = 0;
 
 			base.OnHoverLost(e);
 		}

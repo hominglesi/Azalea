@@ -143,7 +143,7 @@ public partial class Composition : GameObject
 		return index;
 	}
 
-	internal virtual bool RemoveInternal(GameObject gameObject)
+	public virtual bool RemoveInternal(GameObject gameObject)
 	{
 		ArgumentNullException.ThrowIfNull(gameObject);
 

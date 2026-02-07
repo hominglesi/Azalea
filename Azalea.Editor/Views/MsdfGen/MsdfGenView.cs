@@ -27,7 +27,7 @@ internal class MsdfGenView : Composition
 		{
 			Direction = FlexDirection.Vertical,
 			RelativeSizeAxes = Axes.Both,
-			Padding = new(20),
+			Padding = new(26),
 			Children = [
 				new LabelControl(){
 					Text = "Input font:",

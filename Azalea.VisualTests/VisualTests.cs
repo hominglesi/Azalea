@@ -5,7 +5,6 @@ using Azalea.Design.Shapes;
 using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
-using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
@@ -36,7 +35,7 @@ public class VisualTests : AzaleaGame
 
 		_testSelectScene = new TestSelectScene(_tests);
 
-		Renderer.ClearColor = Palette.Flowers.Azalea;
+		BackgroundColor = new Color(40, 51, 60);
 
 		var selectedTest = Config.Get(__currentSceneKey);
 		if (selectedTest is null || _tests.Contains(selectedTest) == false)
@@ -58,7 +57,6 @@ public class VisualTests : AzaleaGame
 		if (currentScene == null || currentScene != _testSelectScene)
 		{
 			SceneManager.ChangeScene(_testSelectScene);
-			Renderer.ClearColor = new Color(40, 51, 60);
 			Window.ClientSize = new(1600, 900);
 			Window.Center();
 		}

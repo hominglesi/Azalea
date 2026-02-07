@@ -8,6 +8,7 @@ using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.IO.Resources;
+using System.Diagnostics;
 
 namespace Azalea.Editor;
 
@@ -20,11 +21,11 @@ public class EditorWrapper : AzaleaGame
 	public EditorWrapper(AzaleaGame? wrappedGame)
 	{
 		_wrappedGame = wrappedGame;
-		SceneManager.ChangeScene(null);
 
 		Add(_mainContainer = new BasicDockingContainer()
 		{
-			RelativeSizeAxes = Axes.Both
+			RelativeSizeAxes = Axes.Both,
+			ContentPadding = 0
 		});
 		_mainContainer.ContentBackground.Color = Palette.White;
 
@@ -41,6 +42,29 @@ public class EditorWrapper : AzaleaGame
 		{
 			RelativeSizeAxes = Axes.Both
 		});
+	}
+
+	bool _sceneContainerHandedOver = false;
+
+	protected override void Update()
+	{
+		if (_sceneContainerHandedOver == false && _wrappedGame is not null)
+		{
+			GameObject? sceneContainer = null;
+
+			foreach (var child in InternalChildren)
+				if (child is SceneContainer)
+				{
+					sceneContainer = child;
+					break;
+				}
+
+			Debug.Assert(sceneContainer is not null);
+
+			RemoveInternal(sceneContainer);
+			_wrappedGame.AddInternal(sceneContainer);
+			_sceneContainerHandedOver = true;
+		}
 	}
 
 	private class MissingGameDisplay : Composition

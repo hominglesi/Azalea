@@ -65,7 +65,7 @@ public class FileInputControl : AbstractFileInput
 			//HoveredColor = new Color(221, 224, 227);
 			// We keep the hovered color the same since opening the file
 			// dialog is not supported
-			HoveredColor = BackgroundColor;
+			HoveredColor = BackgroundColor.Value;
 			RelativeSizeAxes = Axes.Y;
 			BorderColor = new Color(206, 212, 218);
 			BorderThickness = 1;
