@@ -5,7 +5,9 @@ using Azalea.Design.UserInterface.Basic;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
+using System;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 
 namespace Azalea.Editor.Views.MsdfGen;
@@ -54,43 +56,44 @@ internal class MsdfGenView : Composition
 				},
 				new LabelControl(){
 					Text = "Character set:",
-					Depth = 3
+					Depth = 6
 				},
 				_characterSetControl = new TextBoxControl(){
-					Text = "[0x21, 0x7A]"
+					Text = "[0x21, 0x7A]",
+					Depth = 7,
 				},
 				new FormTextControl(){
 					Text = "A comma separated list like: 'A', 'B', \"ABC\", ['A', 'Z'], [65, 90]; or [0x21, 0x7A] for all ASCII characters and [0x0, 0xFFFF] for all characters",
-					Depth = 5
+					Depth = 8
 				},
 				new LabelControl(){
 					Text = $"Mode:",
-					Depth = 6
+					Depth = 9
 				},
 				_modeControl = new DropDownMenuControl(){
 					RelativeSizeAxes = Axes.None,
 					Width = 300,
 					Values = ["Hardmask", "Softmask", "Sdf", "Pdsf", "Msdf", "Mtsdf"],
 					SelectedValue = "Msdf",
-					Depth = 7
+					Depth = 10
 				},
 				new LabelControl(){
 					Text = $"Size: {_size}",
-					Depth = 8
+					Depth = 11
 				},
 				new ButtonControl(){
 					Text = "Generate",
 					ClickAction = _ => generate(_fontInputControl.SelectedPath,
 						_outputDirectoryControl.SelectedPath, _size, _modeControl.SelectedValue),
 					Margin = new(16, 0, 16, 0),
-					Depth = 9
+					Depth = 12
 				},
 				_outputTextContainer = new FlexContainer(){
 					RelativeSizeAxes = Axes.X,
 					AutoSizeAxes = Axes.Y,
 					Margin = new(16, 0, 0, 0),
 					Direction = FlexDirection.Vertical,
-					Depth = 10
+					Depth = 13
 				}
 			]
 		});
@@ -211,7 +214,7 @@ internal class MsdfGenView : Composition
 		{
 			StartInfo = new()
 			{
-				FileName = @"bin\msdf-gen.exe",
+				FileName = @"bin\msdf-atlas-gen.exe",
 				Arguments = args.ToString(),
 				UseShellExecute = false,
 				RedirectStandardOutput = true,
@@ -314,12 +317,13 @@ internal class MsdfGenView : Composition
 			})
 		{
 			Height = ControlConstants.InputControlHeight;
-			Width = 500;
+			Width = 700;
 			BorderColor = ControlConstants.DarkControlColor;
 			BorderThickness = 1;
 			Alignment = FlexAlignment.Center;
 			Wrapping = FlexWrapping.NoWrapping;
 			CaratColor = ControlConstants.DarkTextColor;
+			Padding = 10;
 		}
 	}
 }
