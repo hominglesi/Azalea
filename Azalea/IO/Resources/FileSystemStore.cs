@@ -14,4 +14,39 @@ public class FileSystemStore : IResourceStore
 	{
 		throw new Exception("Cannot list all file system resources");
 	}
+
+	public IEnumerable<string> GetItems(string path = "")
+	{
+		if (path == "")
+		{
+			foreach (var drive in DriveInfo.GetDrives())
+			{
+				if (drive.IsReady)
+					yield return drive.Name;
+			}
+		}
+		else
+		{
+			var directoryInfo = new DirectoryInfo(path);
+			bool readable = true;
+
+			try
+			{
+				directoryInfo.EnumerateFiles();
+			}
+			catch (UnauthorizedAccessException)
+			{
+				readable = false;
+			}
+
+			if (readable)
+			{
+				foreach (var directory in directoryInfo.EnumerateDirectories())
+					yield return $"{directory.FullName}\\";
+
+				foreach (var file in directoryInfo.EnumerateFiles())
+					yield return file.FullName;
+			}
+		}
+	}
 }

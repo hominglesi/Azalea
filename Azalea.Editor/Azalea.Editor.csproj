@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Title>$(AssemblyName)</Title>
+    <Version>1.0.0</Version>
+    <Authors>hominglesi</Authors>
+    <Company>Azalea</Company>
+    <Description>An editor wrapper for Azalea projects.</Description>
+    <PackageIcon>azalea-icon.png</PackageIcon>
+    <PackageIconUrl>https://i.imgur.com/UPsEzXU.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/hominglesi/Azalea</RepositoryUrl>
+    <PackageReleaseNotes>https://github.com/hominglesi/Azalea/releases</PackageReleaseNotes>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageId>$(AssemblyName)</PackageId>
+    <DebugSymbols>true</DebugSymbols>
+    <EmbedAllSources>true</EmbedAllSources>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Azalea\Azalea.csproj" />
+    <None Include="README.md" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Azalea\Resources\Textures\azalea-icon.png" Pack="true" PackagePath="\" Visible="false" />
+    
+  </ItemGroup>
+
+  <ItemGroup Label="FilesToCopy">
+    <Content Include="..\build\Native\msdf-atlas-gen.exe" Pack="true" PackagePath="native">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <TargetPath>bin/msdf-gen.exe</TargetPath>
+      <Visible>false</Visible>
+    </Content>
+  </ItemGroup>
+
+</Project>

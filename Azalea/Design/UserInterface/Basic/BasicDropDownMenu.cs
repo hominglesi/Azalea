@@ -1,4 +1,5 @@
 ﻿using Azalea.Design.Containers;
+using Azalea.Design.Controls;
 using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
@@ -10,7 +11,7 @@ using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Design.UserInterface.Basic;
-public class BasicDropDownMenu : DropDownMenu<string>
+public class BasicDropDownMenu : AbstractDropDownMenu<string>
 {
 	public readonly Sprite Arrow;
 	public readonly SpriteText Label;
@@ -159,16 +160,16 @@ public class BasicDropDownMenu : DropDownMenu<string>
 		return true;
 	}
 
-	public override void Contract()
+	protected override void ExpandImplementation()
 	{
-		base.Contract();
-		Arrow.Scale = Vector2.One;
+		Add(ExpandedSegment);
+		Arrow.Scale = new(1, -1);
 	}
 
-	public override void Expand()
+	protected override void ContractImplementation()
 	{
-		base.Expand();
-		Arrow.Scale = new(1, -1);
+		Remove(ExpandedSegment);
+		Arrow.Scale = Vector2.One;
 	}
 
 	public void AddOption(string name, string? value = null)
@@ -216,13 +217,18 @@ public class BasicDropDownMenu : DropDownMenu<string>
 		SelectedValue = value;
 	}
 
-	protected override DropDownExpanded CreateExpandedSegment()
+	protected override GameObject CreateExpandedSegment()
 		=> new BasicDropDownExpanded(this);
+
+	protected override void AddOptionInternal(string item) { }
+
+	protected override void RemoveOptionInternal(string item) { }
+	protected override void ClearOptionsInternal() { }
 
 	private BasicDropDownExpanded _basicExpandedSegment
 	{ get => (BasicDropDownExpanded)ExpandedSegment; }
 
-	public class BasicDropDownExpanded : DropDownExpanded
+	public class BasicDropDownExpanded : Composition
 	{
 		private BasicDropDownMenu _parentMenu;
 

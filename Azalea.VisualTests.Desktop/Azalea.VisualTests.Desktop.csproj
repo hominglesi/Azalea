@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Azalea.Editor\Azalea.Editor.csproj" />
     <ProjectReference Include="..\Azalea.VisualTests\Azalea.VisualTests.csproj" />
     <ProjectReference Include="..\Azalea\Azalea.csproj" />
   </ItemGroup>

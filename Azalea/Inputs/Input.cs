@@ -127,6 +127,7 @@ public static class Input
 		_lastHoveredObjects.AddRange(_hoveredObjects);
 
 		_hoveredObjects.Clear();
+		OverDroppableFile = false;
 
 		var positionalQueue = GetPositionalInputQueue(MousePosition);
 
@@ -134,6 +135,9 @@ public static class Input
 		{
 			_hoveredObjects.Add(obj);
 			_lastHoveredObjects.Remove(obj);
+
+			if (OverDroppableFile == false && obj.AcceptsFiles)
+				OverDroppableFile = true;
 
 			if (obj.Hovered)
 			{
@@ -297,6 +301,24 @@ public static class Input
 
 	public static IGamepad? GetGamepad(int index)
 		=> _gamepadManager!.GetGamepad(index);
+
+	#endregion
+
+	#region Files
+
+	public static bool OverDroppableFile { get; private set; } = false;
+
+	public static void ExecuteFileDropped(string[] filePaths)
+	{
+		var e = new FileDroppedEvent(filePaths);
+
+		foreach (var obj in _hoveredObjects)
+		{
+			e.Target = obj;
+			if (obj.TriggerEvent(e))
+				break;
+		}
+	}
 
 	#endregion
 

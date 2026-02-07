@@ -61,7 +61,9 @@ internal class ResourceExplorerIcons : ResourceExplorer
 					Origin = Anchor.TopCenter,
 					Y = 4,
 					Size = new(92),
-					Texture = Assets.GetTexture($"Textures/{(isDirectory ? "directory" : "file")}-icon.png")
+					Texture = Assets.MainStore.GetTexture(
+						$"Textures/{(isDirectory ? "directory" : "file")}-icon.png",
+						Graphics.Textures.TextureFiltering.Linear)
 				},
 				new SpriteTextTruncating()
 				{

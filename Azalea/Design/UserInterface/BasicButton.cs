@@ -62,13 +62,11 @@ public class BasicButton : Button
 	{
 		HoveredBackground.Alpha = 1;
 
-		return base.OnHover(e);
+		return true;
 	}
 
 	protected override void OnHoverLost(HoverLostEvent e)
 	{
 		HoveredBackground.Alpha = 0;
-
-		base.OnHoverLost(e);
 	}
 }

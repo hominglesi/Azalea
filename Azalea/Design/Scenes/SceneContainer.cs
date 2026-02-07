@@ -11,7 +11,7 @@ public class SceneContainer : Composition
 		RelativeSizeAxes = Axes.Both;
 	}
 
-	public void ChangeScene(Scene newScene)
+	public void ChangeScene(Scene? newScene)
 	{
 		if (CurrentScene == newScene)
 			return;
@@ -19,7 +19,9 @@ public class SceneContainer : Composition
 		if (CurrentScene is not null)
 			Remove(CurrentScene);
 
+		if (newScene is not null)
+			Add(newScene);
+
 		CurrentScene = newScene;
-		Add(CurrentScene);
 	}
 }
