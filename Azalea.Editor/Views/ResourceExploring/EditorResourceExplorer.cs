@@ -6,6 +6,7 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
+using System;
 
 namespace Azalea.Editor.Views.ResourceExploring;
 public class EditorResourceExplorer : Composition

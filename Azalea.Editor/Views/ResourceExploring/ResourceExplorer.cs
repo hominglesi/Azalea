@@ -1,5 +1,7 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.IO.Resources;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
