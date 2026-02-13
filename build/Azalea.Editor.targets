@@ -1,8 +1,0 @@
-<Project>
-  <ItemGroup>
-    <MsdfGen Include="$(MSBuildThisFileDirectory)\..\native\msdf-atlas-gen.exe" />
-  </ItemGroup>
-  <Target Name="CopyMsdfGen" BeforeTargets="Build">
-    <Copy SourceFiles="@(MsdfGen)" DestinationFolder="$(TargetDir)\bin\" />
-  </Target>
-</Project>

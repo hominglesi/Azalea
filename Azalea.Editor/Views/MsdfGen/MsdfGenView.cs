@@ -214,7 +214,7 @@ internal class MsdfGenView : Composition
 		{
 			StartInfo = new()
 			{
-				FileName = @"bin\msdf-atlas-gen.exe",
+				FileName = @"msdf-atlas-gen.exe",
 				Arguments = args.ToString(),
 				UseShellExecute = false,
 				RedirectStandardOutput = true,

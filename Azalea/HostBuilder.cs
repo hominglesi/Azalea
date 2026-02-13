@@ -23,6 +23,15 @@ public class HostBuilder
 			return (GameHost)Activator.CreateInstance(webHostType, bindingFlags, null, arguments, null)!;
 		}
 
+		if (NativeLibrary.TryLoad("soft_oal", out var _) == false)
+		{
+			throw new Exception("Native binaries could not be loaded!\n" +
+				"If you are a developer make sure to specify a RuntimeIdentifier in the project. " +
+				"Valid runtimes are: 'win-x64'.\n" +
+				"If you are a user and have moved the executable file " +
+				"make sure to move all the other files with it.");
+		}
+
 		return new DesktopGameHost(_preferences);
 	}
 

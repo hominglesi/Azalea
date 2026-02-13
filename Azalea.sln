@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azalea.Editor", "Azalea.Edi
 		{38689BE4-5B41-4D24-A581-1BC302DF0D85} = {38689BE4-5B41-4D24-A581-1BC302DF0D85}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azalea.NativeLibraries", "Azalea.NativeLibraries\Azalea.NativeLibraries.csproj", "{17B30B8F-5CF5-4DDC-8711-10ABD9C8705C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -113,6 +115,14 @@ Global
 		{32ECC318-B417-47B2-8A32-ED7505758D67}.Release|Any CPU.Build.0 = Release|Any CPU
 		{32ECC318-B417-47B2-8A32-ED7505758D67}.Release|x64.ActiveCfg = Release|Any CPU
 		{32ECC318-B417-47B2-8A32-ED7505758D67}.Release|x64.Build.0 = Release|Any CPU
+		{17B30B8F-5CF5-4DDC-8711-10ABD9C8705C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17B30B8F-5CF5-4DDC-8711-10ABD9C8705C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17B30B8F-5CF5-4DDC-8711-10ABD9C8705C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{17B30B8F-5CF5-4DDC-8711-10ABD9C8705C}.Debug|x64.Build.0 = Debug|Any CPU
+		{17B30B8F-5CF5-4DDC-8711-10ABD9C8705C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17B30B8F-5CF5-4DDC-8711-10ABD9C8705C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17B30B8F-5CF5-4DDC-8711-10ABD9C8705C}.Release|x64.ActiveCfg = Release|Any CPU
+		{17B30B8F-5CF5-4DDC-8711-10ABD9C8705C}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

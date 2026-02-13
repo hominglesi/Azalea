@@ -5,35 +5,28 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Title>$(AssemblyName)</Title>
-    <Version>1.0.2</Version>
+    <Version>1.0.0</Version>
     <Authors>hominglesi</Authors>
     <Company>Azalea</Company>
-    <Description>An editor wrapper for Azalea projects.</Description>
+    <Description>Native libraries used in Azalea projects.</Description>
     <PackageIcon>azalea-icon.png</PackageIcon>
     <PackageIconUrl>https://i.imgur.com/UPsEzXU.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/hominglesi/Azalea</RepositoryUrl>
     <PackageReleaseNotes>https://github.com/hominglesi/Azalea/releases</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageId>$(AssemblyName)</PackageId>
-    <DebugSymbols>true</DebugSymbols>
-    <EmbedAllSources>true</EmbedAllSources>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Azalea\Azalea.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\Azalea\Resources\Textures\azalea-icon.png" Visible="false" Pack="true" PackagePath="\" />
-    <None Include="README.md" Visible="false" Pack="true" PackagePath="\" />
+    <None Include="..\Azalea\Resources\Textures\azalea-icon.png" Visible="false" Pack="true" PackagePath="\"  />
+    <None Include="README.md" Visible="false" Pack="true" PackagePath="\"  />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="runtimes\**\*"
-          Pack="true"
-          PackagePath="%(Identity)"
-          CopyToOutputDirectory="PreserveNewest"
+          Pack="true" 
+          PackagePath="%(Identity)" 
+          CopyToOutputDirectory="PreserveNewest" 
           TargetPath="%(Filename)%(Extension)" />
   </ItemGroup>
 

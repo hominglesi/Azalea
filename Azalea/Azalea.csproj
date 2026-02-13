@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Title>$(AssemblyName)</Title>
-    <Version>1.6-alpha08</Version>
+    <Version>1.6.0</Version>
     <Authors>hominglesi</Authors>
     <Company>Azalea</Company>
     <Description>A lightweight 2D game framework.</Description>
@@ -24,27 +24,19 @@
   <ItemGroup>
     <PackageReference Include="FFmpeg.AutoGen" Version="8.0.0" />
     <PackageReference Include="StbImageSharp" Version="2.30.15" />
-    <PackageReference Include="System.Runtime.InteropServices" Version="4.1.0" />
-  </ItemGroup>
-	
-	<ItemGroup>
-    <EmbeddedResource Include="Resources\**\*"/>
-    <EmbeddedResource Remove="**\__*" />
-    <None Include="Resources\Textures\azalea-icon.png" Pack="true" PackagePath="\" />
-    <None Include="../README.md" Pack="true" PackagePath="\" Visible="false" />
   </ItemGroup>
 
-  <ItemGroup Label="FilesToCopy">
-    <Content Include="..\build\Azalea.targets" PackagePath="build\Azalea.targets" Visible="false" />
-    <Content Include="..\build\Native\soft_oal.dll" Pack="true" PackagePath="native">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-      <Visible>false</Visible>
-    </Content>
-    <Content Include="..\build\Native\ffmpeg\*" Pack="true" PackagePath="native\ffmpeg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-      <Visible>false</Visible>
-    </Content>
+  <ItemGroup>
+    <ProjectReference Include="..\Azalea.NativeLibraries\Azalea.NativeLibraries.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Resources\Textures\azalea-icon.png" Pack="true" PackagePath="\" />
+    <None Include="../README.md" Visible="false" Pack="true" PackagePath="\"  />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\**\*"/>
+    <EmbeddedResource Remove="**\__*" />
   </ItemGroup>
 </Project>
