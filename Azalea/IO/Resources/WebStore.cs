@@ -28,7 +28,10 @@ internal class WebStore : IResourceStore
 		// would still break because we assume all streams are seekable
 		// return _client.GetStreamAsync(path).GetAwaiter().GetResult();
 
-		var data = _client.GetByteArrayAsync(path).GetAwaiter().GetResult();
+		byte[]? data = null;
+
+		try { data = _client.GetByteArrayAsync(path).GetAwaiter().GetResult(); }
+		catch (Exception) { return null; }
 
 		return new MemoryStream(data);
 	}

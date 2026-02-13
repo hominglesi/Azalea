@@ -284,6 +284,8 @@ public partial class Composition : GameObject
 
 	public override void Draw(IRenderer renderer)
 	{
+		DrawBackground(renderer);
+
 		if (Masking)
 		{
 			var newScissor = (RectangleInt)ScreenSpaceDrawQuad;
@@ -297,15 +299,13 @@ public partial class Composition : GameObject
 			renderer.PushScissor(newScissor);
 		}
 
-		DrawBackground(renderer);
-
 		foreach (var child in _internalChildren)
 			child.Draw(renderer);
 
-		DrawForeground(renderer);
-
 		if (Masking)
 			renderer.PopScissor();
+
+		DrawForeground(renderer);
 	}
 
 	private Boundary _padding;

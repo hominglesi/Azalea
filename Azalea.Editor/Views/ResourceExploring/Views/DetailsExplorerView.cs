@@ -7,6 +7,7 @@ using Azalea.Graphics.Textures;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
+using System.Collections.Generic;
 
 namespace Azalea.Editor.Views.ResourceExploring.Views;
 internal class DetailsExplorerView : ResourceExplorer
