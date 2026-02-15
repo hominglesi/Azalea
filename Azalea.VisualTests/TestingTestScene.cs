@@ -39,6 +39,7 @@ public class TestingTestScene : TestScene
 		"https://coverartarchive.org/release/057d7de3-acfa-4c17-9b83-1788254811b1/front-250",
 		"https://f4.bcbits.com/img/a4181301446_10.jpg",
 		"https://f4.bcbits.com/img/a0566082153_10.jpg",
+		"https://f4.bcbits.com/img/a0566082154_10.jpg"
 		];
 
 
@@ -59,18 +60,11 @@ public class TestingTestScene : TestScene
 		{
 			var sprite = new Sprite()
 			{
-				Size = new(250)
+				Size = new(250),
+				Texture = Assets.WebStore.GetTextureAsync(imageURL)
 			};
 
 			container.Add(sprite);
-
-			Assets.WebStore.GetTexturePromise(imageURL).Then(texture =>
-			{
-				if (texture == Assets.MissingTexture)
-					Console.WriteLine("Texture returned null");
-				else
-					sprite.Texture = texture;
-			});
 		}
 
 		Console.WriteLine("gas");
@@ -291,13 +285,10 @@ public class TestingTestScene : TestScene
 		});
 	}
 
-
-
 	private float _elapsedTime = 0;
 	protected override void Update()
 	{
 		_sprite.Position += Input.GetDirectionalMovement() * Time.DeltaTime * 200;
-
 
 		/*
 		_elapsedTime += Time.DeltaTime;

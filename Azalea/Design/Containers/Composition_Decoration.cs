@@ -1,5 +1,4 @@
-﻿using Azalea.Design.Shapes;
-using Azalea.Graphics;
+﻿using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Rendering;
 
@@ -17,7 +16,7 @@ public partial class Composition
 				.MultiplyAlpha(BackgroundAlpha)
 				.MultiplyAlpha(Alpha));
 
-			renderer.DrawQuad(renderer.WhitePixel, ScreenSpaceDrawQuad, colorInfo);
+			renderer.DrawQuad(renderer.WhitePixel.GetNativeTexture(), ScreenSpaceDrawQuad, colorInfo);
 		}
 	}
 

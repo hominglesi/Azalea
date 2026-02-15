@@ -277,6 +277,9 @@ internal static unsafe class GL
 	private static GetShaderivDelegate? _glGetShaderiv;
 	public static void GetShaderiv(uint shader, GLParameterName name, int* args) => _glGetShaderiv!(shader, name, args);
 
+	private delegate void GetShaderInfoLogDelegate(uint shader, int maxLength, out int length, StringBuilder infoLog);
+	private static GetShaderInfoLogDelegate? _glGetShaderInfoLog;
+	public static void GetShaderInfoLog(uint shader, int maxLength, out int length, StringBuilder infoLog) => _glGetShaderInfoLog!(shader, maxLength, out length, infoLog);
 
 	private delegate void GetProgramivDelegate(uint program, GLParameterName name, int* args);
 	private static GetProgramivDelegate? _glGetProgramiv;
@@ -314,6 +317,20 @@ internal static unsafe class GL
 	{
 		fixed (int* p = array)
 			_glUniform1iv!(location, array.Length, p);
+	}
+
+	private delegate void Uniform1fDelegate(int location, float v);
+	private static Uniform1fDelegate? _glUniform1f;
+	public static void Uniform1f(int location, float v)
+	{
+		_glUniform1f!(location, v);
+	}
+
+	private delegate void Uniform2fDelegate(int location, float v0, float v1);
+	private static Uniform2fDelegate? _glUniform2f;
+	public static void Uniform2f(int location, float v0, float v1)
+	{
+		_glUniform2f!(location, v0, v1);
 	}
 
 	private delegate void Uniform4fDelegate(int location, float v0, float v1, float v2, float v3);
@@ -386,11 +403,14 @@ internal static unsafe class GL
 		_glDeleteShader = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glDeleteShader"));
 		_glDeleteProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glDeleteProgram"));
 		_glGetShaderiv = Marshal.GetDelegateForFunctionPointer<GetShaderivDelegate>(wglGetProcAddress("glGetShaderiv"));
+		_glGetShaderInfoLog = Marshal.GetDelegateForFunctionPointer<GetShaderInfoLogDelegate>(wglGetProcAddress("glGetShaderInfoLog"));
 		_glGetProgramiv = Marshal.GetDelegateForFunctionPointer<GetProgramivDelegate>(wglGetProcAddress("glGetProgramiv"));
 		_glUseProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glUseProgram"));
 		_glGetUniformLocation = Marshal.GetDelegateForFunctionPointer<GetUniformLocationDelegate>(wglGetProcAddress("glGetUniformLocation"));
 		_glUniform1i = Marshal.GetDelegateForFunctionPointer<Uniform1iDelegate>(wglGetProcAddress("glUniform1i"));
 		_glUniform1iv = Marshal.GetDelegateForFunctionPointer<Uniform1ivDelegate>(wglGetProcAddress("glUniform1iv"));
+		_glUniform1f = Marshal.GetDelegateForFunctionPointer<Uniform1fDelegate>(wglGetProcAddress("glUniform1f"));
+		_glUniform2f = Marshal.GetDelegateForFunctionPointer<Uniform2fDelegate>(wglGetProcAddress("glUniform2f"));
 		_glUniform4f = Marshal.GetDelegateForFunctionPointer<Uniform4fDelegate>(wglGetProcAddress("glUniform4f"));
 		_glUniformMatrix4fv = Marshal.GetDelegateForFunctionPointer<UniformMatrix4fvDelegate>(wglGetProcAddress("glUniformMatrix4fv"));
 		_glDeleteBuffers = Marshal.GetDelegateForFunctionPointer<DeleteBuffersDelegate>(wglGetProcAddress("glDeleteBuffers"));

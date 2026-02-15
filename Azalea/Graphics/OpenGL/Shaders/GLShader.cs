@@ -5,7 +5,6 @@ using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Azalea.Graphics.OpenGL.Shaders;
@@ -45,14 +44,12 @@ public class GLShader : Disposable, INativeShader
 			{
 				int length;
 				GL.GetShaderiv(id, GLParameterName.InfoLogLength, &length);
-				Console.WriteLine(length);
 
-				var str = new StringBuilder(length);
-				for (int i = 0; i < length; i++)
-				{
-					str.Append((char)Marshal.ReadByte(result, i));
-				}
-				Console.WriteLine(str);
+				var infoLog = new StringBuilder(length);
+
+				GL.GetShaderInfoLog(id, length, out _, infoLog);
+
+				Console.WriteLine(infoLog);
 				GL.DeleteShader(id);
 				return 0;
 			}
@@ -74,6 +71,18 @@ public class GLShader : Disposable, INativeShader
 	{
 		Bind();
 		GL.Uniform1iv(getUniformLocation(name), array);
+	}
+
+	public void SetUniform(string name, float f)
+	{
+		Bind();
+		GL.Uniform1f(getUniformLocation(name), f);
+	}
+
+	public void SetUniform(string name, float f0, float f1)
+	{
+		Bind();
+		GL.Uniform2f(getUniformLocation(name), f0, f1);
 	}
 
 	public void SetUniform(string name, float f0, float f1, float f2, float f3)
@@ -102,7 +111,8 @@ public class GLShader : Disposable, INativeShader
 
 		Bind();
 		var location = GL.GetUniformLocation(_handle, name);
-		if (location == -1) Console.WriteLine($"Uniform with name '{name}' was not found.");
+		//if (location == -1)
+		//	Console.WriteLine($"Uniform with name '{name}' was not found.");
 
 		_uniformLocations.Add(name, location);
 		return location;

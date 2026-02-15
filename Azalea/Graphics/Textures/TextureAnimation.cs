@@ -1,74 +1,78 @@
 ﻿using Azalea.IO.Resources;
+using Azalea.Numerics;
+using System;
 using System.Collections.Generic;
 
 namespace Azalea.Graphics.Textures;
-public class TextureAnimation : Texture
+public class TextureAnimation : ITexture
 {
-	private Texture? _firstTexture;
-	internal override INativeTexture NativeTexture
-		=> _firstTexture is null ? Assets.MissingTexture.NativeTexture : _firstTexture.NativeTexture;
-	public override int Width
-		=> _firstTexture is null ? Assets.MissingTexture.Width : _firstTexture.Width;
+	private readonly List<(ITexture, float)> _frames = [];
+	private float _totalDuration;
 
-	public override int Height
-		=> _firstTexture is null ? Assets.MissingTexture.Height : _firstTexture.Height;
+	public TextureAnimation() { }
 
-	public TextureAnimation()
-		: base(Assets.MissingTexture.NativeTexture)
+	public TextureAnimation(IEnumerable<ITexture> frames, float duration)
+		=> AddFrames(frames, duration);
+
+	public INativeTexture GetNativeTexture(float time)
 	{
+		if (_frames.Count == 0)
+			return Assets.MissingTexture.GetNativeTexture();
 
-	}
-
-	public TextureAnimation(IEnumerable<Texture> frames, float duration)
-		: base(Assets.MissingTexture.NativeTexture)
-	{
-		AddFrames(frames, duration);
-	}
-
-	private List<KeyValuePair<Texture, float>> _frames = new();
-	private float _duration;
-
-	public Texture GetTextureAtTime(float time)
-	{
-		if (_frames.Count == 0) return Assets.MissingTexture;
-
-		time %= _duration;
+		time %= _totalDuration;
 		float counter = 0;
 
-		foreach (var pair in _frames)
+		foreach (var (frame, frameDuration) in _frames)
 		{
-			if (time < pair.Value + counter)
-			{
-				return pair.Key;
-			}
+			if (time < counter + frameDuration)
+				return frame.GetNativeTexture(time - counter);
 
-			counter += pair.Value;
+			counter += frameDuration;
 		}
 
-		return Assets.MissingTexture;
+		return Assets.MissingTexture.GetNativeTexture();
 	}
 
-	public void AddFrame(Texture texture, float time)
+	public Rectangle GetUVCoordinates(float time)
 	{
-		_frames.Add(new(texture, time));
-		_duration += time;
+		if (_frames.Count == 0)
+			return Assets.MissingTexture.GetUVCoordinates(time);
 
-		_firstTexture ??= texture;
+		time %= _totalDuration;
+		float counter = 0;
+
+		foreach (var (frame, frameDuration) in _frames)
+		{
+			if (time < counter + frameDuration)
+				return frame.GetUVCoordinates(time - counter);
+
+			counter += frameDuration;
+		}
+
+		return Assets.MissingTexture.GetUVCoordinates(time);
 	}
 
-	public void AddFrames(IEnumerable<Texture> textures, float time)
+	public void UploadImage(Image image)
+	{
+		throw new Exception("Cannot upload Image to TextureAnimation! " +
+			"Upload images to the individual Textures instead.");
+	}
+
+	public void SetFiltering(TextureFiltering minFilter, TextureFiltering magFilter)
+	{
+		throw new Exception("Cannot set filtering of TextureAnimation! " +
+			"Set the filtering of the individual Textures instead.");
+	}
+
+	public void AddFrame(ITexture texture, float time)
+	{
+		_frames.Add((texture, time));
+		_totalDuration += time;
+	}
+
+	public void AddFrames(IEnumerable<ITexture> textures, float time)
 	{
 		foreach (var texture in textures)
-		{
 			AddFrame(texture, time);
-		}
-	}
-
-	// TODO: Since the texture passed to the TextureAnimation is a Texture itself
-	// both will try to dispose the texture. The TextureAnimation probably shouldn't
-	// inherit from Texture
-	protected override void OnDispose()
-	{
-
 	}
 }

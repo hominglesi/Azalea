@@ -8,11 +8,11 @@ using System.Text.RegularExpressions;
 namespace Azalea.Text;
 public class MsdfFontData
 {
-	private Texture _spriteSheet;
+	private ITexture _spriteSheet;
 
 	private Dictionary<char, Character> _characters;
 
-	public MsdfFontData(string csvData, Texture spriteSheet)
+	public MsdfFontData(string csvData, ITexture spriteSheet)
 	{
 		_spriteSheet = spriteSheet;
 
@@ -62,8 +62,10 @@ public class MsdfFontData
 		// never be used
 		if (character._texture is null)
 		{
-			character._texture = new TextureRegion(_spriteSheet,
-				new RectangleInt(character.Position, character.Size));
+			character._texture = new Texture(_spriteSheet)
+			{
+				Region = new RectangleInt(character.Position, character.Size)
+			};
 
 			_characters[charCode] = character;
 		}
@@ -84,7 +86,7 @@ public class MsdfFontData
 		public readonly Vector2Int Position = position;
 		public readonly Vector2Int Size = size;
 
-		internal TextureRegion? _texture;
-		public readonly TextureRegion Texture => _texture!;
+		internal Texture? _texture;
+		public readonly Texture Texture => _texture!;
 	}
 }

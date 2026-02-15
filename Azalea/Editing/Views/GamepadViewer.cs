@@ -301,6 +301,6 @@ internal class GamepadViewer : Composition
 		}
 	}
 
-	private static Texture getTexture(string name)
+	private static ITexture getTexture(string name)
 		=> Assets.GetTexture("Textures/Editing/GamepadViewer/" + name);
 }

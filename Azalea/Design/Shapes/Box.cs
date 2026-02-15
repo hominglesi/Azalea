@@ -12,7 +12,7 @@ public class Box : Sprite
 		base.Texture = Renderer.WhitePixel;
 	}
 
-	public override Texture? Texture
+	public override ITexture Texture
 	{
 		get => base.Texture;
 		set => throw new InvalidOperationException($"The texture of a {nameof(Box)} cannot be set");

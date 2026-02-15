@@ -52,9 +52,10 @@ public class TiledLayer : GameObject
 				var quad = new Quad(startPosition + offset - allowedPadding, tileSize * sizeRatio + allowedPadding);
 
 				renderer.DrawQuad(
-					texture,
+					texture.GetNativeTexture(),
 					quad,
-					DrawColorInfo);
+					DrawColorInfo,
+					texture.GetUVCoordinates());
 			}
 		}
 	}

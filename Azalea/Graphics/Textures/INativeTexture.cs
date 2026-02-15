@@ -3,7 +3,7 @@ using System;
 
 namespace Azalea.Graphics.Textures;
 
-internal interface INativeTexture : IDisposable
+public interface INativeTexture : IDisposable
 {
 	IRenderer Renderer { get; }
 	int Width { get; }

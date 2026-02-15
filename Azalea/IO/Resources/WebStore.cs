@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 
 namespace Azalea.IO.Resources;
 internal class WebStore : IResourceStore
@@ -11,6 +12,9 @@ internal class WebStore : IResourceStore
 
 	static WebStore()
 	{
+		ServicePointManager.SecurityProtocol
+			= SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+
 		_client = new HttpClient(new SocketsHttpHandler()
 		{
 			MaxConnectionsPerServer = 10,
@@ -30,12 +34,28 @@ internal class WebStore : IResourceStore
 		// would still break because we assume all streams are seekable
 		// return _client.GetStreamAsync(path).GetAwaiter().GetResult();
 
-		byte[]? data = null;
+		for (int i = 0; i < 3; i++)
+		{
+			byte[]? data = null;
 
-		try { data = _client.GetByteArrayAsync(path).GetAwaiter().GetResult(); }
-		catch (Exception) { return null; }
+			try { data = _client.GetByteArrayAsync(path).GetAwaiter().GetResult(); }
+			catch (HttpRequestException e)
+			{
+				if (e.StatusCode == HttpStatusCode.NotFound)
+					return null;
 
-		return new MemoryStream(data);
+				Thread.Sleep(100 * i);
+				continue;
+			}
+			catch (Exception) { return null; }
+
+			if (data is null)
+				return null;
+
+			return new MemoryStream(data);
+		}
+
+		return null;
 	}
 
 	public IEnumerable<(string, bool)> GetAvalibleResources(string subPath = "")

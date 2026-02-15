@@ -114,7 +114,7 @@ internal class DetailsExplorerView : ResourceExplorer
 			];
 		}
 
-		private static Texture getIcon(bool isDirectory)
+		private static ITexture getIcon(bool isDirectory)
 			=> Assets.GetTexture($"Textures/{(isDirectory ? "directory" : "file")}-icon-small.png");
 
 		public void SetPath(string path, bool isDirectory)

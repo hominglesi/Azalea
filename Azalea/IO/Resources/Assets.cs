@@ -73,7 +73,7 @@ public static partial class Assets
 	/// <summary>
 	/// Returned texture used when a requested texture doesn't exist.
 	/// </summary>
-	public static Texture MissingTexture => GetTexture("Textures/missing-texture.png");
+	public static ITexture MissingTexture => GetTexture("Textures/missing-texture.png");
 
 	/// <summary>
 	/// Makes a resource store available for use from the main resource store.
@@ -88,7 +88,12 @@ public static partial class Assets
 	/// <summary>
 	/// Gets a texture from the main resource store.
 	/// </summary>
-	public static Texture GetTexture(string path) => MainStore.GetTexture(path);
+	public static ITexture GetTexture(string path) => MainStore.GetTexture(path);
+
+	/// <summary>
+	/// Gets a texture promise from the main resource store.
+	/// </summary>
+	public static PromisedTexture GetTextureAsync(string path) => MainStore.GetTextureAsync(path);
 
 	/// <summary>
 	/// Gets text from the main resource store.

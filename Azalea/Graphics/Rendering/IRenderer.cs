@@ -17,7 +17,7 @@ public interface IRenderer
 	internal IVertexBatch<TexturedVertex2D> DefaultQuadBatch { get; }
 	public Shader DefaultQuadShader { get; }
 	internal INativeShader? ActiveShader { get; }
-	public Texture WhitePixel { get; }
+	public ITexture WhitePixel { get; }
 
 	internal void Initialize();
 
@@ -29,7 +29,7 @@ public interface IRenderer
 
 	internal IVertexBatch CreateQuadBatch(int size);
 	internal Texture CreateTexture(Image image);
-	internal bool BindTexture(Texture texture, int unit = 0);
+	internal bool BindTexture(INativeTexture texture, int unit = 0);
 
 	internal Shader CreateShader(string vertexCode, string fragmentCode);
 	public void BindShader(Shader shader);

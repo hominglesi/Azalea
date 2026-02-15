@@ -19,7 +19,7 @@ public readonly struct Tileset
 	public int Spacing { get; init; }
 	public int Margin { get; init; }
 	public Texture Source { get; init; }
-	public Texture[] Tiles { get; init; }
+	public ITexture[] Tiles { get; init; }
 
 	public static Tileset Load(IResourceStore store, string path)
 	{
@@ -46,7 +46,7 @@ public readonly struct Tileset
 		{
 			var image = imageNodes[i]!;
 			var imagePath = image.GetAttribute("source");
-			var imageData = store.GetImage(PathUtils.CombinePaths(Path.GetDirectoryName(path)!, imagePath));
+			var imageData = store.GetImage(PathUtils.CombinePaths(Path.GetDirectoryName(path)!, imagePath))!;
 
 			sources[i] = imageData;
 		}
@@ -141,7 +141,10 @@ public readonly struct Tileset
 		textureSeeker = Vector2Int.Zero;
 		for (int i = 0; i < tiles.Length; i++)
 		{
-			tiles[i] = new TextureRegion(atlasTexture, new RectangleInt(textureSeeker + Vector2Int.One, tileSize));
+			tiles[i] = new Texture(atlasTexture)
+			{
+				Region = new RectangleInt(textureSeeker + Vector2Int.One, tileSize)
+			};
 
 			textureSeeker.X += paddedSize.X;
 			if (textureSeeker.X + paddedSize.X > textureSize.X)

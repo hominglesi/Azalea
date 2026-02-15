@@ -48,6 +48,8 @@ public static partial class ResourceStoreExtentions
 			_imageCache.AddValue(store, path, image);
 		});
 
+		_imagePromiseCache.AddValue(store, path, promise);
+
 		return promise;
 	}
 }

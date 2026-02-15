@@ -109,7 +109,7 @@ internal class TextLayoutProvider()
 	public struct Character
 	{
 		public char RepresentedCharacter;
-		public Texture Texture;
+		public ITexture Texture;
 
 		public Rectangle DrawRectangle;
 	}

@@ -25,49 +25,48 @@ public static class RendererExtentions
 		return false;
 	}
 
-	public static void DrawQuad(this IRenderer renderer, Texture texture, Quad vertexQuad, DrawColorInfo drawColorInfo, Rectangle? customUV = null)
+	public static void DrawQuad(this IRenderer renderer, INativeTexture texture, Quad vertexQuad, DrawColorInfo drawColorInfo, Rectangle? textureRegion = null)
 	{
 		if (ClientContainsQuad(vertexQuad) == false)
 			return;
 
 		renderer.BindTexture(texture);
 
+		var textureUV = textureRegion ?? Rectangle.One;
 		var vertexAction = renderer.DefaultQuadBatch.AddAction;
-
-		var textureRegion = customUV ?? texture.GetUVCoordinates();
 
 		vertexAction(new TexturedVertex2D
 		{
 			Position = vertexQuad.BottomLeft,
 			Color = drawColorInfo.Color.BottomLeft,
-			TexturePosition = textureRegion.BottomLeft
+			TexturePosition = textureUV.BottomLeft
 		});
 
 		vertexAction(new TexturedVertex2D
 		{
 			Position = vertexQuad.BottomRight,
 			Color = drawColorInfo.Color.BottomRight,
-			TexturePosition = textureRegion.BottomRight
+			TexturePosition = textureUV.BottomRight
 		});
 
 		vertexAction(new TexturedVertex2D
 		{
 			Position = vertexQuad.TopRight,
 			Color = drawColorInfo.Color.TopRight,
-			TexturePosition = textureRegion.TopRight
+			TexturePosition = textureUV.TopRight
 		});
 
 		vertexAction(new TexturedVertex2D
 		{
 			Position = vertexQuad.TopLeft,
 			Color = drawColorInfo.Color.TopLeft,
-			TexturePosition = textureRegion.TopLeft
+			TexturePosition = textureUV.TopLeft
 		});
 	}
 
 	public static void DrawRectangle(this IRenderer renderer, Rectangle rect, Matrix3 drawMatrix, Boundary thickness, DrawColorInfo color, BorderAlignment alignment)
 	{
-		var texture = renderer.WhitePixel;
+		var whitePixelTexture = renderer.WhitePixel.GetNativeTexture();
 
 		var topRect = alignment switch
 		{
@@ -173,9 +172,9 @@ public static class RendererExtentions
 			color.Color.BottomLeft,
 			color.Color.TopLeft);
 
-		renderer.DrawQuad(texture, Quad.FromRectangle(topRect) * drawMatrix, new DrawColorInfo(topColor));
-		renderer.DrawQuad(texture, Quad.FromRectangle(rightRect) * drawMatrix, new DrawColorInfo(rightColor));
-		renderer.DrawQuad(texture, Quad.FromRectangle(bottomRect) * drawMatrix, new DrawColorInfo(bottomColor));
-		renderer.DrawQuad(texture, Quad.FromRectangle(leftRect) * drawMatrix, new DrawColorInfo(leftColor));
+		renderer.DrawQuad(whitePixelTexture, Quad.FromRectangle(topRect) * drawMatrix, new DrawColorInfo(topColor));
+		renderer.DrawQuad(whitePixelTexture, Quad.FromRectangle(rightRect) * drawMatrix, new DrawColorInfo(rightColor));
+		renderer.DrawQuad(whitePixelTexture, Quad.FromRectangle(bottomRect) * drawMatrix, new DrawColorInfo(bottomColor));
+		renderer.DrawQuad(whitePixelTexture, Quad.FromRectangle(leftRect) * drawMatrix, new DrawColorInfo(leftColor));
 	}
 }

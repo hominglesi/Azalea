@@ -55,8 +55,8 @@ internal abstract class RendererBase : IRenderer
 		BindShader(_defaultQuadShader);
 	}
 
-	private Texture? _whitePixel;
-	public Texture WhitePixel => _whitePixel ??= generateWhitePixel();
+	private ITexture? _whitePixel;
+	public ITexture WhitePixel => _whitePixel ??= generateWhitePixel();
 	private Texture generateWhitePixel()
 	{
 		var whitePixel = new Image(1, 1,
@@ -113,13 +113,9 @@ internal abstract class RendererBase : IRenderer
 		currentActiveBatch?.Draw();
 	}
 
-	internal bool BindTexture(Texture texture, int unit = 0)
-	{
-		return BindTexture(texture.NativeTexture, unit);
-	}
-
 	protected abstract bool SetTextureImplementation(INativeTexture? texture, int unit);
 
+	bool IRenderer.BindTexture(INativeTexture texture, int unit) => BindTexture(texture, unit);
 	internal bool BindTexture(INativeTexture nativeTexture, int unit = 0)
 	{
 		if (lastActiveTextureUnit == unit && lastBoundTexture[unit] == nativeTexture)
@@ -201,5 +197,4 @@ internal abstract class RendererBase : IRenderer
 	IVertexBatch<TexturedVertex2D> IRenderer.DefaultQuadBatch => defaultQuadBatch ?? throw new Exception("Cannot call DefaultQuadBatch before Initialization");
 	void IRenderer.FlushCurrentBatch() => FlushCurrentBatch();
 	IVertexBatch IRenderer.CreateQuadBatch(int size) => CreateQuadBatch(size);
-	bool IRenderer.BindTexture(Texture texture, int unit) => BindTexture(texture, unit);
 }

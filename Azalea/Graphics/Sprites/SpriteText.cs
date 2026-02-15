@@ -2,8 +2,6 @@
 using Azalea.Text;
 using System;
 using System.Numerics;
-using Azalea.Inputs;
-using Azalea.Editing;
 
 #if OLDTEXT
 using System.Numerics;
@@ -25,7 +23,7 @@ public class SpriteText : GameObject
 
 	static SpriteText()
 	{
-		_textShader = Assets.MainStore.GetShader("Shaders/text_vertex.glsl", "Shaders/text_fragment.glsl");
+		_textShader = Assets.MainStore.GetShader("Shaders/quad_vertex.glsl", "Shaders/text_fragment.glsl");
 	}
 
 	private TextLayoutProvider _layoutProvider = new();
@@ -76,12 +74,6 @@ public class SpriteText : GameObject
 		set => throw new InvalidOperationException($"Cannot set {nameof(Size)} of {nameof(SpriteText)}");
 	}
 
-	protected override void Update()
-	{
-		if (Input.GetKey(Keys.J).Down)
-			Editor.HighlightObject(this);
-	}
-
 	public override void Draw(IRenderer renderer)
 	{
 		renderer.BindShader(_textShader);
@@ -90,7 +82,7 @@ public class SpriteText : GameObject
 		{
 			var quad = ToScreenSpace(character.DrawRectangle);
 
-			renderer.DrawQuad(character.Texture, quad, DrawColorInfo);
+			renderer.DrawQuad(character.Texture.GetNativeTexture(), quad, DrawColorInfo, character.Texture.GetUVCoordinates());
 		}
 
 		renderer.BindShader(renderer.DefaultQuadShader);

@@ -21,7 +21,7 @@ public static class Renderer
 		set => Instance.AutomaticallyClear = value;
 	}
 
-	public static Texture WhitePixel => Instance.WhitePixel;
+	public static ITexture WhitePixel => Instance.WhitePixel;
 
 	public static void Clear() => Instance.Clear();
 

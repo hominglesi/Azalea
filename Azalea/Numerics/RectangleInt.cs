@@ -5,7 +5,8 @@ namespace Azalea.Numerics;
 
 public struct RectangleInt : IEquatable<RectangleInt>
 {
-	public static RectangleInt Empty { get; } = new RectangleInt();
+	public static RectangleInt Zero { get; } = new RectangleInt(0, 0, 0, 0);
+	public static RectangleInt One { get; } = new RectangleInt(0, 0, 1, 1);
 
 	public int X;
 	public int Y;

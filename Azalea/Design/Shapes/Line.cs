@@ -29,7 +29,7 @@ public class Line : GameObject
 		MatrixExtentions.RotateFromLeft(ref matrix, rotation);
 
 		renderer.DrawQuad(
-		Renderer.WhitePixel,
+		Renderer.WhitePixel.GetNativeTexture(),
 		Quad.FromRectangle(rectangle) * matrix, //  quad * Info.Matrix,
 		DrawColorInfo);
 	}

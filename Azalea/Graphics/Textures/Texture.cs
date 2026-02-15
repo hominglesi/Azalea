@@ -1,34 +1,85 @@
-﻿using Azalea.Utils;
+﻿using Azalea.Numerics;
+using Azalea.Utils;
 using System;
 using System.Numerics;
-using Rect = Azalea.Numerics.Rectangle;
-
 namespace Azalea.Graphics.Textures;
 
-public class Texture : Disposable
+public class Texture : Disposable, ITexture
 {
-	internal virtual INativeTexture NativeTexture { get; }
-	public virtual int Width => NativeTexture.Width;
-	public virtual int Height => NativeTexture.Height;
-	public virtual Vector2 Size => new(Width, Height);
+	private readonly INativeTexture _nativeTexture;
 
-	public string AssetName { get; set; }
+	private Rectangle _uvCoordinates = Rectangle.One;
+	private RectangleInt _region = new(-1, -1, -1, -1);
+	public RectangleInt Region
+	{
+		get => _region;
+		set
+		{
+			if (value == _region) return;
+
+			_region = value;
+
+			_uvCoordinates = new Rectangle(
+				_region.X / (float)_nativeTexture.Width,
+				_region.Y / (float)_nativeTexture.Height,
+				_region.Width / (float)_nativeTexture.Width,
+				_region.Height / (float)_nativeTexture.Height);
+		}
+	}
+
+	public int Width
+	{
+		get
+		{
+			if (_region.Width == -1)
+				return _nativeTexture.Width;
+
+			return _region.Width;
+		}
+	}
+
+	public int Height
+	{
+		get
+		{
+			if (_region.Height == -1)
+				return _nativeTexture.Height;
+
+			return _region.Height;
+		}
+	}
+
+	public Vector2 Size
+	{
+		get
+		{
+			if (_region.Width == -1)
+				return new(_nativeTexture.Width, _nativeTexture.Height);
+
+			return _region.Size;
+		}
+	}
+
+	public Texture(ITexture other)
+		: this(other.GetNativeTexture()) { }
 
 	internal Texture(INativeTexture nativeTexture)
 	{
-		NativeTexture = nativeTexture ?? throw new ArgumentNullException(nameof(nativeTexture));
+		ArgumentNullException.ThrowIfNull(nativeTexture);
+
+		_nativeTexture = nativeTexture;
 	}
 
-	internal void SetData(Image upload)
-		=> NativeTexture.SetData(upload);
+	public INativeTexture GetNativeTexture(float time) => _nativeTexture;
+	public Rectangle GetUVCoordinates(float time) => _uvCoordinates;
 
-	internal void SetFiltering(TextureFiltering minFilter, TextureFiltering magFilter)
-		=> NativeTexture.SetFiltering(minFilter, magFilter);
+	public void UploadImage(Image upload) => _nativeTexture.SetData(upload);
 
-	internal virtual Rect GetUVCoordinates() => Rect.One;
+	public void SetFiltering(TextureFiltering minFilter, TextureFiltering magFilter)
+		=> _nativeTexture.SetFiltering(minFilter, magFilter);
 
 	protected override void OnDispose()
 	{
-		NativeTexture.Dispose();
+		_nativeTexture.Dispose();
 	}
 }

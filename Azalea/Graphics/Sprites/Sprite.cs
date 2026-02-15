@@ -1,6 +1,8 @@
 ﻿using Azalea.Graphics.Rendering;
+using Azalea.Graphics.Shaders;
 using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
+using Azalea.Platform;
 using System;
 using System.Numerics;
 
@@ -8,8 +10,8 @@ namespace Azalea.Graphics.Sprites;
 
 public class Sprite : GameObject
 {
-	private Texture _texture = Assets.MissingTexture;
-	public virtual Texture Texture
+	private ITexture _texture = Assets.MissingTexture;
+	public virtual ITexture Texture
 	{
 		get => _texture;
 		set
@@ -37,6 +39,8 @@ public class Sprite : GameObject
 		_time += Platform.Time.DeltaTime;
 	}
 
+	private static Shader? _loadingShader = null;
+
 	public override void Draw(IRenderer renderer)
 	{
 		if (Alpha <= 0) return;
@@ -47,15 +51,26 @@ public class Sprite : GameObject
 			return;
 		}
 
-		var texture = Texture;
-		if (Texture is TextureAnimation anim)
+		if (Texture is PromisedTexture promised && promised.IsResolved == false)
 		{
-			texture = anim.GetTextureAtTime(Time);
+			_loadingShader ??= Assets.MainStore.GetShader("Shaders/quad_vertex.glsl", "Shaders/loading_fragment.glsl");
+
+			renderer.BindShader(_loadingShader);
+
+			_loadingShader.NativeShader.SetUniform("u_Time", Time);
+			_loadingShader.NativeShader.SetUniform("u_Offset", ScreenSpaceDrawQuad.TopLeft.X, ScreenSpaceDrawQuad.TopLeft.Y);
+			_loadingShader.NativeShader.SetUniform("u_Resolution", ScreenSpaceDrawQuad.Width, ScreenSpaceDrawQuad.Height);
+			_loadingShader.NativeShader.SetUniform("u_ScreenResolution", Window.ClientSize.X, Window.ClientSize.Y);
+
+			renderer.DrawQuad(renderer.WhitePixel.GetNativeTexture(), ScreenSpaceDrawQuad, DrawColorInfo);
+
+			renderer.BindShader(renderer.DefaultQuadShader);
+			return;
 		}
 
-		DrawTexture(renderer, texture);
+		DrawTexture(renderer, Texture);
 	}
 
-	protected virtual void DrawTexture(IRenderer renderer, Texture texture)
-		=> renderer.DrawQuad(texture, ScreenSpaceDrawQuad, DrawColorInfo);
+	protected virtual void DrawTexture(IRenderer renderer, ITexture texture)
+		=> renderer.DrawQuad(texture.GetNativeTexture(Time), ScreenSpaceDrawQuad, DrawColorInfo, texture.GetUVCoordinates(Time));
 }

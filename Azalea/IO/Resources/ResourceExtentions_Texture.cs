@@ -8,9 +8,9 @@ namespace Azalea.IO.Resources;
 
 public static partial class ResourceStoreExtentions
 {
-	private static readonly ResourceCache<Texture> _textureCache = new();
+	private static readonly ResourceCache<ITexture> _textureCache = new();
 
-	public static Texture GetTexture(this IResourceStore store, string path, TextureFiltering filtering = TextureFiltering.Nearest)
+	public static ITexture GetTexture(this IResourceStore store, string path, TextureFiltering filtering = TextureFiltering.Nearest)
 	{
 		if (_textureCache.TryGetValue(store, path, out var cached))
 			return cached;
@@ -26,19 +26,19 @@ public static partial class ResourceStoreExtentions
 		return texture;
 	}
 
-	private static readonly ResourceCache<Promise<Texture>> _texturePromiseCache = new();
+	private static readonly ResourceCache<Promise<ITexture>> _texturePromiseCache = new();
 
-	public static Promise<Texture> GetTexturePromise(this IResourceStore store, string path, TextureFiltering filtering = TextureFiltering.Nearest)
+	public static Promise<ITexture> GetTexturePromise(this IResourceStore store, string path, TextureFiltering filtering = TextureFiltering.Nearest)
 	{
 		if (_textureCache.TryGetValue(store, path, out var cached))
-			return new Promise<Texture>(cached);
+			return new Promise<ITexture>(cached);
 
 		if (_texturePromiseCache.TryGetValue(store, path, out var cachedPromise))
 			return cachedPromise;
 
-		var promise = new Promise<Texture>(() =>
+		var promise = new Promise<ITexture>(() =>
 		{
-			Texture result = Assets.MissingTexture;
+			ITexture result = Assets.MissingTexture;
 
 			var imagePromise = store.GetImagePromise(path).Then(image =>
 			{
@@ -56,6 +56,15 @@ public static partial class ResourceStoreExtentions
 			return result;
 		});
 
+		_texturePromiseCache.AddValue(store, path, promise);
+
 		return promise;
+	}
+
+	public static PromisedTexture GetTextureAsync(this IResourceStore store, string path, TextureFiltering filtering = TextureFiltering.Nearest)
+	{
+		var promise = GetTexturePromise(store, path, filtering);
+
+		return new PromisedTexture(promise);
 	}
 }

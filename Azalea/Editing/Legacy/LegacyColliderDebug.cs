@@ -30,11 +30,11 @@ public class LegacyColliderDebug : GameObject
 
 			foreach (var collider in ComponentStorage<RectCollider>.GetComponents())
 			{
-				renderer.DrawQuad(renderer.WhitePixel, collider.Quad, color);
+				renderer.DrawQuad(renderer.WhitePixel.GetNativeTexture(), collider.Quad, color);
 
 				var centerQuad = new Quad(collider.Position - new Vector2(5), new(10));
 
-				renderer.DrawQuad(renderer.WhitePixel, centerQuad, color2);
+				renderer.DrawQuad(renderer.WhitePixel.GetNativeTexture(), centerQuad, color2);
 			}
 		}
 	}

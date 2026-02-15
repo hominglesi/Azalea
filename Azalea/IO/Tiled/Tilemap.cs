@@ -23,7 +23,7 @@ public readonly struct Tilemap
 	public TileObject[] Objects { get; init; }
 	public TilemapLayer[] Layers { get; init; }
 
-	public Texture GetTextureById(int id)
+	public ITexture GetTextureById(int id)
 	{
 		foreach (var tileset in Tilesets)
 			if (id >= tileset.FirstId && id < tileset.FirstId + tileset.Source.TileCount)
