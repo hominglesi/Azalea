@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace Azalea.IO.Resources;
 public class ResourceCache<T>
 {
-	private static Dictionary<IResourceStore, Dictionary<string, T>> _cache = new();
+	private static readonly ConcurrentDictionary<IResourceStore, Dictionary<string, T>> _cache = new();
 	public bool TryGetValue(IResourceStore store, string path, out T value)
 	{
 		value = default!;
@@ -11,9 +12,9 @@ public class ResourceCache<T>
 			return false;
 
 		var cache = _cache[store];
-		if (cache.ContainsKey(path))
+		if (cache.TryGetValue(path, out T? foundValue))
 		{
-			value = cache[path];
+			value = foundValue;
 			return true;
 		}
 
@@ -23,7 +24,7 @@ public class ResourceCache<T>
 	public void AddValue(IResourceStore store, string path, T resource)
 	{
 		if (_cache.ContainsKey(store) == false)
-			_cache[store] = new Dictionary<string, T>();
+			_cache[store] = [];
 
 		_cache[store][path] = resource;
 	}

@@ -11,8 +11,10 @@ internal class WebStore : IResourceStore
 
 	static WebStore()
 	{
-		_client = new HttpClient(new HttpClientHandler()
+		_client = new HttpClient(new SocketsHttpHandler()
 		{
+			MaxConnectionsPerServer = 10,
+			PooledConnectionLifetime = TimeSpan.FromMinutes(5),
 			AutomaticDecompression =
 				DecompressionMethods.GZip |
 				DecompressionMethods.Deflate |

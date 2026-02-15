@@ -10,7 +10,10 @@ using Azalea.Graphics.Textures;
 using Azalea.Inputs;
 using Azalea.IO.Resources;
 using Azalea.Platform;
+using Azalea.Threading;
+using System;
 using System.Numerics;
+using System.Threading;
 
 namespace Azalea.VisualTests;
 
@@ -24,10 +27,77 @@ public class TestingTestScene : TestScene
 	private Box _igrac;
 	private Sprite _sprite;
 
+	private string[] _imageURLs = [
+		"https://coverartarchive.org/release/7ef86f4d-2895-4c81-a0ab-c112d9958e5a/front-250",
+		"https://coverartarchive.org/release/c394f14d-aed7-4f6b-814c-e11761b48401/front-250",
+		"https://coverartarchive.org/release/560db4c2-5af5-4ef0-a9e0-b56fca3d8bea/front-250",
+		"https://coverartarchive.org/release/cf812bac-614d-4185-bed0-8e2c5ff16c6c/front-250",
+		"https://coverartarchive.org/release/275bc44c-e020-48cf-8c1c-d6fc05004fbe/front-250",
+		"https://coverartarchive.org/release/e030524c-3a90-404d-af12-1459c7e8fcc2/front-250",
+		"https://coverartarchive.org/release/151dd53a-e493-440c-8794-25673ba3fcf1/front-250",
+		"https://coverartarchive.org/release/5fe6cb1a-bb37-440c-ab21-5fea6364a5ce/front-250",
+		"https://coverartarchive.org/release/057d7de3-acfa-4c17-9b83-1788254811b1/front-250",
+		"https://f4.bcbits.com/img/a4181301446_10.jpg",
+		"https://f4.bcbits.com/img/a0566082153_10.jpg",
+		];
+
+
 	private SpriteText _scrollDisplay;
 
 	public TestingTestScene()
 	{
+		var container = new FlexContainer()
+		{
+			Depth = -1000,
+			RelativeSizeAxes = Axes.Both,
+			Wrapping = FlexWrapping.Wrap
+		};
+
+		Add(container);
+
+		foreach (var imageURL in _imageURLs)
+		{
+			var sprite = new Sprite()
+			{
+				Size = new(250)
+			};
+
+			container.Add(sprite);
+
+			Assets.WebStore.GetTexturePromise(imageURL).Then(texture =>
+			{
+				if (texture == Assets.MissingTexture)
+					Console.WriteLine("Texture returned null");
+				else
+					sprite.Texture = texture;
+			});
+		}
+
+		Console.WriteLine("gas");
+
+		new Promise<string>(() =>
+		{
+			Thread.Sleep(3000);
+			return "Ide Gas 3";
+		}).Then(Console.WriteLine);
+
+		new Promise<string>(() =>
+		{
+			Thread.Sleep(2000);
+			return "Ide Gas 2";
+		}).Then(Console.WriteLine);
+
+		new Promise<string>(() =>
+		{
+			Thread.Sleep(1000);
+			return "Ide Gas 1";
+		}).Then(Console.WriteLine);
+
+		new Promise<string>(() =>
+		{
+			return "Ide Gas 0";
+		}).Then(Console.WriteLine);
+
 
 		var tileset = Assets.MainStore.GetTileset("MapForTiled/TilesForMap.tsx");
 

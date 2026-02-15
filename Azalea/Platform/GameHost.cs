@@ -8,6 +8,7 @@ using Azalea.Inputs;
 using Azalea.IO.Configs;
 using Azalea.Simulations;
 using Azalea.Sounds;
+using Azalea.Threading;
 using System;
 using System.Numerics;
 
@@ -77,6 +78,8 @@ public abstract class GameHost
 
 		Time.UpdateDeltaTime();
 		_accumulator += Time.DeltaTime;
+
+		PromiseSystem.ProcessPromises();
 
 		Window.ProcessEvents();
 		AudioManager.Update();

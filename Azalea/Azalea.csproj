@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Title>$(AssemblyName)</Title>
-    <Version>1.6.0</Version>
+    <Version>1.6.1</Version>
     <Authors>hominglesi</Authors>
     <Company>Azalea</Company>
     <Description>A lightweight 2D game framework.</Description>
@@ -32,11 +32,11 @@
 
   <ItemGroup>
     <None Include="Resources\Textures\azalea-icon.png" Pack="true" PackagePath="\" />
-    <None Include="../README.md" Visible="false" Pack="true" PackagePath="\"  />
+    <None Include="../README.md" Visible="false" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\**\*"/>
+    <EmbeddedResource Include="Resources\**\*" />
     <EmbeddedResource Remove="**\__*" />
   </ItemGroup>
 </Project>
