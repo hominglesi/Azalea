@@ -183,12 +183,21 @@ internal abstract class PlatformWindow : Disposable, IWindow
 		}
 	}
 
-	private bool _vSync = false;
+	private bool? _vSync = null;
 	protected abstract void SetVSyncImplementation(bool enabled);
 	protected abstract bool GetVSyncImplementation();
 	public bool VSync
 	{
-		get => _vSync;
+		get
+		{
+			if (_vSync is null)
+			{
+				_vSync = GetVSyncImplementation();
+				return _vSync.Value;
+			}
+
+			return _vSync.Value;
+		}
 		set
 		{
 			if (_vSync == value) return;

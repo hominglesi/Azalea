@@ -50,7 +50,9 @@ public abstract class BasicWindowContainer : Composition
 
 	protected override void OnMouseUp(MouseUpEvent e)
 	{
+		if (_isBeingDragged == false)
+			return;
+
 		endDragging();
-		base.OnMouseUp(e);
 	}
 }

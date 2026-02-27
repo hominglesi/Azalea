@@ -1,5 +1,4 @@
 ﻿using Azalea.Design.Containers;
-using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
@@ -13,32 +12,31 @@ public class FrameRateTest : TestScene
 	private SpriteText _deltaTimeText;
 	private SpriteText _fixedDeltaTimeText;
 
-	private DateTime _startTime;
 	public FrameRateTest()
 	{
-		_startTime = Time.GetCurrentPreciseTime();
-
 		Add(new FlexContainer()
 		{
 			RelativeSizeAxes = Graphics.Axes.Both,
 			Direction = FlexDirection.Vertical,
-			Children = new GameObject[]
-			{
+			Children = [
 				_elapsedTimeText = createText(),
 				_deltaTimeText = createText(),
-				_fixedDeltaTimeText = createText(),
-			}
+				_fixedDeltaTimeText = createText()
+			]
 		});
 	}
 
 	private float _deltaTimeCounter;
 
+	private DateTime? _startTime;
 	protected override void Update()
 	{
+		_startTime ??= Time.GetCurrentPreciseTime();
+
+		_elapsedTimeText.Text = (Time.GetPreciseMilisecondsSince(_startTime.Value) / 1000).ToString();
+
 		_deltaTimeCounter += Time.DeltaTime;
 		_deltaTimeText.Text = _deltaTimeCounter.ToString();
-
-		_elapsedTimeText.Text = (Time.GetPreciseMilisecondsSince(_startTime) / 1000).ToString();
 	}
 
 	protected override bool OnKeyDown(KeyDownEvent e)

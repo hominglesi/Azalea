@@ -59,11 +59,11 @@ public class GameObjectTests : UnitTestSuite
 	public class GameObjectInclusionTest : UnitTest
 	{
 		private Composition _parent;
-		private readonly InclusionGameObject _object;
+		private InclusionGameObject? _object;
 
 		public GameObjectInclusionTest()
 		{
-			_object = new InclusionGameObject();
+			AddOperation("Create object", () => _object = new InclusionGameObject());
 
 			AddResult("Check if object is not included", () =>
 			{
@@ -71,7 +71,7 @@ public class GameObjectTests : UnitTestSuite
 				&& _object.HasBeenIncluded == false
 				&& _object.HasBeedExcluded == false;
 			});
-			AddOperation("Add object to scene", () => _parent.Add(_object));
+			AddOperation("Add object to scene", () => _parent.Add(_object!));
 			AddResult("Check if object is included", () =>
 			{
 				return _object.IsPresentInGame == true
@@ -83,7 +83,7 @@ public class GameObjectTests : UnitTestSuite
 				_object.HasBeenIncluded = false;
 				_object.HasBeedExcluded = false;
 			});
-			AddOperation("Remove object from scene", () => _parent.Remove(_object));
+			AddOperation("Remove object from scene", () => _parent.Remove(_object!));
 			AddResult("Check if object is excluded", () =>
 			{
 				return _object.IsPresentInGame == false

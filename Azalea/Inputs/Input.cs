@@ -222,7 +222,7 @@ public static class Input
 		}
 		else
 		{
-			propagatePositionalInputEvent(new MouseUpEvent(button, MousePosition));
+			propagateNonPositionalInputEvent(new MouseUpEvent(button, MousePosition));
 			var clickUpGameObjects = GetPositionalInputQueue(MousePosition);
 
 			foreach (var obj in clickUpGameObjects)

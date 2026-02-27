@@ -91,7 +91,9 @@ public abstract class GameHost
 		}
 
 		PerformanceTrace.RunAndTrace(CallOnUpdate, "Update");
-		PerformanceTrace.RunAndTrace(CallOnRender, "Render");
+
+		if (Window.State != WindowState.Minimized)
+			PerformanceTrace.RunAndTrace(CallOnRender, "Render");
 
 		if (_firstWindowShown == false)
 		{

@@ -15,6 +15,7 @@ public class ObservedDirectory : Disposable
 	private readonly string _cachePath;
 	private bool _started = false;
 
+
 	public ObservedDirectory(IEnumerable<string> paths, string cachePath)
 	{
 		_cachePath = cachePath;
@@ -75,12 +76,17 @@ public class ObservedDirectory : Disposable
 				if (isFileConsidered(metadata.Path) == false)
 					continue;
 
-				var data = getSerializedData(metadata.Path);
+				if (_cacheFiles.TryGetValue(metadata, out var cachedData))
+				{
+					_currentFiles[metadata] = cachedData;
+				}
+				else
+				{
+					var data = getSerializedData(metadata.Path);
 
-				_currentFiles.Add(metadata, data);
-
-				if (_cacheFiles.ContainsKey(metadata) == false)
+					_currentFiles.Add(metadata, data);
 					OnCreated?.Invoke(new(metadata.Path, data));
+				}
 			}
 
 			createWatcherOnPath(path);
@@ -175,13 +181,26 @@ public class ObservedDirectory : Disposable
 		watchers.Clear();
 	}
 
-	public void AddPath(string path) => processPaths([path]);
+	public void AddPath(string path)
+	{
+		if (_started == false)
+		{
+			_allPaths.Add(path);
+			return;
+		}
+
+		processPaths([path]);
+	}
+
 	public void RemovePath(string path)
 	{
 		if (_allPaths.Contains(path) == false)
 			return;
 
 		_allPaths.Remove(path);
+
+		if (_started == false)
+			return;
 
 		var keys = _currentFiles
 			.Where(x => x.Key.Path.StartsWith(path.Replace('/', '\\')))

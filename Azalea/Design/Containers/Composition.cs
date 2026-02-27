@@ -19,6 +19,8 @@ public partial class Composition : GameObject
 		_internalChildren = new SortedList<GameObject>(childComparer);
 
 		AddLayout(_childrenSizeDependencies);
+		AddLayout(_backgroundColorBacking);
+		AddLayout(_borderColorBacking);
 	}
 
 	public bool Masking { get; set; }

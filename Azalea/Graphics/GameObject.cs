@@ -22,6 +22,7 @@ public partial class GameObject : Amendable, IGameObject
 	public GameObject()
 	{
 		AddLayout(_drawInfoBacking);
+		AddLayout(_drawColorInfoBacking);
 	}
 
 	public event Action<GameObject>? OnUpdate;
@@ -490,6 +491,8 @@ public partial class GameObject : Amendable, IGameObject
 			if (_color == value) return;
 
 			_color = value;
+
+			Invalidate(Invalidation.Color);
 		}
 	}
 
@@ -649,7 +652,7 @@ public partial class GameObject : Amendable, IGameObject
 	}
 
 	private DrawInfo _drawInfo;
-	private readonly LayoutValue _drawInfoBacking = new LayoutValue(Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
+	private readonly LayoutValue _drawInfoBacking = new(Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence);
 	private DrawInfo computeDrawInfo()
 	{
 		DrawInfo di = Parent?.DrawInfo ?? new DrawInfo(null);
@@ -923,6 +926,7 @@ public partial class GameObject : Amendable, IGameObject
 				return false;
 			case KeyDownEvent keyDown:
 				var kdResult = OnKeyDown(keyDown);
+				KeyDown?.Invoke(keyDown);
 				return kdResult;
 			case KeyUpEvent keyUp:
 				OnKeyUp(keyUp);
@@ -973,20 +977,27 @@ public partial class GameObject : Amendable, IGameObject
 
 	public virtual Quad ScreenSpaceDrawQuad => ToScreenSpace(DrawRectangle);
 
-	public virtual DrawColorInfo DrawColorInfo => computeDrawColorInfo();
-
-	private DrawColorInfo computeDrawColorInfo()
+	private DrawColorInfo _drawColorInfo;
+	private readonly LayoutValue _drawColorInfoBacking = new(Invalidation.Color);
+	public DrawColorInfo DrawColorInfo
 	{
-		var info = Parent?.DrawColorInfo ?? new DrawColorInfo(null);
+		get
+		{
+			if (_drawColorInfoBacking.IsValid)
+				return _drawColorInfo;
 
-		var colorInfo = _color;
+			_drawColorInfo = Parent?.DrawColorInfo ?? new DrawColorInfo(null);
 
-		if (Alpha != 1)
-			colorInfo = colorInfo.MultiplyAlpha(Alpha);
+			var colorInfo = _color;
 
-		info.Color.ApplyChild(colorInfo);
+			if (Alpha != 1) colorInfo = colorInfo.MultiplyAlpha(Alpha);
 
-		return info;
+			_drawColorInfo.Color.ApplyChild(colorInfo);
+
+			_drawColorInfoBacking.Validate();
+
+			return _drawColorInfo;
+		}
 	}
 }
 

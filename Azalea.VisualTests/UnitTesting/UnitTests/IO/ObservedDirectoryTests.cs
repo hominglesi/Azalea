@@ -350,6 +350,7 @@ public class ObservedDirectoryTests : UnitTestSuite
 		createObservedDirectory([path]);
 
 		ObservedDirectory!.SaveCache();
+		ObservedDirectory!.Dispose();
 	}
 
 	private static void saveCache() { ObservedDirectory!.SaveCache(); }

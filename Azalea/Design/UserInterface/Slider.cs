@@ -121,32 +121,44 @@ public abstract class Slider : Composition
 
 	protected void onHeadMouseDown(MouseDownEvent e)
 	{
-		IsHeld = true;
+		OnHeld();
 		_heldOffset = getDirectionalValue(Head.Position) - getLocalMousePosition();
 	}
 
 	protected override bool OnMouseDown(MouseDownEvent e)
 	{
-		if (IsHeld) return true;
+		if (IsHeld)
+			return true;
 
-		IsHeld = true;
+		OnHeld();
 		_heldOffset = 0;
 		return true;
+	}
+
+	protected override void OnMouseUp(MouseUpEvent e)
+	{
+		if (IsHeld == false)
+			return;
+
+		OnLetGo();
+
+		IsHeld = false;
+	}
+
+	protected virtual void OnHeld()
+	{
+		IsHeld = true;
+	}
+
+	protected virtual void OnLetGo()
+	{
+		OnValueSet?.Invoke(Value);
 	}
 
 	private Vector2 _lastDrawSize;
 	private float _lastHeadLength;
 	protected override void Update()
 	{
-		if (Input.GetMouseButton(0).Released)
-		{
-			if (IsHeld)
-				OnValueSet?.Invoke(Value);
-
-			IsHeld = false;
-		}
-
-
 		if (_lastDrawSize != DrawSize || _lastHeadLength != _headLength)
 		{
 			uncacheSliderRange();

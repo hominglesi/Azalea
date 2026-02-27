@@ -16,6 +16,7 @@ internal class Program
 			.SetVSync(true)
 			.SetupPersistentDirectory("Azalea.VisualTests")
 			.SetupReflectedDirectory("../../../../../../Azalea.VisualTests/")
+			//.EnableTracing()
 			.SetupConfig()
 			.Create()
 			.Run(new EditorWrapper(new VisualTests()));

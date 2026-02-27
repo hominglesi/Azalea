@@ -180,8 +180,9 @@ internal class ALAudioSource : IAudioSource
 				ALC.BufferData(buffer, ALFormat.Stereo16, pcm, pcm.Length, sampleRate);
 				_source.QueueBuffer(buffer);
 				_bufferStartTimes[_nextBufferStartTime] = startTime;
-				_nextBufferStartTime = (_nextBufferStartTime + 1) % __bufferCount;
 			}
+
+			_nextBufferStartTime = (_nextBufferStartTime + 1) % __bufferCount;
 		}
 
 		if (ALC.GetSourceState(_source.Handle) != ALSourceState.Playing)

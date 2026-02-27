@@ -236,7 +236,7 @@ internal class Win32Window : PlatformWindow
 			case WindowMessage.SysKeyDown:
 				var downSysKey = WindowsExtentions.KeycodeToKey((int)wParam);
 
-				if (downSysKey == Keys.F10)
+				if (downSysKey == Keys.F10 || downSysKey == Keys.AltLeft)
 				{
 					var downSysKeyIsRepeat = BitwiseUtils.GetSpecificBit(lParam, 31);
 					handleKeyDown(downSysKey, downSysKeyIsRepeat);

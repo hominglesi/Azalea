@@ -51,18 +51,13 @@ public static class Time
 
 	#region Precise Time
 
-	private static long getTicksSinceStartup() => Stopwatch.GetTimestamp();
-	private static long getCurrentTicks() => _startTime + getTicksSinceStartup();
-
-	private static long _startTime;
-	static Time()
-	{
-		_startTime = DateTime.UtcNow.Ticks - getTicksSinceStartup();
-	}
+	private static readonly Stopwatch _stopwatch = Stopwatch.StartNew();
+	private static long getCurrentTicks() => _stopwatch.ElapsedTicks;
+	private static readonly long _startTime = DateTime.UtcNow.Ticks;
 
 	public static DateTime GetCurrentPreciseTime()
 	{
-		return DateTime.FromFileTimeUtc(getCurrentTicks());
+		return new DateTime(_startTime + getCurrentTicks());
 	}
 
 	public static float GetPreciseMilisecondsSince(DateTime time)
