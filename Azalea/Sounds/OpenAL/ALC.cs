@@ -1,5 +1,6 @@
 ﻿using Azalea.Sounds.OpenAL.Enums;
 using System;
+using System.Numerics;
 using System.Runtime.InteropServices;
 
 namespace Azalea.Sounds.OpenAL;
@@ -7,7 +8,32 @@ internal unsafe static class ALC
 {
 	public const string LibraryPath = "soft_oal.dll";
 
-	#region Device Lifetime
+	#region General
+
+	[DllImport(LibraryPath, EntryPoint = "alcGetIntegerv")]
+	private static extern void getIntegerv(IntPtr device, int param, int size, [Out] int* value);
+
+	[DllImport(LibraryPath, EntryPoint = "alGetString")]
+	private static extern IntPtr getString(int param);
+
+	public static string GetVersion()
+	{
+		var ptr = getString(0xB002 /* AL_VERSION*/);
+		return Marshal.PtrToStringAnsi(ptr)!;
+	}
+
+	public static string GetRenderer()
+	{
+		var ptr = getString(0xB007 /* AL_RENDERER */);
+		return Marshal.PtrToStringAnsi(ptr)!;
+	}
+
+	[DllImport(LibraryPath, EntryPoint = "alDistanceModel")]
+	public static extern void DistanceModel(int distanceModel);
+
+	#endregion
+
+	#region Device
 	[DllImport(LibraryPath, EntryPoint = "alcOpenDevice")]
 	private static extern IntPtr openDevice(char* deviceName);
 
@@ -23,15 +49,40 @@ internal unsafe static class ALC
 
 	[DllImport(LibraryPath, EntryPoint = "alcCloseDevice")]
 	public static extern bool CloseDevice(ALC_Device device);
+
+	public static int GetDeviceFrequency(ALC_Device device)
+	{
+		int a1;
+		int a2;
+		getIntegerv(device, 0x1991 /* ALC_FREQUENCY */, 1, &a1);
+		getIntegerv(device, 0x1990 /* ALC_FREQUENCY */, 1, &a2);
+
+		Console.WriteLine($"ALC_FORMAT_TYPE_SOFT: {a1}, ALC_FORMAT_CHANNELS_SOFT: {a2}");
+
+
+		int frequency;
+		getIntegerv(device, 0x1007 /* ALC_FREQUENCY */, 1, &frequency);
+		return frequency;
+	}
+
+	public static bool GetDeviceHRTF(ALC_Device device)
+	{
+		int hrtf;
+		getIntegerv(device, 0x1992 /* ALC_HRTF_SOFT */, 1, &hrtf);
+		return hrtf != 0;
+	}
 	#endregion
 
 	#region Context Lifetime
 	[DllImport(LibraryPath, EntryPoint = "alcCreateContext")]
-	private static extern ALC_Context createContext(ALC_Device device, int* attrlist);
+	private static extern ALC_Context createContext(ALC_Device device, int* attributeList);
 
-	public static ALC_Context CreateContext(ALC_Device device)
+	public static ALC_Context CreateContext(ALC_Device device, int[] attributeList)
 	{
-		return createContext(device, null);
+		fixed (int* ptr = attributeList)
+		{
+			return createContext(device, ptr);
+		}
 	}
 
 	[DllImport(LibraryPath, EntryPoint = "alcMakeContextCurrent")]
@@ -71,6 +122,7 @@ internal unsafe static class ALC
 		fixed (void* p = data)
 		{
 			bufferData(buffer, format, p, size, frequency);
+			Console.WriteLine(size);
 		}
 	}
 
@@ -127,9 +179,6 @@ internal unsafe static class ALC
 	[DllImport(LibraryPath, EntryPoint = "alSourcef")]
 	private static extern void sourcef(uint source, int param, float value);
 
-	[DllImport(LibraryPath, EntryPoint = "alGetSourcef")]
-	private static extern void getSourcef(uint source, int param, [Out] float* value);
-
 	public static void SetSourceGain(uint source, float gain)
 	{
 		//0x100A = AL_GAIN
@@ -154,6 +203,29 @@ internal unsafe static class ALC
 		sourcef(source, 0x1024, offset);
 	}
 
+	public static void SetSourceRelative(uint source, bool relative)
+	{
+		//0x202 = AL_SOURCE_RELATIVE
+		sourcei(source, 0x202, relative ? 1 : 0);
+	}
+
+	[DllImport(LibraryPath, EntryPoint = "alSource3f")]
+	private static extern void source3f(uint source, int param, float value1, float value2, float value3);
+
+	public static void SetSourcePosition(uint source, Vector3 position)
+	{
+		//0x1004 = AL_POSITION
+		source3f(source, 0x1004, position.X, position.Y, position.Z);
+	}
+
+	public static void SetSourceVelocity(uint source, Vector3 velocity)
+	{
+		//0x1006 = AL_VELOCITY
+		source3f(source, 0x1006, velocity.X, velocity.Y, velocity.Z);
+	}
+
+	[DllImport(LibraryPath, EntryPoint = "alGetSourcef")]
+	private static extern void getSourcef(uint source, int param, [Out] float* value);
 	public static int GetBuffersProcessed(uint source)
 	{
 		//0x1016 = AL_BUFFERS_PROCESSED
@@ -211,13 +283,28 @@ internal unsafe static class ALC
 	[DllImport(LibraryPath, EntryPoint = "alListenerf")]
 	private static extern void listenerf(int param, float value);
 
+	[DllImport(LibraryPath, EntryPoint = "alListener3f")]
+	private static extern void listener3f(int param, float value1, float value2, float value3);
+
 	public static void SetListenerGain(float gain)
 	{
-		//0x100A = GL_GAIN
+		//0x100A = AL_GAIN
 		listenerf(0x100A, gain);
+	}
+	public static void SetListenerPosition(Vector3 position)
+	{
+		//0x1004 = AL_POSITION
+		listener3f(0x1004, position.X, position.Y, position.Z);
+	}
+
+	public static void SetListenerVelocity(Vector3 velocity)
+	{
+		//0x1006 = AL_VELOCITY
+		listener3f(0x1006, velocity.X, velocity.Y, velocity.Z);
 	}
 
 	#endregion
+
 
 	#region Errors
 	[DllImport(LibraryPath, EntryPoint = "alGetError")]
