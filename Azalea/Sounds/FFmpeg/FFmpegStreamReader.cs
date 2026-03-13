@@ -1,4 +1,5 @@
-﻿using Azalea.Utils;
+﻿using Azalea.Sounds.OpenAL;
+using Azalea.Utils;
 using FFmpeg.AutoGen;
 using System;
 using System.Collections.Generic;
@@ -82,13 +83,15 @@ internal unsafe class FFmpegStreamReader : Disposable
 			&swr,
 			&outLayout,
 			AVSampleFormat.AV_SAMPLE_FMT_S16,
-			_codecContext->sample_rate,
+			ALAudioManager.DEVICE_FREQUENCY, // This is kinda hard-coded for now but it will be changed
 
 			&inLayout,
 			_codecContext->sample_fmt,
 			_codecContext->sample_rate,
 			0,
 			null);
+
+		ffmpeg.av_opt_set_int(swr, "resampler", 1 /* SWR_RESAMPLER_SOXR*/, 0);
 
 		ffmpeg.swr_init(swr);
 
@@ -102,14 +105,18 @@ internal unsafe class FFmpegStreamReader : Disposable
 		_swr = swr;
 	}
 
-	private readonly Queue<(byte[], float)> _pendingChunks = [];
+	private readonly Queue<(byte[], int, float)> _pendingChunks = [];
 
-	public bool ReadChunk(out byte[] pcm, out int sampleRate, out float startTime)
+	public bool ReadChunk(out ReadOnlySpan<byte> pcm, out int sampleRate, out float startTime)
 	{
+		// Since we now do the resampling ourselves, this will always just be
+		// the device frequency;
+		sampleRate = ALAudioManager.DEVICE_FREQUENCY;
+
 		if (_pendingChunks.Count > 0)
 		{
-			(pcm, startTime) = _pendingChunks.Dequeue();
-			sampleRate = _codecContext->sample_rate;
+			(var readPcm, var readPcmLength, startTime) = _pendingChunks.Dequeue();
+			pcm = readPcm.AsSpan()[..readPcmLength];
 			return true;
 		}
 
@@ -121,7 +128,6 @@ internal unsafe class FFmpegStreamReader : Disposable
 			if (result < 0)
 			{
 				pcm = [];
-				sampleRate = -1;
 				startTime = -1;
 				return false;
 			}
@@ -140,7 +146,9 @@ internal unsafe class FFmpegStreamReader : Disposable
 					? _frame->pts * (float)ffmpeg.av_q2d(_formatContext->streams[_audioStreamIndex]->time_base)
 					: -1;
 
-				_pendingChunks.Enqueue((convertFrameToPcm(_frame, _swr), start));
+				var readPcm = convertFrameToPcm(_frame, _swr, out var bufferLength);
+
+				_pendingChunks.Enqueue((readPcm, bufferLength, start));
 			}
 		}
 
@@ -148,8 +156,8 @@ internal unsafe class FFmpegStreamReader : Disposable
 
 		if (_pendingChunks.Count > 0)
 		{
-			(pcm, startTime) = _pendingChunks.Dequeue();
-			sampleRate = _codecContext->sample_rate;
+			(var readPcm, var readPcmLength, startTime) = _pendingChunks.Dequeue();
+			pcm = readPcm.AsSpan()[..readPcmLength];
 			return true;
 		}
 		else
@@ -202,7 +210,7 @@ internal unsafe class FFmpegStreamReader : Disposable
 		// ffmpeg.av_free(_ioBuffer);
 	}
 
-	private static byte[] convertFrameToPcm(AVFrame* frame, SwrContext* swr)
+	private static byte[] convertFrameToPcm(AVFrame* frame, SwrContext* swr, out int bufferLength)
 	{
 		int dstSamples = ffmpeg.swr_get_out_samples(swr, frame->nb_samples);
 		int bufferSize = ffmpeg.av_samples_get_buffer_size(
@@ -211,11 +219,16 @@ internal unsafe class FFmpegStreamReader : Disposable
 		byte[] buffer = new byte[bufferSize];
 		fixed (byte* outPtr = buffer)
 		{
-			byte** outArr = stackalloc byte*[1];
+			byte** outArr = stackalloc byte*[2];
 			outArr[0] = outPtr;
+			outArr[1] = null;
 
-			ffmpeg.swr_convert(swr, outArr, dstSamples,
+			var sampleCount = ffmpeg.swr_convert(swr, outArr, dstSamples,
 				frame->extended_data, frame->nb_samples);
+
+			// Since we're using signed 16 byte stereo samples we multiply the resulting samples
+			// by 4 to get the buffer size
+			bufferLength = sampleCount * 4;
 		}
 
 		return buffer;

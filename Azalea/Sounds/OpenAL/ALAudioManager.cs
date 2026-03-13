@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 namespace Azalea.Sounds.OpenAL;
 internal class ALAudioManager : AudioManager
@@ -11,6 +12,10 @@ internal class ALAudioManager : AudioManager
 	private readonly ALC_Device _device;
 	private readonly ALC_Context _context;
 
+	private readonly int _deviceFrequency;
+
+	public static int DEVICE_FREQUENCY;
+
 	private readonly ALAudioSource[] _audioSources;
 	private readonly ALAudioByteSource[] _audioByteSources;
 	private readonly ALAudioByteSource[] _audioByteSourcesInternal;
@@ -22,8 +27,16 @@ internal class ALAudioManager : AudioManager
 	public ALAudioManager()
 	{
 		_device = ALC.OpenDevice();
-		_context = ALC.CreateContext(_device);
+		_context = ALC.CreateContext(_device, [0x1992 /* ALC_HRTF_SOFT */, 0 /* ALC_FALSE */, 0]);
 		ALC.MakeContextCurrent(_context);
+
+		ALC.DistanceModel(0);
+		ALC.SetListenerPosition(Vector3.Zero);
+		ALC.SetListenerVelocity(Vector3.Zero);
+
+		_deviceFrequency = ALC.GetDeviceFrequency(_device);
+		DEVICE_FREQUENCY = _deviceFrequency;
+		Console.WriteLine(DEVICE_FREQUENCY);
 
 		_audioSources = new ALAudioSource[AudioSourceCount];
 		for (int i = 0; i < AudioSourceCount; i++)

@@ -1,5 +1,6 @@
 ﻿using Azalea.Sounds.OpenAL.Enums;
 using Azalea.Utils;
+using System.Numerics;
 
 namespace Azalea.Sounds.OpenAL;
 internal class ALSource : Disposable
@@ -9,6 +10,10 @@ internal class ALSource : Disposable
 	public ALSource()
 	{
 		Handle = ALC.GenSource();
+
+		ALC.SetSourcePosition(Handle, Vector3.Zero);
+		ALC.SetSourceVelocity(Handle, Vector3.Zero);
+		ALC.SetSourceRelative(Handle, true);
 	}
 
 	private float _gain = 1;
