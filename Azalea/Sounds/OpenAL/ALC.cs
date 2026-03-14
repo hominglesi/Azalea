@@ -10,11 +10,14 @@ internal unsafe static class ALC
 
 	#region General
 
-	[DllImport(LibraryPath, EntryPoint = "alcGetIntegerv")]
-	private static extern void getIntegerv(IntPtr device, int param, int size, [Out] int* value);
-
 	[DllImport(LibraryPath, EntryPoint = "alGetString")]
 	private static extern IntPtr getString(int param);
+
+	public static string GetString(int param)
+	{
+		var ptr = getString(param);
+		return Marshal.PtrToStringAnsi(ptr)!;
+	}
 
 	public static string GetVersion()
 	{
@@ -33,51 +36,11 @@ internal unsafe static class ALC
 
 	#endregion
 
-	#region Device
-	[DllImport(LibraryPath, EntryPoint = "alcOpenDevice")]
-	private static extern IntPtr openDevice(char* deviceName);
-
-	public static ALC_Device OpenDevice()
-	{
-		var device = openDevice(null);
-
-		if (device == IntPtr.Zero)
-			throw new Exception("Could not open device");
-
-		return device;
-	}
-
-	[DllImport(LibraryPath, EntryPoint = "alcCloseDevice")]
-	public static extern bool CloseDevice(ALC_Device device);
-
-	public static int GetDeviceFrequency(ALC_Device device)
-	{
-		int a1;
-		int a2;
-		getIntegerv(device, 0x1991 /* ALC_FREQUENCY */, 1, &a1);
-		getIntegerv(device, 0x1990 /* ALC_FREQUENCY */, 1, &a2);
-
-		Console.WriteLine($"ALC_FORMAT_TYPE_SOFT: {a1}, ALC_FORMAT_CHANNELS_SOFT: {a2}");
-
-
-		int frequency;
-		getIntegerv(device, 0x1007 /* ALC_FREQUENCY */, 1, &frequency);
-		return frequency;
-	}
-
-	public static bool GetDeviceHRTF(ALC_Device device)
-	{
-		int hrtf;
-		getIntegerv(device, 0x1992 /* ALC_HRTF_SOFT */, 1, &hrtf);
-		return hrtf != 0;
-	}
-	#endregion
-
 	#region Context Lifetime
 	[DllImport(LibraryPath, EntryPoint = "alcCreateContext")]
-	private static extern ALC_Context createContext(ALC_Device device, int* attributeList);
+	private static extern ALC_Context createContext(IntPtr device, int* attributeList);
 
-	public static ALC_Context CreateContext(ALC_Device device, int[] attributeList)
+	public static ALC_Context CreateContext(IntPtr device, int[] attributeList)
 	{
 		fixed (int* ptr = attributeList)
 		{
@@ -122,7 +85,6 @@ internal unsafe static class ALC
 		fixed (void* p = data)
 		{
 			bufferData(buffer, format, p, size, frequency);
-			Console.WriteLine(size);
 		}
 	}
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azalea.Platform;
+using System;
 using System.Numerics;
 
 namespace Azalea.Sounds.OpenAL;
@@ -9,10 +10,8 @@ internal class ALAudioManager : AudioManager
 	protected const int AudioByteSourceCount = 24;
 	protected const int AudioByteSourceInternalCount = 4;
 
-	private readonly ALC_Device _device;
+	private ALDevice _device;
 	private readonly ALC_Context _context;
-
-	private readonly int _deviceFrequency;
 
 	public static int DEVICE_FREQUENCY;
 
@@ -24,19 +23,24 @@ internal class ALAudioManager : AudioManager
 	public override IAudioSource[] AudioByteChannels => _audioByteSources;
 	public override IAudioSource[] AudioByteInternalChannels => _audioByteSourcesInternal;
 
+	private readonly int[] _deviceAttributes = [0x1992 /* ALC_HRTF_SOFT */, 0 /* ALC_FALSE */, 0];
+
 	public ALAudioManager()
 	{
-		_device = ALC.OpenDevice();
-		_context = ALC.CreateContext(_device, [0x1992 /* ALC_HRTF_SOFT */, 0 /* ALC_FALSE */, 0]);
+		foreach (var device in ALDevice.EnumerateDevices())
+			Console.WriteLine(device);
+
+		_device = ALDevice.OpenDefaultDevice();
+		_context = ALC.CreateContext(_device.Handle, _deviceAttributes);
 		ALC.MakeContextCurrent(_context);
 
 		ALC.DistanceModel(0);
 		ALC.SetListenerPosition(Vector3.Zero);
 		ALC.SetListenerVelocity(Vector3.Zero);
 
-		_deviceFrequency = ALC.GetDeviceFrequency(_device);
-		DEVICE_FREQUENCY = _deviceFrequency;
-		Console.WriteLine(DEVICE_FREQUENCY);
+		_device.Reopen(null, _deviceAttributes);
+
+		DEVICE_FREQUENCY = _device.GetFrequency();
 
 		_audioSources = new ALAudioSource[AudioSourceCount];
 		for (int i = 0; i < AudioSourceCount; i++)
@@ -86,8 +90,29 @@ internal class ALAudioManager : AudioManager
 		return audioByteSource.Play(soundByte, gain, looping)!;
 	}
 
+	private DateTime _lastDefaultDevicePoll = new();
 	public override void Update()
 	{
+		if (_device.PollConnected() == false)
+		{
+			Console.WriteLine("HE DISCONNECTED!!!");
+
+			_device.Reopen(null, _deviceAttributes);
+
+			return;
+		}
+
+		if (Time.GetPreciseMilisecondsSince(_lastDefaultDevicePoll) > 1000)
+		{
+			var defaultDeviceName = ALDevice.GetDefaultDeviceName();
+			var deviceName = _device.GetDeviceName();
+			if (deviceName != defaultDeviceName)
+			{
+				_device.Reopen(defaultDeviceName, _deviceAttributes);
+			}
+			_lastDefaultDevicePoll = Time.GetCurrentPreciseTime();
+		}
+
 		foreach (var source in _audioSources)
 			source.Update();
 
@@ -97,6 +122,6 @@ internal class ALAudioManager : AudioManager
 
 	protected override void OnDispose()
 	{
-		ALC.CloseDevice(_device);
+		_device.Dispose();
 	}
 }
