@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 
-namespace Azalea.Platform.Windows.ComInterfaces;
+namespace Azalea.Platform.Windows.Com;
 
 [ComImport]
 [Guid("00000122-0000-0000-C000-000000000046")]

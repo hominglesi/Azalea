@@ -10,6 +10,8 @@ internal class ALAudioManager : AudioManager
 	protected const int AudioByteSourceCount = 24;
 	protected const int AudioByteSourceInternalCount = 4;
 
+	private readonly IAudioDeviceNotificationClient _deviceNotificationClient;
+
 	private ALDevice _device;
 	private readonly ALC_Context _context;
 
@@ -25,8 +27,11 @@ internal class ALAudioManager : AudioManager
 
 	private readonly int[] _deviceAttributes = [0x1992 /* ALC_HRTF_SOFT */, 0 /* ALC_FALSE */, 0];
 
-	public ALAudioManager()
+	public ALAudioManager(IAudioDeviceNotificationClient deviceNotificationClient)
 	{
+		// We need to keep a reference to the client alive
+		_deviceNotificationClient = deviceNotificationClient;
+
 		foreach (var device in ALDevice.EnumerateDevices())
 			Console.WriteLine(device);
 
@@ -34,11 +39,11 @@ internal class ALAudioManager : AudioManager
 		_context = ALC.CreateContext(_device.Handle, _deviceAttributes);
 		ALC.MakeContextCurrent(_context);
 
+		_deviceNotificationClient.DefaultDeviceChanged += () => _device.Reopen(null, _deviceAttributes);
+
 		ALC.DistanceModel(0);
 		ALC.SetListenerPosition(Vector3.Zero);
 		ALC.SetListenerVelocity(Vector3.Zero);
-
-		_device.Reopen(null, _deviceAttributes);
 
 		DEVICE_FREQUENCY = _device.GetFrequency();
 
@@ -90,27 +95,13 @@ internal class ALAudioManager : AudioManager
 		return audioByteSource.Play(soundByte, gain, looping)!;
 	}
 
-	private DateTime _lastDefaultDevicePoll = new();
 	public override void Update()
 	{
 		if (_device.PollConnected() == false)
 		{
-			Console.WriteLine("HE DISCONNECTED!!!");
-
 			_device.Reopen(null, _deviceAttributes);
 
 			return;
-		}
-
-		if (Time.GetPreciseMilisecondsSince(_lastDefaultDevicePoll) > 1000)
-		{
-			var defaultDeviceName = ALDevice.GetDefaultDeviceName();
-			var deviceName = _device.GetDeviceName();
-			if (deviceName != defaultDeviceName)
-			{
-				_device.Reopen(defaultDeviceName, _deviceAttributes);
-			}
-			_lastDefaultDevicePoll = Time.GetCurrentPreciseTime();
 		}
 
 		foreach (var source in _audioSources)
