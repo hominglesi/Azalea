@@ -1,6 +1,6 @@
 ﻿using Azalea.Graphics;
 using Azalea.Numerics;
-using Azalea.Platform.Windows.ComInterfaces;
+using Azalea.Platform.Windows.Com;
 using Azalea.Platform.Windows.Enums;
 using Azalea.Platform.Windows.Enums.RawInput;
 using Microsoft.Win32.SafeHandles;

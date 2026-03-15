@@ -2,7 +2,7 @@
 using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Inputs;
-using Azalea.Platform.Windows.ComInterfaces;
+using Azalea.Platform.Windows.Com;
 using Azalea.Utils;
 using System;
 using System.Runtime.InteropServices;

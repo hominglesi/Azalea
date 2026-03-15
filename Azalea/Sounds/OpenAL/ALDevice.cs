@@ -13,7 +13,7 @@ internal unsafe partial class ALDevice : Disposable
 		Handle = handle;
 	}
 
-	public void Reopen(string newDeviceName, int[] attibutes)
+	public void Reopen(string? newDeviceName, int[] attibutes)
 	{
 		_alcReopenDeviceSOFT ??= Marshal.GetDelegateForFunctionPointer<ReopenDeviceDelegate>(alcGetProcAddress(Handle, "alcReopenDeviceSOFT"));
 
@@ -101,8 +101,8 @@ internal unsafe partial class ALDevice : Disposable
 	private static partial IntPtr alcGetString(IntPtr device, DeviceParameter param);
 
 	[LibraryImport(ALC.LibraryPath, StringMarshalling = StringMarshalling.Utf8)]
-	private static partial IntPtr alcOpenDevice(string deviceName);
+	private static partial IntPtr alcOpenDevice(string? deviceName);
 
-	private delegate bool ReopenDeviceDelegate(IntPtr device, [MarshalAs(UnmanagedType.LPStr)] string deviceName, int[] attributes);
+	private delegate bool ReopenDeviceDelegate(IntPtr device, [MarshalAs(UnmanagedType.LPStr)] string? deviceName, int[] attributes);
 	private ReopenDeviceDelegate? _alcReopenDeviceSOFT;
 }
