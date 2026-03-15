@@ -32,9 +32,6 @@ internal class ALAudioManager : AudioManager
 		// We need to keep a reference to the client alive
 		_deviceNotificationClient = deviceNotificationClient;
 
-		foreach (var device in ALDevice.EnumerateDevices())
-			Console.WriteLine(device);
-
 		_device = ALDevice.OpenDefaultDevice();
 		_context = ALC.CreateContext(_device.Handle, _deviceAttributes);
 		ALC.MakeContextCurrent(_context);

@@ -33,6 +33,8 @@ public abstract class GameHost
 	private readonly bool _editorEnabled;
 	internal EditorContainer? EditorContainer { get; private set; }
 
+	private AudioThread? _audioThread;
+
 	internal GameHost(HostPreferences prefs)
 	{
 		_editorEnabled = prefs.EditorEnabled;
@@ -62,6 +64,9 @@ public abstract class GameHost
 
 		Input.Initialize(_root);
 		Time.Setup();
+
+		_audioThread = new AudioThread();
+		_audioThread.Start();
 
 		RunGameLoop();
 	}
