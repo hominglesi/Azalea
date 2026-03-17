@@ -4,7 +4,14 @@ using System;
 namespace Azalea.Sounds.OpenAL;
 internal class ALAudioByteSource : IAudioSource
 {
-	private readonly ALSource _source = new();
+	private readonly ALAudioManager _audioManager;
+	private readonly ALSource _source;
+
+	public ALAudioByteSource(ALAudioManager audioManager)
+	{
+		_audioManager = audioManager;
+		_source = new(audioManager);
+	}
 
 	public IAudioInstance? CurrentInstance { get; private set; }
 	public float CurrentTimestamp { get; private set; }
@@ -99,7 +106,7 @@ internal class ALAudioByteSource : IAudioSource
 
 		_source.Stop();
 
-		ALC.SetSecOffset(_source.Handle, timestamp);
+		_source.SetSecOffset(timestamp);
 		CurrentTimestamp = Math.Min(timestamp, CurrentInstance!.TotalDuration);
 
 		if (State == AudioSourceState.Playing)

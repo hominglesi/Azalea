@@ -3,6 +3,7 @@
 namespace Azalea.Utils;
 public abstract class Disposable : IDisposable
 {
+	protected readonly object DisposeLock = new();
 	protected bool Disposed { get; private set; }
 
 	public void Dispose()
@@ -13,13 +14,16 @@ public abstract class Disposable : IDisposable
 
 	private void dispose(bool manualDispose)
 	{
-		if (Disposed) return;
+		lock (DisposeLock)
+		{
+			if (Disposed) return;
 
-		OnDispose();
-		Disposed = true;
+			OnDispose();
+			Disposed = true;
 
-		if (manualDispose == false)
-			Console.WriteLine($"The object '{this}' was garbage collected before being manualy disposed.");
+			if (manualDispose == false)
+				Console.WriteLine($"The object '{this}' was garbage collected before being manualy disposed.");
+		}
 	}
 
 	protected abstract void OnDispose();

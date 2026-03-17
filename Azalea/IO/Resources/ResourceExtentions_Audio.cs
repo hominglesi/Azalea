@@ -30,7 +30,8 @@ public static partial class ResourceStoreExtentions
 		try { wav = new WavSound(stream); }
 		catch (ArgumentException) { throw new ArgumentException("Sound Bytes only support .wav files"); }
 
-		var sound = Audio.CreateSound(wav.Data, wav.Format, wav.Frequency);
+		var data = wav.Data.ToArray();
+		var sound = Audio.CreateSound(data, data.Length, wav.Format, wav.Frequency);
 
 		_soundByteCache.AddValue(store, path, sound);
 

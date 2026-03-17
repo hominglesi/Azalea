@@ -15,6 +15,7 @@ internal class AudioTest : TestScene
 	private SoundByte _goodkidByte;
 
 	private Sound _harbor;
+	private Sound _esseCara;
 	private Sound _naviaWeb;
 	private Sound _navia;
 	private SoundByte _hitnormal;
@@ -24,10 +25,12 @@ internal class AudioTest : TestScene
 	public AudioTest()
 	{
 		_goodkid = Assets.GetSound("Audio/goodkid.wav");
-		_goodkidByte = Assets.GetSoundByte("Audio/goodkidByte.wav");
+		//_goodkidByte = Assets.GetSoundByte("Audio/goodkidByte.wav");
 
 		_harbor = Assets.FileSystemStore.GetSound(@"E:\Music\Alohaii\Virtual Paradise\\10 - Harbor (feat. Kaneko Lumi).flac");
-		_hitnormal = Assets.GetSoundByte("Audio/hitnormal.wav");
+		_esseCara = Assets.FileSystemStore.GetSound(@"E:\Music\Sayfalse, Scythermane & TRXSHBXY\ESSE CARA!\01 - ESSE CARA!.m4a");
+
+		//_hitnormal = Assets.GetSoundByte("Audio/hitnormal.wav");
 		_navia = Assets.FileSystemStore.GetSound(@"E:\cut small.mp3");
 		_naviaWeb = Assets.WebStore.GetSound("https://cdn.discordapp.com/attachments/403993461684043776/1467983957810352220/cut_3.mp3?ex=69825e19&is=69810c99&hm=dc96bf622cb1ade23ddf37d948e8bf093f05c55c28cc5637a759c3bd8e237944&");
 
@@ -40,6 +43,9 @@ internal class AudioTest : TestScene
 				CreateActionButton(
 					"'Harbor (feat. Kaneko Lumi)' at 0.1f",
 					() => _instance = Audio.Play(_harbor, 0.1f)),
+				CreateActionButton(
+					"'Esse Cara at 0.1f",
+					() => _instance = Audio.Play(_esseCara, 0.1f)),
 				CreateActionButton(
 					"'Navia Song' at 0.1f",
 					() => _instance = Audio.Play(_navia, 0.1f)),
@@ -235,6 +241,7 @@ internal class AudioTest : TestScene
 					var minutes = (int)Math.Round(duration) / 60;
 					var seconds = (int)Math.Round(duration % 60);
 					_durationDisplay.Text = $"Duration: {minutes}:{seconds}";
+					_loopingCheckbox.SetChecked(_audioSource.Looping);
 				}
 				else
 					_durationDisplay.Text = $"Duration: *:**";
@@ -257,8 +264,8 @@ internal class AudioTest : TestScene
 				else
 				{
 					var duration = _audioSource.CurrentInstance.CurrentTimestamp;
-					var minutes = (int)Math.Round(duration) / 60;
-					var seconds = (int)Math.Round(duration % 60);
+					var minutes = (int)Math.Floor(duration) / 60;
+					var seconds = (int)Math.Floor(duration % 60);
 					_timestampDisplay.Text = $"Timestamp: {minutes}:{seconds}";
 				}
 			}

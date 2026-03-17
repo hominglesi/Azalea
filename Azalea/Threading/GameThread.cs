@@ -23,7 +23,7 @@ internal abstract class GameThread
 		_thread.Start();
 	}
 
-	public void Start()
+	public virtual void Start()
 	{
 		if (_running)
 			return;

@@ -3,14 +3,16 @@
 namespace Azalea.Sounds.OpenAL;
 internal class ALSound : SoundByte
 {
-	internal ALBuffer Buffer;
+	private readonly ALAudioManager _audioManager;
 
-	public float Duration { get; private init; }
+	public ALBuffer Buffer { get; }
+	public float Duration { get; }
 
-	public ALSound(ReadOnlySpan<byte> data, ALFormat format, int frequency)
+	public ALSound(ALAudioManager audioManager, byte[] data, int dataLength, ALFormat format, int frequency)
 	{
-		Buffer = new ALBuffer();
-		Buffer.SetData(data, format, frequency);
+		_audioManager = audioManager;
+		Buffer = new ALBuffer(audioManager);
+		Buffer.BufferData(data, dataLength, format, frequency);
 
 		Duration = getDuration(data.Length, format, frequency);
 	}
