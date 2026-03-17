@@ -23,7 +23,7 @@ public abstract class GameHost
 
 	public IWindow Window { get; }
 	public IRenderer Renderer { get; }
-	public IAudioManager AudioManager { get; }
+	public IAudioManager AudioManager => _audioThread.AudioManager;
 	public IConfigProvider? ConfigProvider { get; protected set; }
 	public SceneContainer SceneManager { get; }
 	public PhysicsGenerator Physics { get; }
@@ -33,7 +33,7 @@ public abstract class GameHost
 	private readonly bool _editorEnabled;
 	internal EditorContainer? EditorContainer { get; private set; }
 
-	private AudioThread? _audioThread;
+	private AudioThread _audioThread;
 
 	internal GameHost(HostPreferences prefs)
 	{
@@ -42,7 +42,8 @@ public abstract class GameHost
 
 		Window = CreateWindow(prefs);
 		Renderer = CreateRenderer(Window);
-		AudioManager = CreateAudioManager();
+
+		_audioThread = new AudioThread(this);
 		Clipboard = CreateClipboard();
 		Physics = new PhysicsGenerator();
 		SceneManager = new SceneContainer();
@@ -65,9 +66,6 @@ public abstract class GameHost
 		Input.Initialize(_root);
 		Time.Setup();
 
-		_audioThread = new AudioThread();
-		_audioThread.Start();
-
 		RunGameLoop();
 	}
 
@@ -87,7 +85,6 @@ public abstract class GameHost
 		PromiseSystem.ProcessPromises();
 
 		Window.ProcessEvents();
-		AudioManager.Update();
 
 		while (_accumulator >= __fixedUpdateFrametime)
 		{

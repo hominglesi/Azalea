@@ -27,22 +27,16 @@ public class Checkbox : Composition
 
 	protected override bool OnClick(ClickEvent e)
 	{
-		Toggle();
+		SetChecked(!Checked);
 		return true;
 	}
 
-	public void Toggle()
+	public void SetChecked(bool isChecked)
 	{
-		if (Checked)
-		{
-			_box.BackgroundColor = new Color(0, 0, 0, 0);
-			Checked = false;
-		}
-		else
-		{
-			_box.BackgroundColor = Palette.Black;
-			Checked = true;
-		}
+		if (Checked == isChecked) return;
+
+		Checked = isChecked;
+		_box.BackgroundColor = isChecked ? Palette.Black : new Color(0, 0, 0, 0);
 		Toggled?.Invoke(Checked);
 	}
 }

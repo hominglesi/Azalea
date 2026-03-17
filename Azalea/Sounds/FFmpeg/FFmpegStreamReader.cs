@@ -2,6 +2,7 @@
 using Azalea.Utils;
 using FFmpeg.AutoGen;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -25,6 +26,35 @@ internal unsafe class FFmpegStreamReader : Disposable
 	private readonly AVPacket* _packet;
 	private readonly AVFrame* _frame;
 
+	static FFmpegStreamReader()
+	{
+		ffmpeg.av_log_set_callback(_logCallback);
+	}
+
+	private static av_log_set_callback_callback _logCallback = logCallback;
+	private static void logCallback(void* ptr, int level, string format, byte* args)
+	{
+		if (level > ffmpeg.AV_LOG_WARNING)
+			return;
+
+		var buffer = stackalloc byte[1024];
+		var printPrefix = 1;
+		ffmpeg.av_log_format_line2(ptr, level, format, args, buffer, 1024, &printPrefix);
+		var message = Marshal.PtrToStringAnsi((IntPtr)buffer);
+
+		if (message is null) return;
+
+		if (_supressLogging)
+		{
+			if (message.Contains("timescale not set"))
+				return;
+		}
+
+		Console.WriteLine(message);
+	}
+
+	private static bool _supressLogging = false;
+
 	public unsafe FFmpegStreamReader(Stream stream)
 	{
 		_ioBuffer = (byte*)ffmpeg.av_malloc(__ioBufferSize);
@@ -45,8 +75,34 @@ internal unsafe class FFmpegStreamReader : Disposable
 		formatCtx->pb = avioCtx;
 		formatCtx->flags |= ffmpeg.AVFMT_FLAG_CUSTOM_IO;
 
+		_supressLogging = true;
 		if (ffmpeg.avformat_open_input(&formatCtx, null, null, null) < 0)
 			throw new Exception("Could not open AvFormat input!");
+		_supressLogging = false;
+
+		for (int i = 0; i < formatCtx->nb_streams; i++)
+		{
+			// If the stream doesn't have time scale data we infer it
+			AVStream* str = formatCtx->streams[i];
+			if (str->time_base.num == 0 || str->time_base.den == 0)
+			{
+				if (str->codecpar->codec_type == AVMediaType.AVMEDIA_TYPE_VIDEO &&
+					str->r_frame_rate.den != 0)
+				{
+					str->time_base = ffmpeg.av_inv_q(str->r_frame_rate);
+				}
+				else if (str->codecpar->sample_rate != 0)
+				{
+					str->time_base.num = 1;
+					str->time_base.den = str->codecpar->sample_rate;
+				}
+				else
+				{
+					str->time_base.num = 1;
+					str->time_base.den = ffmpeg.AV_TIME_BASE;
+				}
+			}
+		}
 
 		ffmpeg.avformat_find_stream_info(formatCtx, null);
 
@@ -107,16 +163,41 @@ internal unsafe class FFmpegStreamReader : Disposable
 
 	private readonly Queue<(byte[], int, float)> _pendingChunks = [];
 
-	public bool ReadChunk(out ReadOnlySpan<byte> pcm, out int sampleRate, out float startTime)
+	public bool ReadChunk(out byte[] pcm, out int pcmLength, out int sampleRate, out float startTime)
 	{
 		// Since we now do the resampling ourselves, this will always just be
-		// the device frequency;
+		// the device frequency
+		sampleRate = ALAudioManager.DEVICE_FREQUENCY;
+
+		if (Disposed)
+		{
+			pcm = [];
+			startTime = -1;
+			pcmLength = 0;
+			return false;
+		}
+
+		lock (DisposeLock)
+		{
+			if (Disposed)
+			{
+				pcm = [];
+				startTime = -1;
+				pcmLength = 0;
+				return false;
+			}
+
+			return readChunk(out pcm, out pcmLength, out sampleRate, out startTime);
+		}
+	}
+
+	private bool readChunk(out byte[] pcm, out int pcmLength, out int sampleRate, out float startTime)
+	{
 		sampleRate = ALAudioManager.DEVICE_FREQUENCY;
 
 		if (_pendingChunks.Count > 0)
 		{
-			(var readPcm, var readPcmLength, startTime) = _pendingChunks.Dequeue();
-			pcm = readPcm.AsSpan()[..readPcmLength];
+			(pcm, pcmLength, startTime) = _pendingChunks.Dequeue();
 			return true;
 		}
 
@@ -129,6 +210,7 @@ internal unsafe class FFmpegStreamReader : Disposable
 			{
 				pcm = [];
 				startTime = -1;
+				pcmLength = 0;
 				return false;
 			}
 
@@ -156,15 +238,12 @@ internal unsafe class FFmpegStreamReader : Disposable
 
 		if (_pendingChunks.Count > 0)
 		{
-			(var readPcm, var readPcmLength, startTime) = _pendingChunks.Dequeue();
-			pcm = readPcm.AsSpan()[..readPcmLength];
+			(pcm, pcmLength, startTime) = _pendingChunks.Dequeue();
 			return true;
 		}
 		else
 		{
-			var result = ReadChunk(out pcm, out sampleRate, out startTime);
-
-			return result;
+			return ReadChunk(out pcm, out pcmLength, out sampleRate, out startTime);
 		}
 	}
 
@@ -172,14 +251,28 @@ internal unsafe class FFmpegStreamReader : Disposable
 
 	public void Seek(float seconds)
 	{
+		if (Disposed)
+			return;
+
+		lock (DisposeLock)
+		{
+			if (Disposed)
+				return;
+
+			seek(seconds);
+		}
+	}
+
+	private void seek(float seconds)
+	{
 		_pendingChunks.Clear();
 
 		_seekSeconds = seconds;
 		var seekTimestamp = seconds * ffmpeg.AV_TIME_BASE;
 
-		ffmpeg.av_seek_frame(_formatContext, -1, (long)seekTimestamp, ffmpeg.AV_TIME_BASE);
-
+		ffmpeg.av_seek_frame(_formatContext, -1, (long)seekTimestamp, ffmpeg.AVSEEK_FLAG_BACKWARD);
 		ffmpeg.avcodec_flush_buffers(_codecContext);
+		ffmpeg.swr_init(_swr);
 	}
 
 	protected override void OnDispose()
@@ -216,7 +309,7 @@ internal unsafe class FFmpegStreamReader : Disposable
 		int bufferSize = ffmpeg.av_samples_get_buffer_size(
 			null, 2, dstSamples, AVSampleFormat.AV_SAMPLE_FMT_S16, 1);
 
-		byte[] buffer = new byte[bufferSize];
+		byte[] buffer = ArrayPool<byte>.Shared.Rent(bufferSize);
 		fixed (byte* outPtr = buffer)
 		{
 			byte** outArr = stackalloc byte*[2];
