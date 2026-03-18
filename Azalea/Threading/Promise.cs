@@ -1,87 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading.Tasks;
 
 namespace Azalea.Threading;
-public class Promise<T> : IPromise
+public class Promise<T>
 {
-	private readonly Task<T>? _task;
-	private readonly T? _wrappedResult;
+	private T? _value;
 
-	public Promise(Func<T> executedFunction)
+	public bool IsResolved { get; private set; }
+
+	public Promise() { }
+
+	public Promise(T value)
 	{
-		_task = Task.Run(executedFunction);
-
-		PromiseSystem.AddPromise(this);
+		_value = value;
+		IsResolved = true;
 	}
 
-	/// <summary>
-	/// If an API expects a Promise but you already have the result you can wrap the result
-	/// in a promise without the actuall overhead of a real promise
-	/// </summary>
-	public Promise(T result)
+	public void Resolve(T value)
 	{
-		_wrappedResult = result;
+		if (IsResolved)
+			throw new InvalidOperationException("Promise cannot be resolved twice!");
+
+		_value = value;
+		IsResolved = true;
 	}
 
-	private List<Action<T>> _onResolvedActions = [];
-
-	public Promise<T> Then(Action<T> onResolved)
+	public T Value
 	{
-		if (_wrappedResult is not null)
+		get
 		{
-			onResolved(_wrappedResult);
-			return this;
+			if (IsResolved == false)
+				throw new InvalidOperationException("Cannot get promise value before it's resolved");
+
+			return _value!;
 		}
-
-		Debug.Assert(_task is not null);
-
-		if (_task.IsCompleted)
-			onResolved(_task.Result);
-		else
-			_onResolvedActions.Add(onResolved);
-
-		return this;
 	}
-
-	internal void ExecuteOnResolved()
-	{
-		Debug.Assert(_task is not null);
-
-		foreach (var action in _onResolvedActions)
-			action.Invoke(_task.Result);
-
-		_onResolvedActions.Clear();
-		_isResolved = true;
-	}
-
-	void IPromise.ExecuteOnResolved() => ExecuteOnResolved();
-
-	private bool _isResolved = false;
-	public bool IsResolved => _task is null || _isResolved;
-
-	bool IPromise.IsResolvedInternal => _task is null || _task.IsCompleted;
 }
-
-/* PromisedTexture(Promise<Texture>) texture = Assets.GetTextureAsync();
- * _sprite.Texture = texture;
- * 
- * _sprite.Draw() {
- *	if(texture is PromisedTexture promised){
- *		if(promised.Resolved == false) drawLoading
- *		else set resolved texture
- *	}
- * }
- * 
- * Assets.GetTextureAsync();
- * 
- * ResourceExtentions.GetTextureAsync(){
- *	new Thread(){
- *		get stream from store ("ALL STREAMS NEED TO BE ATOMIC")
- *		
- *		
- *	}
- * }
- * 
- */

@@ -82,7 +82,7 @@ public abstract class GameHost
 		Time.UpdateDeltaTime();
 		_accumulator += Time.DeltaTime;
 
-		PromiseSystem.ProcessPromises();
+		Scheduler.InvokeScheduled();
 
 		Window.ProcessEvents();
 

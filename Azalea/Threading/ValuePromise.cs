@@ -4,16 +4,21 @@ namespace Azalea.Threading;
 public readonly struct ValuePromise<T>
 {
 	private readonly T? _value;
-	private readonly Promise2<T>? _promise;
+	private readonly Promise<T>? _promise;
 
 	public ValuePromise(T value)
 	{
 		_value = value;
 	}
 
-	public ValuePromise(Promise2<T> promise)
+	public ValuePromise(Promise<T> promise)
 	{
 		_promise = promise;
+	}
+
+	public ValuePromise()
+	{
+		throw new Exception($"{nameof(ValuePromise<T>)} must be created with either a value or a promise.");
 	}
 
 	public bool IsResolved => _promise is null || _promise.IsResolved;

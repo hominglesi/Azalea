@@ -225,7 +225,7 @@ internal unsafe partial class ALAudioManager
 	#endregion
 	#region GenerateBuffer
 
-	internal record GenerateBufferCommand(Promise2<uint> result) : AudioCommand;
+	internal record GenerateBufferCommand(Promise<uint> result) : AudioCommand;
 
 	[LibraryImport(OpenALPath)]
 	private static partial void alGenBuffers(int count, uint* buffers);
@@ -242,7 +242,7 @@ internal unsafe partial class ALAudioManager
 		if (IsAudioThread())
 			return new ValuePromise<uint>(generateBuffer());
 
-		var result = new Promise2<uint>();
+		var result = new Promise<uint>();
 		IssueCommand(new GenerateBufferCommand(result));
 		return new ValuePromise<uint>(result);
 	}
@@ -854,7 +854,7 @@ internal unsafe partial class ALAudioManager
 	#endregion
 	#region UnqueueSourceBuffer
 
-	internal record UnqueueSourceBufferCommand(uint source, Promise2<uint> result) : AudioCommand;
+	internal record UnqueueSourceBufferCommand(uint source, Promise<uint> result) : AudioCommand;
 
 	[LibraryImport(OpenALPath)]
 	private static partial void alSourceUnqueueBuffers(uint source, int size, uint* buffers);
@@ -871,7 +871,7 @@ internal unsafe partial class ALAudioManager
 		if (IsAudioThread())
 			return new ValuePromise<uint>(unqueueSourceBuffer(source));
 
-		var promise = new Promise2<uint>();
+		var promise = new Promise<uint>();
 		IssueCommand(new UnqueueSourceBufferCommand(source, promise));
 		return new ValuePromise<uint>(promise);
 	}
