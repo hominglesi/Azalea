@@ -1,22 +1,21 @@
-﻿using Azalea.Utils;
+﻿using Azalea.Threading;
+using Azalea.Utils;
 
 namespace Azalea.Sounds.OpenAL;
 internal class ALBuffer : Disposable
 {
+	public readonly ValuePromise<uint> Handle;
 	private readonly ALAudioManager _audioManager;
-	public uint Handle;
 
 	public ALBuffer(ALAudioManager audioManager, uint handle)
 	{
 		_audioManager = audioManager;
-		_audioManager.AssertAudioThread();
-		Handle = handle;
+		Handle = new(handle);
 	}
 
 	public ALBuffer(ALAudioManager audioManager)
 	{
 		_audioManager = audioManager;
-		_audioManager.AssertAudioThread();
 		Handle = _audioManager.GenerateBuffer();
 	}
 
