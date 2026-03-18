@@ -27,7 +27,6 @@ internal class ALAudioSource : IAudioSource
 	public ALAudioSource(ALAudioManager audioManager)
 	{
 		_audioManager = audioManager;
-		_audioManager.AssertAudioThread();
 
 		_source = new(_audioManager);
 
@@ -203,7 +202,6 @@ internal class ALAudioSource : IAudioSource
 
 				_nextBufferStartTime = (_nextBufferStartTime + 1) % __bufferCount;
 			}
-
 
 			if (_source.GetState() != ALSourceState.Playing)
 				_source.Play();

@@ -46,7 +46,7 @@ internal unsafe partial class ALAudioManager
 
 	#region BindSourceBuffer
 
-	internal record BindSourceBufferCommand(uint source, uint buffer) : AudioCommand;
+	internal record BindSourceBufferCommand(uint source, ValuePromise<uint> buffer) : AudioCommand;
 
 	private static void bindSourceBuffer(uint source, uint buffer)
 	{
@@ -54,10 +54,10 @@ internal unsafe partial class ALAudioManager
 		alSourcei(source, AL_BUFFER, (int)buffer);
 	}
 
-	public void BindSourceBuffer(uint source, uint buffer)
+	public void BindSourceBuffer(uint source, ValuePromise<uint> buffer)
 	{
-		if (IsAudioThread())
-			bindSourceBuffer(source, buffer);
+		if (IsAudioThread() && buffer.IsResolved)
+			bindSourceBuffer(source, buffer.Value);
 		else
 			IssueCommand(new BindSourceBufferCommand(source, buffer));
 	}
@@ -65,7 +65,7 @@ internal unsafe partial class ALAudioManager
 	#endregion
 	#region BufferAndFreeData
 
-	internal record BufferAndFreeDataCommand(uint buffer, byte[] data, int dataLength, ALFormat format, int frequency) : AudioCommand;
+	internal record BufferAndFreeDataCommand(ValuePromise<uint> buffer, byte[] data, int dataLength, ALFormat format, int frequency) : AudioCommand;
 
 	private static void bufferAndFreeData(uint buffer, byte[] data, int dataLength, ALFormat format, int frequency)
 	{
@@ -73,10 +73,10 @@ internal unsafe partial class ALAudioManager
 		ArrayPool<byte>.Shared.Return(data);
 	}
 
-	public void BufferAndFreeData(uint buffer, byte[] data, int dataLength, ALFormat format, int frequency)
+	public void BufferAndFreeData(ValuePromise<uint> buffer, byte[] data, int dataLength, ALFormat format, int frequency)
 	{
-		if (IsAudioThread())
-			bufferAndFreeData(buffer, data, dataLength, format, frequency);
+		if (IsAudioThread() && buffer.IsResolved)
+			bufferAndFreeData(buffer.Value, data, dataLength, format, frequency);
 		else
 			IssueCommand(new BufferAndFreeDataCommand(buffer, data, dataLength, format, frequency));
 	}
@@ -84,7 +84,7 @@ internal unsafe partial class ALAudioManager
 	#endregion
 	#region BufferData
 
-	internal record BufferDataCommand(uint buffer, byte[] data, int dataLength, ALFormat format, int frequency) : AudioCommand;
+	internal record BufferDataCommand(ValuePromise<uint> buffer, byte[] data, int dataLength, ALFormat format, int frequency) : AudioCommand;
 
 	[LibraryImport(OpenALPath)]
 	private static partial void alBufferData(uint buffer, ALFormat format, void* data, int size, int frequency);
@@ -95,10 +95,10 @@ internal unsafe partial class ALAudioManager
 			alBufferData(buffer, format, p, dataLength, frequency);
 	}
 
-	public void BufferData(uint buffer, byte[] data, int dataLength, ALFormat format, int frequency)
+	public void BufferData(ValuePromise<uint> buffer, byte[] data, int dataLength, ALFormat format, int frequency)
 	{
-		if (IsAudioThread())
-			bufferData(buffer, data, dataLength, format, frequency);
+		if (IsAudioThread() && buffer.IsResolved)
+			bufferData(buffer.Value, data, dataLength, format, frequency);
 		else
 			IssueCommand(new BufferDataCommand(buffer, data, dataLength, format, frequency));
 	}
@@ -160,7 +160,7 @@ internal unsafe partial class ALAudioManager
 	#endregion
 	#region DeleteBuffer
 
-	internal record DeleteBufferCommand(uint buffer) : AudioCommand;
+	internal record DeleteBufferCommand(ValuePromise<uint> buffer) : AudioCommand;
 
 	[LibraryImport(OpenALPath)]
 	private static partial void alDeleteBuffers(int count, uint* buffers);
@@ -170,10 +170,10 @@ internal unsafe partial class ALAudioManager
 		alDeleteBuffers(1, &buffer);
 	}
 
-	public void DeleteBuffer(uint buffer)
+	public void DeleteBuffer(ValuePromise<uint> buffer)
 	{
-		if (IsAudioThread())
-			deleteBuffer(buffer);
+		if (IsAudioThread() && buffer.IsResolved)
+			deleteBuffer(buffer.Value);
 		else
 			IssueCommand(new DeleteBufferCommand(buffer));
 	}
@@ -225,6 +225,8 @@ internal unsafe partial class ALAudioManager
 	#endregion
 	#region GenerateBuffer
 
+	internal record GenerateBufferCommand(Promise2<uint> result) : AudioCommand;
+
 	[LibraryImport(OpenALPath)]
 	private static partial void alGenBuffers(int count, uint* buffers);
 
@@ -235,11 +237,14 @@ internal unsafe partial class ALAudioManager
 		return buffer;
 	}
 
-	public uint GenerateBuffer()
+	public ValuePromise<uint> GenerateBuffer()
 	{
-		AssertAudioThread();
+		if (IsAudioThread())
+			return new ValuePromise<uint>(generateBuffer());
 
-		return generateBuffer();
+		var result = new Promise2<uint>();
+		IssueCommand(new GenerateBufferCommand(result));
+		return new ValuePromise<uint>(result);
 	}
 
 	#endregion
@@ -556,7 +561,7 @@ internal unsafe partial class ALAudioManager
 	#endregion
 	#region QueueSourceBuffer
 
-	internal record QueueSourceBufferCommand(uint source, uint buffer) : AudioCommand;
+	internal record QueueSourceBufferCommand(uint source, ValuePromise<uint> buffer) : AudioCommand;
 
 	[LibraryImport(OpenALPath)]
 	private static partial void alSourceQueueBuffers(uint source, int size, uint* buffers);
@@ -566,10 +571,10 @@ internal unsafe partial class ALAudioManager
 		alSourceQueueBuffers(source, 1, &buffer);
 	}
 
-	public void QueueSourceBuffer(uint source, uint buffer)
+	public void QueueSourceBuffer(uint source, ValuePromise<uint> buffer)
 	{
-		if (IsAudioThread())
-			queueSourceBuffer(source, buffer);
+		if (IsAudioThread() && buffer.IsResolved)
+			queueSourceBuffer(source, buffer.Value);
 		else
 			IssueCommand(new QueueSourceBufferCommand(source, buffer));
 	}
@@ -849,6 +854,8 @@ internal unsafe partial class ALAudioManager
 	#endregion
 	#region UnqueueSourceBuffer
 
+	internal record UnqueueSourceBufferCommand(uint source, Promise2<uint> result) : AudioCommand;
+
 	[LibraryImport(OpenALPath)]
 	private static partial void alSourceUnqueueBuffers(uint source, int size, uint* buffers);
 
@@ -859,11 +866,14 @@ internal unsafe partial class ALAudioManager
 		return buffer;
 	}
 
-	public uint UnqueueSourceBuffer(uint source)
+	public ValuePromise<uint> UnqueueSourceBuffer(uint source)
 	{
-		AssertAudioThread();
+		if (IsAudioThread())
+			return new ValuePromise<uint>(unqueueSourceBuffer(source));
 
-		return unqueueSourceBuffer(source);
+		var promise = new Promise2<uint>();
+		IssueCommand(new UnqueueSourceBufferCommand(source, promise));
+		return new ValuePromise<uint>(promise);
 	}
 
 	#endregion

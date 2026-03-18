@@ -113,13 +113,16 @@ internal partial class ALAudioManager : AudioManager
 					HandleCommand(singleCommand);
 				break;
 			case BindSourceBufferCommand(var source, var buffer):
-				bindSourceBuffer(source, buffer);
+				buffer.AssertResolved();
+				bindSourceBuffer(source, buffer.Value);
 				break;
 			case BufferAndFreeDataCommand(var buffer, byte[] data, int dataLength, ALFormat format, int frequency):
-				bufferAndFreeData(buffer, data, dataLength, format, frequency);
+				buffer.AssertResolved();
+				bufferAndFreeData(buffer.Value, data, dataLength, format, frequency);
 				break;
 			case BufferDataCommand(var buffer, byte[] data, int dataLength, ALFormat format, int frequency):
-				bufferData(buffer, data, dataLength, format, frequency);
+				buffer.AssertResolved();
+				bufferData(buffer.Value, data, dataLength, format, frequency);
 				return;
 			case CloseDeviceCommand(IntPtr device):
 				closeDevice(device);
@@ -128,10 +131,14 @@ internal partial class ALAudioManager : AudioManager
 				decrementCounter(counter);
 				break;
 			case DeleteBufferCommand(var buffer):
-				deleteBuffer(buffer);
+				buffer.AssertResolved();
+				deleteBuffer(buffer.Value);
 				break;
 			case DeleteSourceCommand(var source):
 				deleteSource(source);
+				break;
+			case GenerateBufferCommand(var result):
+				result.Resolve(generateBuffer());
 				break;
 			case PauseSourceCommand(var source):
 				pauseSource(source);
@@ -143,9 +150,10 @@ internal partial class ALAudioManager : AudioManager
 				printErrors();
 				break;
 			case QueueSourceBufferCommand(var source, var buffer):
-				queueSourceBuffer(source, buffer);
+				buffer.AssertResolved();
+				queueSourceBuffer(source, buffer.Value);
 				break;
-			case ReopenDeviceCommand(IntPtr device, string deviceName, int[] attributes):
+			case ReopenDeviceCommand(var device, var deviceName, var attributes):
 				reopenDevice(device, deviceName, attributes);
 				break;
 			case SetDistanceModelCommand(var distanceModel):
@@ -187,6 +195,8 @@ internal partial class ALAudioManager : AudioManager
 			case UnqueueAllSourceBuffersCommand(var source):
 				unqueueAllSourceBuffers(source);
 				break;
+			default:
+				throw new Exception($"Could not handle {command.GetType().Name}");
 		}
 	}
 

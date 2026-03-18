@@ -25,12 +25,12 @@ internal class AudioTest : TestScene
 	public AudioTest()
 	{
 		_goodkid = Assets.GetSound("Audio/goodkid.wav");
-		//_goodkidByte = Assets.GetSoundByte("Audio/goodkidByte.wav");
+		_goodkidByte = Assets.GetSoundByte("Audio/goodkidByte.wav");
 
 		_harbor = Assets.FileSystemStore.GetSound(@"E:\Music\Alohaii\Virtual Paradise\\10 - Harbor (feat. Kaneko Lumi).flac");
 		_esseCara = Assets.FileSystemStore.GetSound(@"E:\Music\Sayfalse, Scythermane & TRXSHBXY\ESSE CARA!\01 - ESSE CARA!.m4a");
 
-		//_hitnormal = Assets.GetSoundByte("Audio/hitnormal.wav");
+		_hitnormal = Assets.GetSoundByte("Audio/hitnormal.wav");
 		_navia = Assets.FileSystemStore.GetSound(@"E:\cut small.mp3");
 		_naviaWeb = Assets.WebStore.GetSound("https://cdn.discordapp.com/attachments/403993461684043776/1467983957810352220/cut_3.mp3?ex=69825e19&is=69810c99&hm=dc96bf622cb1ade23ddf37d948e8bf093f05c55c28cc5637a759c3bd8e237944&");
 

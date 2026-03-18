@@ -1,4 +1,5 @@
 ﻿using Azalea.Sounds.OpenAL.Enums;
+using Azalea.Threading;
 using Azalea.Utils;
 using System.Numerics;
 
@@ -61,9 +62,9 @@ internal class ALSource : Disposable
 	public void BindBuffer(ALBuffer buffer) => _audioManager.BindSourceBuffer(Handle, buffer.Handle);
 	public int GetBuffersProcessed() => _audioManager.GetSourceBuffersProcessed(Handle);
 	public int GetBuffersQueued() => _audioManager.GetSourceBuffersQueued(Handle);
-	public void QueueBuffer(uint handle) => _audioManager.QueueSourceBuffer(Handle, handle);
+	public void QueueBuffer(ValuePromise<uint> handle) => _audioManager.QueueSourceBuffer(Handle, handle);
 	public void QueueBuffer(ALBuffer buffer) => _audioManager.QueueSourceBuffer(Handle, buffer.Handle);
-	public uint UnqueueBuffer() => _audioManager.UnqueueSourceBuffer(Handle);
+	public ValuePromise<uint> UnqueueBuffer() => _audioManager.UnqueueSourceBuffer(Handle);
 	public void UnqueueAllBuffers() => _audioManager.UnqueueAllSourceBuffers(Handle);
 
 	public ALSourceState GetState() => _audioManager.GetSourceState(Handle);
