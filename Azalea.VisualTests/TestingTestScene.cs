@@ -13,7 +13,7 @@ using Azalea.Platform;
 using Azalea.Threading;
 using System;
 using System.Numerics;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace Azalea.VisualTests;
 
@@ -69,29 +69,28 @@ public class TestingTestScene : TestScene
 
 		Console.WriteLine("gas");
 
-		new Promise<string>(() =>
+		Scheduler.Run(async () =>
 		{
-			Thread.Sleep(3000);
-			return "Ide Gas 3";
-		}).Then(Console.WriteLine);
+			await Task.Delay(3000);
+			Scheduler.Schedule(() => Console.WriteLine("Ide Gas 3"));
+		});
 
-		new Promise<string>(() =>
+		Scheduler.Run(async () =>
 		{
-			Thread.Sleep(2000);
-			return "Ide Gas 2";
-		}).Then(Console.WriteLine);
+			await Task.Delay(2000);
+			Scheduler.Schedule(() => Console.WriteLine("Ide Gas 2"));
+		});
 
-		new Promise<string>(() =>
+		Scheduler.Run(async () =>
 		{
-			Thread.Sleep(1000);
-			return "Ide Gas 1";
-		}).Then(Console.WriteLine);
+			await Task.Delay(1000);
+			Scheduler.Schedule(() => Console.WriteLine("Ide Gas 1"));
+		});
 
-		new Promise<string>(() =>
+		Scheduler.Run(() =>
 		{
-			return "Ide Gas 0";
-		}).Then(Console.WriteLine);
-
+			Scheduler.Schedule(() => Console.WriteLine("Ide Gas 0"));
+		});
 
 		var tileset = Assets.MainStore.GetTileset("MapForTiled/TilesForMap.tsx");
 

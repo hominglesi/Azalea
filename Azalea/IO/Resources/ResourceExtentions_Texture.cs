@@ -26,39 +26,44 @@ public static partial class ResourceStoreExtentions
 		return texture;
 	}
 
-	private static readonly ResourceCache<Promise<ITexture>> _texturePromiseCache = new();
+	private static readonly ResourceCache<ValuePromise<ITexture>> _texturePromiseCache = new();
 
-	public static Promise<ITexture> GetTexturePromise(this IResourceStore store, string path, TextureFiltering filtering = TextureFiltering.Nearest)
+	public static ValuePromise<ITexture> GetTexturePromise(this IResourceStore store, string path, TextureFiltering filtering = TextureFiltering.Nearest)
 	{
 		if (_textureCache.TryGetValue(store, path, out var cached))
-			return new Promise<ITexture>(cached);
+			return new ValuePromise<ITexture>(cached);
 
 		if (_texturePromiseCache.TryGetValue(store, path, out var cachedPromise))
 			return cachedPromise;
 
-		var promise = new Promise<ITexture>(() =>
+		var promise = new Promise<ITexture>();
+		var result = new ValuePromise<ITexture>(promise);
+
+		_texturePromiseCache.AddValue(store, path, result);
+
+		Scheduler.Run(() =>
 		{
-			ITexture result = Assets.MissingTexture;
+			var image = store.GetImagePromise(path);
 
-			var imagePromise = store.GetImagePromise(path).Then(image =>
-			{
-				if (image is null)
-					return;
-
-				result = Renderer.CreateTexture(image);
-				result.SetFiltering(filtering, filtering);
-				_textureCache.AddValue(store, path, result);
-			});
-
-			while (imagePromise.IsResolved == false)
+			while (image.IsResolved == false)
 				Thread.Sleep(5);
 
-			return result;
+			if (image.Value is null)
+			{
+				promise.Resolve(Assets.MissingTexture);
+				return;
+			}
+
+			Scheduler.Schedule(() =>
+			{
+				var texture = Renderer.CreateTexture(image.Value);
+				texture.SetFiltering(filtering, filtering);
+				_textureCache.AddValue(store, path, texture);
+				promise.Resolve(texture);
+			});
 		});
 
-		_texturePromiseCache.AddValue(store, path, promise);
-
-		return promise;
+		return result;
 	}
 
 	public static PromisedTexture GetTextureAsync(this IResourceStore store, string path, TextureFiltering filtering = TextureFiltering.Nearest)

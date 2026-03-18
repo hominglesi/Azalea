@@ -25,31 +25,36 @@ public static partial class ResourceStoreExtentions
 		return image;
 	}
 
-	private static readonly ResourceCache<Promise<Image?>> _imagePromiseCache = new();
+	private static readonly ResourceCache<ValuePromise<Image?>> _imagePromiseCache = new();
 
-	public static Promise<Image?> GetImagePromise(this IResourceStore store, string path)
+	public static ValuePromise<Image?> GetImagePromise(this IResourceStore store, string path)
 	{
 		if (_imageCache.TryGetValue(store, path, out var cached))
-			return new Promise<Image?>(cached);
+			return new ValuePromise<Image?>(cached);
 
 		if (_imagePromiseCache.TryGetValue(store, path, out var cachedPromise))
 			return cachedPromise;
 
-		var promise = new Promise<Image?>(() =>
+		var promise = new Promise<Image?>();
+		var result = new ValuePromise<Image?>(promise);
+		_imagePromiseCache.AddValue(store, path, result);
+
+		Scheduler.Run(() =>
 		{
 			var stream = store.GetStream(path);
 
 			if (stream is null)
-				return null;
+			{
+				promise.Resolve(null);
+				return;
+			}
 
-			return Image.FromStream(stream);
-		}).Then(image =>
-		{
+			var image = Image.FromStream(stream);
+
 			_imageCache.AddValue(store, path, image);
+			promise.Resolve(image);
 		});
 
-		_imagePromiseCache.AddValue(store, path, promise);
-
-		return promise;
+		return result;
 	}
 }
