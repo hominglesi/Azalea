@@ -2,7 +2,6 @@
 using Azalea.Graphics.Textures;
 using Azalea.Threading;
 using System;
-using System.Threading;
 
 namespace Azalea.IO.Resources;
 
@@ -41,14 +40,11 @@ public static partial class ResourceStoreExtentions
 
 		_texturePromiseCache.AddValue(store, path, result);
 
-		Scheduler.Run(() =>
+		Scheduler.Run(async () =>
 		{
-			var image = store.GetImagePromise(path);
+			var image = await store.GetImagePromise(path);
 
-			while (image.IsResolved == false)
-				Thread.Sleep(5);
-
-			if (image.Value is null)
+			if (image is null)
 			{
 				promise.Resolve(Assets.MissingTexture);
 				return;
@@ -56,7 +52,7 @@ public static partial class ResourceStoreExtentions
 
 			Scheduler.Schedule(() =>
 			{
-				var texture = Renderer.CreateTexture(image.Value);
+				var texture = Renderer.CreateTexture(image);
 				texture.SetFiltering(filtering, filtering);
 				_textureCache.AddValue(store, path, texture);
 				promise.Resolve(texture);
