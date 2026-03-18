@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Azalea.Threading;
 public class Promise<T>
@@ -22,6 +23,8 @@ public class Promise<T>
 
 		_value = value;
 		IsResolved = true;
+
+		_awaiter?.Complete(_value);
 	}
 
 	public T Value
@@ -33,5 +36,27 @@ public class Promise<T>
 
 			return _value!;
 		}
+	}
+
+	private PromiseAwaiter? _awaiter;
+	public PromiseAwaiter GetAwaiter() => _awaiter ??= new();
+
+	public class PromiseAwaiter : INotifyCompletion
+	{
+		public bool IsCompleted { get; private set; }
+		private Action? _onCompleted;
+		private T? _result;
+
+		public void Complete(T result)
+		{
+			_result = result;
+			IsCompleted = true;
+			_onCompleted?.Invoke();
+		}
+
+		public T GetResult() => _result!;
+
+		public void OnCompleted(Action onCompleted)
+			=> _onCompleted = onCompleted;
 	}
 }
