@@ -1,15 +1,19 @@
-﻿using Azalea.Sounds.OpenAL;
+﻿using Azalea.Sounds.FFmpeg.Native;
+using Azalea.Sounds.OpenAL;
 using Azalea.Utils;
-using FFmpeg.AutoGen;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Azalea.Sounds.FFmpeg;
-internal unsafe class FFmpegStreamReader : Disposable
+internal unsafe partial class FFmpegStreamReader : Disposable
 {
+	const int AV_TIME_BASE = 0xf4240;
+	const int AVERROR_EOF = -541478213;
+
 	const int __ioBufferSize = 4096;
 
 	public readonly float TotalDuration;
@@ -28,18 +32,19 @@ internal unsafe class FFmpegStreamReader : Disposable
 
 	static FFmpegStreamReader()
 	{
-		ffmpeg.av_log_set_callback(_logCallback);
+		av_log_set_callback(&logCallback);
 	}
 
-	private static av_log_set_callback_callback _logCallback = logCallback;
-	private static void logCallback(void* ptr, int level, string format, byte* args)
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	private static void logCallback(void* ptr, int level, byte* format, byte* args)
 	{
-		if (level > ffmpeg.AV_LOG_WARNING)
+		const int AV_LOG_WARNING = 0x18;
+		if (level > AV_LOG_WARNING)
 			return;
 
 		var buffer = stackalloc byte[1024];
 		var printPrefix = 1;
-		ffmpeg.av_log_format_line2(ptr, level, format, args, buffer, 1024, &printPrefix);
+		av_log_format_line2(ptr, level, format, args, buffer, 1024, &printPrefix);
 		var message = Marshal.PtrToStringAnsi((IntPtr)buffer);
 
 		if (message is null) return;
@@ -57,26 +62,27 @@ internal unsafe class FFmpegStreamReader : Disposable
 
 	public unsafe FFmpegStreamReader(Stream stream)
 	{
-		_ioBuffer = (byte*)ffmpeg.av_malloc(__ioBufferSize);
+		_ioBuffer = (byte*)av_malloc(__ioBufferSize);
 
 		_streamHandle = GCHandle.Alloc(stream);
 
-		AVIOContext* avioCtx = ffmpeg.avio_alloc_context(
+		AVIOContext* avioCtx = avio_alloc_context(
 			_ioBuffer,
 			__ioBufferSize,
 			0,
 			(void*)GCHandle.ToIntPtr(_streamHandle),
-			new avio_alloc_context_read_packet_func { Pointer = (nint)_readPacketPtr },
-			null,
-			stream.CanSeek ? new avio_alloc_context_seek_func() { Pointer = (nint)_seekPtr } : null
+			(nint)_readPacketPtr,
+			nint.Zero,
+			stream.CanSeek ? (nint)_seekPtr : nint.Zero
 			);
 
-		AVFormatContext* formatCtx = ffmpeg.avformat_alloc_context();
+		const int AVFMT_FLAG_CUSTOM_IO = 0x80;
+		AVFormatContext* formatCtx = avformat_alloc_context();
 		formatCtx->pb = avioCtx;
-		formatCtx->flags |= ffmpeg.AVFMT_FLAG_CUSTOM_IO;
+		formatCtx->flags |= AVFMT_FLAG_CUSTOM_IO;
 
 		_supressLogging = true;
-		if (ffmpeg.avformat_open_input(&formatCtx, null, null, null) < 0)
+		if (avformat_open_input(&formatCtx, null, null, null) < 0)
 			throw new Exception("Could not open AvFormat input!");
 		_supressLogging = false;
 
@@ -86,10 +92,11 @@ internal unsafe class FFmpegStreamReader : Disposable
 			AVStream* str = formatCtx->streams[i];
 			if (str->time_base.num == 0 || str->time_base.den == 0)
 			{
-				if (str->codecpar->codec_type == AVMediaType.AVMEDIA_TYPE_VIDEO &&
+				const int AVMEDIA_TYPE_VIDEO = 0;
+				if (str->codecpar->codec_type == AVMEDIA_TYPE_VIDEO &&
 					str->r_frame_rate.den != 0)
 				{
-					str->time_base = ffmpeg.av_inv_q(str->r_frame_rate);
+					str->time_base = av_inv_q(str->r_frame_rate);
 				}
 				else if (str->codecpar->sample_rate != 0)
 				{
@@ -99,19 +106,21 @@ internal unsafe class FFmpegStreamReader : Disposable
 				else
 				{
 					str->time_base.num = 1;
-					str->time_base.den = ffmpeg.AV_TIME_BASE;
+
+					str->time_base.den = AV_TIME_BASE;
 				}
 			}
 		}
 
-		ffmpeg.avformat_find_stream_info(formatCtx, null);
+		avformat_find_stream_info(formatCtx, null);
 
-		TotalDuration = formatCtx->duration / (float)ffmpeg.AV_TIME_BASE;
+		TotalDuration = formatCtx->duration / (float)AV_TIME_BASE;
 		if (TotalDuration < 0) TotalDuration = -1;
 
 		for (int i = 0; i < formatCtx->nb_streams; i++)
 		{
-			if (formatCtx->streams[i]->codecpar->codec_type == AVMediaType.AVMEDIA_TYPE_AUDIO)
+			const int AVMEDIA_TYPE_AUDIO = 1;
+			if (formatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
 			{
 				_audioStreamIndex = i;
 				break;
@@ -119,26 +128,28 @@ internal unsafe class FFmpegStreamReader : Disposable
 		}
 
 		AVCodecParameters* codecPar = formatCtx->streams[_audioStreamIndex]->codecpar;
-		AVCodec* codec = ffmpeg.avcodec_find_decoder(codecPar->codec_id);
+		AVCodec* codec = avcodec_find_decoder(codecPar->codec_id);
 
-		_codecContext = ffmpeg.avcodec_alloc_context3(codec);
-		ffmpeg.avcodec_parameters_to_context(_codecContext, codecPar);
+		_codecContext = avcodec_alloc_context3(codec);
+		avcodec_parameters_to_context(_codecContext, codecPar);
+
 		_codecContext->pkt_timebase = formatCtx->streams[_audioStreamIndex]->time_base;
-		ffmpeg.avcodec_open2(_codecContext, codec, null);
+		avcodec_open2(_codecContext, codec, null);
 
 		AVChannelLayout outLayout;
-		ffmpeg.av_channel_layout_default(&outLayout, 2);
+		av_channel_layout_default(&outLayout, 2);
 
 		AVChannelLayout inLayout = _codecContext->ch_layout;
 		if (inLayout.nb_channels == 0)
-			ffmpeg.av_channel_layout_default(&inLayout, _codecContext->ch_layout.nb_channels);
+			av_channel_layout_default(&inLayout, _codecContext->ch_layout.nb_channels);
 
 		SwrContext* swr;
 
-		var result = ffmpeg.swr_alloc_set_opts2(
+		const int AV_SAMPLE_FMT_S16 = 1;
+		var result = swr_alloc_set_opts2(
 			&swr,
 			&outLayout,
-			AVSampleFormat.AV_SAMPLE_FMT_S16,
+			AV_SAMPLE_FMT_S16,
 			ALAudioManager.DEVICE_FREQUENCY, // This is kinda hard-coded for now but it will be changed
 
 			&inLayout,
@@ -147,12 +158,13 @@ internal unsafe class FFmpegStreamReader : Disposable
 			0,
 			null);
 
-		ffmpeg.av_opt_set_int(swr, "resampler", 1 /* SWR_RESAMPLER_SOXR*/, 0);
+		const int SWR_RESAMPLER_SOXR = 1;
+		av_opt_set_int(swr, "resampler", SWR_RESAMPLER_SOXR, 0);
 
-		ffmpeg.swr_init(swr);
+		swr_init(swr);
 
-		_packet = ffmpeg.av_packet_alloc();
-		_frame = ffmpeg.av_frame_alloc();
+		_packet = av_packet_alloc();
+		_frame = av_frame_alloc();
 
 		_formatContext = formatCtx;
 		_avioContext = avioCtx;
@@ -204,9 +216,7 @@ internal unsafe class FFmpegStreamReader : Disposable
 		double frameSeconds = 0;
 		do
 		{
-			var result = ffmpeg.av_read_frame(_formatContext, _packet);
-
-			if (result < 0)
+			if (av_read_frame(_formatContext, _packet) < 0)
 			{
 				pcm = [];
 				startTime = -1;
@@ -214,18 +224,19 @@ internal unsafe class FFmpegStreamReader : Disposable
 				return false;
 			}
 
-			frameSeconds = (ulong)_packet->pts * ffmpeg.av_q2d(_formatContext->streams[_audioStreamIndex]->time_base);
+			frameSeconds = (ulong)_packet->pts * av_q2d(_formatContext->streams[_audioStreamIndex]->time_base);
 		}
 		while (frameSeconds < _seekSeconds);
 
 		if (_packet->stream_index == _audioStreamIndex)
 		{
-			ffmpeg.avcodec_send_packet(_codecContext, _packet);
+			avcodec_send_packet(_codecContext, _packet);
 
-			while (ffmpeg.avcodec_receive_frame(_codecContext, _frame) == 0)
+			while (avcodec_receive_frame(_codecContext, _frame) == 0)
 			{
-				var start = _frame->pts != ffmpeg.AV_NOPTS_VALUE
-					? _frame->pts * (float)ffmpeg.av_q2d(_formatContext->streams[_audioStreamIndex]->time_base)
+				const long AV_NOPT_VALUE = long.MinValue;
+				var start = _frame->pts != AV_NOPT_VALUE
+					? _frame->pts * (float)av_q2d(_formatContext->streams[_audioStreamIndex]->time_base)
 					: -1;
 
 				var readPcm = convertFrameToPcm(_frame, _swr, out var bufferLength);
@@ -234,7 +245,7 @@ internal unsafe class FFmpegStreamReader : Disposable
 			}
 		}
 
-		ffmpeg.av_packet_unref(_packet);
+		av_packet_unref(_packet);
 
 		if (_pendingChunks.Count > 0)
 		{
@@ -268,11 +279,12 @@ internal unsafe class FFmpegStreamReader : Disposable
 		_pendingChunks.Clear();
 
 		_seekSeconds = seconds;
-		var seekTimestamp = seconds * ffmpeg.AV_TIME_BASE;
+		var seekTimestamp = seconds * AV_TIME_BASE;
 
-		ffmpeg.av_seek_frame(_formatContext, -1, (long)seekTimestamp, ffmpeg.AVSEEK_FLAG_BACKWARD);
-		ffmpeg.avcodec_flush_buffers(_codecContext);
-		ffmpeg.swr_init(_swr);
+		const int AVSEEK_FLAG_BACKWARD = 0x1;
+		av_seek_frame(_formatContext, -1, (long)seekTimestamp, AVSEEK_FLAG_BACKWARD);
+		avcodec_flush_buffers(_codecContext);
+		swr_init(_swr);
 	}
 
 	protected override void OnDispose()
@@ -286,14 +298,14 @@ internal unsafe class FFmpegStreamReader : Disposable
 		fixed (SwrContext** swr = &_swr)
 		fixed (AVCodecContext** codecCtx = &_codecContext)
 		{
-			ffmpeg.av_frame_free(frame);
-			ffmpeg.av_packet_free(packet);
-			ffmpeg.swr_free(swr);
-			ffmpeg.av_channel_layout_uninit(inLayout);
-			ffmpeg.av_channel_layout_uninit(outLayout);
-			ffmpeg.avcodec_free_context(codecCtx);
-			ffmpeg.avformat_close_input(fmtCtx);
-			ffmpeg.avio_context_free(avioCtx);
+			av_frame_free(frame);
+			av_packet_free(packet);
+			swr_free(swr);
+			av_channel_layout_uninit(inLayout);
+			av_channel_layout_uninit(outLayout);
+			avcodec_free_context(codecCtx);
+			avformat_close_input(fmtCtx);
+			avio_context_free(avioCtx);
 		}
 
 		_streamHandle.Free();
@@ -305,9 +317,10 @@ internal unsafe class FFmpegStreamReader : Disposable
 
 	private static byte[] convertFrameToPcm(AVFrame* frame, SwrContext* swr, out int bufferLength)
 	{
-		int dstSamples = ffmpeg.swr_get_out_samples(swr, frame->nb_samples);
-		int bufferSize = ffmpeg.av_samples_get_buffer_size(
-			null, 2, dstSamples, AVSampleFormat.AV_SAMPLE_FMT_S16, 1);
+		const int AV_SAMPLE_FMT_S16 = 1;
+		int dstSamples = swr_get_out_samples(swr, frame->nb_samples);
+		int bufferSize = av_samples_get_buffer_size(
+			null, 2, dstSamples, AV_SAMPLE_FMT_S16, 1);
 
 		byte[] buffer = ArrayPool<byte>.Shared.Rent(bufferSize);
 		fixed (byte* outPtr = buffer)
@@ -316,7 +329,7 @@ internal unsafe class FFmpegStreamReader : Disposable
 			outArr[0] = outPtr;
 			outArr[1] = null;
 
-			var sampleCount = ffmpeg.swr_convert(swr, outArr, dstSamples,
+			var sampleCount = swr_convert(swr, outArr, dstSamples,
 				frame->extended_data, frame->nb_samples);
 
 			// Since we're using signed 16 byte stereo samples we multiply the resulting samples
@@ -333,7 +346,7 @@ internal unsafe class FFmpegStreamReader : Disposable
 	{
 		GCHandle handle = GCHandle.FromIntPtr((IntPtr)ptr);
 		if (handle.Target is null)
-			return ffmpeg.AVERROR_EOF;
+			return AVERROR_EOF;
 
 		Stream stream = (Stream)handle.Target;
 
@@ -343,7 +356,7 @@ internal unsafe class FFmpegStreamReader : Disposable
 		if (bytesRead > 0)
 			Marshal.Copy(managedBuffer, 0, (IntPtr)buffer, bytesRead);
 
-		return bytesRead > 0 ? bytesRead : ffmpeg.AVERROR_EOF;
+		return bytesRead > 0 ? bytesRead : AVERROR_EOF;
 	}
 
 	private delegate* unmanaged<void*, long, int, long> _seekPtr = &seek;
@@ -359,18 +372,19 @@ internal unsafe class FFmpegStreamReader : Disposable
 		if (stream.CanSeek == false)
 			return -1;
 
+		const int SEEK_SET = 0, SEEK_CUR = 1, SEEK_END = 2, AVSEEK_SIZE = 0x10000;
 		switch (whence)
 		{
-			case /* SEEK_SET */ 0:
+			case SEEK_SET:
 				stream.Position = offset;
 				break;
-			case /* SEEK_CUR */ 1:
+			case SEEK_CUR:
 				stream.Position += offset;
 				break;
-			case /* SEEK_END */ 2:
+			case SEEK_END:
 				stream.Position = stream.Length + offset;
 				break;
-			case ffmpeg.AVSEEK_SIZE:
+			case AVSEEK_SIZE:
 				return stream.Length;
 		}
 

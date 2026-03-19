@@ -31,35 +31,38 @@ internal abstract class AudioManager : Disposable, IAudioManager
 	public bool IsAudioThread() => Environment.CurrentManagedThreadId == _audioThreadId;
 
 	internal record BatchCommand(List<AudioCommand> commands) : AudioCommand;
-	private List<AudioCommand>? _commandQueue;
+	private Dictionary<int, List<AudioCommand>> _commandQueues = [];
 	public void BeginCommandQueue()
 	{
-		if (_commandQueue is not null)
+		var callingThread = Environment.CurrentManagedThreadId;
+
+		if (_commandQueues.ContainsKey(callingThread))
 			throw new Exception("Cannot begin two command queues at the same time!");
 
-		_commandQueue = [];
+		_commandQueues[callingThread] = [];
 	}
 
 	public void SubmitCommandQueue()
 	{
-		if (_commandQueue is null)
-			throw new Exception("Command queue hasn't been started yet");
+		var callingThread = Environment.CurrentManagedThreadId;
 
-		var commandQueue = _commandQueue;
-		_commandQueue = null;
-
-		IssueCommand(new BatchCommand(commandQueue));
+		if (_commandQueues.TryGetValue(callingThread, out var queue))
+		{
+			_commandQueues.Remove(callingThread);
+			IssueCommand(new BatchCommand(queue));
+		}
+		else throw new Exception("Command queue hasn't been started yet");
 	}
 
 	public void IssueCommand(AudioCommand command)
 	{
-		if (_commandQueue is not null)
-		{
-			_commandQueue.Add(command);
-			return;
-		}
+		var callingThread = Environment.CurrentManagedThreadId;
 
-		if (_commandChannel.Writer.TryWrite(command) == false)
+		if (_commandQueues.TryGetValue(callingThread, out var queue))
+		{
+			queue.Add(command);
+		}
+		else if (_commandChannel.Writer.TryWrite(command) == false)
 			Console.WriteLine("Could not write command");
 	}
 
