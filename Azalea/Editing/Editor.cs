@@ -3,11 +3,37 @@ using Azalea.Design.Shapes;
 using Azalea.Graphics;
 using Azalea.Inputs;
 using Azalea.Platform;
+using System;
 
 namespace Azalea.Editing;
 public static class Editor
 {
 	public static EditorContainer? Instance => GameHost.Main.EditorContainer;
+
+	#region DisplayValues
+
+	public static void AddDisplayedValue(string name, Func<object> getValue)
+	{
+		if (Instance is null) return;
+
+		Instance.DisplayValues.AddDisplayedValue(name, getValue);
+	}
+
+	public static void ClearDisplayedValues()
+	{
+		if (Instance is null) return;
+
+		Instance.DisplayValues.ClearDisplayedValues();
+	}
+
+	public static void RemoveDisplayedValue(int index)
+	{
+		if (Instance is null) return;
+
+		Instance.DisplayValues.RemoveDisplayedValue(index);
+	}
+
+	#endregion
 
 	internal static void InspectTemplate(GameObject template)
 	{

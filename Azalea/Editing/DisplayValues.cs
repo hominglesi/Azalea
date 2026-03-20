@@ -4,6 +4,7 @@ using Azalea.Editing.Legacy;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
+using System;
 using System.Numerics;
 
 namespace Azalea.Editing;
@@ -22,7 +23,7 @@ internal class DisplayValues : FlexContainer
 		Depth = -1000;
 	}
 
-	public void AddDisplayedValue(string name, DisplayedValueDelegate getValue)
+	public void AddDisplayedValue(string name, Func<object> getValue)
 		=> Add(new DisplayedValue(name, getValue));
 
 	public void ClearDisplayedValues()
@@ -36,9 +37,9 @@ internal class DisplayValues : FlexContainer
 		public SpriteText Text { get; init; }
 
 		private readonly string _name;
-		private readonly DisplayedValueDelegate _getValue;
+		private readonly Func<object> _getValue;
 
-		public DisplayedValue(string name, DisplayedValueDelegate getValue)
+		public DisplayedValue(string name, Func<object> getValue)
 		{
 			_name = name;
 			_getValue = getValue;
@@ -63,5 +64,4 @@ internal class DisplayValues : FlexContainer
 			Size = Text.Size + new Vector2(4);
 		}
 	}
-	public delegate object DisplayedValueDelegate();
 }
