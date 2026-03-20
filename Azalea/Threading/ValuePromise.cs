@@ -32,6 +32,24 @@ public readonly struct ValuePromise<T>
 			throw new Exception($"{nameof(ValuePromise<T>)} wasn't resolved!");
 	}
 
+	public void ThenRun(Action action)
+	{
+		if (_promise is null)
+			action.Invoke();
+		else
+			_promise.ThenRun(action);
+	}
+
+	public void ThenSchedule(Action action)
+	{
+		if (_promise is null)
+			Scheduler.Schedule(action);
+		else
+			_promise.ThenSchedule(action);
+	}
+
+	#region Awaiting
+
 	public ValueAwaiter GetAwaiter() => ValueAwaiter.Create(_value, _promise);
 
 	public readonly struct ValueAwaiter(T? value, Promise<T>? promise) : INotifyCompletion
@@ -56,4 +74,6 @@ public readonly struct ValuePromise<T>
 		public readonly void OnCompleted(Action onCompleted)
 			=> _promise!.GetAwaiter().OnCompleted(onCompleted);
 	}
+
+	#endregion
 }

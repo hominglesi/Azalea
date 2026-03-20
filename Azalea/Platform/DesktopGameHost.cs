@@ -11,6 +11,7 @@ using Azalea.Threading;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Azalea.Platform;
 internal class DesktopGameHost : GameHost
@@ -131,6 +132,7 @@ internal class DesktopGameHost : GameHost
 			NativeLibrary.Load(createPath("swscale-9.dll"));
 
 			FFmpegStreamReader.Preload();
+			return Task.CompletedTask;
 		});
 
 		static string createPath(string file)

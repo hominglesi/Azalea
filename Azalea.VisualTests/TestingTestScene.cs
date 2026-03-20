@@ -69,27 +69,28 @@ public class TestingTestScene : TestScene
 
 		Console.WriteLine("gas");
 
-		Scheduler.Run(async () =>
-		{
-			await Task.Delay(3000);
-			Scheduler.Schedule(() => Console.WriteLine("Ide Gas 3"));
-		});
-
-		Scheduler.Run(async () =>
-		{
-			await Task.Delay(2000);
-			Scheduler.Schedule(() => Console.WriteLine("Ide Gas 2"));
-		});
-
-		Scheduler.Run(async () =>
-		{
-			await Task.Delay(1000);
-			Scheduler.Schedule(() => Console.WriteLine("Ide Gas 1"));
-		});
-
 		Scheduler.Run(() =>
 		{
-			Scheduler.Schedule(() => Console.WriteLine("Ide Gas 0"));
+			_ = Scheduler.Schedule(() => Console.WriteLine("Ide Gas 0"));
+			return Task.CompletedTask;
+		});
+
+		var promise = Scheduler.Run(async () =>
+		{
+			await Task.Delay(1000);
+			Console.WriteLine("gas 1");
+		});
+
+		promise.ThenRun(async () =>
+		{
+			await Task.Delay(1000);
+			Console.WriteLine("gas 2");
+		});
+
+		promise.ThenRun(async () =>
+		{
+			await Task.Delay(2000);
+			Console.WriteLine("gas 3");
 		});
 
 		var tileset = Assets.MainStore.GetTileset("MapForTiled/TilesForMap.tsx");
