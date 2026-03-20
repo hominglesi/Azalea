@@ -1,5 +1,6 @@
 ﻿using Azalea.Graphics;
 using Azalea.Threading;
+using System.Threading.Tasks;
 
 namespace Azalea.IO.Resources;
 public static partial class ResourceStoreExtentions
@@ -46,13 +47,14 @@ public static partial class ResourceStoreExtentions
 			if (stream is null)
 			{
 				promise.Resolve(null);
-				return;
+				return Task.CompletedTask;
 			}
 
 			var image = Image.FromStream(stream);
 
 			_imageCache.AddValue(store, path, image);
 			promise.Resolve(image);
+			return Task.CompletedTask;
 		});
 
 		return result;
