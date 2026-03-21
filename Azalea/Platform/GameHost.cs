@@ -137,6 +137,7 @@ public abstract class GameHost
 	internal abstract IRenderer CreateRenderer(IWindow window);
 	internal abstract IAudioManager CreateAudioManager();
 	internal abstract IClipboard CreateClipboard();
+	public abstract ITrayIcon CreateTrayIcon(string iconName, Image icon);
 
 	public virtual DateTime GetCurrentTime() => Time.GetCurrentPreciseTime();
 

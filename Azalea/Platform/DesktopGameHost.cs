@@ -1,4 +1,5 @@
 ﻿using Azalea.Editing;
+using Azalea.Graphics;
 using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.Rendering;
 using Azalea.IO.Configs;
@@ -87,6 +88,16 @@ internal class DesktopGameHost : GameHost
 	}
 	internal override IClipboard CreateClipboard()
 		=> new WindowsClipboard();
+
+	public override ITrayIcon CreateTrayIcon(string iconName, Image icon)
+	{
+		ArgumentNullException.ThrowIfNull(icon, nameof(icon));
+
+		var window = (Win32Window)Window;
+		var trayicon = new WindowsTrayIcon(window, iconName, icon);
+		window.AddTrayIcon(trayicon);
+		return trayicon;
+	}
 
 	private void setupNativeLibraries()
 	{
