@@ -8,29 +8,29 @@ public struct PixelFormatDescriptor
 	private uint size;
 	private uint version;
 	private int flags;
-	byte pixelType;
-	byte colorBits;
-	byte redBits = 0;
-	byte redShift = 0;
-	byte greenBits = 0;
-	byte greenShift = 0;
-	byte blueBits = 0;
-	byte blueShift = 0;
-	byte alphaBits = 8;
-	byte alphaShift = 0;
-	byte accumBits = 0;
-	byte accumRedBits = 0;
-	byte accumGreenBits = 0;
-	byte accumBlueBits = 0;
-	byte accumAlphaBits = 0;
-	byte depthBits = 24;
-	byte stencilBits = 8;
-	byte auxBuffers = 0;
-	byte layerType = 0; // PFD_MAIN_PLANE
-	byte reserved = 0;
-	int layerMask = 0;
-	int visibleMask = 0;
-	int damageMask = 0;
+	private byte pixelType;
+	private byte colorBits;
+	private byte redBits = 0;
+	private byte redShift = 0;
+	private byte greenBits = 0;
+	private byte greenShift = 0;
+	private byte blueBits = 0;
+	private byte blueShift = 0;
+	private byte alphaBits = 8;
+	private byte alphaShift = 0;
+	private byte accumBits = 0;
+	private byte accumRedBits = 0;
+	private byte accumGreenBits = 0;
+	private byte accumBlueBits = 0;
+	private byte accumAlphaBits = 0;
+	private byte depthBits = 24;
+	private byte stencilBits = 8;
+	private byte auxBuffers = 0;
+	private byte layerType = 0; // PFD_MAIN_PLANE
+	private byte reserved = 0;
+	private int layerMask = 0;
+	private int visibleMask = 0;
+	private int damageMask = 0;
 
 	public PixelFormatDescriptor()
 	{

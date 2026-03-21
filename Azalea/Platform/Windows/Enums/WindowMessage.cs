@@ -219,5 +219,9 @@ internal enum WindowMessage : uint
 	/// Sent when the user drops a file on the window of an application that
 	/// has registered itself as a recipient of dropped files.
 	/// </summary>
-	DropFiles = 563
+	DropFiles = 563,
+
+	// Azalea Defined Messages
+
+	TrayIcon = 1025
 }
