@@ -23,7 +23,11 @@ public class SpriteText : GameObject
 
 	static SpriteText()
 	{
-		_textShader = Assets.MainStore.GetShader("Shaders/quad_vertex.glsl", "Shaders/text_fragment.glsl");
+		_textShader = ShaderBuilder.FromShaderCode(
+			Assets.GetText("Shaders/quad_vertex.glsl")!,
+			Assets.GetText("Shaders/text_fragment.glsl")!);
+
+		ShaderLibrary.RegisterShader("TextShader", _textShader);
 	}
 
 	private TextLayoutProvider _layoutProvider = new();

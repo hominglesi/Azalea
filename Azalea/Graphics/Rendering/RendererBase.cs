@@ -51,7 +51,11 @@ internal abstract class RendererBase : IRenderer
 		defaultQuadBatch = CreateQuadBatch(10000);
 		currentActiveBatch = defaultQuadBatch;
 
-		_defaultQuadShader = Assets.MainStore.GetShader("Shaders/quad_vertex.glsl", "Shaders/quad_fragment.glsl");
+		_defaultQuadShader = ShaderBuilder.FromShaderCode(
+			Assets.GetText("Shaders/quad_vertex.glsl")!,
+			Assets.GetText("Shaders/quad_fragment.glsl")!);
+		ShaderLibrary.RegisterShader("QuadShader", _defaultQuadShader);
+
 		BindShader(_defaultQuadShader);
 	}
 

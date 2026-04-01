@@ -53,7 +53,14 @@ public class Sprite : GameObject
 
 		if (Texture is PromisedTexture promised && promised.IsResolved == false)
 		{
-			_loadingShader ??= Assets.MainStore.GetShader("Shaders/quad_vertex.glsl", "Shaders/loading_fragment.glsl");
+			if (_loadingShader is null)
+			{
+				_loadingShader = ShaderBuilder.FromShaderCode(
+					Assets.GetText("Shaders/quad_vertex.glsl")!,
+					Assets.GetText("Shaders/loading_fragment.glsl")!);
+
+				ShaderLibrary.RegisterShader("LoadingShader", _loadingShader);
+			}
 
 			renderer.BindShader(_loadingShader);
 
