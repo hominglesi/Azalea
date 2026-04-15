@@ -23,7 +23,7 @@ public class FileInputControl : AbstractFileInput
 		{
 			RelativeSizeAxes = Axes.Both,
 			Wrapping = FlexWrapping.NoWrapping,
-			Alignment = FlexAlignment.Center,
+			ItemAlignment = FlexItemAlignment.Center,
 			Children = [
 				new SelectFileButton(this),
 				new GameObject(){

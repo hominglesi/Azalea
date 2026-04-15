@@ -48,15 +48,15 @@ public class FlexContainer : FlowContainer
 		}
 	}
 
-	private FlexAlignment _alignment = FlexAlignment.Start;
-	public FlexAlignment Alignment
+	private FlexItemAlignment _itemAlignment = FlexItemAlignment.Start;
+	public FlexItemAlignment ItemAlignment
 	{
-		get => _alignment;
+		get => _itemAlignment;
 		set
 		{
-			if (_alignment == value) return;
+			if (_itemAlignment == value) return;
 
-			_alignment = value;
+			_itemAlignment = value;
 			InvalidateLayout();
 		}
 	}
@@ -204,11 +204,11 @@ public class FlexContainer : FlowContainer
 
 			// Item alignment pass
 			index = 0;
-			if (Alignment != FlexAlignment.Start)
+			if (ItemAlignment != FlexItemAlignment.Start)
 			{
-				var offsetRatio = _alignment switch
+				var offsetRatio = _itemAlignment switch
 				{
-					FlexAlignment.Center => 0.5f,
+					FlexItemAlignment.Center => 0.5f,
 					_ => 1
 				};
 
@@ -403,7 +403,7 @@ public enum FlexJustification
 	SpaceEvenly
 }
 
-public enum FlexAlignment
+public enum FlexItemAlignment
 {
 	Start,
 	End,

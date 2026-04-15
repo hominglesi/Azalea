@@ -19,7 +19,7 @@ public class UnitTestMenuBar : FlexContainer
 	{
 		BackgroundColor = __backgroundColor;
 		Direction = FlexDirection.Horizontal;
-		Alignment = FlexAlignment.Center;
+		ItemAlignment = FlexItemAlignment.Center;
 
 		Add(new Box()
 		{
