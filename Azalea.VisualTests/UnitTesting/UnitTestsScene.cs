@@ -7,7 +7,7 @@ namespace Azalea.VisualTests.UnitTesting;
 public class UnitTestsScene : TestScene
 {
 	private readonly static float __menuBarHeight = 30;
-	private readonly static float __sidebarWidth = 340;
+	private readonly static float __sidebarWidth = 450;
 
 	private readonly UnitTestsManager _manager;
 	private readonly UnitTestMenuBar _menuBar;
