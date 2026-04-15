@@ -61,6 +61,19 @@ public class FlexContainer : FlowContainer
 		}
 	}
 
+	private FlexContentAlignment _contentAlignment = FlexContentAlignment.Start;
+	public FlexContentAlignment ContentAlignment
+	{
+		get => _contentAlignment;
+		set
+		{
+			if (_contentAlignment == value) return;
+
+			_contentAlignment = value;
+			InvalidateLayout();
+		}
+	}
+
 	private Vector2 _spacing;
 	public Vector2 Spacing
 	{
@@ -74,263 +87,289 @@ public class FlexContainer : FlowContainer
 		}
 	}
 
-	private void orderByDirection(ref Vector2[] positions, ref GameObject[] children)
-	{
-		var offset = 0f;
-		for (int i = 0; i < children.Length; i++)
-		{
-			positions[i] = createMainVector(offset);
-			offset += getMainLength(children[i]);
-			offset += getMainSpacing();
-		}
-	}
-
-	private int getNextChunk(ref Vector2[] positions, ref GameObject[] children, int startIndex, float maxLength)
-	{
-		var length = 0f;
-		for (int i = startIndex; i < children.Length; i++)
-		{
-			length += getMainLength(children[i]);
-			if (length > maxLength || children[i] is FlowNewLine)
-			{
-				if (i == startIndex) return startIndex;
-				return i - 1;
-			}
-			length += getMainSpacing();
-		}
-
-		return children.Length - 1;
-	}
-
-	private float getMaxSideLength(ref GameObject[] children, int startIndex, int endIndex)
-	{
-		var max = 0f;
-		for (int i = startIndex; i <= endIndex; i++)
-			max = MathF.Max(max, getSideLength(children[i]));
-
-		return max;
-	}
-
-	private float getTotalLength(ref GameObject[] children, int startIndex, int endIndex)
-	{
-		var total = 0f;
-		for (int i = startIndex; i <= endIndex; i++)
-		{
-			total += getMainLength(children[i]);
-			total += getMainSpacing();
-		}
-		total -= getMainSpacing();
-
-		return total;
-	}
-
-	private void placeRow(ref Vector2[] positions, int startIndex, int endIndex, float x, float y)
-	{
-		var firstX = positions[startIndex].X;
-		for (int i = startIndex; i <= endIndex; i++)
-		{
-			positions[i].X += x;
-			positions[i].X -= firstX;
-			positions[i].Y = y;
-		}
-	}
-
-	private void placeRowReverse(ref Vector2[] positions, ref GameObject[] children, int startIndex, int endIndex, float width, float x, float y)
-	{
-		var firstX = positions[startIndex].X;
-		for (int i = startIndex; i <= endIndex; i++)
-		{
-			var xOffset = positions[i].X - firstX;
-			positions[i].X = width - children[i].LayoutRectangle.Width - xOffset - x;
-			positions[i].Y = y;
-		}
-	}
-
-	private void placeColumn(ref Vector2[] positions, int startIndex, int endIndex, float x, float y)
-	{
-		var firstY = positions[startIndex].Y;
-		for (int i = startIndex; i <= endIndex; i++)
-		{
-			positions[i].Y += y;
-			positions[i].Y -= firstY;
-			positions[i].X = x;
-		}
-	}
-
-	private void placeColumnReverse(ref Vector2[] positions, ref GameObject[] children, int startIndex, int endIndex, float height, float x, float y)
-	{
-		var firstY = positions[startIndex].Y;
-		for (int i = startIndex; i <= endIndex; i++)
-		{
-			var yOffset = positions[i].Y - firstY;
-			positions[i].Y = height - children[i].LayoutRectangle.Height - yOffset - y;
-			positions[i].X = x;
-		}
-	}
-
-	private void align(ref Vector2[] positions, ref GameObject[] children, int startIndex, int endIndex)
-	{
-		if (Alignment == FlexAlignment.Start) return;
-
-		var maxLength = getMaxSideLength(ref children, startIndex, endIndex);
-
-		for (int i = startIndex; i <= endIndex; i++)
-		{
-			var offset = maxLength - getSideLength(children[i]);
-			if (Alignment == FlexAlignment.Center)
-				offset /= 2;
-			positions[i] += createSideVector(offset);
-		}
-	}
-
 	protected override IEnumerable<Vector2> ComputeLayoutPositions()
 	{
 		var layoutSize = ChildSize;
 
 		var children = FlexChildren.ToArray();
+
 		var positions = ArrayPool<Vector2>.Shared.Rent(children.Length);
+		var lines = ArrayPool<Vector2WithInt>.Shared.Rent(children.Length);
+		var nextLine = 0;
 
 		try
 		{
+			var nextPosition = getMainStart();
+			var nextItemLineIndex = 0;
+			var mainLength = 0f;
+			var totalMainLength = 0f;
+			var maxMainLength = getMainLength(layoutSize);
+			var crossLength = 0f;
+			var totalCrossLength = 0f;
+			var maxCrossLength = getCrossLength(layoutSize);
 
-			if (Direction == FlexDirection.Horizontal || Direction == FlexDirection.HorizontalReverse)
-			{
-				orderByDirection(ref positions, ref children);
-
-				if (Wrapping == FlexWrapping.NoWrapping)
-				{
-					var startIndex = 0;
-					var endIndex = children.Length - 1;
-
-					if (Direction == FlexDirection.Horizontal)
-						placeRow(ref positions, startIndex, endIndex, 0, 0);
-					else
-					{
-						var totalWidth = getTotalLength(ref children, startIndex, endIndex);
-						placeRowReverse(ref positions, ref children, startIndex, endIndex, totalWidth, 0, 0);
-					}
-
-					align(ref positions, ref children, startIndex, endIndex);
-				}
-				else
-				{
-					int startIndex = 0;
-					var verticalOffset = 0f;
-
-					while (true)
-					{
-						var endIndex = getNextChunk(ref positions, ref children, startIndex, layoutSize.X);
-						var contentWidth = getTotalLength(ref children, startIndex, endIndex);
-						var xOffset = Justification switch
-						{
-							FlexJustification.End => layoutSize.X - contentWidth,
-							FlexJustification.Center => (layoutSize.X - contentWidth) / 2,
-							_ => 0
-						};
-						if (Direction == FlexDirection.Horizontal)
-							placeRow(ref positions, startIndex, endIndex, xOffset, verticalOffset);
-						else
-							placeRowReverse(ref positions, ref children, startIndex, endIndex, layoutSize.X, xOffset, verticalOffset);
-
-						align(ref positions, ref children, startIndex, endIndex);
-
-						verticalOffset += getMaxSideLength(ref children, startIndex, endIndex);
-						verticalOffset += Spacing.Y;
-
-						if (children[endIndex] is FlowNewLine nl)
-							verticalOffset += nl.Length;
-
-						if (endIndex >= children.Length - 1)
-							break;
-
-						startIndex = endIndex + 1;
-					}
-				}
-			}
-			else
-			{
-				orderByDirection(ref positions, ref children);
-
-				if (Wrapping == FlexWrapping.NoWrapping)
-				{
-					var startIndex = 0;
-					var endIndex = children.Length - 1;
-
-					if (Direction == FlexDirection.Vertical)
-						placeColumn(ref positions, startIndex, endIndex, 0, 0);
-					else
-					{
-						var totalHeight = getTotalLength(ref children, startIndex, endIndex);
-						placeColumnReverse(ref positions, ref children, startIndex, endIndex, totalHeight, 0, 0);
-					}
-
-					align(ref positions, ref children, startIndex, endIndex);
-				}
-				else
-				{
-					int startIndex = 0;
-					var horizontalOffset = 0f;
-
-					while (true)
-					{
-						var endIndex = getNextChunk(ref positions, ref children, startIndex, layoutSize.Y);
-						var contentHeight = getTotalLength(ref children, startIndex, endIndex);
-						var yOffset = Justification switch
-						{
-							FlexJustification.End => layoutSize.Y - contentHeight,
-							FlexJustification.Center => (layoutSize.Y - contentHeight) / 2,
-							_ => 0
-						};
-						if (Direction == FlexDirection.Vertical)
-							placeColumn(ref positions, startIndex, endIndex, horizontalOffset, yOffset);
-						else
-							placeColumnReverse(ref positions, ref children, startIndex, endIndex, layoutSize.Y, horizontalOffset, yOffset);
-
-						align(ref positions, ref children, startIndex, endIndex);
-
-						horizontalOffset += getMaxSideLength(ref children, startIndex, endIndex);
-						horizontalOffset += Spacing.X;
-
-						if (children[endIndex] is FlowNewLine nl)
-							horizontalOffset += nl.Length;
-
-						if (endIndex >= children.Length - 1)
-							break;
-
-						startIndex = endIndex + 1;
-					}
-				}
-			}
-
-
-
+			// Layout pass
 			for (int i = 0; i < children.Length; i++)
 			{
-				yield return positions[i];
+				var itemMainLength = getMainLength(children[i]);
+
+				if (Wrapping != FlexWrapping.NoWrapping && mainLength + itemMainLength > maxMainLength)
+				{
+					var crossSpacing = getCrossLength(Spacing);
+					var crossOffset = crossLength + totalCrossLength + crossSpacing;
+					nextPosition = getMainStart() + (crossOffset * getCrossDirection());
+
+					totalMainLength += mainLength;
+					totalCrossLength += crossLength + crossSpacing;
+					lines[nextLine++] = new Vector2WithInt(mainLength, crossLength, nextItemLineIndex);
+					mainLength = 0f;
+					crossLength = 0f;
+					nextItemLineIndex = 0;
+				}
+
+				var positionOffset = itemMainLength + getMainSpacing();
+
+				positions[i] = nextPosition + getPositionOffset(children[i]);
+				nextPosition += positionOffset * getMainDirection();
+				crossLength = Math.Max(crossLength, getCrossLength(children[i]));
+				mainLength += positionOffset;
+				nextItemLineIndex++;
 			}
+
+			if (nextLine != lines.Length)
+			{
+				totalMainLength += mainLength;
+				totalCrossLength += crossLength;
+				lines[nextLine++] = new Vector2WithInt(mainLength, crossLength, nextItemLineIndex);
+			}
+
+			// Justification pass
+			int index = 0;
+			switch (Justification)
+			{
+				case FlexJustification.Center:
+				case FlexJustification.End:
+					var offsetRatio = Justification switch
+					{
+						FlexJustification.Center => 0.5f,
+						_ => 1
+					};
+
+					for (int i = 0; i < nextLine; i++)
+					{
+						for (int j = 0; j < lines[i].Int; j++)
+						{
+							var mainOffset = (maxMainLength - lines[i].Position.X) * offsetRatio;
+							positions[index++] += mainOffset * getMainDirection();
+						}
+					}
+					break;
+				case FlexJustification.SpaceBetween:
+					for (int i = 0; i < nextLine; i++)
+					{
+						if (lines[i].Int <= 1)
+							break;
+
+						for (int j = 0; j < lines[i].Int; j++)
+						{
+							var mainOffset = maxMainLength - lines[i].Position.X;
+							mainOffset /= lines[i].Int - 1;
+							positions[index++] += (mainOffset * j) * getMainDirection();
+						}
+					}
+					break;
+				case FlexJustification.SpaceEvenly:
+					for (int i = 0; i < nextLine; i++)
+					{
+						for (int j = 0; j < lines[i].Int; j++)
+						{
+							var mainOffset = maxMainLength - lines[i].Position.X;
+							mainOffset /= (lines[i].Int - 1) + 2;
+							positions[index++] += (mainOffset * (j + 1)) * getMainDirection();
+						}
+					}
+					break;
+				case FlexJustification.SpaceAround:
+					for (int i = 0; i < nextLine; i++)
+					{
+						for (int j = 0; j < lines[i].Int; j++)
+						{
+							var mainOffset = maxMainLength - lines[i].Position.X;
+							mainOffset /= lines[i].Int * 2;
+							positions[index++] += (mainOffset * ((j * 2) + 1)) * getMainDirection();
+						}
+					}
+					break;
+			}
+
+			// Item alignment pass
+			index = 0;
+			if (Alignment != FlexAlignment.Start)
+			{
+				var offsetRatio = _alignment switch
+				{
+					FlexAlignment.Center => 0.5f,
+					_ => 1
+				};
+
+				for (int i = 0; i < nextLine; i++)
+				{
+					for (int j = 0; j < lines[i].Int; j++)
+					{
+						var crossOffset = (lines[i].Position.Y - getCrossLength(children[index])) * offsetRatio;
+						positions[index++] += crossOffset * getCrossDirection();
+					}
+				}
+			}
+
+			// Content alignment pass
+			var remainingCrossLength = maxCrossLength - totalCrossLength;
+
+			Vector2 offset = Vector2.Zero;
+			index = 0;
+			switch (ContentAlignment)
+			{
+				case FlexContentAlignment.End:
+					offset = remainingCrossLength * getCrossDirection();
+					for (int i = 0; i < positions.Length; i++)
+						positions[i] += offset;
+					break;
+				case FlexContentAlignment.Center:
+					offset = (remainingCrossLength / 2) * getCrossDirection();
+					for (int i = 0; i < positions.Length; i++)
+						positions[i] += offset;
+					break;
+				case FlexContentAlignment.SpaceBetween:
+					if (nextLine <= 1)
+						break;
+
+					offset = remainingCrossLength * getCrossDirection();
+					offset /= nextLine - 1;
+
+					for (int i = 0; i <= nextLine; i++)
+						for (int j = 0; j < lines[i].Int; j++)
+							positions[index++] += offset * i;
+					break;
+				case FlexContentAlignment.SpaceEvenly:
+					offset = remainingCrossLength * getCrossDirection();
+					offset /= (nextLine - 1) + 2;
+
+					for (int i = 0; i <= nextLine; i++)
+						for (int j = 0; j < lines[i].Int; j++)
+							positions[index++] += offset * (i + 1);
+					break;
+				case FlexContentAlignment.SpaceAround:
+					offset = remainingCrossLength * getCrossDirection();
+					offset /= nextLine * 2;
+
+					for (int i = 0; i <= nextLine; i++)
+						for (int j = 0; j < lines[i].Int; j++)
+							positions[index++] += offset * ((i * 2) + 1);
+
+					break;
+
+			}
+
+			for (int i = 0; i < children.Length; i++)
+				yield return positions[i];
 		}
 		finally
 		{
 			ArrayPool<Vector2>.Shared.Return(positions);
+			ArrayPool<Vector2WithInt>.Shared.Return(lines);
 		}
 	}
 
-	private float getMainLength(GameObject obj)
-		=> isHorizontal() ? obj.BoundingBox.Width : obj.BoundingBox.Height;
+	struct Vector2WithInt(float x, float y, int @int)
+	{
+		public Vector2 Position = new(x, y);
+		public int Int = @int;
+	}
+
+	private Vector2 getMainDirection()
+		=> Direction switch
+		{
+			FlexDirection.Horizontal => new(1, 0),
+			FlexDirection.HorizontalReverse => new(-1, 0),
+			FlexDirection.Vertical => new(0, 1),
+			_ => new(0, -1),
+		};
+
+	private Vector2 getCrossDirection()
+	{
+		var axisDir = Wrapping == FlexWrapping.WrapReverse ? -1 : 1;
+
+		return Direction switch
+		{
+			FlexDirection.Horizontal or FlexDirection.HorizontalReverse => new(0, axisDir),
+			_ => new(axisDir, 0),
+		};
+	}
+
+	private Vector2 getMainStart()
+	{
+		var crossStart = 0f;
+		if (Wrapping == FlexWrapping.WrapReverse)
+		{
+			crossStart = Direction switch
+			{
+				FlexDirection.Horizontal or FlexDirection.HorizontalReverse => ChildSize.Y,
+				_ => ChildSize.X
+			};
+		}
+
+		return Direction switch
+		{
+			FlexDirection.Horizontal => new(0, crossStart),
+			FlexDirection.HorizontalReverse => new(ChildSize.X, crossStart),
+			FlexDirection.Vertical => new(crossStart, 0),
+			_ => new(crossStart, ChildSize.Y),
+		};
+	}
+
+	private float getMainLength(GameObject obj) => getMainLength(obj.BoundingBox.Size);
+
+	private float getMainLength(Vector2 vector)
+		=> Direction switch
+		{
+			FlexDirection.Horizontal or FlexDirection.HorizontalReverse => vector.X,
+			_ => vector.Y
+		};
+
+	private float getCrossLength(GameObject obj) => getCrossLength(obj.BoundingBox.Size);
+	private float getCrossLength(Vector2 vector)
+		=> Direction switch
+		{
+			FlexDirection.Horizontal or FlexDirection.HorizontalReverse => vector.Y,
+			_ => vector.X
+		};
 
 	private float getMainSpacing()
-		=> isHorizontal() ? Spacing.X : Spacing.Y;
+		=> Direction switch
+		{
+			FlexDirection.Horizontal or FlexDirection.HorizontalReverse => Spacing.X,
+			_ => Spacing.Y
+		};
 
-	private Vector2 createMainVector(float value)
-		=> isHorizontal() ? new(value, 0) : new(0, value);
+	private Vector2 getPositionOffset(GameObject obj)
+	{
+		var offset = Vector2.Zero;
 
-	private Vector2 createSideVector(float value)
-		=> isHorizontal() ? new(0, value) : new(value, 0);
+		if (Direction == FlexDirection.HorizontalReverse)
+			offset.X -= obj.Width;
+		else if (Direction == FlexDirection.VerticalReverse)
+			offset.Y -= obj.Height;
 
-	private float getSideLength(GameObject obj)
-		=> isHorizontal() ? obj.BoundingBox.Height : obj.BoundingBox.Width;
+		if (Wrapping == FlexWrapping.WrapReverse)
+		{
+			if (Direction == FlexDirection.Horizontal || Direction == FlexDirection.HorizontalReverse)
+				offset.Y -= obj.Height;
+			else if (Direction == FlexDirection.Vertical || Direction == FlexDirection.VerticalReverse)
+				offset.X -= obj.Width;
+		}
 
-	private bool isHorizontal() => Direction == FlexDirection.Horizontal || Direction == FlexDirection.HorizontalReverse;
+		return offset;
+	}
 }
 
 /// <summary>
@@ -351,13 +390,17 @@ public enum FlexWrapping
 {
 	NoWrapping,
 	Wrap,
+	WrapReverse
 }
 
 public enum FlexJustification
 {
 	Start,
 	End,
-	Center
+	Center,
+	SpaceBetween,
+	SpaceAround,
+	SpaceEvenly
 }
 
 public enum FlexAlignment
@@ -365,4 +408,14 @@ public enum FlexAlignment
 	Start,
 	End,
 	Center
+}
+
+public enum FlexContentAlignment
+{
+	Start,
+	End,
+	Center,
+	SpaceBetween,
+	SpaceAround,
+	SpaceEvenly
 }

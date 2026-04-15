@@ -4,13 +4,14 @@ using System.Collections.Generic;
 namespace Azalea.VisualTests.UnitTesting;
 public abstract class UnitTestSuite : UnitTestBase
 {
-	public List<UnitTest> Tests { get; init; } = new();
+	public List<UnitTest> Tests { get; init; } = [];
 
 	public UnitTestSuite()
 	{
 		foreach (var type in GetType().GetNestedTypes())
 		{
-			if (type.IsAssignableTo(typeof(UnitTest)) == false) continue;
+			if (type.IsAbstract || type.IsAssignableTo(typeof(UnitTest)) == false)
+				continue;
 
 			var test = ReflectionUtils.InstantiateType<UnitTest>(type);
 			test.Suite = this;

@@ -16,8 +16,8 @@ public class UnitTestsSidebar : Composition
 	private readonly static float __dropDownHeight = 145;
 	private readonly static float __headerHeight = 65;
 
-	private readonly static float __stepHeight = 35;
-	private readonly static float __stepCheckboxPadding = 5;
+	private readonly static float __stepHeight = 28;
+	private readonly static float __stepCheckboxPadding = 3;
 	private readonly static Color __stepBackgroundColor = new(252, 191, 73);
 	private readonly static Color __stepDoneBackgroundColor = new(247, 127, 0);
 	private readonly static Color __stepTextColor = new(0, 48, 73);
@@ -94,13 +94,13 @@ public class UnitTestsSidebar : Composition
 		menu.RelativePositionAxes = Axes.X;
 		menu.X = 0.5f;
 		menu.Origin = Anchor.TopCenter;
-		menu.Size = new(250, 35);
+		menu.Size = new(380, 28);
 		menu.DropDownOffset = 5;
 
 		menu.Arrow.Color = __stepTextColor;
 		menu.Arrow.Size = new(16);
 		menu.Label.Color = __stepTextColor;
-		menu.Label.Font = FontUsage.Default.With(size: 20);
+		menu.Label.Font = FontUsage.Default.With(size: 18);
 		menu.ItemFont = menu.Label.Font;
 		menu.AccentColor = __stepBackgroundColor;
 		menu.ItemHeight = menu.Height;
@@ -253,7 +253,8 @@ public class UnitTestsSidebar : Composition
 				Color = __stepTextColor,
 				Anchor = Anchor.CenterLeft,
 				Origin = Anchor.CenterLeft,
-				Position = new(5, 0)
+				Position = new(5, 0),
+				Font = FontUsage.Default.With(size: 18)
 			});
 		}
 

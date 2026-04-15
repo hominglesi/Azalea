@@ -15,7 +15,6 @@ public class BasicDropDownMenu : AbstractDropDownMenu<string>
 {
 	public readonly Sprite Arrow;
 	public readonly SpriteText Label;
-	private readonly HollowBox _outline;
 	private readonly Box _background;
 
 	#region Customisation
@@ -31,8 +30,8 @@ public class BasicDropDownMenu : AbstractDropDownMenu<string>
 
 			_accentColor = value;
 
-			_outline.Color = _accentColor;
-			_basicExpandedSegment.Outline.Color = _accentColor;
+			BorderColor = _accentColor;
+			_basicExpandedSegment.BorderColor = _accentColor;
 		}
 	}
 
@@ -124,11 +123,7 @@ public class BasicDropDownMenu : AbstractDropDownMenu<string>
 			Color = Palette.White
 		});
 
-		Add(_outline = new HollowBox()
-		{
-			RelativeSizeAxes = Axes.Both,
-			Color = _accentColor,
-		});
+		BorderColor = _accentColor;
 
 		Add(Label = new SpriteText()
 		{
@@ -232,7 +227,6 @@ public class BasicDropDownMenu : AbstractDropDownMenu<string>
 	{
 		private BasicDropDownMenu _parentMenu;
 
-		public readonly HollowBox Outline;
 		private readonly Box _shadow;
 		private readonly FlexContainer _inner;
 		public BasicDropDownExpanded(BasicDropDownMenu parentMenu)
@@ -260,12 +254,7 @@ public class BasicDropDownMenu : AbstractDropDownMenu<string>
 				Direction = FlexDirection.Vertical,
 			});
 
-			Add(Outline = new HollowBox()
-			{
-				RelativeSizeAxes = Axes.Both,
-				Color = _parentMenu.AccentColor,
-				IgnoredForAutoSizeAxes = Axes.Both
-			});
+			BorderColor = _parentMenu.AccentColor;
 		}
 
 		public void AddItem(GameObject obj)
