@@ -320,7 +320,7 @@ internal class MsdfGenView : Composition
 			Width = 700;
 			BorderColor = ControlConstants.DarkControlColor;
 			BorderThickness = 1;
-			Alignment = FlexAlignment.Center;
+			ItemAlignment = FlexItemAlignment.Center;
 			Wrapping = FlexWrapping.NoWrapping;
 			CaratColor = ControlConstants.DarkTextColor;
 			Padding = 10;

@@ -64,7 +64,7 @@ public class UnitTestsSidebar : Composition
 			Y = __dropDownHeight,
 			Size = new(1, __headerHeight),
 			Justification = FlexJustification.Center,
-			Alignment = FlexAlignment.Center,
+			ItemAlignment = FlexItemAlignment.Center,
 			Wrapping = FlexWrapping.Wrap
 		});
 

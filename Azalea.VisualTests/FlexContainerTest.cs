@@ -70,7 +70,7 @@ public class FlexContainerTest : TestScene
 		_itemAlignmentMenu.OnSelectedChanged += itemAlignment =>
 		{
 			if (_flex is null || itemAlignment is null) return;
-			_flex.Alignment = Enum.Parse<FlexAlignment>(itemAlignment);
+			_flex.ItemAlignment = Enum.Parse<FlexItemAlignment>(itemAlignment);
 		};
 
 		_contentAlignmentMenu = AddDropdownMenu();
