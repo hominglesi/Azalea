@@ -19,7 +19,7 @@ internal class Program
 			//.EnableTracing()
 			.SetupConfig()
 			.Create()
-			.Run(new EditorWrapper(new VisualTests()));
+			.Run(EditorWrapper.Wrap(new VisualTests()));
 	}
 }
 

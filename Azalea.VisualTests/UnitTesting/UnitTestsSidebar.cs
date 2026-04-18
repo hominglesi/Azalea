@@ -34,7 +34,7 @@ public class UnitTestsSidebar : Composition
 	{
 		BackgroundColor = new Color(0, 48, 73);
 
-		Add(customizeDropDownMenuLabal(new SpriteText()
+		Add(customizeDropDownMenuLabel(new SpriteText()
 		{
 			Y = 20,
 			Text = "Test Suite:"
@@ -46,7 +46,7 @@ public class UnitTestsSidebar : Composition
 			Depth = -1001
 		}));
 
-		Add(customizeDropDownMenuLabal(new SpriteText()
+		Add(customizeDropDownMenuLabel(new SpriteText()
 		{
 			Y = 90,
 			Text = "Test:"
@@ -82,7 +82,7 @@ public class UnitTestsSidebar : Composition
 		});
 	}
 
-	private SpriteText customizeDropDownMenuLabal(SpriteText text)
+	private SpriteText customizeDropDownMenuLabel(SpriteText text)
 	{
 		text.Origin = Anchor.CenterLeft;
 		text.X = 60;

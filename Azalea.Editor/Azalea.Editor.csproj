@@ -30,11 +30,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="runtimes\**\*"
-          Pack="true"
-          PackagePath="%(Identity)"
-          CopyToOutputDirectory="PreserveNewest"
-          TargetPath="%(Filename)%(Extension)" />
+    <None Include="runtimes\**\*" Pack="true" PackagePath="%(Identity)" CopyToOutputDirectory="PreserveNewest" TargetPath="%(Filename)%(Extension)" />
   </ItemGroup>
-
+  
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\**\*" />
+    <EmbeddedResource Remove="**\__*" />
+  </ItemGroup>
 </Project>

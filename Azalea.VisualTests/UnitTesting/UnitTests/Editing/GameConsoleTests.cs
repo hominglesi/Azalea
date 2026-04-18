@@ -1,7 +1,8 @@
-﻿using Azalea.Editing;
-using Azalea.Inputs;
+﻿using Azalea.Inputs;
 using Azalea.Platform;
 using Azalea.Utils;
+
+using EditorOld = Azalea.Editing.Editor;
 
 namespace Azalea.VisualTests.UnitTesting.UnitTests.Editing;
 public class GameConsoleTests : UnitTestSuite
@@ -13,7 +14,7 @@ public class GameConsoleTests : UnitTestSuite
 			AddOperation("Press F9 key", () => InputUtils.SimulateKeyInput(Keys.F9));
 			AddOperation("Input 'fullscreen' command", () =>
 			{
-				Editor.FocusConsole();
+				EditorOld.FocusConsole();
 				InputUtils.SimulateCharInput("fullscreen");
 			});
 			AddOperation("Input enter", () => InputUtils.SimulateKeyInput(Keys.Enter));
@@ -22,7 +23,7 @@ public class GameConsoleTests : UnitTestSuite
 			AddOperation("Press F9 key", () => InputUtils.SimulateKeyInput(Keys.F9));
 			AddOperation("Execute 'restorewindow' command", () =>
 			{
-				Editor.FocusConsole();
+				EditorOld.FocusConsole();
 				InputUtils.SimulateCharInput("restorewindow");
 			});
 			AddOperation("Input enter", () => InputUtils.SimulateKeyInput(Keys.Enter));
@@ -32,7 +33,7 @@ public class GameConsoleTests : UnitTestSuite
 			AddOperation("Press F9 key", () => InputUtils.SimulateKeyInput(Keys.F9));
 			AddOperation("Execute 'windowtitle Lorem Ipsum' command", () =>
 			{
-				Editor.FocusConsole();
+				EditorOld.FocusConsole();
 				InputUtils.SimulateCharInput("windowtitle Lorem Ipsum");
 			});
 			AddOperation("Input enter", () => InputUtils.SimulateKeyInput(Keys.Enter));
@@ -49,9 +50,9 @@ public class GameConsoleTests : UnitTestSuite
 		{
 			_commandRan = false;
 			AddOperation("Add custom command",
-				() => Editor.AddConsoleCommand(_customCommand, args => _commandRan = true));
+				() => EditorOld.AddConsoleCommand(_customCommand, args => _commandRan = true));
 			AddOperation("Run custom command",
-				() => Editor.ExecuteConsoleQuery(_customCommand));
+				() => EditorOld.ExecuteConsoleQuery(_customCommand));
 			AddResult("Check if command was ran", () => _commandRan);
 		}
 
@@ -59,7 +60,7 @@ public class GameConsoleTests : UnitTestSuite
 		{
 			base.TearDown(scene);
 
-			Editor.RemoveConsoleCommand(_customCommand);
+			EditorOld.RemoveConsoleCommand(_customCommand);
 		}
 	}
 }

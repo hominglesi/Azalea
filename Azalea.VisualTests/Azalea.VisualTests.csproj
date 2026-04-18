@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Azalea.Editor\Azalea.Editor.csproj" />
 	  <ProjectReference Include="..\Azalea\Azalea.csproj">
 		  <ExcludeAssets>compile</ExcludeAssets>
 	  </ProjectReference>
