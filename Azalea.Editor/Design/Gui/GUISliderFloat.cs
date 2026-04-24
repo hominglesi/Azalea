@@ -3,6 +3,7 @@ using Azalea.Design.Shapes;
 using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
+using Azalea.Utils;
 using System;
 
 namespace Azalea.Editor.Design.Gui;
@@ -49,7 +50,7 @@ public class GUISliderFloat : Composition
 		else
 			_slider.OnValueSet = onValueChanged;
 
-		_slider.Value = initialValue / (_maxValue - _minValue);
+		_slider.Value = MathUtils.Map(initialValue, _minValue, _maxValue, 0, 1);
 	}
 
 	private void onValueChanged(float value)

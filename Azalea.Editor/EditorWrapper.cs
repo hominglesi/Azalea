@@ -2,11 +2,13 @@
 using Azalea.Design.Controls;
 using Azalea.Design.Docking;
 using Azalea.Design.Scenes;
+using Azalea.Editor.DebugWindows;
 using Azalea.Editor.Views.MsdfGen;
 using Azalea.Editor.Views.ResourceExploring;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
+using Azalea.Inputs;
 using Azalea.IO.Resources;
 using System;
 using System.Diagnostics;
@@ -89,6 +91,9 @@ public class EditorWrapper : AzaleaGame
 			_wrappedGame.AddInternal(sceneContainer);
 			_sceneContainerHandedOver = true;
 		}
+
+		if (Input.GetKey(Keys.F1).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
+			CameraWindow.Toggle();
 	}
 
 	private class MissingGameDisplay : Composition

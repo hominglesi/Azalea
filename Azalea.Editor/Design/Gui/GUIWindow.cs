@@ -68,6 +68,13 @@ public class GUIWindow : BasicWindowContainer
 		return label;
 	}
 
+	public GUILabelContinuous AddLabel(Func<string> textFunction)
+	{
+		var label = new GUILabelContinuous(textFunction);
+		_content.Add(label);
+		return label;
+	}
+
 	public GUICheckbox AddCheckbox(string name, bool @checked = false)
 	{
 		var checkbox = new GUICheckbox(name, @checked);
@@ -83,6 +90,22 @@ public class GUIWindow : BasicWindowContainer
 			name, minValue, maxValue, initialValue, stringFormat, continuous);
 		_content.Add(sliderFloat);
 		return sliderFloat;
+	}
+
+	public void Hide()
+	{
+		if (Parent is null)
+			return;
+
+		EditorWrapper.Instance.Remove(this);
+	}
+
+	public void Show()
+	{
+		if (Parent is not null)
+			return;
+
+		EditorWrapper.Instance.Add(this);
 	}
 
 	protected override bool OnHover(HoverEvent e) => true;

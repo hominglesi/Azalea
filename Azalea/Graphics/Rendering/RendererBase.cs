@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.Colors;
+﻿using Azalea.Graphics.Camera;
+using Azalea.Graphics.Colors;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Graphics.Shaders;
 using Azalea.Graphics.Textures;
@@ -169,7 +170,11 @@ internal abstract class RendererBase : IRenderer
 		_scissorRectangles.Push(scissorRect);
 
 		if (rectSameAsLast == false)
-			SetScissorTestRectangle(scissorRect);
+		{
+			var screenRect = MainCamera.Instance.ToWorldSpace(scissorRect);
+			SetScissorTestRectangle(screenRect);
+		}
+
 	}
 
 	public void PopScissor()
@@ -186,7 +191,10 @@ internal abstract class RendererBase : IRenderer
 			FlushCurrentBatch();
 
 		if (stackEmpty == false && rectSameAsLast == false)
-			SetScissorTestRectangle(_scissorRectangles.Peek());
+		{
+			var screenRect = MainCamera.Instance.ToWorldSpace(_scissorRectangles.Peek());
+			SetScissorTestRectangle(screenRect);
+		}
 
 		if (stackEmpty)
 			SetScissorTestState(enabled: false);

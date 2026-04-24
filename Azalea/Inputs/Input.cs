@@ -1,6 +1,7 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Editing;
 using Azalea.Graphics;
+using Azalea.Graphics.Camera;
 using Azalea.Inputs.Events;
 using Azalea.Inputs.Gamepads;
 using System;
@@ -175,7 +176,9 @@ public static class Input
 
 		_lastMousePosition = MousePosition;
 
-		MousePosition = newPosition;
+		var worldPosition = MainCamera.Instance.ToWorldSpace(newPosition);
+
+		MousePosition = worldPosition;
 
 		PerformanceTrace.RunAndTrace(updateHoveredObjects, "Hover Update");
 	}

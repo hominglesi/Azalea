@@ -1,11 +1,11 @@
-﻿using Azalea.Graphics.OpenGL.Enums;
+﻿using Azalea.Graphics.Camera;
+using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.OpenGL.Shaders;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Platform;
 using Azalea.Utils;
 using System;
-using System.Numerics;
 
 namespace Azalea.Graphics.OpenGL.Batches;
 
@@ -66,9 +66,7 @@ internal class GLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 
 		_vertexBuffer.SetData(_vertices, _vertexCount * _stride, GLUsageHint.DynamicDraw);
 
-		var clientSize = _window.ClientSize;
-		var projectionMatrix = Matrix4x4.CreateOrthographicOffCenter(0, clientSize.X, clientSize.Y, 0, 0.1f, 100);
-
+		var projectionMatrix = MainCamera.Instance.CreateProjectionMatrix(_window.ClientSize);
 		if (_renderer.ActiveShader is GLShader glShader)
 		{
 			glShader.SetUniform("u_Projection", projectionMatrix);
