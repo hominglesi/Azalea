@@ -10,5 +10,10 @@ internal static class GUIConstants
 	{
 		public readonly static Color AccentColor = new(32, 50, 76);
 		public readonly static Color AccentColor2 = new(61, 133, 224);
+		public readonly static Color AccentColor3 = new(35, 62, 93);
+
+		public readonly static Color BackgroundDarkest = new(13);
+
+		public readonly static Color SliderBody = new(79);
 	}
 }

@@ -50,6 +50,7 @@ public class GUISliderFloat : Composition
 		else
 			_slider.OnValueSet = onValueChanged;
 
+		initialValue = Math.Clamp(initialValue, _minValue, _maxValue);
 		_slider.Value = MathUtils.Map(initialValue, _minValue, _maxValue, 0, 1);
 	}
 
