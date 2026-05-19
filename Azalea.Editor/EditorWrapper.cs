@@ -94,6 +94,8 @@ public class EditorWrapper : AzaleaGame
 
 		if (Input.GetKey(Keys.F1).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
 			CameraWindow.Toggle();
+		if (Input.GetKey(Keys.F2).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
+			WindowingWindow.Toggle();
 	}
 
 	private class MissingGameDisplay : Composition

@@ -4,6 +4,7 @@ using Azalea.Graphics.Sprites;
 namespace Azalea.Editor.Design.Gui;
 internal static class GUIConstants
 {
+	public const float ElementHeight = 19;
 	public readonly static FontUsage Font = FontUsage.Default.With(size: 14);
 
 	public static class Colors

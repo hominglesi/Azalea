@@ -26,7 +26,7 @@ public class GUICheckbox : FlexContainer
 
 		AddRange([
 			new Composition(){
-				Size = new(19),
+				Size = new(GUIConstants.ElementHeight),
 				Children = [
 					new Box(){
 						RelativeSizeAxes = Axes.Both,

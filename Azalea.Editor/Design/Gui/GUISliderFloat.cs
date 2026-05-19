@@ -29,7 +29,7 @@ public class GUISliderFloat : Composition
 		AddRange([
 			_slider = new GUISlider(){
 				Width = 220,
-				Height = 19
+				Height = GUIConstants.ElementHeight
 			},
 			new SpriteText(){
 				Position = new(225, 9),

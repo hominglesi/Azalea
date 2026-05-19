@@ -79,6 +79,8 @@ public class GUIWindow : BasicWindowContainer
 			_groupStack.Peek().Add(obj);
 	}
 
+	public void RemoveElement(GameObject obj) => obj.Parent!.Remove(obj);
+
 	private readonly Stack<GUIGroup> _groupStack = [];
 
 	public GUIGroup AddGroup(string name)
@@ -106,6 +108,13 @@ public class GUIWindow : BasicWindowContainer
 		var label = new GUILabelContinuous(textFunction);
 		addToWindow(label);
 		return label;
+	}
+
+	public GUIButton AddButton(string text, Action clickAction)
+	{
+		var button = new GUIButton(text, clickAction);
+		addToWindow(button);
+		return button;
 	}
 
 	public GUICheckbox AddCheckbox(string name, bool @checked = false)

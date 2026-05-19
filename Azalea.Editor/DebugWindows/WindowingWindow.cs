@@ -1,0 +1,52 @@
+﻿using Azalea.Editor.Design.Gui;
+using Azalea.Platform.Windowing;
+using System.Collections.Generic;
+
+namespace Azalea.Editor.DebugWindows;
+internal class WindowingWindow
+{
+	private static GUIWindow? _window;
+	private static bool _shown = false;
+
+	public static void Toggle()
+	{
+		_shown = !_shown;
+		if (_shown) show();
+		else hide();
+	}
+
+	private static readonly Dictionary<PlatformWindow, GUIGroup> _windowGroups = [];
+
+	private static void show()
+	{
+		if (_window is null)
+		{
+			_window = GUIWindow.Create("Windows", new(400, 400));
+
+			PlatformWindow.OnWindowCreated += window =>
+				{
+					var group = _window.AddGroup(window.Title);
+					_window.AddButton("Close", () => window.Close());
+					_window.FinishGroup();
+					_windowGroups.Add(window, group);
+				};
+			PlatformWindow.OnWindowClosed += window =>
+				{
+					_window.RemoveElement(_windowGroups[window]);
+					_windowGroups.Remove(window);
+				};
+
+			_window.AddButton("Create new Window", () => PlatformWindow.Create());
+		}
+
+		_window.Show();
+	}
+
+	private static void hide()
+	{
+		if (_window is null)
+			return;
+
+		_window.Hide();
+	}
+}
