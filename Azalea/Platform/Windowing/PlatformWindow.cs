@@ -1,22 +1,63 @@
-﻿using System;
+﻿using Azalea.Platform.Windowing.Windows;
+using Azalea.Threading;
+using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Azalea.Platform.Windowing;
-internal class PlatformWindow
+internal abstract class PlatformWindow
 {
 	#region Creation
 
 	private static List<PlatformWindow> _windows = [];
 	public static event Action<PlatformWindow>? OnWindowCreated;
 
-	private PlatformWindow() { }
+	protected PlatformWindow()
+	{
+		_thread = new WindowThread(this);
+		_thread.Start();
+	}
 
 	public static PlatformWindow Create()
 	{
-		var newWindow = new PlatformWindow();
+		var newWindow = RuntimeInformation.ProcessArchitecture switch
+		{
+			Architecture.X64 or Architecture.X86 => new WindowsWindow(),
+			_ => throw new NotSupportedException(
+				$"Platform '{RuntimeInformation.ProcessArchitecture}' is not supported")
+		};
+
 		_windows.Add(newWindow);
 		OnWindowCreated?.Invoke(newWindow);
 		return newWindow;
+	}
+
+	protected abstract void Initialize();
+	protected abstract void Update();
+
+	#endregion
+
+	#region Thread
+
+	private readonly WindowThread _thread;
+
+	class WindowThread(PlatformWindow window) : GameThread(1000)
+	{
+		public override string DisplayName => "Window Thread";
+
+		private readonly PlatformWindow _window = window;
+		private bool _initialized = false;
+
+		protected override void Work()
+		{
+			if (_initialized == false)
+			{
+				_window.Initialize();
+				_initialized = true;
+			}
+
+			_window.Update();
+		}
 	}
 
 	#endregion
@@ -30,6 +71,8 @@ internal class PlatformWindow
 	{
 		if (Closed) return;
 
+		_thread.Stop();
+
 		Closed = true;
 		_windows.Remove(this);
 		OnWindowClosed?.Invoke(this);
@@ -38,4 +81,5 @@ internal class PlatformWindow
 	#endregion
 
 	public string Title => "Azalea Window";
+	public virtual string PlatformType => "Abstract Window";
 }

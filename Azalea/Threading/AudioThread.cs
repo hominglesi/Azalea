@@ -15,6 +15,8 @@ internal class AudioThread : GameThread
 
 	private readonly SemaphoreSlim _readyGate = new(0, 1);
 
+	public override string DisplayName => "Audio Thread";
+
 	public AudioThread(GameHost host) : base(1)
 	{
 		_host = host;

@@ -1,18 +1,27 @@
 ﻿using Azalea.Platform.Windows;
+using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Azalea.Threading;
 internal abstract class GameThread
 {
-	private readonly int _targetInterval;
+	public static readonly List<GameThread> ActiveThreads = [];
+	public static event Action<GameThread>? OnThreadStarted;
+	public static event Action<GameThread>? OnThreadStopped;
+
 	private volatile bool _running;
 	private readonly Thread _thread;
 
 	private WindowsWaitableTimer? _timer;
 
+	public virtual string DisplayName => "Game Thread";
+	public int TargetInterval { get; }
+	public int ManagedThreadId { get; }
+
 	public GameThread(int targetInterval)
 	{
-		_targetInterval = targetInterval;
+		TargetInterval = targetInterval;
 
 		_running = true;
 		_thread = new Thread(threadLoop)
@@ -20,7 +29,12 @@ internal abstract class GameThread
 			IsBackground = true,
 		};
 
+		ManagedThreadId = _thread.ManagedThreadId;
+
 		_thread.Start();
+
+		ActiveThreads.Add(this);
+		OnThreadStarted?.Invoke(this);
 	}
 
 	public virtual void Start()
@@ -39,13 +53,15 @@ internal abstract class GameThread
 
 		_running = false;
 		_thread.Join();
+
+		OnThreadStopped?.Invoke(this);
 	}
 
 	private void threadLoop()
 	{
 		Thread.BeginThreadAffinity();
 
-		_timer = new WindowsWaitableTimer(_targetInterval);
+		_timer = new WindowsWaitableTimer(TargetInterval);
 		_timer.Start();
 
 		try
