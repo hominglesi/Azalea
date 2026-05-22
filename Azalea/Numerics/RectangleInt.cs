@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics.Primitives;
+using Azalea.Native.Windows.Win32;
 using System;
 
 namespace Azalea.Numerics;
@@ -59,4 +60,7 @@ public struct RectangleInt : IEquatable<RectangleInt>
 			(int)Math.Round(quad.BottomRight.X - quad.TopLeft.X), (int)Math.Round(quad.BottomRight.Y - quad.TopLeft.Y));
 	public override readonly int GetHashCode() => HashCode.Combine(X, Y, Width, Height);
 	public override readonly string ToString() => $"{X}, {Y}, {Width}, {Height}";
+
+	public static explicit operator RectangleInt(Win32.RECT rect) =>
+		new(rect.X, rect.Y, rect.Width, rect.Height);
 }

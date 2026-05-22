@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics;
+using Azalea.Native.Windows.Win32;
 using Azalea.Numerics;
 using Azalea.Platform.Windows.Com;
 using Azalea.Platform.Windows.Enums;
@@ -18,10 +19,6 @@ internal static partial class WinAPI
 	private const string Ole32Path = "ole32.dll";
 	private const string Shell32Path = "shell32.dll";
 	private const string User32Path = "user32.dll";
-
-	[DllImport(User32Path, EntryPoint = "AdjustWindowRectEx")]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	public static extern bool AdjustWindowRect(ref WinRectangle rect, WindowStyles style, bool menu, WindowStylesEx exStyle);
 
 	[DllImport(User32Path, EntryPoint = "BringWindowToTop")]
 	[return: MarshalAs(UnmanagedType.Bool)]
@@ -101,24 +98,6 @@ internal static partial class WinAPI
 	[DllImport(Gdi32Path, EntryPoint = "ChoosePixelFormat")]
 	public static extern int ChoosePixelFormat(IntPtr deviceContext, [In] ref PixelFormatDescriptor descriptor);
 
-	[DllImport(User32Path, EntryPoint = "CreateWindowExW", CharSet = CharSet.Unicode)]
-	public static extern IntPtr CreateWindow(
-		WindowStylesEx stylesEx,
-		ushort classAtom,
-		string title,
-		WindowStyles styles,
-		int x,
-		int y,
-		int width,
-		int height,
-		IntPtr parent,
-		IntPtr menu,
-		IntPtr instance,
-		IntPtr param);
-
-	[DllImport(User32Path, EntryPoint = "DefWindowProcW", CharSet = CharSet.Unicode)]
-	public static extern IntPtr DefWindowProc(IntPtr window, uint message, IntPtr wParam, IntPtr lParam);
-
 	[DllImport(Gdi32Path, EntryPoint = "DeleteObject")]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool DeleteObject(IntPtr obj);
@@ -128,9 +107,6 @@ internal static partial class WinAPI
 
 	[DllImport(User32Path, EntryPoint = "DestroyWindow")]
 	public static extern bool DestroyWindow(IntPtr window);
-
-	[DllImport(User32Path, EntryPoint = "DispatchMessageW", CharSet = CharSet.Unicode)]
-	public static extern IntPtr DispatchMessage([In] ref Message message);
 
 	[DllImport(Shell32Path, EntryPoint = "DragAcceptFiles")]
 	public static extern void DragAcceptFiles(IntPtr window, bool accept);
@@ -151,11 +127,11 @@ internal static partial class WinAPI
 
 	[DllImport(User32Path, EntryPoint = "GetClientRect")]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	private static extern bool getClientRect(IntPtr window, out WinRectangle rect);
+	private static extern bool getClientRect(IntPtr window, out Win32.RECT rect);
 	public static RectangleInt GetClientRect(IntPtr window)
 	{
 		getClientRect(window, out var rect);
-		return rect;
+		return (RectangleInt)rect;
 	}
 
 	[DllImport(User32Path, EntryPoint = "GetClipboardData")]
@@ -172,8 +148,8 @@ internal static partial class WinAPI
 	public static extern IntPtr GetDesktopWindow();
 
 	[DllImport(User32Path, EntryPoint = "GetMessageW", CharSet = CharSet.Unicode)]
-	private static extern sbyte getMessage(out Message message, IntPtr window, uint wMsgFilterMin, uint wMsgFilterMax);
-	public static sbyte GetMessage(out Message message, IntPtr window) => getMessage(out message, window, 0, 0);
+	private static extern sbyte getMessage(out Win32.MSG message, IntPtr window, uint wMsgFilterMin, uint wMsgFilterMax);
+	public static sbyte GetMessage(out Win32.MSG message, IntPtr window) => getMessage(out message, window, 0, 0);
 
 	[DllImport(User32Path, EntryPoint = "GetMonitorInfoW", CharSet = CharSet.Unicode)]
 	[return: MarshalAs(UnmanagedType.Bool)]
@@ -204,11 +180,11 @@ internal static partial class WinAPI
 
 	[DllImport(User32Path, EntryPoint = "GetWindowRect")]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	private static extern bool getWindowRect(IntPtr window, out WinRectangle rect);
+	private static extern bool getWindowRect(IntPtr window, out Win32.RECT rect);
 	public static RectangleInt GetWindowRect(IntPtr window)
 	{
 		getWindowRect(window, out var rect);
-		return rect;
+		return (RectangleInt)rect;
 	}
 
 	[DllImport(Kernel32Path, EntryPoint = "GlobalAlloc")]
@@ -225,7 +201,7 @@ internal static partial class WinAPI
 
 	[DllImport(User32Path, EntryPoint = "IsDialogMessageW", CharSet = CharSet.Unicode)]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	public static extern bool IsDialogMessage(IntPtr window, [In] ref Message message);
+	public static extern bool IsDialogMessage(IntPtr window, [In] ref Win32.MSG message);
 
 	[DllImport(User32Path, EntryPoint = "LoadCursorW", CharSet = CharSet.Unicode)]
 	public static extern IntPtr LoadCursor(IntPtr instance, uint cursorValue);
@@ -239,17 +215,12 @@ internal static partial class WinAPI
 	[DllImport(User32Path, EntryPoint = "OpenClipboard")]
 	public static extern bool OpenClipboard(IntPtr newWindowOwner);
 
-	[DllImport(User32Path, EntryPoint = "PeekMessageW", CharSet = CharSet.Unicode)]
-	private static extern sbyte peekMessage(out Message message, IntPtr window, uint minFilter, uint maxFilter, uint remove);
-	public static sbyte PeekMessage(out Message message, IntPtr window)
-		=> peekMessage(out message, window, 0, 0, 0x0001); // 0x0001 = PM_REMOVE
-
 	[DllImport(User32Path, EntryPoint = "PostQuitMessage")]
 	public static extern void PostQuitMessage(int exitCode);
 
 	[DllImport(User32Path, EntryPoint = "RedrawWindow")]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	public static extern bool RedrawWindow(IntPtr window, WinRectangle? rectangle, IntPtr region, uint flags);
+	public static extern bool RedrawWindow(IntPtr window, Win32.RECT? rectangle, IntPtr region, uint flags);
 
 	[DllImport(Ole32Path, EntryPoint = "RegisterDragDrop")]
 	public static extern uint RegisterDragDrop(IntPtr window, IDropTarget dropTarget);
@@ -305,7 +276,7 @@ internal static partial class WinAPI
 		int height,
 		SetWindowPosFlags flags);
 
-	public static void SetWindowStyle(IntPtr window, WindowStyles style)
+	public static void SetWindowStyle(IntPtr window, Win32.WindowStyles style)
 	{
 		if (SetWindowLong(window, WindowLongValue.Style, (uint)style) == 0)
 			Console.WriteLine("Couldn't set window style");
@@ -330,19 +301,15 @@ internal static partial class WinAPI
 	private static extern bool systemParametersInfoRect(
 		uint action,
 		uint param,
-		[Out] out WinRectangle rect,
+		[Out] out Win32.RECT rect,
 		uint winIni);
 
 	public static RectangleInt GetSystemWorkArea()
 	{
 		// 0x0030 = SPI_GETWORKAREA
-		systemParametersInfoRect(0x0030, 0, out WinRectangle rect, 0);
-		return rect;
+		systemParametersInfoRect(0x0030, 0, out Win32.RECT rect, 0);
+		return (RectangleInt)rect;
 	}
-
-	[DllImport(User32Path, EntryPoint = "TranslateMessage")]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	public static extern bool TranslateMessage([In] ref Message message);
 
 	[DllImport(User32Path, EntryPoint = "UpdateWindow")]
 	public static extern bool UpdateWindow(IntPtr window);

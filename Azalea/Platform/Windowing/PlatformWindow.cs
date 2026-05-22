@@ -42,7 +42,7 @@ internal abstract class PlatformWindow
 
 	private readonly WindowThread _thread;
 
-	class WindowThread(PlatformWindow window) : GameThread(1000)
+	class WindowThread(PlatformWindow window) : GameThread(1)
 	{
 		public override string DisplayName => "Window Thread";
 

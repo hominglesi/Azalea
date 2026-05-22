@@ -1,5 +1,7 @@
 ﻿using Azalea.Native.Windows.Win32;
 using Azalea.Platform.Windows;
+using Azalea.Threading;
+using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -11,6 +13,7 @@ internal class WindowsWindow : PlatformWindow
 
 	public override string PlatformType => "Windows";
 	public ushort ClassAtom { get; private set; }
+	public nint Handle { get; private set; }
 
 	protected override void Initialize()
 	{
@@ -31,16 +34,44 @@ internal class WindowsWindow : PlatformWindow
 
 		ClassAtom = Win32.RegisterClassExW(ref wndClass);
 
+		Handle = Win32.CreateWindowExWDLL(
+			Win32.WindowStylesExtended.APPWINDOW,
+			ClassAtom,
+			Title,
+			Win32.WindowStyles.OVERLAPPEDWINDOW | Win32.WindowStyles.VISIBLE,
+			100,
+			100,
+			800,
+			600,
+			IntPtr.Zero,
+			IntPtr.Zero,
+			processHandle,
+			IntPtr.Zero);
+
+		if (Handle == IntPtr.Zero)
+			throw new Exception($"Could not create Window. (Error {Marshal.GetLastWin32Error()})");
+
 		Marshal.FreeHGlobal(classNamePtr);
 	}
 
 	protected override void Update()
 	{
-
+		while (Win32.PeekMessageW(out Win32.MSG message, Handle, 0, 0, 0x0001) != 0)
+		{
+			Win32.TranslateMessage(in message);
+			Win32.DispatchMessageW(in message);
+		}
 	}
 
 	private nint windowProcedure(nint hWnd, uint uMsg, nint wParam, nint lParam)
 	{
-		return nint.Zero;
+		switch (uMsg)
+		{
+			case 16 /* WM_CLOSE */:
+				Scheduler.Schedule(Close);
+				return IntPtr.Zero;
+		}
+
+		return Win32.DefWindowProcW(hWnd, uMsg, wParam, lParam);
 	}
 }

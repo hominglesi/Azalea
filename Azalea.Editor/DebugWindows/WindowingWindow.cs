@@ -38,6 +38,7 @@ internal class WindowingWindow
 						Thread.Sleep(1);
 
 					_window.AddLabel("Class Atom: " + win.ClassAtom);
+					_window.AddLabel("Handle: " + win.Handle);
 				}
 
 				_window.AddButton("Close", () => window.Close());
