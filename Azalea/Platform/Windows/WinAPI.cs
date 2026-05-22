@@ -251,9 +251,6 @@ internal static partial class WinAPI
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool RedrawWindow(IntPtr window, WinRectangle? rectangle, IntPtr region, uint flags);
 
-	[DllImport(User32Path, EntryPoint = "RegisterClassExW", CharSet = CharSet.Unicode)]
-	public static extern ushort RegisterClass([In] ref WindowClass windowClass);
-
 	[DllImport(Ole32Path, EntryPoint = "RegisterDragDrop")]
 	public static extern uint RegisterDragDrop(IntPtr window, IDropTarget dropTarget);
 

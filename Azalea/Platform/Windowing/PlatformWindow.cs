@@ -32,6 +32,7 @@ internal abstract class PlatformWindow
 		return newWindow;
 	}
 
+	public bool Initialized { get; private set; } = false;
 	protected abstract void Initialize();
 	protected abstract void Update();
 
@@ -46,14 +47,13 @@ internal abstract class PlatformWindow
 		public override string DisplayName => "Window Thread";
 
 		private readonly PlatformWindow _window = window;
-		private bool _initialized = false;
 
 		protected override void Work()
 		{
-			if (_initialized == false)
+			if (_window.Initialized == false)
 			{
 				_window.Initialize();
-				_initialized = true;
+				_window.Initialized = true;
 			}
 
 			_window.Update();

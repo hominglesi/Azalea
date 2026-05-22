@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Azalea.NativeLibraries\Azalea.NativeLibraries.csproj" />
+    <ProjectReference Include="..\Azalea.Native\Azalea.Native.csproj" />
   </ItemGroup>
 
   <ItemGroup>

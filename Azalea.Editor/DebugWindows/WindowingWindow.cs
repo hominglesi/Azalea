@@ -1,7 +1,9 @@
 ﻿using Azalea.Editor.Design.Gui;
 using Azalea.Platform.Windowing;
+using Azalea.Platform.Windowing.Windows;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace Azalea.Editor.DebugWindows;
 internal class WindowingWindow
@@ -25,18 +27,28 @@ internal class WindowingWindow
 			_window = GUIWindow.Create("Windows", new(400, 400));
 
 			PlatformWindow.OnWindowCreated += window =>
+			{
+				var group = _window.AddGroup(window.Title);
+				_window.AddLabel("Window Type: " + window.PlatformType);
+
+				if (window is WindowsWindow win)
 				{
-					var group = _window.AddGroup(window.Title);
-					_window.AddLabel("Window Type: " + window.PlatformType);
-					_window.AddButton("Close", () => window.Close());
-					_window.FinishGroup();
-					_windowGroups.Add(window, group);
-				};
+					// A bit hacky but it's for debugging purposes so it should be fine
+					while (window.Initialized == false)
+						Thread.Sleep(1);
+
+					_window.AddLabel("Class Atom: " + win.ClassAtom);
+				}
+
+				_window.AddButton("Close", () => window.Close());
+				_window.FinishGroup();
+				_windowGroups.Add(window, group);
+			};
 			PlatformWindow.OnWindowClosed += window =>
-				{
-					_window.RemoveElement(_windowGroups[window]);
-					_windowGroups.Remove(window);
-				};
+			{
+				_window.RemoveElement(_windowGroups[window]);
+				_windowGroups.Remove(window);
+			};
 
 			_window.AddLabel("Process Architecture: " + RuntimeInformation.ProcessArchitecture);
 			_window.AddButton("Create new Window", () => PlatformWindow.Create());

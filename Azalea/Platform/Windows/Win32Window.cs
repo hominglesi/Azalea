@@ -2,6 +2,7 @@
 using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Inputs;
+using Azalea.Native.Windows.Win32;
 using Azalea.Platform.Windows.Com;
 using Azalea.Utils;
 using System;
@@ -16,7 +17,7 @@ internal class Win32Window : PlatformWindow
 	public nint Handle { get; }
 	public nint DeviceContext { get; }
 
-	private readonly WindowProcedure _windowProcedure;
+	private readonly Win32.WNDPROC _windowProcedure;
 	private readonly WindowState _initialShowState;
 
 	private readonly XInputManager _xInputManager;
@@ -29,10 +30,15 @@ internal class Win32Window : PlatformWindow
 		var processHandle = System.Diagnostics.Process.GetCurrentProcess().Handle;
 
 		_windowProcedure = windowProcedure;
-		var wndClass = new WindowClass("Azalea Window", processHandle, _windowProcedure)
+		var winProcPtr = Marshal.GetFunctionPointerForDelegate(_windowProcedure);
+		var classNamePtr = Marshal.StringToHGlobalUni("Azalea Window");
+		var wndClass = new Win32.WNDCLASSEXW
 		{
-			Style = ClassStyles.OwnDC,
-			Cursor = WinAPI.LoadCursor(IntPtr.Zero, 32512)
+			lpszClassName = classNamePtr,
+			hInstance = processHandle,
+			lpfnWndProc = winProcPtr,
+			style = Win32.WNDCLASSEXW.ClassStyles.OWNDC,
+			hCursor = WinAPI.LoadCursor(nint.Zero, 32512)
 		};
 
 		WinRectangle windowRect = new(100, 100, clientSize.X, clientSize.Y);
@@ -45,7 +51,9 @@ internal class Win32Window : PlatformWindow
 
 		WinAPI.AdjustWindowRect(ref windowRect, style, false, styleEx);
 
-		var atom = WinAPI.RegisterClass(ref wndClass);
+		var atom = Win32.RegisterClassExW(ref wndClass);
+		Marshal.FreeHGlobal(classNamePtr);
+
 		Handle = WinAPI.CreateWindow(
 			styleEx,
 			atom,
@@ -123,12 +131,20 @@ internal class Win32Window : PlatformWindow
 
 		var processHandle = System.Diagnostics.Process.GetCurrentProcess().Handle;
 
-		var dummywindowClass = new WindowClass("Dummy Window", processHandle, _windowProcedure)
+		var classNamePtr = Marshal.StringToHGlobalUni("Dummy Window");
+		var winProcPtr = Marshal.GetFunctionPointerForDelegate(_windowProcedure);
+		var dummywindowClass = new Win32.WNDCLASSEXW()
 		{
-			Style = ClassStyles.HorizontalReDraw | ClassStyles.VerticalReDraw | ClassStyles.OwnDC
+			lpszClassName = classNamePtr,
+			hInstance = processHandle,
+			lpfnWndProc = winProcPtr,
+			style = Win32.WNDCLASSEXW.ClassStyles.HREDRAW
+			| Win32.WNDCLASSEXW.ClassStyles.VREDRAW | Win32.WNDCLASSEXW.ClassStyles.OWNDC
 		};
 
-		var atom = WinAPI.RegisterClass(ref dummywindowClass);
+		var atom = Win32.RegisterClassExW(ref dummywindowClass);
+		Marshal.FreeHGlobal(classNamePtr);
+
 		var dummyWindow = WinAPI.CreateWindow(
 			0,
 			atom,
