@@ -84,7 +84,7 @@ internal class Win32Window : PlatformWindow
 			Console.WriteLine("The Main method has not been marked with an [STAThread] attribute. You may experience some strange behaviours.");
 
 		//Setup OpenGL
-		DeviceContext = WinAPI.GetDC(Handle);
+		DeviceContext = Win32.GetDC(Handle);
 
 		initializeOpenGL();
 
@@ -166,7 +166,7 @@ internal class Win32Window : PlatformWindow
 			return;
 		}
 
-		var dummyDC = WinAPI.GetDC(dummyWindow);
+		var dummyDC = Win32.GetDC(dummyWindow);
 		var pfDescriptor = new PixelFormatDescriptor();
 		var pixelFormat = WinAPI.ChoosePixelFormat(dummyDC, ref pfDescriptor);
 

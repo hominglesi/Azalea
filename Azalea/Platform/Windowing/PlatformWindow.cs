@@ -3,6 +3,7 @@ using Azalea.Threading;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace Azalea.Platform.Windowing;
 internal abstract class PlatformWindow
@@ -18,11 +19,11 @@ internal abstract class PlatformWindow
 		_thread.Start();
 	}
 
-	public static PlatformWindow Create()
+	public static PlatformWindow Create(bool visible = true)
 	{
 		var newWindow = RuntimeInformation.ProcessArchitecture switch
 		{
-			Architecture.X64 or Architecture.X86 => new WindowsWindow(),
+			Architecture.X64 or Architecture.X86 => new WindowsWindow(visible),
 			_ => throw new NotSupportedException(
 				$"Platform '{RuntimeInformation.ProcessArchitecture}' is not supported")
 		};
@@ -36,6 +37,12 @@ internal abstract class PlatformWindow
 	protected abstract void Initialize();
 	protected abstract void Update();
 
+	private void assureInitialized()
+	{
+		while (Initialized == false)
+			Thread.Sleep(1);
+	}
+
 	#endregion
 
 	#region Thread
@@ -48,14 +55,14 @@ internal abstract class PlatformWindow
 
 		private readonly PlatformWindow _window = window;
 
-		protected override void Work()
+		protected override void Initialize()
 		{
-			if (_window.Initialized == false)
-			{
-				_window.Initialize();
-				_window.Initialized = true;
-			}
+			_window.Initialize();
+			_window.Initialized = true;
+		}
 
+		protected override void Update()
+		{
 			_window.Update();
 		}
 	}
@@ -77,6 +84,29 @@ internal abstract class PlatformWindow
 		_windows.Remove(this);
 		OnWindowClosed?.Invoke(this);
 	}
+
+	#endregion
+
+	#region DeviceContext
+
+	private readonly object _deviceContextOwnerLock = new();
+	private bool _deviceContextBorrowed = false;
+
+	public PlatformDeviceContext BorrowDeviceContext()
+	{
+		lock (_deviceContextOwnerLock)
+		{
+			if (_deviceContextBorrowed)
+				throw new InvalidOperationException("Device Context is already in use!");
+
+			_deviceContextBorrowed = true;
+
+			assureInitialized();
+			return GetDeviceContext();
+		}
+	}
+
+	protected abstract PlatformDeviceContext GetDeviceContext();
 
 	#endregion
 

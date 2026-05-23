@@ -3,7 +3,6 @@ using Azalea.Sounds;
 using Azalea.Sounds.OpenAL;
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace Azalea.Threading;
@@ -30,22 +29,18 @@ internal class AudioThread : GameThread
 	public override void Start()
 		=> throw new Exception($"{nameof(AudioThread)} starts when constructed");
 
-	protected override void Work()
-	{
-		if (AudioManager is null)
-			initializeAudioManager();
-
-		AudioManager.HandleCommands();
-		AudioManager.Update();
-
-		((ALAudioManager)AudioManager).PrintErrors();
-	}
-
-	[MemberNotNull(nameof(AudioManager))]
-	private void initializeAudioManager()
+	protected override void Initialize()
 	{
 		AudioManager = _host.CreateAudioManager();
 
 		_readyGate.Release();
+	}
+
+	protected override void Update()
+	{
+		AudioManager.HandleCommands();
+		AudioManager.Update();
+
+		((ALAudioManager)AudioManager).PrintErrors();
 	}
 }

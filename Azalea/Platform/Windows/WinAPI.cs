@@ -141,9 +141,6 @@ internal static partial class WinAPI
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool GetCursorPos(out Vector2Int point);
 
-	[DllImport(User32Path, EntryPoint = "GetDC")]
-	public static extern IntPtr GetDC(IntPtr window);
-
 	[DllImport(User32Path, EntryPoint = "GetDesktopWindow")]
 	public static extern IntPtr GetDesktopWindow();
 

@@ -54,6 +54,10 @@ public static partial class Win32
 	[LibraryImport(User32Path)]
 	public static partial nint DispatchMessageW(in MSG message);
 
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdc">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	public static partial nint GetDC(nint hWnd);
+
 	[StructLayout(LayoutKind.Sequential, Pack = 8)]
 	public struct MSG
 	{

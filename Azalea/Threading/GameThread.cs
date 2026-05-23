@@ -61,6 +61,8 @@ internal abstract class GameThread
 	{
 		Thread.BeginThreadAffinity();
 
+		Initialize();
+
 		_timer = new WindowsWaitableTimer(TargetInterval);
 		_timer.Start();
 
@@ -68,7 +70,7 @@ internal abstract class GameThread
 		{
 			while (_running)
 			{
-				Work();
+				Update();
 
 				_timer.Wait();
 			}
@@ -80,5 +82,6 @@ internal abstract class GameThread
 		}
 	}
 
-	protected abstract void Work();
+	protected abstract void Initialize();
+	protected abstract void Update();
 }

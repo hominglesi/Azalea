@@ -53,6 +53,11 @@ internal class WindowingWindow
 
 			_window.AddLabel("Process Architecture: " + RuntimeInformation.ProcessArchitecture);
 			_window.AddButton("Create new Window", () => PlatformWindow.Create());
+			_window.AddButton("Create renderable new Window", () =>
+			{
+				var window = PlatformWindow.Create();
+				PlatformRenderer.AttachRenderer(window);
+			});
 		}
 
 		_window.Show();

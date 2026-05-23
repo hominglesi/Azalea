@@ -6,10 +6,12 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Azalea.Platform.Windowing.Windows;
-internal class WindowsWindow : PlatformWindow
+internal class WindowsWindow(bool visible = true) : PlatformWindow
 {
 	private static int _nextClassId = 0;
 	private Win32.WNDPROC? _windowProcedure;
+
+	private readonly bool _visible = visible;
 
 	public override string PlatformType => "Windows";
 	public ushort ClassAtom { get; private set; }
@@ -34,11 +36,14 @@ internal class WindowsWindow : PlatformWindow
 
 		ClassAtom = Win32.RegisterClassExW(ref wndClass);
 
+		var styles = Win32.WindowStyles.OVERLAPPEDWINDOW;
+		if (_visible) styles |= Win32.WindowStyles.VISIBLE;
+
 		Handle = Win32.CreateWindowExWDLL(
 			Win32.WindowStylesExtended.APPWINDOW,
 			ClassAtom,
 			Title,
-			Win32.WindowStyles.OVERLAPPEDWINDOW | Win32.WindowStyles.VISIBLE,
+			styles,
 			100,
 			100,
 			800,
@@ -73,5 +78,11 @@ internal class WindowsWindow : PlatformWindow
 		}
 
 		return Win32.DefWindowProcW(hWnd, uMsg, wParam, lParam);
+	}
+
+	protected override PlatformDeviceContext GetDeviceContext()
+	{
+		var deviceContext = Win32.GetDC(Handle);
+		return new WindowsDeviceContext(deviceContext);
 	}
 }
