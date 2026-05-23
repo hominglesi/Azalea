@@ -11,15 +11,8 @@ internal static unsafe class GL
 {
 	private const string LibraryPath = "opengl32.dll";
 
-	[DllImport(LibraryPath, EntryPoint = "wglCreateContext")]
-	public static extern IntPtr CreateContext(IntPtr deviceContext);
-
 	[DllImport(LibraryPath, EntryPoint = "wglDeleteContext")]
 	public static extern bool DeleteContext(IntPtr context);
-
-	[DllImport(LibraryPath, EntryPoint = "wglMakeCurrent")]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	public static extern bool MakeCurrent(IntPtr deviceContext, IntPtr glContext);
 
 	private delegate void SwapIntervalDelegate(int interval);
 	private static SwapIntervalDelegate? _wglSwapInterval;

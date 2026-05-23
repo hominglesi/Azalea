@@ -54,6 +54,7 @@ internal abstract class GameThread
 		_running = false;
 		_thread.Join();
 
+		ActiveThreads.Remove(this);
 		OnThreadStopped?.Invoke(this);
 	}
 

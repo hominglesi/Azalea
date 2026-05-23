@@ -105,9 +105,9 @@ internal class Win32Window : PlatformWindow
 		uint formatCount = 0;
 		GL.ChoosePixelFormatARB(DeviceContext, ref pixelFormatAttribs[0], IntPtr.Zero, 1, ref pixelFormat, ref formatCount);
 
-		PixelFormatDescriptor pixelFormatDescriptor = default;
-		_ = WinAPI.DescribePixelFormat(DeviceContext, pixelFormat, (uint)Marshal.SizeOf<PixelFormatDescriptor>(), ref pixelFormatDescriptor);
-		WinAPI.SetPixelFormat(DeviceContext, pixelFormat, ref pixelFormatDescriptor);
+		Win32.PIXELFORMATDESCRIPTOR pixelFormatDescriptor = default;
+		_ = WinAPI.DescribePixelFormat(DeviceContext, pixelFormat, pixelFormatDescriptor.nSize, ref pixelFormatDescriptor);
+		Win32.SetPixelFormat(DeviceContext, pixelFormat, in pixelFormatDescriptor);
 
 		var openGLAttribs = new int[]
 		{
@@ -118,7 +118,7 @@ internal class Win32Window : PlatformWindow
 		};
 
 		var glContext = GL.CreateContextAttribsARB(DeviceContext, false, ref openGLAttribs[0]);
-		GL.MakeCurrent(DeviceContext, glContext);
+		Win32.wglMakeCurrent(DeviceContext, glContext);
 
 		//Sync values with PlatformWindow
 		var windowSize = WinAPI.GetWindowRect(Handle).Size;
@@ -167,17 +167,17 @@ internal class Win32Window : PlatformWindow
 		}
 
 		var dummyDC = Win32.GetDC(dummyWindow);
-		var pfDescriptor = new PixelFormatDescriptor();
-		var pixelFormat = WinAPI.ChoosePixelFormat(dummyDC, ref pfDescriptor);
+		var pfDescriptor = new Win32.PIXELFORMATDESCRIPTOR();
+		var pixelFormat = Win32.ChoosePixelFormat(dummyDC, in pfDescriptor);
 
-		WinAPI.SetPixelFormat(dummyDC, pixelFormat, ref pfDescriptor);
+		Win32.SetPixelFormat(dummyDC, pixelFormat, in pfDescriptor);
 
-		var dummyContext = GL.CreateContext(dummyDC);
-		GL.MakeCurrent(dummyDC, dummyContext);
+		var dummyContext = Win32.wglCreateContext(dummyDC);
+		Win32.wglMakeCurrent(dummyDC, dummyContext);
 
 		GL.ImportFunctions();
 
-		GL.MakeCurrent(dummyDC, IntPtr.Zero);
+		Win32.wglMakeCurrent(dummyDC, IntPtr.Zero);
 		GL.DeleteContext(dummyContext);
 		WinAPI.ReleaseDC(dummyWindow, dummyDC);
 		WinAPI.DestroyWindow(dummyWindow);
@@ -479,7 +479,7 @@ internal class Win32Window : PlatformWindow
 	}
 
 	public override void SwapBuffers()
-		=> WinAPI.SwapBuffers(DeviceContext);
+		=> Win32.SwapBuffers(DeviceContext);
 
 	public override void Show(bool firstTime)
 	{

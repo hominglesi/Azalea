@@ -95,15 +95,12 @@ internal static partial class WinAPI
 	[DllImport(User32Path, EntryPoint = "CreateIconIndirect")]
 	public static extern IntPtr CreateIconIndirect(ref IconInfo info);
 
-	[DllImport(Gdi32Path, EntryPoint = "ChoosePixelFormat")]
-	public static extern int ChoosePixelFormat(IntPtr deviceContext, [In] ref PixelFormatDescriptor descriptor);
-
 	[DllImport(Gdi32Path, EntryPoint = "DeleteObject")]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool DeleteObject(IntPtr obj);
 
 	[DllImport(Gdi32Path, EntryPoint = "DescribePixelFormat")]
-	public static extern int DescribePixelFormat(IntPtr deviceContext, int pixelFormat, uint bytes, [In, Out] ref PixelFormatDescriptor descriptor);
+	public static extern int DescribePixelFormat(IntPtr deviceContext, int pixelFormat, uint bytes, [In, Out] ref Win32.PIXELFORMATDESCRIPTOR descriptor);
 
 	[DllImport(User32Path, EntryPoint = "DestroyWindow")]
 	public static extern bool DestroyWindow(IntPtr window);
@@ -255,10 +252,6 @@ internal static partial class WinAPI
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool SetForegroundWindow(IntPtr window);
 
-	[DllImport(Gdi32Path, EntryPoint = "SetPixelFormat")]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	public static extern bool SetPixelFormat(IntPtr deviceContext, int format, [In] ref PixelFormatDescriptor descriptor);
-
 	[DllImport(User32Path, EntryPoint = "SetWindowLongW", CharSet = CharSet.Unicode)]
 	public static extern uint SetWindowLong(IntPtr window, WindowLongValue index, uint newValue);
 
@@ -289,10 +282,6 @@ internal static partial class WinAPI
 	[DllImport(User32Path, EntryPoint = "ShowWindow")]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool ShowWindow(IntPtr window, ShowWindowCommand showCommand);
-
-	[DllImport(Gdi32Path, EntryPoint = "SwapBuffers")]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	public static extern bool SwapBuffers(IntPtr deviceContext);
 
 	[DllImport(User32Path, EntryPoint = "SystemParametersInfoW", CharSet = CharSet.Unicode)]
 	private static extern bool systemParametersInfoRect(

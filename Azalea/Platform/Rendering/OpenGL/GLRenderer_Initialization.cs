@@ -7,7 +7,7 @@ internal partial class GLRenderer
 {
 	private static object _initializationLock = new();
 	private static bool _initialzed = false;
-	private static void assureInitialized()
+	private static void assureGLInitialized()
 	{
 		lock (_initializationLock)
 		{
@@ -31,7 +31,7 @@ internal partial class GLRenderer
 		}
 	}
 
-	class InitializationThread(PlatformDeviceContext deviceContext) : GameThread(1000)
+	class InitializationThread(PlatformDeviceContext deviceContext) : GameThread(1)
 	{
 		public override string DisplayName => "OpenGL Initialization Thread";
 
@@ -41,7 +41,8 @@ internal partial class GLRenderer
 
 		protected override void Initialize()
 		{
-
+			var context = GLContext.CreateSimple(_deviceContext);
+			context.MakeCurrent();
 
 			Initialized = true;
 		}

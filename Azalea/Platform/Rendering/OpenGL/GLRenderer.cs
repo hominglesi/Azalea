@@ -1,16 +1,32 @@
-﻿using Azalea.Platform.Windowing;
-using Azalea.Platform.Windowing.Windows;
-using System;
+﻿using Azalea.Graphics.Colors;
+using Azalea.Graphics.OpenGL;
+using Azalea.Graphics.OpenGL.Enums;
+using Azalea.Platform.Windowing;
 
 namespace Azalea.Platform.Rendering.OpenGL;
 internal partial class GLRenderer : PlatformRenderer
 {
-	internal GLRenderer(PlatformDeviceContext deviceContext)
-		: base(deviceContext)
-	{
-		assureInitialized();
+	private readonly PlatformDeviceContext _deviceContext;
 
-		if (deviceContext is WindowsDeviceContext winDC)
-			Console.WriteLine("Created windows dc: " + winDC.Handle);
+	internal GLRenderer(PlatformDeviceContext deviceContext)
+	{
+		_deviceContext = deviceContext;
+	}
+
+	protected override void Initialize()
+	{
+		assureGLInitialized();
+
+		var context = GLContext.CreateSimple(_deviceContext);
+		context.MakeCurrent();
+
+		GL.ClearColor(Palette.Aqua);
+		GL.Clear(GLBufferBit.Color);
+		context.SwapBuffers();
+	}
+
+	protected override void Update()
+	{
+
 	}
 }
