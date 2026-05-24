@@ -1,5 +1,5 @@
 ﻿using Azalea.Graphics.Primitives;
-using Azalea.Native.Windows.Win32;
+using Azalea.Native.Windows;
 using System;
 
 namespace Azalea.Numerics;

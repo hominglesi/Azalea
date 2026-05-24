@@ -1,5 +1,6 @@
 ﻿using Azalea.Graphics.Colors;
 using Azalea.Graphics.OpenGL.Enums;
+using Azalea.Native.Windows;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -145,9 +146,6 @@ internal static unsafe class GL
 
 	#region Modern
 
-	//Function for getting the modern function pointers
-	[DllImport(LibraryPath, EntryPoint = "wglGetProcAddress")]
-	public static extern IntPtr wglGetProcAddress(string functionName);
 	private delegate void VoidDelegate();
 	private delegate void VoidUIntDelegate(uint value);
 	private delegate uint UIntDelegate();
@@ -376,42 +374,42 @@ internal static unsafe class GL
 
 	public static void ImportFunctions()
 	{
-		_wglSwapInterval = Marshal.GetDelegateForFunctionPointer<SwapIntervalDelegate>(wglGetProcAddress("wglSwapIntervalEXT"));
-		_wglGetSwapInterval = Marshal.GetDelegateForFunctionPointer<GetSwapIntervalDelegate>(wglGetProcAddress("wglGetSwapIntervalEXT"));
-		_glCreateBuffers = Marshal.GetDelegateForFunctionPointer<CreateBuffersDelegate>(wglGetProcAddress("glCreateBuffers"));
-		_glGenBuffers = Marshal.GetDelegateForFunctionPointer<GenBuffersDelegate>(wglGetProcAddress("glGenBuffers"));
-		_glGenVertexArrays = Marshal.GetDelegateForFunctionPointer<GenVertexArraysDelegate>(wglGetProcAddress("glGenVertexArrays"));
-		_glBindBuffer = Marshal.GetDelegateForFunctionPointer<BindBufferDelegate>(wglGetProcAddress("glBindBuffer"));
-		_glBindVertexArray = Marshal.GetDelegateForFunctionPointer<BindVertexArrayDelegate>(wglGetProcAddress("glBindVertexArray"));
-		_glBufferData = Marshal.GetDelegateForFunctionPointer<BufferDataDelegate>(wglGetProcAddress("glBufferData"));
-		_glVertexAttribPointer = Marshal.GetDelegateForFunctionPointer<VertexAttribPointerDelegate>(wglGetProcAddress("glVertexAttribPointer"));
-		_glEnableVertexAttribArray = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glEnableVertexAttribArray"));
-		_glCreateProgram = Marshal.GetDelegateForFunctionPointer<UIntDelegate>(wglGetProcAddress("glCreateProgram"));
-		_glCreateShader = Marshal.GetDelegateForFunctionPointer<CreateShaderDelegate>(wglGetProcAddress("glCreateShader"));
-		_glShaderSource = Marshal.GetDelegateForFunctionPointer<ShaderSourceDelegate>(wglGetProcAddress("glShaderSource"));
-		_glCompileShader = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glCompileShader"));
-		_glAttachShader = Marshal.GetDelegateForFunctionPointer<AttachShaderDelegate>(wglGetProcAddress("glAttachShader"));
-		_glLinkProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glLinkProgram"));
-		_glValidateProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glValidateProgram"));
-		_glDeleteShader = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glDeleteShader"));
-		_glDeleteProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glDeleteProgram"));
-		_glGetShaderiv = Marshal.GetDelegateForFunctionPointer<GetShaderivDelegate>(wglGetProcAddress("glGetShaderiv"));
-		_glGetShaderInfoLog = Marshal.GetDelegateForFunctionPointer<GetShaderInfoLogDelegate>(wglGetProcAddress("glGetShaderInfoLog"));
-		_glGetProgramiv = Marshal.GetDelegateForFunctionPointer<GetProgramivDelegate>(wglGetProcAddress("glGetProgramiv"));
-		_glUseProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(wglGetProcAddress("glUseProgram"));
-		_glGetUniformLocation = Marshal.GetDelegateForFunctionPointer<GetUniformLocationDelegate>(wglGetProcAddress("glGetUniformLocation"));
-		_glUniform1i = Marshal.GetDelegateForFunctionPointer<Uniform1iDelegate>(wglGetProcAddress("glUniform1i"));
-		_glUniform1iv = Marshal.GetDelegateForFunctionPointer<Uniform1ivDelegate>(wglGetProcAddress("glUniform1iv"));
-		_glUniform1f = Marshal.GetDelegateForFunctionPointer<Uniform1fDelegate>(wglGetProcAddress("glUniform1f"));
-		_glUniform2f = Marshal.GetDelegateForFunctionPointer<Uniform2fDelegate>(wglGetProcAddress("glUniform2f"));
-		_glUniform4f = Marshal.GetDelegateForFunctionPointer<Uniform4fDelegate>(wglGetProcAddress("glUniform4f"));
-		_glUniformMatrix4fv = Marshal.GetDelegateForFunctionPointer<UniformMatrix4fvDelegate>(wglGetProcAddress("glUniformMatrix4fv"));
-		_glDeleteBuffers = Marshal.GetDelegateForFunctionPointer<DeleteBuffersDelegate>(wglGetProcAddress("glDeleteBuffers"));
-		_glDeleteVertexArrays = Marshal.GetDelegateForFunctionPointer<DeleteVertexArrays>(wglGetProcAddress("glDeleteVertexArrays"));
-		_glActiveTexture = Marshal.GetDelegateForFunctionPointer<GLTextureSlotDelegate>(wglGetProcAddress("glActiveTexture"));
-		_glGenerateMipmap = Marshal.GetDelegateForFunctionPointer<GLTextureTypeDelegate>(wglGetProcAddress("glGenerateMipmap"));
-		_wglChoosePixelFormatARB = Marshal.GetDelegateForFunctionPointer<ChoosePixelFormatARBDelegate>(wglGetProcAddress("wglChoosePixelFormatARB"));
-		_wglCreateContextAttribsARB = Marshal.GetDelegateForFunctionPointer<CreateContextAttribsARBDelegate>(wglGetProcAddress("wglCreateContextAttribsARB"));
+		_wglSwapInterval = Marshal.GetDelegateForFunctionPointer<SwapIntervalDelegate>(Win32.wglGetProcAddress("wglSwapIntervalEXT"));
+		_wglGetSwapInterval = Marshal.GetDelegateForFunctionPointer<GetSwapIntervalDelegate>(Win32.wglGetProcAddress("wglGetSwapIntervalEXT"));
+		_glCreateBuffers = Marshal.GetDelegateForFunctionPointer<CreateBuffersDelegate>(Win32.wglGetProcAddress("glCreateBuffers"));
+		_glGenBuffers = Marshal.GetDelegateForFunctionPointer<GenBuffersDelegate>(Win32.wglGetProcAddress("glGenBuffers"));
+		_glGenVertexArrays = Marshal.GetDelegateForFunctionPointer<GenVertexArraysDelegate>(Win32.wglGetProcAddress("glGenVertexArrays"));
+		_glBindBuffer = Marshal.GetDelegateForFunctionPointer<BindBufferDelegate>(Win32.wglGetProcAddress("glBindBuffer"));
+		_glBindVertexArray = Marshal.GetDelegateForFunctionPointer<BindVertexArrayDelegate>(Win32.wglGetProcAddress("glBindVertexArray"));
+		_glBufferData = Marshal.GetDelegateForFunctionPointer<BufferDataDelegate>(Win32.wglGetProcAddress("glBufferData"));
+		_glVertexAttribPointer = Marshal.GetDelegateForFunctionPointer<VertexAttribPointerDelegate>(Win32.wglGetProcAddress("glVertexAttribPointer"));
+		_glEnableVertexAttribArray = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(Win32.wglGetProcAddress("glEnableVertexAttribArray"));
+		_glCreateProgram = Marshal.GetDelegateForFunctionPointer<UIntDelegate>(Win32.wglGetProcAddress("glCreateProgram"));
+		_glCreateShader = Marshal.GetDelegateForFunctionPointer<CreateShaderDelegate>(Win32.wglGetProcAddress("glCreateShader"));
+		_glShaderSource = Marshal.GetDelegateForFunctionPointer<ShaderSourceDelegate>(Win32.wglGetProcAddress("glShaderSource"));
+		_glCompileShader = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(Win32.wglGetProcAddress("glCompileShader"));
+		_glAttachShader = Marshal.GetDelegateForFunctionPointer<AttachShaderDelegate>(Win32.wglGetProcAddress("glAttachShader"));
+		_glLinkProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(Win32.wglGetProcAddress("glLinkProgram"));
+		_glValidateProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(Win32.wglGetProcAddress("glValidateProgram"));
+		_glDeleteShader = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(Win32.wglGetProcAddress("glDeleteShader"));
+		_glDeleteProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(Win32.wglGetProcAddress("glDeleteProgram"));
+		_glGetShaderiv = Marshal.GetDelegateForFunctionPointer<GetShaderivDelegate>(Win32.wglGetProcAddress("glGetShaderiv"));
+		_glGetShaderInfoLog = Marshal.GetDelegateForFunctionPointer<GetShaderInfoLogDelegate>(Win32.wglGetProcAddress("glGetShaderInfoLog"));
+		_glGetProgramiv = Marshal.GetDelegateForFunctionPointer<GetProgramivDelegate>(Win32.wglGetProcAddress("glGetProgramiv"));
+		_glUseProgram = Marshal.GetDelegateForFunctionPointer<VoidUIntDelegate>(Win32.wglGetProcAddress("glUseProgram"));
+		_glGetUniformLocation = Marshal.GetDelegateForFunctionPointer<GetUniformLocationDelegate>(Win32.wglGetProcAddress("glGetUniformLocation"));
+		_glUniform1i = Marshal.GetDelegateForFunctionPointer<Uniform1iDelegate>(Win32.wglGetProcAddress("glUniform1i"));
+		_glUniform1iv = Marshal.GetDelegateForFunctionPointer<Uniform1ivDelegate>(Win32.wglGetProcAddress("glUniform1iv"));
+		_glUniform1f = Marshal.GetDelegateForFunctionPointer<Uniform1fDelegate>(Win32.wglGetProcAddress("glUniform1f"));
+		_glUniform2f = Marshal.GetDelegateForFunctionPointer<Uniform2fDelegate>(Win32.wglGetProcAddress("glUniform2f"));
+		_glUniform4f = Marshal.GetDelegateForFunctionPointer<Uniform4fDelegate>(Win32.wglGetProcAddress("glUniform4f"));
+		_glUniformMatrix4fv = Marshal.GetDelegateForFunctionPointer<UniformMatrix4fvDelegate>(Win32.wglGetProcAddress("glUniformMatrix4fv"));
+		_glDeleteBuffers = Marshal.GetDelegateForFunctionPointer<DeleteBuffersDelegate>(Win32.wglGetProcAddress("glDeleteBuffers"));
+		_glDeleteVertexArrays = Marshal.GetDelegateForFunctionPointer<DeleteVertexArrays>(Win32.wglGetProcAddress("glDeleteVertexArrays"));
+		_glActiveTexture = Marshal.GetDelegateForFunctionPointer<GLTextureSlotDelegate>(Win32.wglGetProcAddress("glActiveTexture"));
+		_glGenerateMipmap = Marshal.GetDelegateForFunctionPointer<GLTextureTypeDelegate>(Win32.wglGetProcAddress("glGenerateMipmap"));
+		_wglChoosePixelFormatARB = Marshal.GetDelegateForFunctionPointer<ChoosePixelFormatARBDelegate>(Win32.wglGetProcAddress("wglChoosePixelFormatARB"));
+		_wglCreateContextAttribsARB = Marshal.GetDelegateForFunctionPointer<CreateContextAttribsARBDelegate>(Win32.wglGetProcAddress("wglCreateContextAttribsARB"));
 	}
 
 	#endregion

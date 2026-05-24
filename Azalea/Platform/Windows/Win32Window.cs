@@ -1,8 +1,8 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.OpenGL;
-using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Inputs;
-using Azalea.Native.Windows.Win32;
+using Azalea.Native;
+using Azalea.Native.Windows;
 using Azalea.Platform.Windows.Com;
 using Azalea.Utils;
 using System;
@@ -90,30 +90,30 @@ internal class Win32Window : PlatformWindow
 
 		var pixelFormatAttribs = new int[]
 		{
-			(int)WGLAttribute.DrawToWindow, 1,
-			(int)WGLAttribute.SupportOpenGL, 1,
-			(int)WGLAttribute.DoubleBuffer, 1,
-			(int)WGLAttribute.Acceleration, (int)WGLAttribute.FullAcceleration,
-			(int)WGLAttribute.PixelType, (int)WGLAttribute.TypeRGBA,
-			(int)WGLAttribute.ColorBits, 32,
-			(int)WGLAttribute.DepthBits, 24,
-			(int)WGLAttribute.StencilBits, 8,
+			OpenGL.WGL_DRAW_TO_WINDOW_ARB, 1,
+			OpenGL.WGL_SUPPORT_OPENGL_ARB, 1,
+			OpenGL.WGL_DOUBLE_BUFFER_ARB, 1,
+			OpenGL.WGL_ACCELERATION_ARB, OpenGL.WGL_FULL_ACCELERATION_ARB,
+			OpenGL.WGL_PIXEL_TYPE_ARB, OpenGL.WGL_TYPE_RGBA_ARB,
+			OpenGL.WGL_COLOR_BITS_ARB, 32,
+			OpenGL.WGL_DEPTH_BITS_ARB, 24,
+			OpenGL.WGL_STENCIL_BITS_ARB, 8,
 			0
 		};
 
 		int pixelFormat = 0;
 		uint formatCount = 0;
-		GL.ChoosePixelFormatARB(DeviceContext, ref pixelFormatAttribs[0], IntPtr.Zero, 1, ref pixelFormat, ref formatCount);
+		GL.ChoosePixelFormatARB(DeviceContext, in pixelFormatAttribs[0], IntPtr.Zero, 1, ref pixelFormat, ref formatCount);
 
 		Win32.PIXELFORMATDESCRIPTOR pixelFormatDescriptor = default;
-		_ = WinAPI.DescribePixelFormat(DeviceContext, pixelFormat, pixelFormatDescriptor.nSize, ref pixelFormatDescriptor);
+		_ = Win32.DescribePixelFormat(DeviceContext, pixelFormat, pixelFormatDescriptor.nSize, ref pixelFormatDescriptor);
 		Win32.SetPixelFormat(DeviceContext, pixelFormat, in pixelFormatDescriptor);
 
 		var openGLAttribs = new int[]
 		{
-			(int)WGLAttribute.ContextMajorVersion, 3,
-			(int)WGLAttribute.ContextMinorVersion, 3,
-			(int)WGLAttribute.ContextProfileMask, (int)WGLAttribute.ContextCoreProfileBit,
+			OpenGL.WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+			OpenGL.WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+			OpenGL.WGL_CONTEXT_PROFILE_MASK_ARB, OpenGL.WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
 			0
 		};
 

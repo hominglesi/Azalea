@@ -1,4 +1,4 @@
-﻿using Azalea.Native.Windows.Win32;
+﻿using Azalea.Native.Windows;
 using System.Runtime.InteropServices;
 
 namespace Azalea.Platform.Windows;

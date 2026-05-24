@@ -1,5 +1,5 @@
 ﻿using Azalea.Graphics;
-using Azalea.Native.Windows.Win32;
+using Azalea.Native.Windows;
 using Azalea.Numerics;
 using Azalea.Platform.Windows.Com;
 using Azalea.Platform.Windows.Enums;
@@ -98,9 +98,6 @@ internal static partial class WinAPI
 	[DllImport(Gdi32Path, EntryPoint = "DeleteObject")]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool DeleteObject(IntPtr obj);
-
-	[DllImport(Gdi32Path, EntryPoint = "DescribePixelFormat")]
-	public static extern int DescribePixelFormat(IntPtr deviceContext, int pixelFormat, uint bytes, [In, Out] ref Win32.PIXELFORMATDESCRIPTOR descriptor);
 
 	[DllImport(User32Path, EntryPoint = "DestroyWindow")]
 	public static extern bool DestroyWindow(IntPtr window);

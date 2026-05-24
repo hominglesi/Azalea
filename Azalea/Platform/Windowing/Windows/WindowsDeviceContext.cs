@@ -1,4 +1,4 @@
-﻿using Azalea.Native.Windows.Win32;
+﻿using Azalea.Native.Windows;
 
 namespace Azalea.Platform.Windowing.Windows;
 internal class WindowsDeviceContext : PlatformDeviceContext

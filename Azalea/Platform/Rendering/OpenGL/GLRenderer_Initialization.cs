@@ -44,6 +44,8 @@ internal partial class GLRenderer
 			var context = GLContext.CreateSimple(_deviceContext);
 			context.MakeCurrent();
 
+			context.LoadDynamicFunctions();
+
 			Initialized = true;
 		}
 

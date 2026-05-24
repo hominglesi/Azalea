@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Azalea.Native.Windows.Win32;
+namespace Azalea.Native.Windows;
 public static partial class Win32
 {
 	private const string User32Path = "user32.dll";

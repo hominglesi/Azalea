@@ -1,4 +1,4 @@
-﻿using Azalea.Native.Windows.Win32;
+﻿using Azalea.Native.Windows;
 using Azalea.Platform.Windows;
 using Azalea.Threading;
 using System;

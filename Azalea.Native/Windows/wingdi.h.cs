@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Azalea.Native.Windows.Win32;
+namespace Azalea.Native.Windows;
 public static partial class Win32
 {
 	private const string Gdi32Path = "gdi32.dll";
@@ -9,6 +9,10 @@ public static partial class Win32
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-choosepixelformat">Official Documentation</see></summary>
 	[LibraryImport(Gdi32Path)]
 	public static partial int ChoosePixelFormat(nint hdc, in PIXELFORMATDESCRIPTOR descriptor);
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-describepixelformat">Official Documentation</see></summary>
+	[LibraryImport(Gdi32Path)]
+	public static partial int DescribePixelFormat(nint hdc, int iPixelFormat, uint nBytes, ref PIXELFORMATDESCRIPTOR ppfd);
 
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-pixelformatdescriptor">Official Documentation</see></summary>
 	[StructLayout(LayoutKind.Sequential)]
@@ -72,6 +76,10 @@ public static partial class Win32
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wglcreatecontext">Official Documentation</see></summary>
 	[LibraryImport(OpenGLPath)]
 	public static partial nint wglCreateContext(nint handleToDeviceContext);
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wglgetprocaddress">Official Documentation</see></summary>
+	[LibraryImport(OpenGLPath, StringMarshalling = StringMarshalling.Utf8)]
+	public static partial nint wglGetProcAddress(string functionName);
 
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-wglmakecurrent">Official Documentation</see></summary>
 	[LibraryImport(OpenGLPath)]

@@ -17,7 +17,7 @@ internal partial class GLRenderer : PlatformRenderer
 	{
 		assureGLInitialized();
 
-		var context = GLContext.CreateSimple(_deviceContext);
+		var context = GLContext.Create(_deviceContext);
 		context.MakeCurrent();
 
 		GL.ClearColor(Palette.Aqua);
