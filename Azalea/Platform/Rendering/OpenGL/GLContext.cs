@@ -1,4 +1,5 @@
-﻿using Azalea.Native.Windows;
+﻿using Azalea.Graphics.Colors;
+using Azalea.Native.Windows;
 using Azalea.Platform.Windowing;
 using Azalea.Platform.Windowing.Windows;
 using System;
@@ -141,6 +142,9 @@ internal class GLContext
 		if (_dynamicFunctionsLoaded == false)
 			throw new Exception("Dynamic functions haven't been loaded!");
 	}
+
+	public void Clear() => GL.glClear(GL.GL_COLOR_BUFFER_BIT);
+	public void ClearColor(Color color) => GL.glClearColor(color.RNormalized, color.GNormalized, color.BNormalized, color.ANormalized);
 
 	#region DynamicallyLoaded
 

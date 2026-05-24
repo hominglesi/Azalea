@@ -39,10 +39,10 @@ internal class GLRenderer : RendererBase
 	}
 
 	protected internal override void SetClearColor(Color value)
-		=> GL.ClearColor(value);
+		=> Native.OpenGL.glClearColor(value.RNormalized, value.GNormalized, value.BNormalized, value.ANormalized);
 
 	protected override void ClearImplementation()
-		=> GL.Clear(GLBufferBit.Color);
+		=> Native.OpenGL.glClear(Native.OpenGL.GL_COLOR_BUFFER_BIT);
 
 	protected override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
 		=> new GLVertexBatch<TexturedVertex2D>(this, Window, size);

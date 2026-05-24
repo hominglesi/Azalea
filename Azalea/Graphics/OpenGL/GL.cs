@@ -50,16 +50,6 @@ internal static unsafe class GL
 		}
 	}
 
-	[DllImport(LibraryPath, EntryPoint = "glClear")]
-	public static extern void Clear(GLBufferBit bufferBits);
-
-	[DllImport(LibraryPath, EntryPoint = "glClearColor")]
-	private static extern void clearColor(float red, float green, float blue, float alpha);
-	public static void ClearColor(Color color)
-	{
-		clearColor(color.RNormalized, color.GNormalized, color.BNormalized, color.ANormalized);
-	}
-
 	[DllImport(LibraryPath, EntryPoint = "glViewport")]
 	public static extern void Viewport(int x, int y, int width, int height);
 
