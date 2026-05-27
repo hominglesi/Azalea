@@ -1,4 +1,4 @@
 ﻿namespace Azalea.Platform.Windowing;
-internal abstract class PlatformDeviceContext
+public abstract class PlatformDeviceContext
 {
 }

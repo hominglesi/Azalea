@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Azalea.Platform.Windowing;
-internal abstract class PlatformWindow
+public abstract class PlatformWindow
 {
 	#region Creation
 

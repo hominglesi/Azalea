@@ -55,7 +55,7 @@ internal class GLRenderer : RendererBase
 		if (texture is null)
 		{
 			GL.ActiveTexture((uint)unit);
-			GL.BindTexture(GLTextureType.Texture2D, 0);
+			Native.OpenGL.glBindTexture(Native.OpenGL.GL_TEXTURE_2D, 0);
 			return true;
 		}
 

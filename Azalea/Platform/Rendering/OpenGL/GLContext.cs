@@ -1,5 +1,4 @@
-﻿using Azalea.Graphics.Colors;
-using Azalea.Native.Windows;
+﻿using Azalea.Native.Windows;
 using Azalea.Platform.Windowing;
 using Azalea.Platform.Windowing.Windows;
 using System;
@@ -129,24 +128,35 @@ internal class GLContext
 
 	private static bool _dynamicFunctionsLoaded = false;
 
-	internal void LoadDynamicFunctions()
-	{
-		_wglChoosePixelFormatARB = Marshal.GetDelegateForFunctionPointer<wglChoosePixelFormatARBDelegate>(getProcAddress("wglChoosePixelFormatARB"));
-		_wglCreateContextAttribsARB = Marshal.GetDelegateForFunctionPointer<wglCreateContextAttribsARBDelegate>(getProcAddress("wglCreateContextAttribsARB"));
-
-		_dynamicFunctionsLoaded = true;
-	}
-
 	private static void assertDynamicFunctionsLoaded()
 	{
 		if (_dynamicFunctionsLoaded == false)
 			throw new Exception("Dynamic functions haven't been loaded!");
 	}
 
-	public void Clear() => GL.glClear(GL.GL_COLOR_BUFFER_BIT);
-	public void ClearColor(Color color) => GL.glClearColor(color.RNormalized, color.GNormalized, color.BNormalized, color.ANormalized);
-
 	#region DynamicallyLoaded
+
+	internal void LoadDynamicFunctions()
+	{
+		_glBindFramebuffer = Marshal.GetDelegateForFunctionPointer<glBindFramebufferDelegate>(getProcAddress("glBindFramebuffer"));
+		_glGenFramebuffers = Marshal.GetDelegateForFunctionPointer<glGenFramebuffersDelegate>(getProcAddress("glGenFramebuffers"));
+		_wglChoosePixelFormatARB = Marshal.GetDelegateForFunctionPointer<wglChoosePixelFormatARBDelegate>(getProcAddress("wglChoosePixelFormatARB"));
+		_wglCreateContextAttribsARB = Marshal.GetDelegateForFunctionPointer<wglCreateContextAttribsARBDelegate>(getProcAddress("wglCreateContextAttribsARB"));
+
+		_dynamicFunctionsLoaded = true;
+	}
+
+	private delegate bool glBindFramebufferDelegate(int target, uint framebuffer);
+	private static glBindFramebufferDelegate? _glBindFramebuffer;
+	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindFramebuffer.xhtml">Official Documentation</see></summary>
+	public static bool glBindFramebuffer(int target, uint framebuffer)
+		=> _glBindFramebuffer!(target, framebuffer);
+
+	private delegate bool glGenFramebuffersDelegate(int n, ref uint ids);
+	private static glGenFramebuffersDelegate? _glGenFramebuffers;
+	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenFramebuffers.xhtml">Official Documentation</see></summary>
+	public static bool glGenFramebuffers(int n, ref uint ids)
+		=> _glGenFramebuffers!(n, ref ids);
 
 	private delegate bool wglChoosePixelFormatARBDelegate(nint hdc, in int piAttribIList, in float pfAttribFList, uint nMaxFormats, ref int piFormats, ref uint nNumFormats);
 	private static wglChoosePixelFormatARBDelegate? _wglChoosePixelFormatARB;

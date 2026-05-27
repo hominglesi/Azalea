@@ -84,18 +84,6 @@ internal static unsafe class GL
 
 	#region Textures
 
-	[DllImport(LibraryPath, EntryPoint = "glBindTexture")]
-	public static extern void BindTexture(GLTextureType type, uint texture);
-
-	[DllImport(LibraryPath, EntryPoint = "glGenTextures")]
-	private static extern void genTextures(int size, uint* textures);
-	public static uint GenTexture()
-	{
-		uint texture;
-		genTextures(1, &texture);
-		return texture;
-	}
-
 	[DllImport(LibraryPath, EntryPoint = "glDeleteTextures")]
 	private static extern void deleteTextures(int size, uint* textures);
 	public static void DeleteTexture(uint texture)
@@ -105,17 +93,6 @@ internal static unsafe class GL
 
 	[DllImport(LibraryPath, EntryPoint = "glTexParameteri")]
 	public static extern void TexParameteri(GLTextureType type, GLTextureParameter name, int value);
-
-	[DllImport(LibraryPath, EntryPoint = "glTexImage2D")]
-	private static extern void texImage2D(GLTextureType type, int level, GLColorFormat internalFormat,
-		int width, int height, int border, GLColorFormat format, GLDataType dataType, void* pixels);
-
-	public static void TexImage2D(GLTextureType type, int level, GLColorFormat internalFormat,
-		int width, int height, int border, GLColorFormat format, GLDataType dataType, byte[] pixels)
-	{
-		fixed (void* p = &pixels[0])
-			texImage2D(type, level, internalFormat, width, height, border, format, dataType, p);
-	}
 
 	private delegate void GLTextureSlotDelegate(GLTextureSlot slot);
 	private static GLTextureSlotDelegate? _glActiveTexture;

@@ -19,7 +19,7 @@ internal class GLTexture : Disposable, INativeTexture
 		_width = width;
 		_height = height;
 
-		_handle = GL.GenTexture();
+		Native.OpenGL.glGenTextures(1, ref _handle);
 	}
 
 	internal void SetData(Image image)
@@ -36,8 +36,8 @@ internal class GLTexture : Disposable, INativeTexture
 		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.WrapS, (int)GLWrapFunction.Repeat);
 		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.WrapT, (int)GLWrapFunction.Repeat);
 
-		GL.TexImage2D(GLTextureType.Texture2D, 0, GLColorFormat.RGBA,
-			_width, _height, 0, GLColorFormat.RGBA, GLDataType.UnsignedByte, image.Data);
+		Native.OpenGL.glTexImage2D(Native.OpenGL.GL_TEXTURE_2D, 0, Native.OpenGL.GL_RGBA,
+			_width, _height, 0, Native.OpenGL.GL_RGBA, Native.OpenGL.GL_UNSIGNED_BYTE, in image.Data[0]);
 
 		GL.GenerateMipmap(GLTextureType.Texture2D);
 	}
@@ -54,10 +54,10 @@ internal class GLTexture : Disposable, INativeTexture
 	public void Bind(uint slot = 0)
 	{
 		GL.ActiveTexture(slot);
-		GL.BindTexture(GLTextureType.Texture2D, _handle);
+		Native.OpenGL.glBindTexture(Native.OpenGL.GL_TEXTURE_2D, _handle);
 	}
 
-	public void Unbind() => GL.BindTexture(GLTextureType.Texture2D, 0);
+	public void Unbind() => Native.OpenGL.glBindTexture(Native.OpenGL.GL_TEXTURE_2D, 0);
 
 	public IRenderer Renderer => _renderer;
 	public int Width => _width;
