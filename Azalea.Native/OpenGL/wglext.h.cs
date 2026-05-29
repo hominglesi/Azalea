@@ -1,5 +1,8 @@
-﻿namespace Azalea.Native;
-public static partial class OpenGL
+﻿namespace Azalea.Native.OpenGL;
+
+// Windows-specific extentions Constants and Windows 
+// Defined here: https://registry.khronos.org/OpenGL/api/GL/wglext.h
+public static partial class GL
 {
 	/// <summary><see href="https://registry.khronos.org/OpenGL/api/GL/wglext.h">Official Documentation</see></summary>
 	public const int WGL_CONTEXT_CORE_PROFILE_BIT_ARB = 0x00000001;

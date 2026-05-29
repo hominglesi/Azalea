@@ -1,8 +1,8 @@
 ﻿using Azalea.Graphics.Colors;
+using Azalea.Native.OpenGL;
 using Azalea.Platform.Windowing;
 using Azalea.Utils;
 using System;
-using GL = Azalea.Native.OpenGL;
 
 namespace Azalea.Platform.Rendering.OpenGL;
 internal partial class GLRenderer : PlatformRenderer
@@ -28,7 +28,7 @@ internal partial class GLRenderer : PlatformRenderer
 		var framebufferTexture = CreateTexture2D();
 		BindTexture2D(framebufferTexture);
 
-		GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGB, 800, 600, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, IntPtr.Zero);
+		GL.TexImage2D(GL.TEXTURE_2D, 0, GL.RGB, 800, 600, 0, GL.RGB, GL.UNSIGNED_BYTE, IntPtr.Zero);
 
 		BindFramebuffer(null);
 	}
@@ -44,35 +44,35 @@ internal partial class GLRenderer : PlatformRenderer
 	public override void Clear(Color color)
 	{
 		if (color != _clearColor)
-			GL.glClearColor(color.RNormalized, color.GNormalized, color.BNormalized, color.ANormalized);
+			GL.ClearColor(color.RNormalized, color.GNormalized, color.BNormalized, color.ANormalized);
 
-		GL.glClear(GL.GL_COLOR_BUFFER_BIT);
+		GL.Clear(GL.COLOR_BUFFER_BIT);
 	}
 
 	public override Framebuffer CreateFramebuffer()
 	{
 		uint handle = 0;
-		GLContext.glGenFramebuffers(1, ref handle);
+		GL.GenFramebuffers(1, ref handle);
 		return new GLFramebuffer(this, handle);
 	}
 
 	protected override void BindFramebufferImplementation(Framebuffer? framebuffer)
 	{
 		if (framebuffer is null)
-			GLContext.glBindFramebuffer(GL.GL_FRAMEBUFFER, 0);
+			GL.BindFramebuffer(GL.FRAMEBUFFER, 0);
 		else
 		{
 			if (framebuffer is not GLFramebuffer glFramebuffer)
 				throw new ArgumentException("Framebuffer type missmatch!");
 
-			GLContext.glBindFramebuffer(GL.GL_FRAMEBUFFER, glFramebuffer.Handle);
+			GL.BindFramebuffer(GL.FRAMEBUFFER, glFramebuffer.Handle);
 		}
 	}
 
 	public override Texture2D CreateTexture2D()
 	{
 		uint handle = 0;
-		GL.glGenTextures(1, ref handle);
+		GL.GenTextures(1, ref handle);
 		return new GLTexture2D(this, handle);
 	}
 
@@ -81,7 +81,7 @@ internal partial class GLRenderer : PlatformRenderer
 		if (texture2D is not GLTexture2D glTexture2D)
 			throw new ArgumentException("Texture2D type missmatch!");
 
-		GL.glBindTexture(GL.GL_TEXTURE_2D, glTexture2D.Handle);
+		GL.BindTexture(GL.TEXTURE_2D, glTexture2D.Handle);
 	}
 
 

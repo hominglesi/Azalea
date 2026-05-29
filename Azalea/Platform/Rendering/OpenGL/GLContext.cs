@@ -1,11 +1,10 @@
-﻿using Azalea.Native.Windows;
+﻿using Azalea.Native.OpenGL;
+using Azalea.Native.Windows;
 using Azalea.Platform.Windowing;
 using Azalea.Platform.Windowing.Windows;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-
-using GL = Azalea.Native.OpenGL;
 
 namespace Azalea.Platform.Rendering.OpenGL;
 internal class GLContext
@@ -49,7 +48,7 @@ internal class GLContext
 				0
 			};
 
-			var context = wglCreateContextAttribsARB(winDeviceContext.Handle, false, in openGLAttribs[0]);
+			var context = GL.wglCreateContextAttribsARB(winDeviceContext.Handle, false, in openGLAttribs[0]);
 			if (context == nint.Zero)
 				throw new Exception($"Could not create context. (Error {Marshal.GetLastWin32Error()})");
 
@@ -107,7 +106,7 @@ internal class GLContext
 
 			int pixelFormat = 0;
 			uint formatCount = 0;
-			wglChoosePixelFormatARB(winDeviceContext.Handle, in pixelFormatAttribs[0], IntPtr.Zero, 1, ref pixelFormat, ref formatCount);
+			GL.wglChoosePixelFormatARB(winDeviceContext.Handle, in pixelFormatAttribs[0], IntPtr.Zero, 1, ref pixelFormat, ref formatCount);
 
 			Win32.PIXELFORMATDESCRIPTOR pixelFormatDescriptor = default;
 			Win32.DescribePixelFormat(winDeviceContext.Handle, pixelFormat, pixelFormatDescriptor.nSize, ref pixelFormatDescriptor);
@@ -118,7 +117,7 @@ internal class GLContext
 		throw new NotSupportedException("Device context is not supported");
 	}
 
-	private nint getProcAddress(string functionName)
+	public nint GetProcAddress(string functionName)
 	{
 		if (DeviceContext is WindowsDeviceContext)
 			return Win32.wglGetProcAddress(functionName);
@@ -130,47 +129,7 @@ internal class GLContext
 
 	private static void assertDynamicFunctionsLoaded()
 	{
-		if (_dynamicFunctionsLoaded == false)
+		if (GL.DynamicFunctionsLoaded == false)
 			throw new Exception("Dynamic functions haven't been loaded!");
 	}
-
-	#region DynamicallyLoaded
-
-	internal void LoadDynamicFunctions()
-	{
-		_glBindFramebuffer = Marshal.GetDelegateForFunctionPointer<glBindFramebufferDelegate>(getProcAddress("glBindFramebuffer"));
-		_glGenFramebuffers = Marshal.GetDelegateForFunctionPointer<glGenFramebuffersDelegate>(getProcAddress("glGenFramebuffers"));
-		_wglChoosePixelFormatARB = Marshal.GetDelegateForFunctionPointer<wglChoosePixelFormatARBDelegate>(getProcAddress("wglChoosePixelFormatARB"));
-		_wglCreateContextAttribsARB = Marshal.GetDelegateForFunctionPointer<wglCreateContextAttribsARBDelegate>(getProcAddress("wglCreateContextAttribsARB"));
-
-		_dynamicFunctionsLoaded = true;
-	}
-
-	private delegate bool glBindFramebufferDelegate(int target, uint framebuffer);
-	private static glBindFramebufferDelegate? _glBindFramebuffer;
-	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindFramebuffer.xhtml">Official Documentation</see></summary>
-	public static bool glBindFramebuffer(int target, uint framebuffer)
-		=> _glBindFramebuffer!(target, framebuffer);
-
-	private delegate bool glGenFramebuffersDelegate(int n, ref uint ids);
-	private static glGenFramebuffersDelegate? _glGenFramebuffers;
-	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenFramebuffers.xhtml">Official Documentation</see></summary>
-	public static bool glGenFramebuffers(int n, ref uint ids)
-		=> _glGenFramebuffers!(n, ref ids);
-
-	private delegate bool wglChoosePixelFormatARBDelegate(nint hdc, in int piAttribIList, in float pfAttribFList, uint nMaxFormats, ref int piFormats, ref uint nNumFormats);
-	private static wglChoosePixelFormatARBDelegate? _wglChoosePixelFormatARB;
-	/// <summary><see href="https://registry.khronos.org/OpenGL/extensions/ARB/WGL_ARB_pixel_format.txt">Official Documentation</see></summary>
-	public static bool wglChoosePixelFormatARB(nint hdc, in int piAttribIList, in float pfAttribFList, uint nMaxFormats, ref int piFormats, ref uint nNumFormats)
-		=> _wglChoosePixelFormatARB!(hdc, in piAttribIList, in pfAttribFList, nMaxFormats, ref piFormats, ref nNumFormats);
-
-	private delegate nint wglCreateContextAttribsARBDelegate(nint hDC, bool hShareContext, in int attribList);
-	private static wglCreateContextAttribsARBDelegate? _wglCreateContextAttribsARB;
-	/// <summary><see href="https://registry.khronos.org/OpenGL/extensions/ARB/WGL_ARB_create_context.txt">Official Documentation</see></summary>
-	public static nint wglCreateContextAttribsARB(nint hDC, bool hShareContext, in int attribList)
-	{
-		return _wglCreateContextAttribsARB!(hDC, hShareContext, in attribList);
-	}
-
-	#endregion
 }

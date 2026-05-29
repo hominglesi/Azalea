@@ -1,7 +1,6 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.OpenGL;
 using Azalea.Inputs;
-using Azalea.Native;
 using Azalea.Native.Windows;
 using Azalea.Platform.Windows.Com;
 using Azalea.Utils;
@@ -90,14 +89,14 @@ internal class Win32Window : PlatformWindow
 
 		var pixelFormatAttribs = new int[]
 		{
-			OpenGL.WGL_DRAW_TO_WINDOW_ARB, 1,
-			OpenGL.WGL_SUPPORT_OPENGL_ARB, 1,
-			OpenGL.WGL_DOUBLE_BUFFER_ARB, 1,
-			OpenGL.WGL_ACCELERATION_ARB, OpenGL.WGL_FULL_ACCELERATION_ARB,
-			OpenGL.WGL_PIXEL_TYPE_ARB, OpenGL.WGL_TYPE_RGBA_ARB,
-			OpenGL.WGL_COLOR_BITS_ARB, 32,
-			OpenGL.WGL_DEPTH_BITS_ARB, 24,
-			OpenGL.WGL_STENCIL_BITS_ARB, 8,
+			Native.OpenGL.GL.WGL_DRAW_TO_WINDOW_ARB, 1,
+			Native.OpenGL.GL.WGL_SUPPORT_OPENGL_ARB, 1,
+			Native.OpenGL.GL.WGL_DOUBLE_BUFFER_ARB, 1,
+			Native.OpenGL.GL.WGL_ACCELERATION_ARB, Native.OpenGL.GL.WGL_FULL_ACCELERATION_ARB,
+			Native.OpenGL.GL.WGL_PIXEL_TYPE_ARB, Native.OpenGL.GL.WGL_TYPE_RGBA_ARB,
+			Native.OpenGL.GL.WGL_COLOR_BITS_ARB, 32,
+			Native.OpenGL.GL.WGL_DEPTH_BITS_ARB, 24,
+			Native.OpenGL.GL.WGL_STENCIL_BITS_ARB, 8,
 			0
 		};
 
@@ -111,9 +110,9 @@ internal class Win32Window : PlatformWindow
 
 		var openGLAttribs = new int[]
 		{
-			OpenGL.WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-			OpenGL.WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-			OpenGL.WGL_CONTEXT_PROFILE_MASK_ARB, OpenGL.WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+			Native.OpenGL.GL.WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+			Native.OpenGL.GL.WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+			Native.OpenGL.GL.WGL_CONTEXT_PROFILE_MASK_ARB, Native.OpenGL.GL.WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
 			0
 		};
 

@@ -1,4 +1,5 @@
-﻿using Azalea.Platform.Windowing;
+﻿using Azalea.Native.OpenGL;
+using Azalea.Platform.Windowing;
 using Azalea.Threading;
 using System.Threading;
 
@@ -44,7 +45,7 @@ internal partial class GLRenderer
 			var context = GLContext.CreateSimple(_deviceContext);
 			context.MakeCurrent();
 
-			context.LoadDynamicFunctions();
+			GL.LoadDynamicFunctions(context.GetProcAddress);
 
 			Initialized = true;
 		}

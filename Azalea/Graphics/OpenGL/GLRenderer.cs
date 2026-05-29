@@ -39,10 +39,10 @@ internal class GLRenderer : RendererBase
 	}
 
 	protected internal override void SetClearColor(Color value)
-		=> Native.OpenGL.glClearColor(value.RNormalized, value.GNormalized, value.BNormalized, value.ANormalized);
+		=> Native.OpenGL.GL.ClearColor(value.RNormalized, value.GNormalized, value.BNormalized, value.ANormalized);
 
 	protected override void ClearImplementation()
-		=> Native.OpenGL.glClear(Native.OpenGL.GL_COLOR_BUFFER_BIT);
+		=> Native.OpenGL.GL.Clear(Native.OpenGL.GL.COLOR_BUFFER_BIT);
 
 	protected override IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size)
 		=> new GLVertexBatch<TexturedVertex2D>(this, Window, size);
@@ -55,7 +55,7 @@ internal class GLRenderer : RendererBase
 		if (texture is null)
 		{
 			GL.ActiveTexture((uint)unit);
-			Native.OpenGL.glBindTexture(Native.OpenGL.GL_TEXTURE_2D, 0);
+			Native.OpenGL.GL.BindTexture(Native.OpenGL.GL.TEXTURE_2D, 0);
 			return true;
 		}
 
