@@ -33,8 +33,8 @@ internal class GLTexture : Disposable, INativeTexture
 		_renderer.BindTexture(this, 0);
 
 		SetFiltering(TextureFiltering.Nearest, TextureFiltering.Nearest);
-		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.WrapS, (int)GLWrapFunction.Repeat);
-		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.WrapT, (int)GLWrapFunction.Repeat);
+		Native.OpenGL.GL.TexParameteri(Native.OpenGL.GL.TEXTURE_2D, Native.OpenGL.GL.TEXTURE_WRAP_S, Native.OpenGL.GL.REPEAT);
+		Native.OpenGL.GL.TexParameteri(Native.OpenGL.GL.TEXTURE_2D, Native.OpenGL.GL.TEXTURE_WRAP_T, Native.OpenGL.GL.REPEAT);
 
 		Native.OpenGL.GL.TexImage2D(Native.OpenGL.GL.TEXTURE_2D, 0, Native.OpenGL.GL.RGBA,
 			_width, _height, 0, Native.OpenGL.GL.RGBA, Native.OpenGL.GL.UNSIGNED_BYTE, in image.Data[0]);
@@ -45,10 +45,10 @@ internal class GLTexture : Disposable, INativeTexture
 	public void SetFiltering(TextureFiltering minFilter, TextureFiltering magFilter)
 	{
 		_renderer.BindTexture(this, 0);
-		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MinFilter,
-			minFilter == TextureFiltering.Nearest ? (int)GLFunction.Nearest : (int)GLFunction.Linear);
-		GL.TexParameteri(GLTextureType.Texture2D, GLTextureParameter.MagFilter,
-			magFilter == TextureFiltering.Nearest ? (int)GLFunction.Nearest : (int)GLFunction.Linear);
+		Native.OpenGL.GL.TexParameteri(Native.OpenGL.GL.TEXTURE_2D, Native.OpenGL.GL.TEXTURE_MIN_FILTER,
+			minFilter == TextureFiltering.Nearest ? Native.OpenGL.GL.NEAREST : Native.OpenGL.GL.LINEAR);
+		Native.OpenGL.GL.TexParameteri(Native.OpenGL.GL.TEXTURE_2D, Native.OpenGL.GL.TEXTURE_MAG_FILTER,
+			magFilter == TextureFiltering.Nearest ? Native.OpenGL.GL.NEAREST : Native.OpenGL.GL.LINEAR);
 	}
 
 	public void Bind(uint slot = 0)

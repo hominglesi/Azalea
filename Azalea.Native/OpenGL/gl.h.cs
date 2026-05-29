@@ -426,4 +426,8 @@ public static partial class GL
 	[LibraryImport(OpenGLPath, EntryPoint = "glTexImage2D")]
 	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml">Official Documentation</see></summary>
 	public static partial void TexImage2D(int target, int level, int internalFormat, int width, int height, int border, int format, int type, IntPtr pixels);
+
+	[LibraryImport(OpenGLPath, EntryPoint = "glTexParameteri")]
+	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexParameter.xhtml">Official Documentation</see></summary>
+	public static partial void TexParameteri(int target, int pname, int param);
 }

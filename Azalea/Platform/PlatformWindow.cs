@@ -4,7 +4,7 @@ using System;
 using System.IO;
 
 namespace Azalea.Platform;
-internal abstract class PlatformWindow : Disposable, IWindow
+public abstract class PlatformWindow : Disposable, IWindow
 {
 	public PlatformWindow(string title, Vector2Int clientSize, WindowState state)
 	{

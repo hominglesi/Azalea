@@ -91,9 +91,6 @@ internal static unsafe class GL
 		deleteTextures(1, &texture);
 	}
 
-	[DllImport(LibraryPath, EntryPoint = "glTexParameteri")]
-	public static extern void TexParameteri(GLTextureType type, GLTextureParameter name, int value);
-
 	private delegate void GLTextureSlotDelegate(GLTextureSlot slot);
 	private static GLTextureSlotDelegate? _glActiveTexture;
 	public static void ActiveTexture(uint slot) => _glActiveTexture!(GLTextureSlot.Texture0 + (int)slot);

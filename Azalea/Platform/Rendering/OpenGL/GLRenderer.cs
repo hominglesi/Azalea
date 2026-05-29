@@ -31,12 +31,42 @@ internal partial class GLRenderer : PlatformRenderer
 		GL.TexImage2D(GL.TEXTURE_2D, 0, GL.RGB, 800, 600, 0, GL.RGB, GL.UNSIGNED_BYTE, IntPtr.Zero);
 
 		BindFramebuffer(null);
+
+		IssuePriorityCommand(new TexImage2DCommand(framebufferTexture, GL.TEXTURE_2D, 0, GL.RGB, 800, 600, 0, GL.RGB, GL.UNSIGNED_BYTE, null));
+		IssuePriorityCommand(new TexParameteri(framebufferTexture, GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR));
+		IssuePriorityCommand(new TexParameteri(framebufferTexture, GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR));
+		IssuePriorityCommand(new FramebufferTexture2D(framebuffer, framebufferTexture, GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, 0));
 	}
 
 	protected override void Update()
 	{
 		Clear(Rng.Color());
 		_context.SwapBuffers();
+	}
+
+	internal override void HandleCommand(RenderCommand command)
+	{
+		switch (command)
+		{
+			case FramebufferTexture2D(var framebuffer, var texture, var target, var attachment, var textarget, var level):
+				GL.BindFramebuffer(target, ((GLFramebuffer)framebuffer).Handle);
+				GL.FramebufferTexture2D(target, attachment, textarget, ((GLTexture2D)texture).Handle, 0);
+				GL.BindFramebuffer(target, 0);
+				break;
+			case TexImage2DCommand(var texture, var target, var level, var internalFormat, var width, var height, var border, var format, var type, var pixels):
+				GL.BindTexture(target, ((GLTexture2D)texture).Handle);
+				if (pixels is null)
+					GL.TexImage2D(target, level, internalFormat, width, height, border, format, type, IntPtr.Zero);
+				else
+					GL.TexImage2D(target, level, internalFormat, width, height, border, format, type, in pixels[0]);
+				GL.BindTexture(target, 0);
+				break;
+			case TexParameteri(var texture, var target, var parameter, var value):
+				GL.BindTexture(target, ((GLTexture2D)texture).Handle);
+				GL.TexParameteri(target, parameter, value);
+				GL.BindTexture(target, 0);
+				break;
+		}
 	}
 
 	private Color? _clearColor = null;

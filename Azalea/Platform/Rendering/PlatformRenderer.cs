@@ -1,13 +1,19 @@
 ﻿using Azalea.Graphics.Colors;
-using Azalea.Platform.Rendering;
 using Azalea.Platform.Rendering.OpenGL;
-using Azalea.Platform.Windowing;
 using Azalea.Threading;
+using System;
+using System.Threading.Channels;
 
+namespace Azalea.Platform.Rendering;
 public abstract class PlatformRenderer
 {
 	protected PlatformRenderer()
 	{
+		_priorityCommands = Channel.CreateUnbounded<RenderCommand>(new()
+		{
+			SingleReader = true
+		});
+
 		_thread = new RenderThread(this);
 		_thread.Start();
 	}
@@ -15,7 +21,7 @@ public abstract class PlatformRenderer
 	protected abstract void Initialize();
 	protected abstract void Update();
 
-	public static PlatformRenderer AttachRenderer(PlatformWindow window)
+	public static PlatformRenderer AttachRenderer(Windowing.PlatformWindow window)
 	{
 		var deviceContext = window.BorrowDeviceContext();
 
@@ -26,6 +32,26 @@ public abstract class PlatformRenderer
 
 	public abstract void Clear(Color color);
 
+	#region Commands
+
+	internal abstract record RenderCommand;
+	private readonly Channel<RenderCommand> _priorityCommands;
+
+	internal void IssuePriorityCommand(RenderCommand command)
+	{
+		if (_priorityCommands.Writer.TryWrite(command) == false)
+			Console.WriteLine("Could not write command");
+	}
+
+	internal abstract void HandleCommand(RenderCommand command);
+
+	protected void HandlePriorityCommands()
+	{
+		while (_priorityCommands.Reader.TryRead(out var command))
+			HandleCommand(command);
+	}
+
+	#endregion
 
 	#region Framebuffer
 
@@ -78,6 +104,7 @@ public abstract class PlatformRenderer
 
 		protected override void Update()
 		{
+			_renderer.HandlePriorityCommands();
 			_renderer.Update();
 		}
 	}
