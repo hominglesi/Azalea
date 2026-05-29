@@ -45,6 +45,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azalea.NativeLibraries", "A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azalea.Native", "Azalea.Native\Azalea.Native.csproj", "{2A363E94-F468-4331-B29C-73D1A70F7D0A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azalea.SourceGeneration", "Azalea.SourceGeneration\Azalea.SourceGeneration.csproj", "{2944D382-5301-47D5-AACB-6CCC93BCDDE2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -133,6 +135,14 @@ Global
 		{2A363E94-F468-4331-B29C-73D1A70F7D0A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2A363E94-F468-4331-B29C-73D1A70F7D0A}.Release|x64.ActiveCfg = Release|Any CPU
 		{2A363E94-F468-4331-B29C-73D1A70F7D0A}.Release|x64.Build.0 = Release|Any CPU
+		{2944D382-5301-47D5-AACB-6CCC93BCDDE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2944D382-5301-47D5-AACB-6CCC93BCDDE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2944D382-5301-47D5-AACB-6CCC93BCDDE2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2944D382-5301-47D5-AACB-6CCC93BCDDE2}.Debug|x64.Build.0 = Debug|Any CPU
+		{2944D382-5301-47D5-AACB-6CCC93BCDDE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2944D382-5301-47D5-AACB-6CCC93BCDDE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2944D382-5301-47D5-AACB-6CCC93BCDDE2}.Release|x64.ActiveCfg = Release|Any CPU
+		{2944D382-5301-47D5-AACB-6CCC93BCDDE2}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

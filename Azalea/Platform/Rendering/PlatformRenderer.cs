@@ -34,7 +34,6 @@ public abstract class PlatformRenderer
 
 	#region Commands
 
-	internal abstract record RenderCommand;
 	private readonly Channel<RenderCommand> _priorityCommands;
 
 	internal void IssuePriorityCommand(RenderCommand command)
