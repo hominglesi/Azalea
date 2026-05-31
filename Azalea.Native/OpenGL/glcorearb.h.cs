@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace Azalea.Native.OpenGL;
+﻿namespace Azalea.Native.OpenGL;
 
 // Core Constants and Functions that were defined after OpenGL 1.0
 // They must be dynamically loaded
@@ -8,108 +6,54 @@ namespace Azalea.Native.OpenGL;
 // To simplify method calls GL_ and gl prefixes are stripped
 public static partial class GL
 {
-	#region Initialization
-
-	public static bool DynamicFunctionsLoaded { get; private set; } = false;
-
-	/// <summary>
-	/// A valid OpenGL context must be current before calling this method
-	/// </summary>
-	public static void LoadDynamicFunctions(Func<string, nint> getProcAddressMethod)
+	[AttributeUsage(AttributeTargets.Delegate)]
+	public sealed class OpenGLLoadedFunctionAttribute(
+		string glName, string? comment = null, string? alternativeName = null) : Attribute
 	{
-		_bindBuffer = Marshal.GetDelegateForFunctionPointer<BindBufferDelegate>(getProcAddressMethod("glBindBuffer"));
-		_bindFramebuffer = Marshal.GetDelegateForFunctionPointer<BindFramebufferDelegate>(getProcAddressMethod("glBindFramebuffer"));
-		_bufferData = Marshal.GetDelegateForFunctionPointer<BufferDataDelegate>(getProcAddressMethod("glBufferData"));
-		_bufferData2 = Marshal.GetDelegateForFunctionPointer<BufferData2Delegate>(getProcAddressMethod("glBufferData"));
-		_bufferData3 = Marshal.GetDelegateForFunctionPointer<BufferData3Delegate>(getProcAddressMethod("glBufferData"));
-		_createShader = Marshal.GetDelegateForFunctionPointer<CreateShaderDelegate>(getProcAddressMethod("glCreateShader"));
-		_compileShader = Marshal.GetDelegateForFunctionPointer<CompileShaderDelegate>(getProcAddressMethod("glCompileShader"));
-		_framebufferTexture2D = Marshal.GetDelegateForFunctionPointer<FramebufferTexture2DDelegate>(getProcAddressMethod("glFramebufferTexture2D"));
-		_genBuffers = Marshal.GetDelegateForFunctionPointer<GenBuffersDelegate>(getProcAddressMethod("glGenBuffers"));
-		_genFramebuffers = Marshal.GetDelegateForFunctionPointer<GenFramebuffersDelegate>(getProcAddressMethod("glGenFramebuffers"));
-		_getShaderiv = Marshal.GetDelegateForFunctionPointer<GetShaderivDelegate>(getProcAddressMethod("glGetShaderiv"));
-		_shaderSource = Marshal.GetDelegateForFunctionPointer<ShaderSourceDelegate>(getProcAddressMethod("glShaderSource"));
-		_wglChoosePixelFormatARB = Marshal.GetDelegateForFunctionPointer<wglChoosePixelFormatARBDelegate>(getProcAddressMethod("wglChoosePixelFormatARB"));
-		_wglCreateContextAttribsARB = Marshal.GetDelegateForFunctionPointer<wglCreateContextAttribsARBDelegate>(getProcAddressMethod("wglCreateContextAttribsARB"));
-
-		DynamicFunctionsLoaded = true;
+		private string _glName = glName;
+		private string? _comment = comment;
+		private string? _alternativeName = alternativeName;
 	}
 
-	#endregion
-
+	[OpenGLLoadedFunction("glBindBuffer", """<see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindBuffer.xhtml">Official Documentation</see>""")]
 	private delegate void BindBufferDelegate(int target, uint buffer);
-	private static BindBufferDelegate? _bindBuffer;
-	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindBuffer.xhtml">Official Documentation</see></summary>
-	public static void BindBuffer(int target, uint buffer) => _bindBuffer!(target, buffer);
 
-	private delegate bool BindFramebufferDelegate(int target, uint framebuffer);
-	private static BindFramebufferDelegate? _bindFramebuffer;
-	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindFramebuffer.xhtml">Official Documentation</see></summary>
-	public static bool BindFramebuffer(int target, uint framebuffer)
-		=> _bindFramebuffer!(target, framebuffer);
+	[OpenGLLoadedFunction("glBindBuffer", """<see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindFramebuffer.xhtml">Official Documentation</see>""")]
+	private delegate void BindFramebufferDelegate(int target, uint framebuffer);
 
+	[OpenGLLoadedFunction("glBindBuffer", """<see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml">Official Documentation</see>""")]
 	private delegate void BufferDataDelegate(int target, nint size, IntPtr data, int usage);
-	private static BufferDataDelegate? _bufferData;
-	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml">Official Documentation</see></summary>
-	public static void BufferData(int target, nint size, IntPtr data, int usage) => _bufferData!(target, size, data, usage);
 
+	[OpenGLLoadedFunction("glBindBuffer", """<see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml">Official Documentation</see>""", "BufferData")]
 	private delegate void BufferData2Delegate(int target, nint size, in byte data, int usage);
-	private static BufferData2Delegate? _bufferData2;
-	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml">Official Documentation</see></summary>
-	public static void BufferData(int target, nint size, in byte data, int usage) => _bufferData2!(target, size, in data, usage);
 
+	[OpenGLLoadedFunction("glBindBuffer", """<see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml">Official Documentation</see>""", "BufferData")]
 	private delegate void BufferData3Delegate(int target, nint size, in float data, int usage);
-	private static BufferData3Delegate? _bufferData3;
-	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml">Official Documentation</see></summary>
-	public static void BufferData(int target, nint size, in float data, int usage) => _bufferData3!(target, size, in data, usage);
 
+	[OpenGLLoadedFunction("glCreateShader", """<see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCreateShader.xhtml">Official Documentation</see>""")]
 	private delegate uint CreateShaderDelegate(int shaderType);
-	private static CreateShaderDelegate? _createShader;
-	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCreateShader.xhtml">Official Documentation</see></summary>
-	public static uint CreateShader(int shaderType) => _createShader!(shaderType);
 
+	[OpenGLLoadedFunction("glCompileShader", """<see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCompileShader.xhtml">Official Documentation</see>""")]
 	private delegate uint CompileShaderDelegate(uint shader);
-	private static CompileShaderDelegate? _compileShader;
-	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCompileShader.xhtml">Official Documentation</see></summary>
-	public static void CompileShader(uint shader) => _compileShader!(shader);
 
+	[OpenGLLoadedFunction("glCompileShader", """<see href="https://registry.khronos.org/OpenGL-Refpages/es3/html/glFramebufferTexture2D.xhtml">Official Documentation</see>""")]
 	private delegate nint FramebufferTexture2DDelegate(int target, int attachment, int textarget, uint texture, int level);
-	private static FramebufferTexture2DDelegate? _framebufferTexture2D;
-	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/es3/html/glFramebufferTexture2D.xhtml">Official Documentation</see></summary>
-	public static nint FramebufferTexture2D(int target, int attachment, int textarget, uint texture, int level)
-		=> _framebufferTexture2D!(target, attachment, textarget, texture, level);
 
+	[OpenGLLoadedFunction("glGenBuffers", """<see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenBuffers.xhtml">Official Documentation</see>""")]
 	private delegate void GenBuffersDelegate(int count, ref uint buffers);
-	private static GenBuffersDelegate? _genBuffers;
-	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenBuffers.xhtml">Official Documentation</see></summary>
-	public static void GenBuffers(int count, ref uint buffers)
-		=> _genBuffers!(count, ref buffers);
 
+	[OpenGLLoadedFunction("glGenFramebuffers", """<see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenFramebuffers.xhtml">Official Documentation</see>""")]
 	private delegate bool GenFramebuffersDelegate(int n, ref uint ids);
-	private static GenFramebuffersDelegate? _genFramebuffers;
-	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenFramebuffers.xhtml">Official Documentation</see></summary>
-	public static bool GenFramebuffers(int n, ref uint ids)
-		=> _genFramebuffers!(n, ref ids);
 
-	private delegate void GetShaderivDelegate(uint shader, int pname, ref int @params);
-	private static GetShaderivDelegate? _getShaderiv;
-	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetShader.xhtml">Official Documentation</see></summary>
-	public static void GetShaderiv(uint shader, int pname, ref int @params) => _getShaderiv!(shader, pname, ref @params);
+	[OpenGLLoadedFunction("glGetShaderiv", """<see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenFramebuffers.xhtml">Official Documentation</see>""")]
+	private delegate void GetShaderivDelegate(uint shader, int pname, ref int _params);
 
-	private delegate uint ShaderSourceDelegate(uint shader, int count, ref IntPtr @string, in int length);
-	private static ShaderSourceDelegate? _shaderSource;
-	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glShaderSource.xhtml">Official Documentation</see></summary>
-	public static unsafe void ShaderSource(uint shader, int count, ref IntPtr @string, in int length) => _shaderSource!(shader, count, ref @string, in length);
+	[OpenGLLoadedFunction("glShaderSource", """<see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glShaderSource.xhtml">Official Documentation</see>""")]
+	private delegate void ShaderSourceDelegate(uint shader, int count, ref nint _string, in int length);
 
+	[OpenGLLoadedFunction("wglChoosePixelFormatARB", """<see href="https://registry.khronos.org/OpenGL/extensions/ARB/WGL_ARB_pixel_format.txt">Official Documentation</see>""")]
 	private delegate bool wglChoosePixelFormatARBDelegate(nint hdc, in int piAttribIList, in float pfAttribFList, uint nMaxFormats, ref int piFormats, ref uint nNumFormats);
-	private static wglChoosePixelFormatARBDelegate? _wglChoosePixelFormatARB;
-	/// <summary><see href="https://registry.khronos.org/OpenGL/extensions/ARB/WGL_ARB_pixel_format.txt">Official Documentation</see></summary>
-	public static bool wglChoosePixelFormatARB(nint hdc, in int piAttribIList, in float pfAttribFList, uint nMaxFormats, ref int piFormats, ref uint nNumFormats)
-		=> _wglChoosePixelFormatARB!(hdc, in piAttribIList, in pfAttribFList, nMaxFormats, ref piFormats, ref nNumFormats);
 
+	[OpenGLLoadedFunction("wglCreateContextAttribsARB", """<see href="https://registry.khronos.org/OpenGL/extensions/ARB/WGL_ARB_create_context.txt">Official Documentation</see>""")]
 	private delegate nint wglCreateContextAttribsARBDelegate(nint hDC, bool hShareContext, in int attribList);
-	private static wglCreateContextAttribsARBDelegate? _wglCreateContextAttribsARB;
-	/// <summary><see href="https://registry.khronos.org/OpenGL/extensions/ARB/WGL_ARB_create_context.txt">Official Documentation</see></summary>
-	public static nint wglCreateContextAttribsARB(nint hDC, bool hShareContext, in int attribList)
-		=> _wglCreateContextAttribsARB!(hDC, hShareContext, in attribList);
 }

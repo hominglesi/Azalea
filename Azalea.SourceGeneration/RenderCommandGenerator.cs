@@ -20,15 +20,6 @@ internal class RenderCommandGenerator : IIncrementalGenerator
 
 	public void Initialize(IncrementalGeneratorInitializationContext context)
 	{
-		context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
-			"GenerateRenderCommandAttribute.g.cs",
-			"""
-			namespace Azalea.Platform.Rendering;
-
-			[System.AttributeUsage(System.AttributeTargets.Class)]
-			public sealed class RenderCommandAttribute : System.Attribute { }
-			"""));
-
 		var provider = context.SyntaxProvider.ForAttributeWithMetadataName(
 			"Azalea.Platform.Rendering.RenderCommandAttribute",
 			predicate: (node, _) => node is ClassDeclarationSyntax,
@@ -54,6 +45,9 @@ internal class RenderCommandGenerator : IIncrementalGenerator
 
 			foreach (var command in commands)
 				builder.Append(generateClass(command));
+
+			if (builder.Length <= 25)
+				return;
 
 			ctx.AddSource("RenderCommands.g.cs", builder.ToString());
 		});

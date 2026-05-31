@@ -12,6 +12,9 @@ internal abstract class RenderCommand
 	public abstract void Return();
 }
 
+[AttributeUsage(AttributeTargets.Class)]
+public sealed class RenderCommandAttribute : Attribute { }
+
 [RenderCommand]
 internal partial class BindBufferCommand : RenderCommand
 {
