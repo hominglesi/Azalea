@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace Azalea.Platform.Rendering;
-public partial class RenderCommandQueue
+public partial class RenderCommandQueue : IRenderCommandConsumer
 {
 	#region Pooling
 
@@ -36,6 +36,6 @@ public partial class RenderCommandQueue
 		return null;
 	}
 
-	internal void Enqueue(RenderCommand command)
-		=> _commands.Enqueue(command);
+	internal void Enqueue(RenderCommand command) => _commands.Enqueue(command);
+	void IRenderCommandConsumer.Enqueue(RenderCommand command) => _commands.Enqueue(command);
 }

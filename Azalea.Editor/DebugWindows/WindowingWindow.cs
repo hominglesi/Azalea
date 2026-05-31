@@ -61,7 +61,50 @@ internal class WindowingWindow
 				var window = PlatformWindow.Create();
 				var renderer = PlatformRenderer.AttachRenderer(window);
 
+				float[] vertices =
+				[
+					-0.5f, -0.5f, 0.0f,
+					 0.5f, -0.5f, 0.0f,
+					 0.0f,  0.5f, 0.0f
+				];
+
+				string vertexShaderSource = """
+					#version 330 core
+					layout (location = 0) in vec3 aPos;
+
+					void main()
+					{
+						gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+					}
+				""";
+
+				string fragmentShaderSource = """
+					#version 330 core
+					out vec4 FragColor;
+
+					void main()
+					{
+						FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+					} 
+				""";
+
+				renderer.BeginCommandGroup();
+
 				var vertexBuffer = renderer.GenerateBuffer();
+				renderer.BindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
+				renderer.BufferData(GL.ARRAY_BUFFER, vertices.Length * sizeof(byte), vertices, GL.STATIC_DRAW);
+
+				var vertexShader = renderer.GenerateShader(GL.VERTEX_SHADER);
+				renderer.ShaderSource(vertexShader, vertexShaderSource);
+				renderer.CompileShader(vertexShader);
+				renderer.DisplayShaderCompileStatus(vertexShader);
+
+				var fragmentShader = renderer.GenerateShader(GL.FRAGMENT_SHADER);
+				renderer.ShaderSource(fragmentShader, fragmentShaderSource);
+				renderer.CompileShader(fragmentShader);
+				renderer.DisplayShaderCompileStatus(fragmentShader);
+
+				renderer.SubmitCommandGroup();
 
 				var renderQueue = RenderCommandQueue.Borrow();
 				renderQueue.Clear(Rng.Color());

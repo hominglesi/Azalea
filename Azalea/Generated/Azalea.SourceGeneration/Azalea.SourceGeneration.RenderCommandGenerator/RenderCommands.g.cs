@@ -19,7 +19,7 @@ namespace Azalea.Platform.Rendering
 			}
 			return new BindBufferCommand(__Type, __Buffer);
 		}
-		public static void Return(BindBufferCommand command) => __commandPool.Add(command);
+		public override void Return() => __commandPool.Add(this);
 		public void Deconstruct(out int __Type, out Azalea.Platform.Rendering.Buffer? __Buffer)
 		{
 			__Type = Type;
@@ -51,8 +51,42 @@ namespace Azalea.Platform.Rendering
 			}
 			return new BufferDataCommand(__Type, __Size, __Data, __Hint);
 		}
-		public static void Return(BufferDataCommand command) => __commandPool.Add(command);
+		public override void Return() => __commandPool.Add(this);
 		public void Deconstruct(out int __Type, out nint __Size, out byte[]? __Data, out int __Hint)
+		{
+			__Type = Type;
+			__Size = Size;
+			__Data = Data;
+			__Hint = Hint;
+		}
+	}
+}
+namespace Azalea.Platform.Rendering
+{
+	internal partial class BufferDataFloatCommand
+	{
+		private BufferDataFloatCommand(int __Type, nint __Size, float[]? __Data, int __Hint)
+		{
+			Type = __Type;
+			Size = __Size;
+			Data = __Data;
+			Hint = __Hint;
+		}
+		private static readonly System.Collections.Concurrent.ConcurrentBag<BufferDataFloatCommand> __commandPool = new();
+		public static BufferDataFloatCommand Borrow(int __Type, nint __Size, float[]? __Data, int __Hint)
+		{
+			if (__commandPool.TryTake(out var command))
+			{
+				command.Type = __Type;
+				command.Size = __Size;
+				command.Data = __Data;
+				command.Hint = __Hint;
+				return command;
+			}
+			return new BufferDataFloatCommand(__Type, __Size, __Data, __Hint);
+		}
+		public override void Return() => __commandPool.Add(this);
+		public void Deconstruct(out int __Type, out nint __Size, out float[]? __Data, out int __Hint)
 		{
 			__Type = Type;
 			__Size = Size;
@@ -79,10 +113,60 @@ namespace Azalea.Platform.Rendering
 			}
 			return new ClearCommand(__Color);
 		}
-		public static void Return(ClearCommand command) => __commandPool.Add(command);
+		public override void Return() => __commandPool.Add(this);
 		public void Deconstruct(out Azalea.Graphics.Colors.Color __Color)
 		{
 			__Color = Color;
+		}
+	}
+}
+namespace Azalea.Platform.Rendering
+{
+	internal partial class CompileShaderCommand
+	{
+		private CompileShaderCommand(Azalea.Platform.Rendering.Shader __Shader)
+		{
+			Shader = __Shader;
+		}
+		private static readonly System.Collections.Concurrent.ConcurrentBag<CompileShaderCommand> __commandPool = new();
+		public static CompileShaderCommand Borrow(Azalea.Platform.Rendering.Shader __Shader)
+		{
+			if (__commandPool.TryTake(out var command))
+			{
+				command.Shader = __Shader;
+				return command;
+			}
+			return new CompileShaderCommand(__Shader);
+		}
+		public override void Return() => __commandPool.Add(this);
+		public void Deconstruct(out Azalea.Platform.Rendering.Shader __Shader)
+		{
+			__Shader = Shader;
+		}
+	}
+}
+namespace Azalea.Platform.Rendering
+{
+	internal partial class DisplayShaderCompileStatusCommand
+	{
+		private DisplayShaderCompileStatusCommand(Azalea.Platform.Rendering.Shader __Shader)
+		{
+			Shader = __Shader;
+		}
+		private static readonly System.Collections.Concurrent.ConcurrentBag<DisplayShaderCompileStatusCommand> __commandPool = new();
+		public static DisplayShaderCompileStatusCommand Borrow(Azalea.Platform.Rendering.Shader __Shader)
+		{
+			if (__commandPool.TryTake(out var command))
+			{
+				command.Shader = __Shader;
+				return command;
+			}
+			return new DisplayShaderCompileStatusCommand(__Shader);
+		}
+		public override void Return() => __commandPool.Add(this);
+		public void Deconstruct(out Azalea.Platform.Rendering.Shader __Shader)
+		{
+			__Shader = Shader;
 		}
 	}
 }
@@ -114,7 +198,7 @@ namespace Azalea.Platform.Rendering
 			}
 			return new FramebufferTexture2DCommand(__Framebuffer, __Texture, __Target, __Attachment, __Textarget, __Level);
 		}
-		public static void Return(FramebufferTexture2DCommand command) => __commandPool.Add(command);
+		public override void Return() => __commandPool.Add(this);
 		public void Deconstruct(out Azalea.Platform.Rendering.Framebuffer __Framebuffer, out Azalea.Platform.Rendering.Texture __Texture, out int __Target, out int __Attachment, out int __Textarget, out int __Level)
 		{
 			__Framebuffer = Framebuffer;
@@ -144,7 +228,7 @@ namespace Azalea.Platform.Rendering
 			}
 			return new GenerateBufferCommand(__Buffer);
 		}
-		public static void Return(GenerateBufferCommand command) => __commandPool.Add(command);
+		public override void Return() => __commandPool.Add(this);
 		public void Deconstruct(out Azalea.Platform.Rendering.Buffer __Buffer)
 		{
 			__Buffer = Buffer;
@@ -169,10 +253,38 @@ namespace Azalea.Platform.Rendering
 			}
 			return new GenerateFramebufferCommand(__Framebuffer);
 		}
-		public static void Return(GenerateFramebufferCommand command) => __commandPool.Add(command);
+		public override void Return() => __commandPool.Add(this);
 		public void Deconstruct(out Azalea.Platform.Rendering.Framebuffer __Framebuffer)
 		{
 			__Framebuffer = Framebuffer;
+		}
+	}
+}
+namespace Azalea.Platform.Rendering
+{
+	internal partial class GenerateShaderCommand
+	{
+		private GenerateShaderCommand(Azalea.Platform.Rendering.Shader __Shader, int __ShaderType)
+		{
+			Shader = __Shader;
+			ShaderType = __ShaderType;
+		}
+		private static readonly System.Collections.Concurrent.ConcurrentBag<GenerateShaderCommand> __commandPool = new();
+		public static GenerateShaderCommand Borrow(Azalea.Platform.Rendering.Shader __Shader, int __ShaderType)
+		{
+			if (__commandPool.TryTake(out var command))
+			{
+				command.Shader = __Shader;
+				command.ShaderType = __ShaderType;
+				return command;
+			}
+			return new GenerateShaderCommand(__Shader, __ShaderType);
+		}
+		public override void Return() => __commandPool.Add(this);
+		public void Deconstruct(out Azalea.Platform.Rendering.Shader __Shader, out int __ShaderType)
+		{
+			__Shader = Shader;
+			__ShaderType = ShaderType;
 		}
 	}
 }
@@ -194,10 +306,38 @@ namespace Azalea.Platform.Rendering
 			}
 			return new GenerateTextureCommand(__Texture);
 		}
-		public static void Return(GenerateTextureCommand command) => __commandPool.Add(command);
+		public override void Return() => __commandPool.Add(this);
 		public void Deconstruct(out Azalea.Platform.Rendering.Texture __Texture)
 		{
 			__Texture = Texture;
+		}
+	}
+}
+namespace Azalea.Platform.Rendering
+{
+	internal partial class ShaderSourceCommand
+	{
+		private ShaderSourceCommand(Azalea.Platform.Rendering.Shader __Shader, string __SourceCode)
+		{
+			Shader = __Shader;
+			SourceCode = __SourceCode;
+		}
+		private static readonly System.Collections.Concurrent.ConcurrentBag<ShaderSourceCommand> __commandPool = new();
+		public static ShaderSourceCommand Borrow(Azalea.Platform.Rendering.Shader __Shader, string __SourceCode)
+		{
+			if (__commandPool.TryTake(out var command))
+			{
+				command.Shader = __Shader;
+				command.SourceCode = __SourceCode;
+				return command;
+			}
+			return new ShaderSourceCommand(__Shader, __SourceCode);
+		}
+		public override void Return() => __commandPool.Add(this);
+		public void Deconstruct(out Azalea.Platform.Rendering.Shader __Shader, out string __SourceCode)
+		{
+			__Shader = Shader;
+			__SourceCode = SourceCode;
 		}
 	}
 }
@@ -218,7 +358,7 @@ namespace Azalea.Platform.Rendering
 			}
 			return new SwapBuffersCommand();
 		}
-		public static void Return(SwapBuffersCommand command) => __commandPool.Add(command);
+		public override void Return() => __commandPool.Add(this);
 		public void Deconstruct()
 		{
 			
@@ -261,7 +401,7 @@ namespace Azalea.Platform.Rendering
 			}
 			return new TexImage2DCommand(__Texture, __Target, __Level, __InternalFormat, __Width, __Height, __Border, __Format, __Type, __Pixels);
 		}
-		public static void Return(TexImage2DCommand command) => __commandPool.Add(command);
+		public override void Return() => __commandPool.Add(this);
 		public void Deconstruct(out Azalea.Platform.Rendering.Texture __Texture, out int __Target, out int __Level, out int __InternalFormat, out int __Width, out int __Height, out int __Border, out int __Format, out int __Type, out byte[]? __Pixels)
 		{
 			__Texture = Texture;
@@ -301,7 +441,7 @@ namespace Azalea.Platform.Rendering
 			}
 			return new TexParameteriCommand(__Texture, __Target, __Parameter, __Value);
 		}
-		public static void Return(TexParameteriCommand command) => __commandPool.Add(command);
+		public override void Return() => __commandPool.Add(this);
 		public void Deconstruct(out Azalea.Platform.Rendering.Texture __Texture, out int __Target, out int __Parameter, out int __Value)
 		{
 			__Texture = Texture;

@@ -1,14 +1,15 @@
 ﻿using Azalea.Platform.Rendering.OpenGL;
 using Azalea.Threading;
 using System;
+using System.Collections.Generic;
 using System.Threading.Channels;
 
 namespace Azalea.Platform.Rendering;
-public abstract class PlatformRenderer
+public abstract class PlatformRenderer : IRenderCommandConsumer
 {
 	protected PlatformRenderer()
 	{
-		_priorityCommands = Channel.CreateUnbounded<RenderCommand>(new()
+		_commands = Channel.CreateUnbounded<RenderCommand>(new()
 		{
 			SingleReader = true
 		});
@@ -31,20 +32,53 @@ public abstract class PlatformRenderer
 
 	#region Commands
 
-	private readonly Channel<RenderCommand> _priorityCommands;
+	private readonly Channel<RenderCommand> _commands;
+	private readonly object _commandsLock = new();
 
-	internal void IssuePriorityCommand(RenderCommand command)
+	internal void Enqueue(RenderCommand command)
 	{
-		if (_priorityCommands.Writer.TryWrite(command) == false)
-			Console.WriteLine("Could not write command");
+		lock (_commandsLock)
+		{
+			if (_commands.Writer.TryWrite(command) == false)
+				throw new Exception("Could not write command");
+		}
+	}
+	void IRenderCommandConsumer.Enqueue(RenderCommand command) => Enqueue(command);
+
+	private bool _commandGroupBegun = false;
+	private List<RenderCommand> _commandGroup = [];
+	public void BeginCommandGroup()
+	{
+		if (_commandGroupBegun)
+			throw new Exception("Only one command group can be begun at a time");
+
+		_commandGroupBegun = true;
+	}
+
+	public void SubmitCommandGroup()
+	{
+		if (_commandGroupBegun == false)
+			throw new Exception("Command group has not been begun");
+
+		lock (_commandsLock)
+		{
+			foreach (var command in _commandGroup)
+				Enqueue(command);
+		}
+
+		_commandGroup.Clear();
+		_commandGroupBegun = false;
 	}
 
 	internal abstract void HandleCommand(RenderCommand command);
 
-	protected void HandlePriorityCommands()
+	protected void HandleCommands()
 	{
-		while (_priorityCommands.Reader.TryRead(out var command))
-			HandleCommand(command);
+		lock (_commandsLock)
+		{
+			while (_commands.Reader.TryRead(out var command))
+				HandleCommand(command);
+		}
 	}
 
 	private RenderCommandQueue? _stagedQueue = null;
@@ -105,7 +139,7 @@ public abstract class PlatformRenderer
 
 		protected override void Update()
 		{
-			_renderer.HandlePriorityCommands();
+			_renderer.HandleCommands();
 			_renderer.Update();
 			_renderer.ProcessStagedQueue();
 		}

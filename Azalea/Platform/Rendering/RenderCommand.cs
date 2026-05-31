@@ -1,7 +1,16 @@
 ﻿using Azalea.Graphics.Colors;
+using System;
 
 namespace Azalea.Platform.Rendering;
-internal class RenderCommand { }
+internal abstract class RenderCommand
+{
+	internal RenderCommand()
+	{
+		Console.WriteLine("Created " + GetType().Name);
+	}
+
+	public abstract void Return();
+}
 
 [RenderCommand]
 internal partial class BindBufferCommand : RenderCommand
@@ -20,9 +29,30 @@ internal partial class BufferDataCommand : RenderCommand
 }
 
 [RenderCommand]
+internal partial class BufferDataFloatCommand : RenderCommand
+{
+	public int Type;
+	public nint Size;
+	public float[]? Data;
+	public int Hint;
+}
+
+[RenderCommand]
 internal partial class ClearCommand : RenderCommand
 {
 	public Color Color;
+}
+
+[RenderCommand]
+internal partial class CompileShaderCommand : RenderCommand
+{
+	public Shader Shader;
+}
+
+[RenderCommand]
+internal partial class DisplayShaderCompileStatusCommand : RenderCommand
+{
+	public Shader Shader;
 }
 
 [RenderCommand]
@@ -49,9 +79,23 @@ internal partial class GenerateFramebufferCommand : RenderCommand
 }
 
 [RenderCommand]
+internal partial class GenerateShaderCommand : RenderCommand
+{
+	public Shader Shader;
+	public int ShaderType;
+}
+
+[RenderCommand]
 internal partial class GenerateTextureCommand : RenderCommand
 {
 	public Texture Texture;
+}
+
+[RenderCommand]
+internal partial class ShaderSourceCommand : RenderCommand
+{
+	public Shader Shader;
+	public string SourceCode;
 }
 
 [RenderCommand]
