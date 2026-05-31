@@ -1,5 +1,17 @@
-﻿namespace Azalea.Platform.Rendering;
-public abstract class Framebuffer(PlatformRenderer renderer)
+﻿using System;
+
+namespace Azalea.Platform.Rendering;
+public class Framebuffer
 {
-	protected readonly PlatformRenderer Renderer = renderer;
+	internal uint? Handle { get; private set; }
+
+	internal Framebuffer() { }
+
+	internal void Initialize(uint handle)
+	{
+		if (Handle is not null)
+			throw new Exception("Framebuffer cannot be initialized multiple times!");
+
+		Handle = handle;
+	}
 }

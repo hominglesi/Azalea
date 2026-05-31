@@ -17,8 +17,11 @@ public static partial class GL
 	/// </summary>
 	public static void LoadDynamicFunctions(Func<string, nint> getProcAddressMethod)
 	{
+		_bindBuffer = Marshal.GetDelegateForFunctionPointer<BindBufferDelegate>(getProcAddressMethod("glBindBuffer"));
 		_bindFramebuffer = Marshal.GetDelegateForFunctionPointer<BindFramebufferDelegate>(getProcAddressMethod("glBindFramebuffer"));
+		_bufferData = Marshal.GetDelegateForFunctionPointer<BufferDataDelegate>(getProcAddressMethod("glBufferData"));
 		_framebufferTexture2D = Marshal.GetDelegateForFunctionPointer<FramebufferTexture2DDelegate>(getProcAddressMethod("glFramebufferTexture2D"));
+		_genBuffers = Marshal.GetDelegateForFunctionPointer<GenBuffersDelegate>(getProcAddressMethod("glGenBuffers"));
 		_genFramebuffers = Marshal.GetDelegateForFunctionPointer<GenFramebuffersDelegate>(getProcAddressMethod("glGenFramebuffers"));
 		_wglChoosePixelFormatARB = Marshal.GetDelegateForFunctionPointer<wglChoosePixelFormatARBDelegate>(getProcAddressMethod("wglChoosePixelFormatARB"));
 		_wglCreateContextAttribsARB = Marshal.GetDelegateForFunctionPointer<wglCreateContextAttribsARBDelegate>(getProcAddressMethod("wglCreateContextAttribsARB"));
@@ -28,17 +31,33 @@ public static partial class GL
 
 	#endregion
 
+	private delegate void BindBufferDelegate(int target, uint buffer);
+	private static BindBufferDelegate? _bindBuffer;
+	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindBuffer.xhtml">Official Documentation</see></summary>
+	public static void BindBuffer(int target, uint buffer) => _bindBuffer!(target, buffer);
+
 	private delegate bool BindFramebufferDelegate(int target, uint framebuffer);
 	private static BindFramebufferDelegate? _bindFramebuffer;
 	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindFramebuffer.xhtml">Official Documentation</see></summary>
 	public static bool BindFramebuffer(int target, uint framebuffer)
 		=> _bindFramebuffer!(target, framebuffer);
 
+	private delegate void BufferDataDelegate(int target, nint size, in byte data, int usage);
+	private static BufferDataDelegate? _bufferData;
+	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml">Official Documentation</see></summary>
+	public static void BufferData(int target, nint size, in byte data, int usage) => _bufferData!(target, size, in data, usage);
+
 	private delegate nint FramebufferTexture2DDelegate(int target, int attachment, int textarget, uint texture, int level);
 	private static FramebufferTexture2DDelegate? _framebufferTexture2D;
 	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/es3/html/glFramebufferTexture2D.xhtml">Official Documentation</see></summary>
 	public static nint FramebufferTexture2D(int target, int attachment, int textarget, uint texture, int level)
 		=> _framebufferTexture2D!(target, attachment, textarget, texture, level);
+
+	private delegate void GenBuffersDelegate(int count, ref uint buffers);
+	private static GenBuffersDelegate? _genBuffers;
+	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenBuffers.xhtml">Official Documentation</see></summary>
+	public static void GenBuffers(int count, ref uint buffers)
+		=> _genBuffers!(count, ref buffers);
 
 	private delegate bool GenFramebuffersDelegate(int n, ref uint ids);
 	private static GenFramebuffersDelegate? _genFramebuffers;

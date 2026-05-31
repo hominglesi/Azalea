@@ -1,16 +1,16 @@
 ﻿using System;
 
 namespace Azalea.Platform.Rendering;
-public class Texture
+public class Buffer
 {
 	internal uint? Handle { get; private set; }
 
-	internal Texture() { }
+	internal Buffer() { }
 
 	internal void Initialize(uint handle)
 	{
 		if (Handle is not null)
-			throw new Exception("Texture cannot be initialized multiple times!");
+			throw new Exception("Buffer cannot be initialized multiple times!");
 
 		Handle = handle;
 	}

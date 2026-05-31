@@ -1,7 +1,9 @@
 ﻿using Azalea.Editor.Design.Gui;
+using Azalea.Native.OpenGL;
 using Azalea.Platform.Rendering;
 using Azalea.Platform.Windowing;
 using Azalea.Platform.Windowing.Windows;
+using Azalea.Utils;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -57,7 +59,17 @@ internal class WindowingWindow
 			_window.AddButton("Create renderable new Window", () =>
 			{
 				var window = PlatformWindow.Create();
-				PlatformRenderer.AttachRenderer(window);
+				var renderer = PlatformRenderer.AttachRenderer(window);
+
+				var vertexBuffer = renderer.GenerateBuffer();
+
+				var renderQueue = RenderCommandQueue.Borrow();
+				renderQueue.Clear(Rng.Color());
+				renderQueue.BindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
+				renderQueue.BindBuffer(GL.ARRAY_BUFFER, null);
+				renderQueue.SwapBuffers();
+
+				renderer.StageQueue(renderQueue);
 			});
 		}
 

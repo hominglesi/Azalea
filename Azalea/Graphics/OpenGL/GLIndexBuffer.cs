@@ -13,10 +13,10 @@ public class GLIndexBuffer : Disposable
 	public void SetData(uint[] data, GLUsageHint hint)
 	{
 		Bind();
-		GL.BufferData(GLBufferType.ElementArray, data, hint);
+		GL.BufferData(Native.OpenGL.GL.ELEMENT_ARRAY_BUFFER, data, hint);
 	}
-	public void Bind() => GL.BindBuffer(GLBufferType.ElementArray, _handle);
-	public void Unbind() => GL.BindBuffer(GLBufferType.ElementArray, 0);
+	public void Bind() => GL.BindBuffer(Native.OpenGL.GL.ELEMENT_ARRAY_BUFFER, _handle);
+	public void Unbind() => GL.BindBuffer(Native.OpenGL.GL.ELEMENT_ARRAY_BUFFER, 0);
 
 	protected override void OnDispose()
 	{

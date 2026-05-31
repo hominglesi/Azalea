@@ -1,5 +1,4 @@
-﻿using Azalea.Graphics.Colors;
-using Azalea.Platform.Rendering.OpenGL;
+﻿using Azalea.Platform.Rendering.OpenGL;
 using Azalea.Threading;
 using System;
 using System.Threading.Channels;
@@ -30,8 +29,6 @@ public abstract class PlatformRenderer
 		return renderer;
 	}
 
-	public abstract void Clear(Color color);
-
 	#region Commands
 
 	private readonly Channel<RenderCommand> _priorityCommands;
@@ -50,38 +47,43 @@ public abstract class PlatformRenderer
 			HandleCommand(command);
 	}
 
-	#endregion
+	private RenderCommandQueue? _stagedQueue = null;
+	private readonly object _stagedQueueLock = new();
+	private RenderCommandQueue? _workingQueue = null;
+	private readonly object _workingQueueLock = new();
 
-	#region Framebuffer
-
-	public abstract Framebuffer CreateFramebuffer();
-
-	protected Framebuffer? BoundFramebuffer { get; private set; } = null;
-	protected abstract void BindFramebufferImplementation(Framebuffer? framebuffer);
-	public void BindFramebuffer(Framebuffer? framebuffer)
+	internal void StageQueue(RenderCommandQueue queue)
 	{
-		if (framebuffer == BoundFramebuffer)
-			return;
-
-		BindFramebufferImplementation(framebuffer);
-		BoundFramebuffer = framebuffer;
+		lock (_stagedQueueLock)
+			_stagedQueue = queue;
 	}
 
-	#endregion
-
-	#region Texture2D
-
-	public abstract Texture2D CreateTexture2D();
-
-	protected Texture2D? BoundTexture2D { get; private set; } = null;
-	public abstract void BindTexture2DImplementation(Texture2D texture2D);
-	public void BindTexture2D(Texture2D texture2D)
+	protected void ProcessStagedQueue()
 	{
-		if (texture2D == BoundTexture2D)
-			return;
+		lock (_workingQueueLock)
+		{
+			lock (_stagedQueueLock)
+			{
+				if (_workingQueue == _stagedQueue)
+					return;
 
-		BindTexture2DImplementation(texture2D);
-		BoundTexture2D = texture2D;
+				if (_workingQueue is not null)
+					RenderCommandQueue.Return(_workingQueue);
+
+				_workingQueue = _stagedQueue;
+			}
+
+			if (_workingQueue is null)
+				return;
+
+			var nextCommand = _workingQueue.Dequeue();
+
+			while (nextCommand is not null)
+			{
+				HandleCommand(nextCommand);
+				nextCommand = _workingQueue.Dequeue();
+			}
+		}
 	}
 
 	#endregion
@@ -105,6 +107,7 @@ public abstract class PlatformRenderer
 		{
 			_renderer.HandlePriorityCommands();
 			_renderer.Update();
+			_renderer.ProcessStagedQueue();
 		}
 	}
 

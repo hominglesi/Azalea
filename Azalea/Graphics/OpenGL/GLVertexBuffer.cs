@@ -11,8 +11,8 @@ public class GLVertexBuffer : Disposable
 		_handle = GL.GenBuffer();
 	}
 
-	public void Bind() => GL.BindBuffer(GLBufferType.Array, _handle);
-	public void Unbind() => GL.BindBuffer(GLBufferType.Array, 0);
+	public void Bind() => GL.BindBuffer(Native.OpenGL.GL.ARRAY_BUFFER, _handle);
+	public void Unbind() => GL.BindBuffer(Native.OpenGL.GL.ARRAY_BUFFER, 0);
 
 	public void SetData(float[] data, GLUsageHint hint)
 		=> SetData(data, data.Length, hint);
@@ -20,7 +20,7 @@ public class GLVertexBuffer : Disposable
 	public void SetData(float[] data, int length, GLUsageHint hint)
 	{
 		Bind();
-		GL.BufferData(GLBufferType.Array, data, length, hint);
+		GL.BufferData(Native.OpenGL.GL.ARRAY_BUFFER, data, length, hint);
 	}
 
 	protected override void OnDispose()

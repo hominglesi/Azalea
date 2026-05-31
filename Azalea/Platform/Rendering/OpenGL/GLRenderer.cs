@@ -1,8 +1,8 @@
 ﻿using Azalea.Graphics.Colors;
 using Azalea.Native.OpenGL;
 using Azalea.Platform.Windowing;
-using Azalea.Utils;
 using System;
+using System.Diagnostics;
 
 namespace Azalea.Platform.Rendering.OpenGL;
 internal partial class GLRenderer : PlatformRenderer
@@ -21,101 +21,91 @@ internal partial class GLRenderer : PlatformRenderer
 
 		_context = GLContext.Create(_deviceContext);
 		_context.MakeCurrent();
-
-		var framebuffer = CreateFramebuffer();
-		BindFramebuffer(framebuffer);
-
-		var framebufferTexture = CreateTexture2D();
-		BindTexture2D(framebufferTexture);
-
-		GL.TexImage2D(GL.TEXTURE_2D, 0, GL.RGB, 800, 600, 0, GL.RGB, GL.UNSIGNED_BYTE, IntPtr.Zero);
-
-		BindFramebuffer(null);
-
-		IssuePriorityCommand(TexImage2DCommand.Borrow(framebufferTexture, GL.TEXTURE_2D, 0, GL.RGB, 800, 600, 0, GL.RGB, GL.UNSIGNED_BYTE, null));
-		IssuePriorityCommand(TexParameteriCommand.Borrow(framebufferTexture, GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR));
-		IssuePriorityCommand(TexParameteriCommand.Borrow(framebufferTexture, GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR));
-		IssuePriorityCommand(FramebufferTexture2DCommand.Borrow(framebuffer, framebufferTexture, GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, 0));
 	}
 
 	protected override void Update()
 	{
-		Clear(Rng.Color());
-		_context.SwapBuffers();
+
 	}
+
+	private Color? _clearColor = null;
 
 	internal override void HandleCommand(RenderCommand command)
 	{
 		switch (command)
 		{
+			case BindBufferCommand(var type, var buffer) bindBufferCommand:
+				if (buffer is null)
+					GL.BindBuffer(type, 0);
+				else
+				{
+					Debug.Assert(buffer.Handle is not null);
+					GL.BindBuffer(type, buffer.Handle.Value);
+				}
+
+				BindBufferCommand.Return(bindBufferCommand);
+				break;
+			case BufferDataCommand(var type, var size, var data, var usage) bufferDataCommand:
+				if (data is null)
+					throw new NotImplementedException();
+
+				GL.BufferData(type, size, in data[0], usage);
+
+				BufferDataCommand.Return(bufferDataCommand);
+				break;
+			case ClearCommand(var color) clearCommand:
+				if (_clearColor != color)
+					GL.ClearColor(color.RNormalized, color.GNormalized, color.BNormalized, color.ANormalized);
+				GL.Clear(GL.COLOR_BUFFER_BIT);
+
+				ClearCommand.Return(clearCommand);
+				break;
+			case GenerateFramebufferCommand(var framebuffer) createFramebufferCommand:
+				uint framebufferHandle = 0;
+				GL.GenFramebuffers(1, ref framebufferHandle);
+				framebuffer.Initialize(framebufferHandle);
+
+				GenerateFramebufferCommand.Return(createFramebufferCommand);
+				break;
 			case FramebufferTexture2DCommand(var framebuffer, var texture, var target, var attachment, var textarget, var level) framebufferTexture2DCommand:
-				GL.BindFramebuffer(target, ((GLFramebuffer)framebuffer).Handle);
-				GL.FramebufferTexture2D(target, attachment, textarget, ((GLTexture2D)texture).Handle, 0);
+				Debug.Assert(framebuffer.Handle is not null);
+				Debug.Assert(texture.Handle is not null);
+				GL.BindFramebuffer(target, framebuffer.Handle.Value);
+				GL.FramebufferTexture2D(target, attachment, textarget, texture.Handle.Value, level);
 				GL.BindFramebuffer(target, 0);
+
 				FramebufferTexture2DCommand.Return(framebufferTexture2DCommand);
 				break;
+			case GenerateBufferCommand(var buffer) generateBufferCommand:
+				uint bufferHandle = 0;
+				GL.GenBuffers(1, ref bufferHandle);
+				buffer.Initialize(bufferHandle);
+
+				GenerateBufferCommand.Return(generateBufferCommand);
+				break;
+			case SwapBuffersCommand swapBuffersCommand:
+				_context.SwapBuffers();
+
+				SwapBuffersCommand.Return(swapBuffersCommand);
+				break;
 			case TexImage2DCommand(var texture, var target, var level, var internalFormat, var width, var height, var border, var format, var type, var pixels) texImage2DCommand:
-				GL.BindTexture(target, ((GLTexture2D)texture).Handle);
-				if (pixels is null)
-					GL.TexImage2D(target, level, internalFormat, width, height, border, format, type, IntPtr.Zero);
-				else
-					GL.TexImage2D(target, level, internalFormat, width, height, border, format, type, in pixels[0]);
+				Debug.Assert(texture.Handle is not null);
+				GL.BindTexture(target, texture.Handle.Value);
+				if (pixels is null) GL.TexImage2D(target, level, internalFormat, width, height, border, format, type, IntPtr.Zero);
+				else GL.TexImage2D(target, level, internalFormat, width, height, border, format, type, in pixels[0]);
 				GL.BindTexture(target, 0);
+
 				TexImage2DCommand.Return(texImage2DCommand);
 				break;
 			case TexParameteriCommand(var texture, var target, var parameter, var value) texParameteriCommand:
-				GL.BindTexture(target, ((GLTexture2D)texture).Handle);
+				Debug.Assert(texture.Handle is not null);
+				GL.BindTexture(target, texture.Handle.Value);
 				GL.TexParameteri(target, parameter, value);
 				GL.BindTexture(target, 0);
+
 				TexParameteriCommand.Return(texParameteriCommand);
 				break;
 		}
 	}
-
-	private Color? _clearColor = null;
-
-	public override void Clear(Color color)
-	{
-		if (color != _clearColor)
-			GL.ClearColor(color.RNormalized, color.GNormalized, color.BNormalized, color.ANormalized);
-
-		GL.Clear(GL.COLOR_BUFFER_BIT);
-	}
-
-	public override Framebuffer CreateFramebuffer()
-	{
-		uint handle = 0;
-		GL.GenFramebuffers(1, ref handle);
-		return new GLFramebuffer(this, handle);
-	}
-
-	protected override void BindFramebufferImplementation(Framebuffer? framebuffer)
-	{
-		if (framebuffer is null)
-			GL.BindFramebuffer(GL.FRAMEBUFFER, 0);
-		else
-		{
-			if (framebuffer is not GLFramebuffer glFramebuffer)
-				throw new ArgumentException("Framebuffer type missmatch!");
-
-			GL.BindFramebuffer(GL.FRAMEBUFFER, glFramebuffer.Handle);
-		}
-	}
-
-	public override Texture2D CreateTexture2D()
-	{
-		uint handle = 0;
-		GL.GenTextures(1, ref handle);
-		return new GLTexture2D(this, handle);
-	}
-
-	public override void BindTexture2DImplementation(Texture2D texture2D)
-	{
-		if (texture2D is not GLTexture2D glTexture2D)
-			throw new ArgumentException("Texture2D type missmatch!");
-
-		GL.BindTexture(GL.TEXTURE_2D, glTexture2D.Handle);
-	}
-
 
 }

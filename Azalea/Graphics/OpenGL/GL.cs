@@ -118,7 +118,6 @@ internal static unsafe class GL
 	private static CreateBuffersDelegate? _glCreateBuffers;
 	public static void CreateBuffers(int n, uint* buffers) => _glCreateBuffers!(n, buffers);
 
-
 	private delegate void GenBuffersDelegate(int count, uint* buffers);
 	private static GenBuffersDelegate? _glGenBuffers;
 	public static uint GenBuffer()
@@ -137,23 +136,22 @@ internal static unsafe class GL
 		return vao;
 	}
 
-	private delegate void BindBufferDelegate(GLBufferType type, uint buffer);
+	private delegate void BindBufferDelegate(int type, uint buffer);
 	private static BindBufferDelegate? _glBindBuffer;
-	public static void BindBuffer(GLBufferType type, uint buffer) => _glBindBuffer!(type, buffer);
+	public static void BindBuffer(int type, uint buffer) => _glBindBuffer!(type, buffer);
 
 	private delegate void BindVertexArrayDelegate(uint vertexArray);
 	private static BindVertexArrayDelegate? _glBindVertexArray;
 	public static void BindVertexArray(uint buffer) => _glBindVertexArray!(buffer);
 
-
-	private delegate void BufferDataDelegate(GLBufferType type, IntPtr size, void* data, GLUsageHint hint);
+	private delegate void BufferDataDelegate(int type, IntPtr size, void* data, GLUsageHint hint);
 	private static BufferDataDelegate? _glBufferData;
-	public static void BufferData(GLBufferType type, IntPtr size, void* data, GLUsageHint hint) => _glBufferData!(type, size, data, hint);
-	public static void BufferData<T>(GLBufferType type, T[] data, GLUsageHint hint)
+	public static void BufferData(int type, IntPtr size, void* data, GLUsageHint hint) => _glBufferData!(type, size, data, hint);
+	public static void BufferData<T>(int type, T[] data, GLUsageHint hint)
 		where T : unmanaged
 		=> BufferData(type, data, data.Length, hint);
 
-	public static void BufferData<T>(GLBufferType type, T[] data, int size, GLUsageHint hint)
+	public static void BufferData<T>(int type, T[] data, int size, GLUsageHint hint)
 		where T : unmanaged
 	{
 		fixed (void* ptr = &data[0])
