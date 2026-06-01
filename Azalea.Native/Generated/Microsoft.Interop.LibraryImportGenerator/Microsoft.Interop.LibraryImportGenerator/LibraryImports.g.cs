@@ -27,6 +27,38 @@ namespace Azalea.Native.OpenGL
 {
     public static unsafe partial class GL
     {
+        [global::System.Runtime.InteropServices.DllImportAttribute("opengl32.dll", EntryPoint = "glDisable", ExactSpelling = true)]
+        public static extern partial void Disable(int cap);
+    }
+}
+namespace Azalea.Native.OpenGL
+{
+    public static unsafe partial class GL
+    {
+        [global::System.Runtime.InteropServices.DllImportAttribute("opengl32.dll", EntryPoint = "glDrawArrays", ExactSpelling = true)]
+        public static extern partial void DrawArrays(int mode, int first, int count);
+    }
+}
+namespace Azalea.Native.OpenGL
+{
+    public static unsafe partial class GL
+    {
+        [global::System.Runtime.InteropServices.DllImportAttribute("opengl32.dll", EntryPoint = "glEnable", ExactSpelling = true)]
+        public static extern partial void Enable(int cap);
+    }
+}
+namespace Azalea.Native.OpenGL
+{
+    public static unsafe partial class GL
+    {
+        [global::System.Runtime.InteropServices.DllImportAttribute("opengl32.dll", EntryPoint = "glGetError", ExactSpelling = true)]
+        public static extern partial int GetError();
+    }
+}
+namespace Azalea.Native.OpenGL
+{
+    public static unsafe partial class GL
+    {
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Interop.LibraryImportGenerator", "8.0.13.10607")]
         [global::System.Runtime.CompilerServices.SkipLocalsInitAttribute]
         public static partial void GenTextures(int n, ref uint textures)

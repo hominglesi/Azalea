@@ -90,26 +90,52 @@ internal class WindowingWindow
 
 				renderer.BeginCommandGroup();
 
-				var vertexBuffer = renderer.GenerateBuffer();
-				renderer.BindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
-				renderer.BufferData(GL.ARRAY_BUFFER, vertices.Length * sizeof(byte), vertices, GL.STATIC_DRAW);
+				renderer.Disable(GL.CULL_FACE);
+				renderer.Disable(GL.DEPTH_TEST);
 
 				var vertexShader = renderer.GenerateShader(GL.VERTEX_SHADER);
 				renderer.ShaderSource(vertexShader, vertexShaderSource);
 				renderer.CompileShader(vertexShader);
-				renderer.DisplayShaderCompileStatus(vertexShader);
+				renderer.PrintShaderCompileStatus(vertexShader);
 
 				var fragmentShader = renderer.GenerateShader(GL.FRAGMENT_SHADER);
 				renderer.ShaderSource(fragmentShader, fragmentShaderSource);
 				renderer.CompileShader(fragmentShader);
-				renderer.DisplayShaderCompileStatus(fragmentShader);
+				renderer.PrintShaderCompileStatus(fragmentShader);
+
+				var program = renderer.GenerateProgram();
+				renderer.AttachShader(program, vertexShader);
+				renderer.AttachShader(program, fragmentShader);
+				renderer.LinkProgram(program);
+				renderer.PrintProgramCompileStatus(program);
+
+				renderer.DeleteShader(vertexShader);
+				renderer.DeleteShader(fragmentShader);
+
+				var vertexArray = renderer.GenerateVertexArray();
+				renderer.BindVertexArray(vertexArray);
+
+				var vertexBuffer = renderer.GenerateBuffer();
+				renderer.BindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
+				renderer.BufferData(GL.ARRAY_BUFFER, vertices.Length * sizeof(float), vertices, GL.STATIC_DRAW);
+
+				renderer.VertexAttribPointer(0, 3, GL.FLOAT, false, 3 * sizeof(float), 0);
+				renderer.EnableVertexAttribArray(0);
+				renderer.BindVertexArray(null);
+
+				renderer.PrintErrors();
 
 				renderer.SubmitCommandGroup();
 
 				var renderQueue = RenderCommandQueue.Borrow();
 				renderQueue.Clear(Rng.Color());
-				renderQueue.BindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
-				renderQueue.BindBuffer(GL.ARRAY_BUFFER, null);
+
+				renderQueue.UseProgram(program);
+				renderQueue.BindVertexArray(vertexArray);
+				renderQueue.DrawArrays(GL.TRIANGLES, 0, 3);
+
+				renderQueue.PrintErrors();
+
 				renderQueue.SwapBuffers();
 
 				renderer.StageQueue(renderQueue);

@@ -35,6 +35,11 @@ internal partial class GLRenderer : PlatformRenderer
 	{
 		switch (command)
 		{
+			case AttachShaderCommand(var program, var shader):
+				Debug.Assert(program.Handle is not null);
+				Debug.Assert(shader.Handle is not null);
+				GL.AttachShader(program.Handle.Value, shader.Handle.Value);
+				break;
 			case BindBufferCommand(var type, var buffer):
 				if (buffer is null)
 					GL.BindBuffer(type, 0);
@@ -42,6 +47,15 @@ internal partial class GLRenderer : PlatformRenderer
 				{
 					Debug.Assert(buffer.Handle is not null);
 					GL.BindBuffer(type, buffer.Handle.Value);
+				}
+				break;
+			case BindVertexArrayCommand(var vertexArray):
+				if (vertexArray is null)
+					GL.BindVertexArray(0);
+				else
+				{
+					Debug.Assert(vertexArray.Handle is not null);
+					GL.BindVertexArray(vertexArray.Handle.Value);
 				}
 				break;
 			case BufferDataCommand(var type, var size, var data, var usage):
@@ -61,17 +75,25 @@ internal partial class GLRenderer : PlatformRenderer
 					GL.ClearColor(color.RNormalized, color.GNormalized, color.BNormalized, color.ANormalized);
 				GL.Clear(GL.COLOR_BUFFER_BIT);
 				break;
-			case CompileShaderCommand(Shader shader):
+			case CompileShaderCommand(var shader):
 				Debug.Assert(shader.Handle is not null);
 				GL.CompileShader(shader.Handle.Value);
 				break;
-			case DisplayShaderCompileStatusCommand(Shader shader):
-				int success = 0;
-				GL.GetShaderiv(shader.Handle.GetValueOrDefault(), GL.COMPILE_STATUS, ref success);
-				if (success != 1)
-					Console.WriteLine("Shader Compilation Error!");
-				else
-					Console.WriteLine("Shader Successfully Compiled!");
+			case DeleteShaderCommand(var shader):
+				Debug.Assert(shader.Handle is not null);
+				GL.DeleteShader(shader.Handle.Value);
+				break;
+			case DisableCommand(var capability):
+				GL.Disable(capability);
+				break;
+			case DrawArraysCommand(int mode, int first, int count):
+				GL.DrawArrays(mode, first, count);
+				break;
+			case EnableCommand(int capability):
+				GL.Enable(capability);
+				break;
+			case EnableVertexAttribArrayCommand(uint index):
+				GL.EnableVertexAttribArray(index);
 				break;
 			case FramebufferTexture2DCommand(var framebuffer, var texture, var target, var attachment, var textarget, var level):
 				Debug.Assert(framebuffer.Handle is not null);
@@ -90,6 +112,10 @@ internal partial class GLRenderer : PlatformRenderer
 				GL.GenFramebuffers(1, ref framebufferHandle);
 				framebuffer.Initialize(framebufferHandle);
 				break;
+			case GenerateProgramCommand(var program):
+				uint programHandle = GL.CreateProgram();
+				program.Initialize(programHandle);
+				break;
 			case GenerateShaderCommand(var shader, var type):
 				uint shaderHandle = GL.CreateShader(type);
 				shader.Initialize(shaderHandle);
@@ -98,6 +124,44 @@ internal partial class GLRenderer : PlatformRenderer
 				uint textureHandle = 0;
 				GL.GenTextures(1, ref textureHandle);
 				texture.Initialize(textureHandle);
+				break;
+			case GenerateVertexArrayCommand(var vertexArray):
+				uint vertexArrayHandle = 0;
+				GL.GenVertexArrays(1, ref vertexArrayHandle);
+				vertexArray.Initialize(vertexArrayHandle);
+				break;
+			case LinkProgramCommand(var program):
+				Debug.Assert(program.Handle is not null);
+				GL.LinkProgram(program.Handle.Value);
+				break;
+			case PrintErrorsCommand():
+				var error = GL.GetError();
+				while (error != 0)
+				{
+					Console.WriteLine("OpenGL Error: " + error);
+					error = GL.GetError();
+				}
+				break;
+			case PrintProgramCompileStatusCommand(Program program):
+				int success = 0;
+				GL.GetProgramiv(program.Handle.GetValueOrDefault(), GL.LINK_STATUS, ref success);
+				if (success != 1)
+				{
+					var programInfoLogLength = 0;
+					var programInfoLog = new char[512];
+					GL.GetProgramInfoLog(program.Handle.GetValueOrDefault(), 512, ref programInfoLogLength, ref programInfoLog[0]);
+					Console.WriteLine("Program Compilation Error: " + new string(programInfoLog));
+				}
+				else
+					Console.WriteLine("Program Successfully Compiled!");
+				break;
+			case PrintShaderCompileStatusCommand(Shader shader):
+				success = 0;
+				GL.GetShaderiv(shader.Handle.GetValueOrDefault(), GL.COMPILE_STATUS, ref success);
+				if (success != 1)
+					Console.WriteLine("Shader Compilation Error!");
+				else
+					Console.WriteLine("Shader Successfully Compiled!");
 				break;
 			case ShaderSourceCommand(var shader, var sourceCode):
 				Debug.Assert(shader.Handle is not null);
@@ -128,6 +192,15 @@ internal partial class GLRenderer : PlatformRenderer
 				GL.TexParameteri(target, parameter, value);
 				GL.BindTexture(target, 0);
 				break;
+			case UseProgramCommand(var program):
+				Debug.Assert(program.Handle is not null);
+				GL.UseProgram(program.Handle.Value);
+				break;
+			case VertexAttribPointerCommand(var index, var size, var type, var normalized, int stride, nint pointer):
+				GL.VertexAttribPointer(index, size, type, normalized, stride, pointer);
+				break;
+			default:
+				throw new NotImplementedException("Command handling hasn't been implemented");
 		}
 
 		command.Return();

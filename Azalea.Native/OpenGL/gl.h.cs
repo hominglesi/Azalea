@@ -415,6 +415,22 @@ public static partial class GL
 	[LibraryImport(OpenGLPath, EntryPoint = "glClearColor")]
 	public static partial void ClearColor(float red, float green, float blue, float alpha);
 
+	[LibraryImport(OpenGLPath, EntryPoint = "glDisable")]
+	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnable.xhtml">Official Documentation</see></summary>
+	public static partial void Disable(int cap);
+
+	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDrawArrays.xhtml">Official Documentation</see></summary>
+	[LibraryImport(OpenGLPath, EntryPoint = "glDrawArrays")]
+	public static partial void DrawArrays(int mode, int first, int count);
+
+	[LibraryImport(OpenGLPath, EntryPoint = "glEnable")]
+	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnable.xhtml">Official Documentation</see></summary>
+	public static partial void Enable(int cap);
+
+	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetError.xhtml">Official Documentation</see></summary>
+	[LibraryImport(OpenGLPath, EntryPoint = "glGetError")]
+	public static partial int GetError();
+
 	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenTextures.xhtml">Official Documentation</see></summary>
 	[LibraryImport(OpenGLPath, EntryPoint = "glGenTextures")]
 	public static partial void GenTextures(int n, ref uint textures);

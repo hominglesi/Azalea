@@ -3,6 +3,15 @@ namespace Azalea.Native.OpenGL
 {
 	public static partial class GL
 	{
+		private static AttachShaderDelegate? __AttachShaderDelegate;
+		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glAttachShader.xhtml">Official Documentation</see></summary>
+		public static void AttachShader(uint program, uint shader) => __AttachShaderDelegate!(program, shader);
+	}
+}
+namespace Azalea.Native.OpenGL
+{
+	public static partial class GL
+	{
 		private static BindBufferDelegate? __BindBufferDelegate;
 		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindBuffer.xhtml">Official Documentation</see></summary>
 		public static void BindBuffer(int target, uint buffer) => __BindBufferDelegate!(target, buffer);
@@ -15,6 +24,15 @@ namespace Azalea.Native.OpenGL
 		private static BindFramebufferDelegate? __BindFramebufferDelegate;
 		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindFramebuffer.xhtml">Official Documentation</see></summary>
 		public static void BindFramebuffer(int target, uint framebuffer) => __BindFramebufferDelegate!(target, framebuffer);
+	}
+}
+namespace Azalea.Native.OpenGL
+{
+	public static partial class GL
+	{
+		private static BindVertexArrayDelegate? __BindVertexArrayDelegate;
+		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindVertexArray.xhtml">Official Documentation</see></summary>
+		public static void BindVertexArray(uint array) => __BindVertexArrayDelegate!(array);
 	}
 }
 namespace Azalea.Native.OpenGL
@@ -48,6 +66,15 @@ namespace Azalea.Native.OpenGL
 {
 	public static partial class GL
 	{
+		private static CreateProgramDelegate? __CreateProgramDelegate;
+		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCreateProgram.xhtml">Official Documentation</see></summary>
+		public static uint CreateProgram() => __CreateProgramDelegate!();
+	}
+}
+namespace Azalea.Native.OpenGL
+{
+	public static partial class GL
+	{
 		private static CreateShaderDelegate? __CreateShaderDelegate;
 		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCreateShader.xhtml">Official Documentation</see></summary>
 		public static uint CreateShader(int shaderType) => __CreateShaderDelegate!(shaderType);
@@ -60,6 +87,24 @@ namespace Azalea.Native.OpenGL
 		private static CompileShaderDelegate? __CompileShaderDelegate;
 		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCompileShader.xhtml">Official Documentation</see></summary>
 		public static uint CompileShader(uint shader) => __CompileShaderDelegate!(shader);
+	}
+}
+namespace Azalea.Native.OpenGL
+{
+	public static partial class GL
+	{
+		private static DeleteShaderDelegate? __DeleteShaderDelegate;
+		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteShader.xhtml">Official Documentation</see></summary>
+		public static uint DeleteShader(uint shader) => __DeleteShaderDelegate!(shader);
+	}
+}
+namespace Azalea.Native.OpenGL
+{
+	public static partial class GL
+	{
+		private static EnableVertexAttribArrayDelegate? __EnableVertexAttribArrayDelegate;
+		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnableVertexAttribArray.xhtml">Official Documentation</see></summary>
+		public static uint EnableVertexAttribArray(uint index) => __EnableVertexAttribArrayDelegate!(index);
 	}
 }
 namespace Azalea.Native.OpenGL
@@ -86,7 +131,34 @@ namespace Azalea.Native.OpenGL
 	{
 		private static GenFramebuffersDelegate? __GenFramebuffersDelegate;
 		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenFramebuffers.xhtml">Official Documentation</see></summary>
-		public static bool GenFramebuffers(int n, ref uint ids) => __GenFramebuffersDelegate!(n, ref ids);
+		public static void GenFramebuffers(int n, ref uint ids) => __GenFramebuffersDelegate!(n, ref ids);
+	}
+}
+namespace Azalea.Native.OpenGL
+{
+	public static partial class GL
+	{
+		private static GenVertexArraysDelegate? __GenVertexArraysDelegate;
+		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenVertexArrays.xhtml">Official Documentation</see></summary>
+		public static void GenVertexArrays(int n, ref uint arrays) => __GenVertexArraysDelegate!(n, ref arrays);
+	}
+}
+namespace Azalea.Native.OpenGL
+{
+	public static partial class GL
+	{
+		private static GetProgramInfoLogDelegate? __GetProgramInfoLogDelegate;
+		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetProgramInfoLog.xhtml">Official Documentation</see></summary>
+		public static void GetProgramInfoLog(uint program, int maxLength, ref int length, ref char infoLog) => __GetProgramInfoLogDelegate!(program, maxLength, ref length, ref infoLog);
+	}
+}
+namespace Azalea.Native.OpenGL
+{
+	public static partial class GL
+	{
+		private static GetProgramivDelegate? __GetProgramivDelegate;
+		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetProgram.xhtml">Official Documentation</see></summary>
+		public static void GetProgramiv(uint program, int pname, ref int _params) => __GetProgramivDelegate!(program, pname, ref _params);
 	}
 }
 namespace Azalea.Native.OpenGL
@@ -102,9 +174,36 @@ namespace Azalea.Native.OpenGL
 {
 	public static partial class GL
 	{
+		private static LinkProgramDelegate? __LinkProgramDelegate;
+		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glLinkProgram.xhtml">Official Documentation</see></summary>
+		public static void LinkProgram(uint program) => __LinkProgramDelegate!(program);
+	}
+}
+namespace Azalea.Native.OpenGL
+{
+	public static partial class GL
+	{
 		private static ShaderSourceDelegate? __ShaderSourceDelegate;
 		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glShaderSource.xhtml">Official Documentation</see></summary>
 		public static void ShaderSource(uint shader, int count, ref nint _string, in int length) => __ShaderSourceDelegate!(shader, count, ref _string, in length);
+	}
+}
+namespace Azalea.Native.OpenGL
+{
+	public static partial class GL
+	{
+		private static UseProgramDelegate? __UseProgramDelegate;
+		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUseProgram.xhtml">Official Documentation</see></summary>
+		public static void UseProgram(uint program) => __UseProgramDelegate!(program);
+	}
+}
+namespace Azalea.Native.OpenGL
+{
+	public static partial class GL
+	{
+		private static VertexAttribPointerDelegate? __VertexAttribPointerDelegate;
+		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttribPointer.xhtml">Official Documentation</see></summary>
+		public static void VertexAttribPointer(uint index, int size, int type, bool normalized, int stride, nint pointer) => __VertexAttribPointerDelegate!(index, size, type, normalized, stride, pointer);
 	}
 }
 namespace Azalea.Native.OpenGL
@@ -133,18 +232,29 @@ namespace Azalea.Native.OpenGL
 		/// <summary> A valid OpenGL context must be current before calling this method </summary>
 		public static void LoadDynamicFunctions(Func<string, nint> getProcAddressMethod)
 		{
+			__AttachShaderDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<AttachShaderDelegate>(getProcAddressMethod("glAttachShader"));
 			__BindBufferDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BindBufferDelegate>(getProcAddressMethod("glBindBuffer"));
 			__BindFramebufferDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BindFramebufferDelegate>(getProcAddressMethod("glBindFramebuffer"));
+			__BindVertexArrayDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BindVertexArrayDelegate>(getProcAddressMethod("glBindVertexArray"));
 			__BufferDataDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BufferDataDelegate>(getProcAddressMethod("glBufferData"));
 			__BufferData2Delegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BufferData2Delegate>(getProcAddressMethod("glBufferData"));
 			__BufferData3Delegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BufferData3Delegate>(getProcAddressMethod("glBufferData"));
+			__CreateProgramDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<CreateProgramDelegate>(getProcAddressMethod("glCreateProgram"));
 			__CreateShaderDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<CreateShaderDelegate>(getProcAddressMethod("glCreateShader"));
 			__CompileShaderDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<CompileShaderDelegate>(getProcAddressMethod("glCompileShader"));
+			__DeleteShaderDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<DeleteShaderDelegate>(getProcAddressMethod("glDeleteShader"));
+			__EnableVertexAttribArrayDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<EnableVertexAttribArrayDelegate>(getProcAddressMethod("glEnableVertexAttribArray"));
 			__FramebufferTexture2DDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<FramebufferTexture2DDelegate>(getProcAddressMethod("glFramebufferTexture2D"));
 			__GenBuffersDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GenBuffersDelegate>(getProcAddressMethod("glGenBuffers"));
 			__GenFramebuffersDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GenFramebuffersDelegate>(getProcAddressMethod("glGenFramebuffers"));
+			__GenVertexArraysDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GenVertexArraysDelegate>(getProcAddressMethod("glGenVertexArrays"));
+			__GetProgramInfoLogDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GetProgramInfoLogDelegate>(getProcAddressMethod("glGetProgramInfoLog"));
+			__GetProgramivDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GetProgramivDelegate>(getProcAddressMethod("glGetProgramiv"));
 			__GetShaderivDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GetShaderivDelegate>(getProcAddressMethod("glGetShaderiv"));
+			__LinkProgramDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<LinkProgramDelegate>(getProcAddressMethod("glLinkProgram"));
 			__ShaderSourceDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<ShaderSourceDelegate>(getProcAddressMethod("glShaderSource"));
+			__UseProgramDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<UseProgramDelegate>(getProcAddressMethod("glUseProgram"));
+			__VertexAttribPointerDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<VertexAttribPointerDelegate>(getProcAddressMethod("glVertexAttribPointer"));
 			__wglChoosePixelFormatARBDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<wglChoosePixelFormatARBDelegate>(getProcAddressMethod("wglChoosePixelFormatARB"));
 			__wglCreateContextAttribsARBDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<wglCreateContextAttribsARBDelegate>(getProcAddressMethod("wglCreateContextAttribsARB"));
 			DynamicFunctionsLoaded = true;

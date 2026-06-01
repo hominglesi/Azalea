@@ -9,4 +9,13 @@ public static class IRenderCommandConsumer_Extentions
 
 	public static void BindBuffer(this IRenderCommandConsumer consumer, int type, Buffer? buffer)
 		=> consumer.Enqueue(BindBufferCommand.Borrow(type, buffer));
+
+	public static void BindVertexArray(this IRenderCommandConsumer consumer, VertexArray? vertexArray)
+		=> consumer.Enqueue(BindVertexArrayCommand.Borrow(vertexArray));
+
+	public static void PrintErrors(this IRenderCommandConsumer consumer)
+		=> consumer.Enqueue(PrintErrorsCommand.Borrow());
+
+	public static void UseProgram(this IRenderCommandConsumer consumer, Program program)
+		=> consumer.Enqueue(UseProgramCommand.Borrow(program));
 }

@@ -6,6 +6,9 @@ public static class RenderCommandQueue_Extentions
 	public static void Clear(this RenderCommandQueue queue, Color color)
 		=> queue.Enqueue(ClearCommand.Borrow(color));
 
+	public static void DrawArrays(this RenderCommandQueue queue, int mode, int first, int count)
+		=> queue.Enqueue(DrawArraysCommand.Borrow(mode, first, count));
+
 	public static void SwapBuffers(this RenderCommandQueue queue)
 		=> queue.Enqueue(SwapBuffersCommand.Borrow());
 }

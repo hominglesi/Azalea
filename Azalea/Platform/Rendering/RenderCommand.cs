@@ -16,10 +16,23 @@ internal abstract class RenderCommand
 public sealed class RenderCommandAttribute : Attribute { }
 
 [RenderCommand]
+internal partial class AttachShaderCommand : RenderCommand
+{
+	public Program Program;
+	public Shader Shader;
+}
+
+[RenderCommand]
 internal partial class BindBufferCommand : RenderCommand
 {
 	public int Type;
 	public Buffer? Buffer;
+}
+
+[RenderCommand]
+internal partial class BindVertexArrayCommand : RenderCommand
+{
+	public VertexArray? VertexArray;
 }
 
 [RenderCommand]
@@ -53,9 +66,35 @@ internal partial class CompileShaderCommand : RenderCommand
 }
 
 [RenderCommand]
-internal partial class DisplayShaderCompileStatusCommand : RenderCommand
+internal partial class DeleteShaderCommand : RenderCommand
 {
 	public Shader Shader;
+}
+
+[RenderCommand]
+internal partial class DisableCommand : RenderCommand
+{
+	public int Capability;
+}
+
+[RenderCommand]
+internal partial class DrawArraysCommand : RenderCommand
+{
+	public int Mode;
+	public int First;
+	public int Count;
+}
+
+[RenderCommand]
+internal partial class EnableCommand : RenderCommand
+{
+	public int Capability;
+}
+
+[RenderCommand]
+internal partial class EnableVertexAttribArrayCommand : RenderCommand
+{
+	public uint Index;
 }
 
 [RenderCommand]
@@ -82,6 +121,12 @@ internal partial class GenerateFramebufferCommand : RenderCommand
 }
 
 [RenderCommand]
+internal partial class GenerateProgramCommand : RenderCommand
+{
+	public Program Program;
+}
+
+[RenderCommand]
 internal partial class GenerateShaderCommand : RenderCommand
 {
 	public Shader Shader;
@@ -92,6 +137,33 @@ internal partial class GenerateShaderCommand : RenderCommand
 internal partial class GenerateTextureCommand : RenderCommand
 {
 	public Texture Texture;
+}
+
+[RenderCommand]
+internal partial class GenerateVertexArrayCommand : RenderCommand
+{
+	public VertexArray VertexArray;
+}
+
+[RenderCommand]
+internal partial class LinkProgramCommand : RenderCommand
+{
+	public Program Program;
+}
+
+[RenderCommand]
+internal partial class PrintErrorsCommand : RenderCommand { }
+
+[RenderCommand]
+internal partial class PrintProgramCompileStatusCommand : RenderCommand
+{
+	public Program Program;
+}
+
+[RenderCommand]
+internal partial class PrintShaderCompileStatusCommand : RenderCommand
+{
+	public Shader Shader;
 }
 
 [RenderCommand]
@@ -127,3 +199,22 @@ internal partial class TexParameteriCommand : RenderCommand
 	public int Parameter;
 	public int Value;
 }
+
+[RenderCommand]
+internal partial class UseProgramCommand : RenderCommand
+{
+	public Program Program;
+}
+
+[RenderCommand]
+internal partial class VertexAttribPointerCommand : RenderCommand
+{
+	public uint Index;
+	public int Size;
+	public int Type;
+	public bool Normalized;
+	public int Stride;
+	public nint Pointer;
+}
+
+
