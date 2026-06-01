@@ -134,13 +134,13 @@ namespace Azalea.Native.OpenGL
 		public static void LoadDynamicFunctions(Func<string, nint> getProcAddressMethod)
 		{
 			__BindBufferDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BindBufferDelegate>(getProcAddressMethod("glBindBuffer"));
-			__BindFramebufferDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BindFramebufferDelegate>(getProcAddressMethod("glBindBuffer"));
-			__BufferDataDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BufferDataDelegate>(getProcAddressMethod("glBindBuffer"));
-			__BufferData2Delegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BufferData2Delegate>(getProcAddressMethod("glBindBuffer"));
-			__BufferData3Delegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BufferData3Delegate>(getProcAddressMethod("glBindBuffer"));
+			__BindFramebufferDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BindFramebufferDelegate>(getProcAddressMethod("glBindFramebuffer"));
+			__BufferDataDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BufferDataDelegate>(getProcAddressMethod("glBufferData"));
+			__BufferData2Delegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BufferData2Delegate>(getProcAddressMethod("glBufferData"));
+			__BufferData3Delegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BufferData3Delegate>(getProcAddressMethod("glBufferData"));
 			__CreateShaderDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<CreateShaderDelegate>(getProcAddressMethod("glCreateShader"));
 			__CompileShaderDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<CompileShaderDelegate>(getProcAddressMethod("glCompileShader"));
-			__FramebufferTexture2DDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<FramebufferTexture2DDelegate>(getProcAddressMethod("glCompileShader"));
+			__FramebufferTexture2DDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<FramebufferTexture2DDelegate>(getProcAddressMethod("glFramebufferTexture2D"));
 			__GenBuffersDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GenBuffersDelegate>(getProcAddressMethod("glGenBuffers"));
 			__GenFramebuffersDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GenFramebuffersDelegate>(getProcAddressMethod("glGenFramebuffers"));
 			__GetShaderivDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GetShaderivDelegate>(getProcAddressMethod("glGetShaderiv"));

@@ -9,17 +9,19 @@ namespace Azalea.SourceGeneration;
 internal class OpenGLLoadedFunctionGenerator : IIncrementalGenerator
 {
 	readonly struct OpenGLLoadedFunctionData(string name, string @namespace, string containingClass,
-		string returnType, (string, string, RefKind)[] arguments, string glName,
-		string? summary, string? alternativeName)
+		string returnType, (string, string, RefKind)[] arguments, string? docs,
+		string? overrideName, bool automaticPrefix)
 	{
 		public string Name { get; } = name;
 		public string Namespace { get; } = @namespace;
 		public string ContainingClass { get; } = containingClass;
 		public string ReturnType { get; } = returnType;
 		public (string, string, RefKind)[] Arguments { get; } = arguments;
-		public string GlName { get; } = glName;
-		public string? Summary { get; } = summary;
-		public string? AlternativeName { get; } = alternativeName;
+		public string? Docs { get; } = docs;
+		public bool AutomaticPrefix { get; } = automaticPrefix;
+		public string ShorthandName { get; } = overrideName is not null
+			? overrideName
+			: name.Substring(0, name.Length - 8);
 	}
 
 	public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -44,9 +46,9 @@ internal class OpenGLLoadedFunctionGenerator : IIncrementalGenerator
 					returnType: delegateMethod.ReturnType.ToString(),
 					arguments: [..delegateMethod.Parameters
 					.Select(p => (p.Type.ToString(), p.Name, p.RefKind))],
-					glName: functionAttribute.ConstructorArguments[0].Value!.ToString(),
-					summary: functionAttribute.ConstructorArguments[1].Value?.ToString(),
-					alternativeName: functionAttribute.ConstructorArguments[2].Value?.ToString());
+					docs: functionAttribute.ConstructorArguments[0].Value?.ToString(),
+					overrideName: functionAttribute.ConstructorArguments[1].Value?.ToString(),
+					automaticPrefix: bool.Parse(functionAttribute.ConstructorArguments[2].Value!.ToString()));
 			});
 
 		context.RegisterSourceOutput(provider.Collect(), (ctx, commands) =>
@@ -76,7 +78,9 @@ internal class OpenGLLoadedFunctionGenerator : IIncrementalGenerator
 				builder.Append(" = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<");
 				builder.Append(command.Name);
 				builder.Append(">(getProcAddressMethod(\"");
-				builder.Append(command.GlName);
+				if (command.AutomaticPrefix)
+					builder.Append("gl");
+				builder.Append(command.ShorthandName);
 				builder.AppendLine("\"));");
 			}
 
@@ -106,18 +110,16 @@ internal class OpenGLLoadedFunctionGenerator : IIncrementalGenerator
 
 		builder.Append($"private static {command.Name}? __{command.Name};");
 		newLine();
-		if (command.Summary is not null)
+		if (command.Docs is not null)
 		{
-			builder.Append("/// <summary>");
-			builder.Append(command.Summary);
-			builder.Append("</summary>");
+			builder.Append("/// <summary><see href=\"");
+			builder.Append(command.Docs);
+			builder.Append("\">Official Documentation</see></summary>");
 			newLine();
 		}
 
 		builder.Append($"public static {command.ReturnType} ");
-		builder.Append(command.AlternativeName is not null
-			? command.AlternativeName
-			: command.Name.Substring(0, command.Name.Length - 8));
+		builder.Append(command.ShorthandName);
 		builder.Append('(');
 		appendAllParameters();
 		builder.Append($") => __{command.Name}!(");
