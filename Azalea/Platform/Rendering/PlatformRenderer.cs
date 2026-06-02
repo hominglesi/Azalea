@@ -96,7 +96,10 @@ public abstract class PlatformRenderer : IRenderCommandConsumer
 	internal void StageQueue(RenderCommandQueue queue)
 	{
 		lock (_stagedQueueLock)
+		{
+			_stagedQueue?.Return();
 			_stagedQueue = queue;
+		}
 	}
 
 	protected void ProcessStagedQueue()
@@ -108,21 +111,23 @@ public abstract class PlatformRenderer : IRenderCommandConsumer
 				if (_workingQueue == _stagedQueue)
 					return;
 
-				if (_workingQueue is not null)
-					RenderCommandQueue.Return(_workingQueue);
-
+				_workingQueue?.Return();
 				_workingQueue = _stagedQueue;
+				_stagedQueue = null;
 			}
 
 			if (_workingQueue is null)
 				return;
 
-			var nextCommand = _workingQueue.Dequeue();
-
-			while (nextCommand is not null)
+			lock (_commandsLock)
 			{
-				HandleCommand(nextCommand);
-				nextCommand = _workingQueue.Dequeue();
+				var nextCommand = _workingQueue.Dequeue();
+
+				while (nextCommand is not null)
+				{
+					HandleCommand(nextCommand);
+					nextCommand = _workingQueue.Dequeue();
+				}
 			}
 		}
 	}

@@ -1,15 +1,19 @@
 ﻿using Azalea.Graphics.Colors;
 using System;
+using System.Buffers;
 
 namespace Azalea.Platform.Rendering;
 internal abstract class RenderCommand
 {
+	private static int _totalCommands = 0;
+
 	internal RenderCommand()
 	{
-		Console.WriteLine("Created " + GetType().Name);
+		Console.WriteLine($"Created {GetType().Name}; Total commands {++_totalCommands};");
 	}
 
 	public abstract void Return();
+	protected virtual void Cleanup() { }
 }
 
 [AttributeUsage(AttributeTargets.Class)]
@@ -42,6 +46,13 @@ internal partial class BufferDataCommand : RenderCommand
 	public nint Size;
 	public byte[]? Data;
 	public int Hint;
+	public bool FreeData;
+
+	protected override void Cleanup()
+	{
+		if (FreeData && Data is not null)
+			ArrayPool<byte>.Shared.Return(Data);
+	}
 }
 
 [RenderCommand]
@@ -51,6 +62,13 @@ internal partial class BufferDataFloatCommand : RenderCommand
 	public nint Size;
 	public float[]? Data;
 	public int Hint;
+	public bool FreeData;
+
+	protected override void Cleanup()
+	{
+		if (FreeData && Data is not null)
+			ArrayPool<float>.Shared.Return(Data);
+	}
 }
 
 [RenderCommand]
@@ -60,6 +78,13 @@ internal partial class BufferDataUIntCommand : RenderCommand
 	public nint Size;
 	public uint[]? Data;
 	public int Hint;
+	public bool FreeData;
+
+	protected override void Cleanup()
+	{
+		if (FreeData && Data is not null)
+			ArrayPool<uint>.Shared.Return(Data);
+	}
 }
 
 [RenderCommand]
@@ -164,6 +189,14 @@ internal partial class GenerateVertexArrayCommand : RenderCommand
 }
 
 [RenderCommand]
+internal partial class GetUniformLocationCommand : RenderCommand
+{
+	public UniformLocation UniformLocation;
+	public Program Program;
+	public string Name;
+}
+
+[RenderCommand]
 internal partial class LinkProgramCommand : RenderCommand
 {
 	public Program Program;
@@ -223,6 +256,16 @@ internal partial class TexParameteriCommand : RenderCommand
 	public int Target;
 	public int Parameter;
 	public int Value;
+}
+
+[RenderCommand]
+internal partial class Uniform4fCommand : RenderCommand
+{
+	public UniformLocation UniformLocation;
+	public float Value0;
+	public float Value1;
+	public float Value2;
+	public float Value3;
 }
 
 [RenderCommand]

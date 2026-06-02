@@ -20,8 +20,13 @@ public partial class RenderCommandQueue : IRenderCommandConsumer
 		return new RenderCommandQueue();
 	}
 
-	internal static void Return(RenderCommandQueue queue)
-		=> _pool.Add(queue);
+	internal void Return()
+	{
+		while (_commands.TryDequeue(out var unusedCommand))
+			unusedCommand.Return();
+
+		_pool.Add(this);
+	}
 
 	#endregion
 
@@ -38,4 +43,10 @@ public partial class RenderCommandQueue : IRenderCommandConsumer
 
 	internal void Enqueue(RenderCommand command) => _commands.Enqueue(command);
 	void IRenderCommandConsumer.Enqueue(RenderCommand command) => _commands.Enqueue(command);
+
+	internal void ReturnAllCommands()
+	{
+		foreach (var command in _commands)
+			command.Return();
+	}
 }

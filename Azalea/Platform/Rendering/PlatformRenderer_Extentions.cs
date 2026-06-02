@@ -61,6 +61,13 @@ public static class PlatformRenderer_Extentions
 		return vertexArray;
 	}
 
+	public static UniformLocation GetUniformLocation(this PlatformRenderer renderer, Program program, string name)
+	{
+		var uniformLocation = new UniformLocation();
+		renderer.Enqueue(GetUniformLocationCommand.Borrow(uniformLocation, program, name));
+		return uniformLocation;
+	}
+
 	public static void LinkProgram(this PlatformRenderer renderer, Program program)
 		=> renderer.Enqueue(LinkProgramCommand.Borrow(program));
 

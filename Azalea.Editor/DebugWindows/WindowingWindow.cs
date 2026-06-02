@@ -1,10 +1,13 @@
 ﻿using Azalea.Editor.Design.Gui;
+using Azalea.Graphics.Colors;
 using Azalea.Native.OpenGL;
 using Azalea.Platform.Rendering;
 using Azalea.Platform.Scheduling;
 using Azalea.Platform.Windowing;
 using Azalea.Platform.Windowing.Windows;
 using Azalea.Utils;
+using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -63,14 +66,6 @@ internal class WindowingWindow
 				var renderer = PlatformRenderer.AttachRenderer(window);
 				var scheduler = PlatformScheduler.AttachScheduler(window);
 
-				float[] vertices =
-				[
-					0.5f,  0.5f, 0.0f,
-					0.5f, -0.5f, 0.0f,
-					-0.5f, -0.5f, 0.0f,
-					-0.5f,  0.5f, 0.0f
-				];
-
 				uint[] indices =
 				[
 					0, 1, 3,
@@ -91,9 +86,11 @@ internal class WindowingWindow
 					#version 330 core
 					out vec4 FragColor;
 
+					uniform vec4 outColor;
+
 					void main()
 					{
-						FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+						FragColor = outColor;
 					} 
 				""";
 
@@ -121,21 +118,21 @@ internal class WindowingWindow
 				renderer.DeleteShader(vertexShader);
 				renderer.DeleteShader(fragmentShader);
 
+				var outColorUniform = renderer.GetUniformLocation(program, "outColor");
+
 				var vertexArray = renderer.GenerateVertexArray();
 				renderer.BindVertexArray(vertexArray);
 
 				var vertexBuffer = renderer.GenerateBuffer();
 				renderer.BindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
-				renderer.BufferData(GL.ARRAY_BUFFER, vertices.Length * sizeof(float), vertices, GL.STATIC_DRAW);
 
 				var indexArray = renderer.GenerateBuffer();
 				renderer.BindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexArray);
-				renderer.BufferData(GL.ELEMENT_ARRAY_BUFFER, indices.Length * sizeof(uint), indices, GL.STATIC_DRAW);
+				renderer.BufferData(GL.ELEMENT_ARRAY_BUFFER, indices.Length * sizeof(uint), indices, GL.STATIC_DRAW, false);
 
 				renderer.VertexAttribPointer(0, 3, GL.FLOAT, false, 3 * sizeof(float), 0);
 				renderer.EnableVertexAttribArray(0);
 
-				renderer.BindBuffer(GL.ARRAY_BUFFER, null);
 				renderer.BindVertexArray(null);
 
 				renderer.PrintErrors();
@@ -145,10 +142,49 @@ internal class WindowingWindow
 				scheduler.InjectProtocol((win, rend) =>
 				{
 					var renderQueue = RenderCommandQueue.Borrow();
-					renderQueue.Clear(Rng.Color());
+					renderQueue.Clear(Palette.Beige);
 
 					renderQueue.UseProgram(program);
+					var blueValue = MathUtils.Map(MathF.Sin(Platform.Time.TimeSinceStart), -1, 1, 0, 1);
+					renderQueue.Uniform4f(outColorUniform, 0, blueValue, 1 - blueValue, 1);
+
 					renderQueue.BindVertexArray(vertexArray);
+
+					var dynamicVertices = ArrayPool<float>.Shared.Rent(12);
+
+					if (Rng.Int(2) == 0)
+					{
+						dynamicVertices[0] = 0.5f;
+						dynamicVertices[1] = 0.5f;
+						dynamicVertices[2] = 0.0f;
+						dynamicVertices[3] = 0.5f;
+						dynamicVertices[4] = -0.5f;
+						dynamicVertices[5] = 0.0f;
+						dynamicVertices[6] = -0.5f;
+						dynamicVertices[7] = -0.5f;
+						dynamicVertices[8] = 0.0f;
+						dynamicVertices[9] = -0.5f;
+						dynamicVertices[10] = 0.5f;
+						dynamicVertices[11] = 0.0f;
+					}
+					else
+					{
+						dynamicVertices[0] = 0.5f;
+						dynamicVertices[1] = 0.5f;
+						dynamicVertices[2] = 0.0f;
+						dynamicVertices[3] = 0.5f;
+						dynamicVertices[4] = -0.5f;
+						dynamicVertices[5] = 0.0f;
+						dynamicVertices[6] = -0.6f;
+						dynamicVertices[7] = -0.6f;
+						dynamicVertices[8] = 0.0f;
+						dynamicVertices[9] = -0.5f;
+						dynamicVertices[10] = 0.5f;
+						dynamicVertices[11] = 0.0f;
+					}
+
+					renderQueue.BufferData(GL.ARRAY_BUFFER, 12 * sizeof(float), dynamicVertices, GL.STATIC_DRAW, true);
+
 					renderQueue.DrawElements(GL.TRIANGLES, 6, GL.UNSIGNED_INT, 0);
 
 					renderQueue.PrintErrors();

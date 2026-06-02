@@ -58,19 +58,19 @@ internal partial class GLRenderer : PlatformRenderer
 					GL.BindVertexArray(vertexArray.Handle.Value);
 				}
 				break;
-			case BufferDataCommand(var type, var size, var data, var usage):
+			case BufferDataCommand(var type, var size, var data, var usage, var _):
 				if (data is null)
 					GL.BufferData(type, size, IntPtr.Zero, usage);
 				else
 					GL.BufferData(type, size, in data[0], usage);
 				break;
-			case BufferDataFloatCommand(var type, var size, var data, var usage):
+			case BufferDataFloatCommand(var type, var size, var data, var usage, var _):
 				if (data is null)
 					GL.BufferData(type, size, IntPtr.Zero, usage);
 				else
 					GL.BufferData(type, size, in data[0], usage);
 				break;
-			case BufferDataUIntCommand(var type, var size, var data, var usage):
+			case BufferDataUIntCommand(var type, var size, var data, var usage, var _):
 				if (data is null)
 					GL.BufferData(type, size, IntPtr.Zero, usage);
 				else
@@ -139,6 +139,12 @@ internal partial class GLRenderer : PlatformRenderer
 				GL.GenVertexArrays(1, ref vertexArrayHandle);
 				vertexArray.Initialize(vertexArrayHandle);
 				break;
+			case GetUniformLocationCommand(var uniformLocation, var program, var name):
+				Debug.Assert(program.Handle is not null);
+				var nameBytes = Encoding.UTF8.GetBytes(name + "\0");
+				int uniformLocationHandle = GL.GetUniformLocation(program.Handle.Value, nameBytes);
+				uniformLocation.Initialize(uniformLocationHandle);
+				break;
 			case LinkProgramCommand(var program):
 				Debug.Assert(program.Handle is not null);
 				GL.LinkProgram(program.Handle.Value);
@@ -203,6 +209,10 @@ internal partial class GLRenderer : PlatformRenderer
 				GL.BindTexture(target, texture.Handle.Value);
 				GL.TexParameteri(target, parameter, value);
 				GL.BindTexture(target, 0);
+				break;
+			case Uniform4fCommand(var uniformLocation, var value0, var value1, var value2, var value3):
+				Debug.Assert(uniformLocation.Handle is not null);
+				GL.Uniform4f(uniformLocation.Handle.Value, value0, value1, value2, value3);
 				break;
 			case UseProgramCommand(var program):
 				Debug.Assert(program.Handle is not null);

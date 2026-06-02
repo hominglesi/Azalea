@@ -19,7 +19,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new AttachShaderCommand(__Program, __Shader);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.Program __Program, out Azalea.Platform.Rendering.Shader __Shader)
 		{
 			__Program = Program;
@@ -47,7 +51,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new BindBufferCommand(__Type, __Buffer);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out int __Type, out Azalea.Platform.Rendering.Buffer? __Buffer)
 		{
 			__Type = Type;
@@ -73,7 +81,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new BindVertexArrayCommand(__VertexArray);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.VertexArray? __VertexArray)
 		{
 			__VertexArray = VertexArray;
@@ -84,15 +96,16 @@ namespace Azalea.Platform.Rendering
 {
 	internal partial class BufferDataCommand
 	{
-		private BufferDataCommand(int __Type, nint __Size, byte[]? __Data, int __Hint)
+		private BufferDataCommand(int __Type, nint __Size, byte[]? __Data, int __Hint, bool __FreeData)
 		{
 			Type = __Type;
 			Size = __Size;
 			Data = __Data;
 			Hint = __Hint;
+			FreeData = __FreeData;
 		}
 		private static readonly System.Collections.Concurrent.ConcurrentBag<BufferDataCommand> __commandPool = new();
-		public static BufferDataCommand Borrow(int __Type, nint __Size, byte[]? __Data, int __Hint)
+		public static BufferDataCommand Borrow(int __Type, nint __Size, byte[]? __Data, int __Hint, bool __FreeData)
 		{
 			if (__commandPool.TryTake(out var command))
 			{
@@ -100,17 +113,23 @@ namespace Azalea.Platform.Rendering
 				command.Size = __Size;
 				command.Data = __Data;
 				command.Hint = __Hint;
+				command.FreeData = __FreeData;
 				return command;
 			}
-			return new BufferDataCommand(__Type, __Size, __Data, __Hint);
+			return new BufferDataCommand(__Type, __Size, __Data, __Hint, __FreeData);
 		}
-		public override void Return() => __commandPool.Add(this);
-		public void Deconstruct(out int __Type, out nint __Size, out byte[]? __Data, out int __Hint)
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
+		public void Deconstruct(out int __Type, out nint __Size, out byte[]? __Data, out int __Hint, out bool __FreeData)
 		{
 			__Type = Type;
 			__Size = Size;
 			__Data = Data;
 			__Hint = Hint;
+			__FreeData = FreeData;
 		}
 	}
 }
@@ -118,15 +137,16 @@ namespace Azalea.Platform.Rendering
 {
 	internal partial class BufferDataFloatCommand
 	{
-		private BufferDataFloatCommand(int __Type, nint __Size, float[]? __Data, int __Hint)
+		private BufferDataFloatCommand(int __Type, nint __Size, float[]? __Data, int __Hint, bool __FreeData)
 		{
 			Type = __Type;
 			Size = __Size;
 			Data = __Data;
 			Hint = __Hint;
+			FreeData = __FreeData;
 		}
 		private static readonly System.Collections.Concurrent.ConcurrentBag<BufferDataFloatCommand> __commandPool = new();
-		public static BufferDataFloatCommand Borrow(int __Type, nint __Size, float[]? __Data, int __Hint)
+		public static BufferDataFloatCommand Borrow(int __Type, nint __Size, float[]? __Data, int __Hint, bool __FreeData)
 		{
 			if (__commandPool.TryTake(out var command))
 			{
@@ -134,17 +154,23 @@ namespace Azalea.Platform.Rendering
 				command.Size = __Size;
 				command.Data = __Data;
 				command.Hint = __Hint;
+				command.FreeData = __FreeData;
 				return command;
 			}
-			return new BufferDataFloatCommand(__Type, __Size, __Data, __Hint);
+			return new BufferDataFloatCommand(__Type, __Size, __Data, __Hint, __FreeData);
 		}
-		public override void Return() => __commandPool.Add(this);
-		public void Deconstruct(out int __Type, out nint __Size, out float[]? __Data, out int __Hint)
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
+		public void Deconstruct(out int __Type, out nint __Size, out float[]? __Data, out int __Hint, out bool __FreeData)
 		{
 			__Type = Type;
 			__Size = Size;
 			__Data = Data;
 			__Hint = Hint;
+			__FreeData = FreeData;
 		}
 	}
 }
@@ -152,15 +178,16 @@ namespace Azalea.Platform.Rendering
 {
 	internal partial class BufferDataUIntCommand
 	{
-		private BufferDataUIntCommand(int __Type, nint __Size, uint[]? __Data, int __Hint)
+		private BufferDataUIntCommand(int __Type, nint __Size, uint[]? __Data, int __Hint, bool __FreeData)
 		{
 			Type = __Type;
 			Size = __Size;
 			Data = __Data;
 			Hint = __Hint;
+			FreeData = __FreeData;
 		}
 		private static readonly System.Collections.Concurrent.ConcurrentBag<BufferDataUIntCommand> __commandPool = new();
-		public static BufferDataUIntCommand Borrow(int __Type, nint __Size, uint[]? __Data, int __Hint)
+		public static BufferDataUIntCommand Borrow(int __Type, nint __Size, uint[]? __Data, int __Hint, bool __FreeData)
 		{
 			if (__commandPool.TryTake(out var command))
 			{
@@ -168,17 +195,23 @@ namespace Azalea.Platform.Rendering
 				command.Size = __Size;
 				command.Data = __Data;
 				command.Hint = __Hint;
+				command.FreeData = __FreeData;
 				return command;
 			}
-			return new BufferDataUIntCommand(__Type, __Size, __Data, __Hint);
+			return new BufferDataUIntCommand(__Type, __Size, __Data, __Hint, __FreeData);
 		}
-		public override void Return() => __commandPool.Add(this);
-		public void Deconstruct(out int __Type, out nint __Size, out uint[]? __Data, out int __Hint)
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
+		public void Deconstruct(out int __Type, out nint __Size, out uint[]? __Data, out int __Hint, out bool __FreeData)
 		{
 			__Type = Type;
 			__Size = Size;
 			__Data = Data;
 			__Hint = Hint;
+			__FreeData = FreeData;
 		}
 	}
 }
@@ -200,7 +233,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new ClearCommand(__Color);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Graphics.Colors.Color __Color)
 		{
 			__Color = Color;
@@ -225,7 +262,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new CompileShaderCommand(__Shader);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.Shader __Shader)
 		{
 			__Shader = Shader;
@@ -250,7 +291,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new DeleteShaderCommand(__Shader);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.Shader __Shader)
 		{
 			__Shader = Shader;
@@ -275,7 +320,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new DisableCommand(__Capability);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out int __Capability)
 		{
 			__Capability = Capability;
@@ -304,7 +353,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new DrawArraysCommand(__Mode, __First, __Count);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out int __Mode, out int __First, out int __Count)
 		{
 			__Mode = Mode;
@@ -337,7 +390,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new DrawElementsCommand(__Mode, __Count, __Type, __Offset);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out int __Mode, out int __Count, out int __Type, out int __Offset)
 		{
 			__Mode = Mode;
@@ -365,7 +422,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new EnableCommand(__Capability);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out int __Capability)
 		{
 			__Capability = Capability;
@@ -390,7 +451,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new EnableVertexAttribArrayCommand(__Index);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out uint __Index)
 		{
 			__Index = Index;
@@ -425,7 +490,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new FramebufferTexture2DCommand(__Framebuffer, __Texture, __Target, __Attachment, __Textarget, __Level);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.Framebuffer __Framebuffer, out Azalea.Platform.Rendering.Texture __Texture, out int __Target, out int __Attachment, out int __Textarget, out int __Level)
 		{
 			__Framebuffer = Framebuffer;
@@ -455,7 +524,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new GenerateBufferCommand(__Buffer);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.Buffer __Buffer)
 		{
 			__Buffer = Buffer;
@@ -480,7 +553,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new GenerateFramebufferCommand(__Framebuffer);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.Framebuffer __Framebuffer)
 		{
 			__Framebuffer = Framebuffer;
@@ -505,7 +582,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new GenerateProgramCommand(__Program);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.Program __Program)
 		{
 			__Program = Program;
@@ -532,7 +613,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new GenerateShaderCommand(__Shader, __ShaderType);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.Shader __Shader, out int __ShaderType)
 		{
 			__Shader = Shader;
@@ -558,7 +643,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new GenerateTextureCommand(__Texture);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.Texture __Texture)
 		{
 			__Texture = Texture;
@@ -583,10 +672,49 @@ namespace Azalea.Platform.Rendering
 			}
 			return new GenerateVertexArrayCommand(__VertexArray);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.VertexArray __VertexArray)
 		{
 			__VertexArray = VertexArray;
+		}
+	}
+}
+namespace Azalea.Platform.Rendering
+{
+	internal partial class GetUniformLocationCommand
+	{
+		private GetUniformLocationCommand(Azalea.Platform.Rendering.UniformLocation __UniformLocation, Azalea.Platform.Rendering.Program __Program, string __Name)
+		{
+			UniformLocation = __UniformLocation;
+			Program = __Program;
+			Name = __Name;
+		}
+		private static readonly System.Collections.Concurrent.ConcurrentBag<GetUniformLocationCommand> __commandPool = new();
+		public static GetUniformLocationCommand Borrow(Azalea.Platform.Rendering.UniformLocation __UniformLocation, Azalea.Platform.Rendering.Program __Program, string __Name)
+		{
+			if (__commandPool.TryTake(out var command))
+			{
+				command.UniformLocation = __UniformLocation;
+				command.Program = __Program;
+				command.Name = __Name;
+				return command;
+			}
+			return new GetUniformLocationCommand(__UniformLocation, __Program, __Name);
+		}
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
+		public void Deconstruct(out Azalea.Platform.Rendering.UniformLocation __UniformLocation, out Azalea.Platform.Rendering.Program __Program, out string __Name)
+		{
+			__UniformLocation = UniformLocation;
+			__Program = Program;
+			__Name = Name;
 		}
 	}
 }
@@ -608,7 +736,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new LinkProgramCommand(__Program);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.Program __Program)
 		{
 			__Program = Program;
@@ -635,7 +767,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new PolygonModeCommand(__Face, __Mode);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out int __Face, out int __Mode)
 		{
 			__Face = Face;
@@ -660,7 +796,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new PrintErrorsCommand();
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct()
 		{
 			
@@ -685,7 +825,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new PrintProgramCompileStatusCommand(__Program);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.Program __Program)
 		{
 			__Program = Program;
@@ -710,7 +854,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new PrintShaderCompileStatusCommand(__Shader);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.Shader __Shader)
 		{
 			__Shader = Shader;
@@ -737,7 +885,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new ShaderSourceCommand(__Shader, __SourceCode);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.Shader __Shader, out string __SourceCode)
 		{
 			__Shader = Shader;
@@ -762,7 +914,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new SwapBuffersCommand();
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct()
 		{
 			
@@ -805,7 +961,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new TexImage2DCommand(__Texture, __Target, __Level, __InternalFormat, __Width, __Height, __Border, __Format, __Type, __Pixels);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.Texture __Texture, out int __Target, out int __Level, out int __InternalFormat, out int __Width, out int __Height, out int __Border, out int __Format, out int __Type, out byte[]? __Pixels)
 		{
 			__Texture = Texture;
@@ -845,13 +1005,58 @@ namespace Azalea.Platform.Rendering
 			}
 			return new TexParameteriCommand(__Texture, __Target, __Parameter, __Value);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.Texture __Texture, out int __Target, out int __Parameter, out int __Value)
 		{
 			__Texture = Texture;
 			__Target = Target;
 			__Parameter = Parameter;
 			__Value = Value;
+		}
+	}
+}
+namespace Azalea.Platform.Rendering
+{
+	internal partial class Uniform4fCommand
+	{
+		private Uniform4fCommand(Azalea.Platform.Rendering.UniformLocation __UniformLocation, float __Value0, float __Value1, float __Value2, float __Value3)
+		{
+			UniformLocation = __UniformLocation;
+			Value0 = __Value0;
+			Value1 = __Value1;
+			Value2 = __Value2;
+			Value3 = __Value3;
+		}
+		private static readonly System.Collections.Concurrent.ConcurrentBag<Uniform4fCommand> __commandPool = new();
+		public static Uniform4fCommand Borrow(Azalea.Platform.Rendering.UniformLocation __UniformLocation, float __Value0, float __Value1, float __Value2, float __Value3)
+		{
+			if (__commandPool.TryTake(out var command))
+			{
+				command.UniformLocation = __UniformLocation;
+				command.Value0 = __Value0;
+				command.Value1 = __Value1;
+				command.Value2 = __Value2;
+				command.Value3 = __Value3;
+				return command;
+			}
+			return new Uniform4fCommand(__UniformLocation, __Value0, __Value1, __Value2, __Value3);
+		}
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
+		public void Deconstruct(out Azalea.Platform.Rendering.UniformLocation __UniformLocation, out float __Value0, out float __Value1, out float __Value2, out float __Value3)
+		{
+			__UniformLocation = UniformLocation;
+			__Value0 = Value0;
+			__Value1 = Value1;
+			__Value2 = Value2;
+			__Value3 = Value3;
 		}
 	}
 }
@@ -873,7 +1078,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new UseProgramCommand(__Program);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out Azalea.Platform.Rendering.Program __Program)
 		{
 			__Program = Program;
@@ -908,7 +1117,11 @@ namespace Azalea.Platform.Rendering
 			}
 			return new VertexAttribPointerCommand(__Index, __Size, __Type, __Normalized, __Stride, __Pointer);
 		}
-		public override void Return() => __commandPool.Add(this);
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
 		public void Deconstruct(out uint __Index, out int __Size, out int __Type, out bool __Normalized, out int __Stride, out nint __Pointer)
 		{
 			__Index = Index;

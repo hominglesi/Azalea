@@ -145,7 +145,12 @@ internal class RenderCommandGenerator : IIncrementalGenerator
 		newLine();
 
 		// Return
-		builder.Append("public override void Return() => __commandPool.Add(this);");
+		builder.Append("public override void Return()");
+		beginNest();
+		newLine();
+		builder.Append("Cleanup();");
+		builder.Append("__commandPool.Add(this);");
+		endNest();
 		newLine();
 
 		// Deconstruc Method

@@ -79,11 +79,17 @@ public static partial class GL
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenFramebuffers.xhtml")]
 	private delegate void GetShaderivDelegate(uint shader, int pname, ref int _params);
 
+	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetUniformLocation.xhtml")]
+	private delegate int GetUniformLocationDelegate(uint program, byte[] name);
+
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glLinkProgram.xhtml")]
 	private delegate void LinkProgramDelegate(uint program);
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glShaderSource.xhtml")]
 	private delegate void ShaderSourceDelegate(uint shader, int count, ref nint _string, in int length);
+
+	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml")]
+	private delegate void Uniform4fDelegate(int location, float v0, float v1, float v2, float v3);
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUseProgram.xhtml")]
 	private delegate void UseProgramDelegate(uint program);
