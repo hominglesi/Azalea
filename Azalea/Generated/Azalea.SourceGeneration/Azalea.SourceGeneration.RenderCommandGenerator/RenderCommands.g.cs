@@ -150,6 +150,40 @@ namespace Azalea.Platform.Rendering
 }
 namespace Azalea.Platform.Rendering
 {
+	internal partial class BufferDataUIntCommand
+	{
+		private BufferDataUIntCommand(int __Type, nint __Size, uint[]? __Data, int __Hint)
+		{
+			Type = __Type;
+			Size = __Size;
+			Data = __Data;
+			Hint = __Hint;
+		}
+		private static readonly System.Collections.Concurrent.ConcurrentBag<BufferDataUIntCommand> __commandPool = new();
+		public static BufferDataUIntCommand Borrow(int __Type, nint __Size, uint[]? __Data, int __Hint)
+		{
+			if (__commandPool.TryTake(out var command))
+			{
+				command.Type = __Type;
+				command.Size = __Size;
+				command.Data = __Data;
+				command.Hint = __Hint;
+				return command;
+			}
+			return new BufferDataUIntCommand(__Type, __Size, __Data, __Hint);
+		}
+		public override void Return() => __commandPool.Add(this);
+		public void Deconstruct(out int __Type, out nint __Size, out uint[]? __Data, out int __Hint)
+		{
+			__Type = Type;
+			__Size = Size;
+			__Data = Data;
+			__Hint = Hint;
+		}
+	}
+}
+namespace Azalea.Platform.Rendering
+{
 	internal partial class ClearCommand
 	{
 		private ClearCommand(Azalea.Graphics.Colors.Color __Color)
@@ -276,6 +310,40 @@ namespace Azalea.Platform.Rendering
 			__Mode = Mode;
 			__First = First;
 			__Count = Count;
+		}
+	}
+}
+namespace Azalea.Platform.Rendering
+{
+	internal partial class DrawElementsCommand
+	{
+		private DrawElementsCommand(int __Mode, int __Count, int __Type, int __Offset)
+		{
+			Mode = __Mode;
+			Count = __Count;
+			Type = __Type;
+			Offset = __Offset;
+		}
+		private static readonly System.Collections.Concurrent.ConcurrentBag<DrawElementsCommand> __commandPool = new();
+		public static DrawElementsCommand Borrow(int __Mode, int __Count, int __Type, int __Offset)
+		{
+			if (__commandPool.TryTake(out var command))
+			{
+				command.Mode = __Mode;
+				command.Count = __Count;
+				command.Type = __Type;
+				command.Offset = __Offset;
+				return command;
+			}
+			return new DrawElementsCommand(__Mode, __Count, __Type, __Offset);
+		}
+		public override void Return() => __commandPool.Add(this);
+		public void Deconstruct(out int __Mode, out int __Count, out int __Type, out int __Offset)
+		{
+			__Mode = Mode;
+			__Count = Count;
+			__Type = Type;
+			__Offset = Offset;
 		}
 	}
 }
@@ -544,6 +612,34 @@ namespace Azalea.Platform.Rendering
 		public void Deconstruct(out Azalea.Platform.Rendering.Program __Program)
 		{
 			__Program = Program;
+		}
+	}
+}
+namespace Azalea.Platform.Rendering
+{
+	internal partial class PolygonModeCommand
+	{
+		private PolygonModeCommand(int __Face, int __Mode)
+		{
+			Face = __Face;
+			Mode = __Mode;
+		}
+		private static readonly System.Collections.Concurrent.ConcurrentBag<PolygonModeCommand> __commandPool = new();
+		public static PolygonModeCommand Borrow(int __Face, int __Mode)
+		{
+			if (__commandPool.TryTake(out var command))
+			{
+				command.Face = __Face;
+				command.Mode = __Mode;
+				return command;
+			}
+			return new PolygonModeCommand(__Face, __Mode);
+		}
+		public override void Return() => __commandPool.Add(this);
+		public void Deconstruct(out int __Face, out int __Mode)
+		{
+			__Face = Face;
+			__Mode = Mode;
 		}
 	}
 }

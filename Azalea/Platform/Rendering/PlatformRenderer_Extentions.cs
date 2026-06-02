@@ -64,6 +64,9 @@ public static class PlatformRenderer_Extentions
 	public static void LinkProgram(this PlatformRenderer renderer, Program program)
 		=> renderer.Enqueue(LinkProgramCommand.Borrow(program));
 
+	public static void PolygonMode(this PlatformRenderer renderer, int face, int mode)
+		=> renderer.Enqueue(PolygonModeCommand.Borrow(face, mode));
+
 	public static void PrintProgramCompileStatus(this PlatformRenderer renderer, Program program)
 		=> renderer.Enqueue(PrintProgramCompileStatusCommand.Borrow(program));
 

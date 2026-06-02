@@ -70,6 +70,12 @@ internal partial class GLRenderer : PlatformRenderer
 				else
 					GL.BufferData(type, size, in data[0], usage);
 				break;
+			case BufferDataUIntCommand(var type, var size, var data, var usage):
+				if (data is null)
+					GL.BufferData(type, size, IntPtr.Zero, usage);
+				else
+					GL.BufferData(type, size, in data[0], usage);
+				break;
 			case ClearCommand(var color):
 				if (_clearColor != color)
 					GL.ClearColor(color.RNormalized, color.GNormalized, color.BNormalized, color.ANormalized);
@@ -86,8 +92,11 @@ internal partial class GLRenderer : PlatformRenderer
 			case DisableCommand(var capability):
 				GL.Disable(capability);
 				break;
-			case DrawArraysCommand(int mode, int first, int count):
+			case DrawArraysCommand(var mode, var first, var count):
 				GL.DrawArrays(mode, first, count);
+				break;
+			case DrawElementsCommand(var mode, var count, var type, var offset):
+				GL.DrawElements(mode, count, type, offset);
 				break;
 			case EnableCommand(int capability):
 				GL.Enable(capability);
@@ -133,6 +142,9 @@ internal partial class GLRenderer : PlatformRenderer
 			case LinkProgramCommand(var program):
 				Debug.Assert(program.Handle is not null);
 				GL.LinkProgram(program.Handle.Value);
+				break;
+			case PolygonModeCommand(var face, var mode):
+				GL.PolygonMode(face, mode);
 				break;
 			case PrintErrorsCommand():
 				var error = GL.GetError();

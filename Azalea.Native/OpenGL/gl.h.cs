@@ -423,6 +423,10 @@ public static partial class GL
 	[LibraryImport(OpenGLPath, EntryPoint = "glDrawArrays")]
 	public static partial void DrawArrays(int mode, int first, int count);
 
+	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDrawElements.xhtml">Official Documentation</see></summary>
+	[LibraryImport(OpenGLPath, EntryPoint = "glDrawElements")]
+	public static partial void DrawElements(int mode, int count, int type, IntPtr indices);
+
 	[LibraryImport(OpenGLPath, EntryPoint = "glEnable")]
 	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnable.xhtml">Official Documentation</see></summary>
 	public static partial void Enable(int cap);
@@ -434,6 +438,10 @@ public static partial class GL
 	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenTextures.xhtml">Official Documentation</see></summary>
 	[LibraryImport(OpenGLPath, EntryPoint = "glGenTextures")]
 	public static partial void GenTextures(int n, ref uint textures);
+
+	[LibraryImport(OpenGLPath, EntryPoint = "glPolygonMode")]
+	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glPolygonMode.xhtml">Official Documentation</see></summary>
+	public static partial void PolygonMode(int face, int mode);
 
 	[LibraryImport(OpenGLPath, EntryPoint = "glTexImage2D")]
 	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml">Official Documentation</see></summary>

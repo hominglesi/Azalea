@@ -66,6 +66,15 @@ namespace Azalea.Native.OpenGL
 {
 	public static partial class GL
 	{
+		private static BufferData4Delegate? __BufferData4Delegate;
+		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml">Official Documentation</see></summary>
+		public static void BufferData(int target, nint size, in uint data, int usage) => __BufferData4Delegate!(target, size, in data, usage);
+	}
+}
+namespace Azalea.Native.OpenGL
+{
+	public static partial class GL
+	{
 		private static CreateProgramDelegate? __CreateProgramDelegate;
 		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCreateProgram.xhtml">Official Documentation</see></summary>
 		public static uint CreateProgram() => __CreateProgramDelegate!();
@@ -239,6 +248,7 @@ namespace Azalea.Native.OpenGL
 			__BufferDataDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BufferDataDelegate>(getProcAddressMethod("glBufferData"));
 			__BufferData2Delegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BufferData2Delegate>(getProcAddressMethod("glBufferData"));
 			__BufferData3Delegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BufferData3Delegate>(getProcAddressMethod("glBufferData"));
+			__BufferData4Delegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<BufferData4Delegate>(getProcAddressMethod("glBufferData"));
 			__CreateProgramDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<CreateProgramDelegate>(getProcAddressMethod("glCreateProgram"));
 			__CreateShaderDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<CreateShaderDelegate>(getProcAddressMethod("glCreateShader"));
 			__CompileShaderDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<CompileShaderDelegate>(getProcAddressMethod("glCompileShader"));

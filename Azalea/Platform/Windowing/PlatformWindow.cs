@@ -1,4 +1,6 @@
-﻿using Azalea.Platform.Windowing.Windows;
+﻿using Azalea.Platform.Rendering;
+using Azalea.Platform.Scheduling;
+using Azalea.Platform.Windowing.Windows;
 using Azalea.Threading;
 using System;
 using System.Collections.Generic;
@@ -79,6 +81,8 @@ public abstract class PlatformWindow
 		if (Closed) return;
 
 		_thread.Stop();
+		SubscribedRenderer?.Close();
+		SubscribedScheduler?.Close();
 
 		Closed = true;
 		_windows.Remove(this);
@@ -107,6 +111,30 @@ public abstract class PlatformWindow
 	}
 
 	protected abstract PlatformDeviceContext GetDeviceContext();
+
+	#endregion
+
+	#region Subscribers
+
+	public PlatformRenderer? SubscribedRenderer { get; private set; } = null;
+
+	internal void Subscribe(PlatformRenderer renderer)
+	{
+		if (SubscribedRenderer is not null)
+			throw new Exception("Only one rendered can be subscribed at a time");
+
+		SubscribedRenderer = renderer;
+	}
+
+	public PlatformScheduler? SubscribedScheduler { get; private set; } = null;
+
+	internal void Subscribe(PlatformScheduler scheduler)
+	{
+		if (SubscribedScheduler is not null)
+			throw new Exception("Only one scheduler can be subscribed at a time");
+
+		SubscribedScheduler = scheduler;
+	}
 
 	#endregion
 

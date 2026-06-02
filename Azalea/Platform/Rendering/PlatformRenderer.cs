@@ -21,12 +21,19 @@ public abstract class PlatformRenderer : IRenderCommandConsumer
 	protected abstract void Initialize();
 	protected abstract void Update();
 
+	internal void Close()
+	{
+		_thread.Stop();
+	}
+
 	public static PlatformRenderer AttachRenderer(Windowing.PlatformWindow window)
 	{
 		var deviceContext = window.BorrowDeviceContext();
 
 		// For now OpenGL is hardcoded
 		var renderer = new GLRenderer(deviceContext);
+
+		window.Subscribe(renderer);
 		return renderer;
 	}
 

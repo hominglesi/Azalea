@@ -54,6 +54,15 @@ internal partial class BufferDataFloatCommand : RenderCommand
 }
 
 [RenderCommand]
+internal partial class BufferDataUIntCommand : RenderCommand
+{
+	public int Type;
+	public nint Size;
+	public uint[]? Data;
+	public int Hint;
+}
+
+[RenderCommand]
 internal partial class ClearCommand : RenderCommand
 {
 	public Color Color;
@@ -83,6 +92,15 @@ internal partial class DrawArraysCommand : RenderCommand
 	public int Mode;
 	public int First;
 	public int Count;
+}
+
+[RenderCommand]
+internal partial class DrawElementsCommand : RenderCommand
+{
+	public int Mode;
+	public int Count;
+	public int Type;
+	public int Offset;
 }
 
 [RenderCommand]
@@ -149,6 +167,13 @@ internal partial class GenerateVertexArrayCommand : RenderCommand
 internal partial class LinkProgramCommand : RenderCommand
 {
 	public Program Program;
+}
+
+[RenderCommand]
+internal partial class PolygonModeCommand : RenderCommand
+{
+	public int Face;
+	public int Mode;
 }
 
 [RenderCommand]

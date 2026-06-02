@@ -6,6 +6,10 @@
 // To simplify method calls GL_ and gl prefixes are stripped
 public static partial class GL
 {
+	public const int UNSIGNED_INT = 0x1405;
+	public const int LINE = 0x1B01;
+	public const int POINT = 0x1B00;
+
 	[AttributeUsage(AttributeTargets.Delegate)]
 	public sealed class OpenGLLoadedFunctionAttribute(
 		string? docs = null, string? overrideName = null, bool automaticPrefix = true) : Attribute
@@ -35,6 +39,9 @@ public static partial class GL
 
 	[OpenGLLoadedFunction(overrideName: "BufferData", docs: "https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml")]
 	private delegate void BufferData3Delegate(int target, nint size, in float data, int usage);
+
+	[OpenGLLoadedFunction(overrideName: "BufferData", docs: "https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml")]
+	private delegate void BufferData4Delegate(int target, nint size, in uint data, int usage);
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCreateProgram.xhtml")]
 	private delegate uint CreateProgramDelegate();

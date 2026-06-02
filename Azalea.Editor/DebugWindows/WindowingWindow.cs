@@ -1,6 +1,7 @@
 ﻿using Azalea.Editor.Design.Gui;
 using Azalea.Native.OpenGL;
 using Azalea.Platform.Rendering;
+using Azalea.Platform.Scheduling;
 using Azalea.Platform.Windowing;
 using Azalea.Platform.Windowing.Windows;
 using Azalea.Utils;
@@ -60,12 +61,20 @@ internal class WindowingWindow
 			{
 				var window = PlatformWindow.Create();
 				var renderer = PlatformRenderer.AttachRenderer(window);
+				var scheduler = PlatformScheduler.AttachScheduler(window);
 
 				float[] vertices =
 				[
+					0.5f,  0.5f, 0.0f,
+					0.5f, -0.5f, 0.0f,
 					-0.5f, -0.5f, 0.0f,
-					 0.5f, -0.5f, 0.0f,
-					 0.0f,  0.5f, 0.0f
+					-0.5f,  0.5f, 0.0f
+				];
+
+				uint[] indices =
+				[
+					0, 1, 3,
+					1, 2, 3
 				];
 
 				string vertexShaderSource = """
@@ -119,26 +128,35 @@ internal class WindowingWindow
 				renderer.BindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
 				renderer.BufferData(GL.ARRAY_BUFFER, vertices.Length * sizeof(float), vertices, GL.STATIC_DRAW);
 
+				var indexArray = renderer.GenerateBuffer();
+				renderer.BindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexArray);
+				renderer.BufferData(GL.ELEMENT_ARRAY_BUFFER, indices.Length * sizeof(uint), indices, GL.STATIC_DRAW);
+
 				renderer.VertexAttribPointer(0, 3, GL.FLOAT, false, 3 * sizeof(float), 0);
 				renderer.EnableVertexAttribArray(0);
+
+				renderer.BindBuffer(GL.ARRAY_BUFFER, null);
 				renderer.BindVertexArray(null);
 
 				renderer.PrintErrors();
 
 				renderer.SubmitCommandGroup();
 
-				var renderQueue = RenderCommandQueue.Borrow();
-				renderQueue.Clear(Rng.Color());
+				scheduler.InjectProtocol((win, rend) =>
+				{
+					var renderQueue = RenderCommandQueue.Borrow();
+					renderQueue.Clear(Rng.Color());
 
-				renderQueue.UseProgram(program);
-				renderQueue.BindVertexArray(vertexArray);
-				renderQueue.DrawArrays(GL.TRIANGLES, 0, 3);
+					renderQueue.UseProgram(program);
+					renderQueue.BindVertexArray(vertexArray);
+					renderQueue.DrawElements(GL.TRIANGLES, 6, GL.UNSIGNED_INT, 0);
 
-				renderQueue.PrintErrors();
+					renderQueue.PrintErrors();
 
-				renderQueue.SwapBuffers();
+					renderQueue.SwapBuffers();
 
-				renderer.StageQueue(renderQueue);
+					renderer.StageQueue(renderQueue);
+				});
 			});
 		}
 

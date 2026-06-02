@@ -43,6 +43,14 @@ namespace Azalea.Native.OpenGL
 {
     public static unsafe partial class GL
     {
+        [global::System.Runtime.InteropServices.DllImportAttribute("opengl32.dll", EntryPoint = "glDrawElements", ExactSpelling = true)]
+        public static extern partial void DrawElements(int mode, int count, int type, nint indices);
+    }
+}
+namespace Azalea.Native.OpenGL
+{
+    public static unsafe partial class GL
+    {
         [global::System.Runtime.InteropServices.DllImportAttribute("opengl32.dll", EntryPoint = "glEnable", ExactSpelling = true)]
         public static extern partial void Enable(int cap);
     }
@@ -73,6 +81,14 @@ namespace Azalea.Native.OpenGL
             [global::System.Runtime.InteropServices.DllImportAttribute("opengl32.dll", EntryPoint = "glGenTextures", ExactSpelling = true)]
             static extern unsafe void __PInvoke(int __n_native, uint* __textures_native);
         }
+    }
+}
+namespace Azalea.Native.OpenGL
+{
+    public static unsafe partial class GL
+    {
+        [global::System.Runtime.InteropServices.DllImportAttribute("opengl32.dll", EntryPoint = "glPolygonMode", ExactSpelling = true)]
+        public static extern partial void PolygonMode(int face, int mode);
     }
 }
 namespace Azalea.Native.OpenGL
