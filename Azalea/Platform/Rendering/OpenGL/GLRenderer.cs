@@ -225,6 +225,17 @@ internal partial class GLRenderer : PlatformRenderer
 				throw new NotImplementedException("Command handling hasn't been implemented");
 		}
 
+		/*
+
+		Console.WriteLine("Processed " + command.GetType().Name);
+
+		int glError;
+
+		while ((glError = GL.GetError()) != 0)
+			Console.WriteLine("GL ERROR: " + glError);
+
+		*/
+
 		command.Return();
 	}
 

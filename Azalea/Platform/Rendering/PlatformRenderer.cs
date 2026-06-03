@@ -1,4 +1,5 @@
-﻿using Azalea.Platform.Rendering.OpenGL;
+﻿using Azalea.Platform.Rendering.Coordination;
+using Azalea.Platform.Rendering.OpenGL;
 using Azalea.Threading;
 using System;
 using System.Collections.Generic;
@@ -130,6 +131,18 @@ public abstract class PlatformRenderer : IRenderCommandConsumer
 				}
 			}
 		}
+	}
+
+	#endregion
+
+	#region Coordinator
+
+	private RenderCoordinator? _coordinator;
+
+	public RenderCoordinator GetCoordinator()
+	{
+		_coordinator ??= new RenderCoordinator(this);
+		return _coordinator;
 	}
 
 	#endregion

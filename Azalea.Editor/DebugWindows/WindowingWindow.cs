@@ -1,13 +1,12 @@
 ﻿using Azalea.Editor.Design.Gui;
 using Azalea.Graphics.Colors;
 using Azalea.Native.OpenGL;
+using Azalea.Numerics;
 using Azalea.Platform.Rendering;
+using Azalea.Platform.Rendering.Coordination;
 using Azalea.Platform.Scheduling;
 using Azalea.Platform.Windowing;
 using Azalea.Platform.Windowing.Windows;
-using Azalea.Utils;
-using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -66,74 +65,12 @@ internal class WindowingWindow
 				var renderer = PlatformRenderer.AttachRenderer(window);
 				var scheduler = PlatformScheduler.AttachScheduler(window);
 
-				uint[] indices =
-				[
-					0, 1, 3,
-					1, 2, 3
-				];
-
-				string vertexShaderSource = """
-					#version 330 core
-					layout (location = 0) in vec3 aPos;
-
-					void main()
-					{
-						gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
-					}
-				""";
-
-				string fragmentShaderSource = """
-					#version 330 core
-					out vec4 FragColor;
-
-					uniform vec4 outColor;
-
-					void main()
-					{
-						FragColor = outColor;
-					} 
-				""";
-
 				renderer.BeginCommandGroup();
 
 				renderer.Disable(GL.CULL_FACE);
 				renderer.Disable(GL.DEPTH_TEST);
 
-				var vertexShader = renderer.GenerateShader(GL.VERTEX_SHADER);
-				renderer.ShaderSource(vertexShader, vertexShaderSource);
-				renderer.CompileShader(vertexShader);
-				renderer.PrintShaderCompileStatus(vertexShader);
-
-				var fragmentShader = renderer.GenerateShader(GL.FRAGMENT_SHADER);
-				renderer.ShaderSource(fragmentShader, fragmentShaderSource);
-				renderer.CompileShader(fragmentShader);
-				renderer.PrintShaderCompileStatus(fragmentShader);
-
-				var program = renderer.GenerateProgram();
-				renderer.AttachShader(program, vertexShader);
-				renderer.AttachShader(program, fragmentShader);
-				renderer.LinkProgram(program);
-				renderer.PrintProgramCompileStatus(program);
-
-				renderer.DeleteShader(vertexShader);
-				renderer.DeleteShader(fragmentShader);
-
-				var outColorUniform = renderer.GetUniformLocation(program, "outColor");
-
-				var vertexArray = renderer.GenerateVertexArray();
-				renderer.BindVertexArray(vertexArray);
-
-				var vertexBuffer = renderer.GenerateBuffer();
-				renderer.BindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
-
-				var indexArray = renderer.GenerateBuffer();
-				renderer.BindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexArray);
-				renderer.BufferData(GL.ELEMENT_ARRAY_BUFFER, indices.Length * sizeof(uint), indices, GL.STATIC_DRAW, false);
-
-				renderer.VertexAttribPointer(0, 3, GL.FLOAT, false, 3 * sizeof(float), 0);
-				renderer.EnableVertexAttribArray(0);
-
-				renderer.BindVertexArray(null);
+				var defaultQuadBatch = new DefaultQuadBatch(renderer.GetCoordinator());
 
 				renderer.PrintErrors();
 
@@ -144,48 +81,11 @@ internal class WindowingWindow
 					var renderQueue = RenderCommandQueue.Borrow();
 					renderQueue.Clear(Palette.Beige);
 
-					renderQueue.UseProgram(program);
-					var blueValue = MathUtils.Map(MathF.Sin(Platform.Time.TimeSinceStart), -1, 1, 0, 1);
-					renderQueue.Uniform4f(outColorUniform, 0, blueValue, 1 - blueValue, 1);
+					defaultQuadBatch.Add(new Rectangle(new(0.4f, -0.6f), new(0.5f)));
+					defaultQuadBatch.Add(new Rectangle(new(-0.4f, -0.2f), new(0.6f)));
+					defaultQuadBatch.Add(new Rectangle(new(-0.9f, 0.4f), new(0.4f)));
 
-					renderQueue.BindVertexArray(vertexArray);
-
-					var dynamicVertices = ArrayPool<float>.Shared.Rent(12);
-
-					if (Rng.Int(2) == 0)
-					{
-						dynamicVertices[0] = 0.5f;
-						dynamicVertices[1] = 0.5f;
-						dynamicVertices[2] = 0.0f;
-						dynamicVertices[3] = 0.5f;
-						dynamicVertices[4] = -0.5f;
-						dynamicVertices[5] = 0.0f;
-						dynamicVertices[6] = -0.5f;
-						dynamicVertices[7] = -0.5f;
-						dynamicVertices[8] = 0.0f;
-						dynamicVertices[9] = -0.5f;
-						dynamicVertices[10] = 0.5f;
-						dynamicVertices[11] = 0.0f;
-					}
-					else
-					{
-						dynamicVertices[0] = 0.5f;
-						dynamicVertices[1] = 0.5f;
-						dynamicVertices[2] = 0.0f;
-						dynamicVertices[3] = 0.5f;
-						dynamicVertices[4] = -0.5f;
-						dynamicVertices[5] = 0.0f;
-						dynamicVertices[6] = -0.6f;
-						dynamicVertices[7] = -0.6f;
-						dynamicVertices[8] = 0.0f;
-						dynamicVertices[9] = -0.5f;
-						dynamicVertices[10] = 0.5f;
-						dynamicVertices[11] = 0.0f;
-					}
-
-					renderQueue.BufferData(GL.ARRAY_BUFFER, 12 * sizeof(float), dynamicVertices, GL.STATIC_DRAW, true);
-
-					renderQueue.DrawElements(GL.TRIANGLES, 6, GL.UNSIGNED_INT, 0);
+					defaultQuadBatch.Draw(renderQueue);
 
 					renderQueue.PrintErrors();
 
