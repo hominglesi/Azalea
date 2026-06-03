@@ -1,4 +1,6 @@
-﻿namespace Azalea.Platform.Rendering;
+﻿using System.Numerics;
+
+namespace Azalea.Platform.Rendering;
 public static class IRenderCommandConsumer_Extentions
 {
 	public static void BufferData(this IRenderCommandConsumer consumer, int type, nint size, byte[]? data, int hint, bool freeData)
@@ -19,8 +21,14 @@ public static class IRenderCommandConsumer_Extentions
 	public static void PrintErrors(this IRenderCommandConsumer consumer)
 		=> consumer.Enqueue(PrintErrorsCommand.Borrow());
 
-	public static void Uniform4f(this IRenderCommandConsumer consumer, UniformLocation uniformLocation, float value0, float value1, float value2, float value3)
-		=> consumer.Enqueue(Uniform4fCommand.Borrow(uniformLocation, value0, value1, value2, value3));
+	public static void Uniform1i(this IRenderCommandConsumer consumer, UniformLocation uniformLocation, int int0)
+		=> consumer.Enqueue(Uniform1iCommand.Borrow(uniformLocation, int0));
+
+	public static void Uniform4f(this IRenderCommandConsumer consumer, UniformLocation uniformLocation, float float0, float float1, float float2, float float3)
+		=> consumer.Enqueue(Uniform4fCommand.Borrow(uniformLocation, float0, float1, float2, float3));
+
+	public static void UniformMatrix4fv(this IRenderCommandConsumer consumer, UniformLocation uniformLocation, int count, bool transpose, Matrix4x4 matrix)
+		=> consumer.Enqueue(UniformMatrix4fvCommand.Borrow(uniformLocation, count, transpose, matrix));
 
 	public static void UseProgram(this IRenderCommandConsumer consumer, Program program)
 		=> consumer.Enqueue(UseProgramCommand.Borrow(program));

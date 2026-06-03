@@ -1,7 +1,7 @@
-﻿using Azalea.Native.OpenGL;
+﻿using Azalea.Graphics.Camera;
+using Azalea.Graphics.Colors;
+using Azalea.Native.OpenGL;
 using Azalea.Numerics;
-using Azalea.Utils;
-using System;
 using System.Buffers;
 using System.Numerics;
 
@@ -11,7 +11,8 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 	private readonly PlatformRenderer _renderer;
 
 	private readonly Program _program;
-	private readonly UniformLocation _outColorUniform;
+	private readonly UniformLocation _projectionUniform;
+	private readonly UniformLocation _textureUniform;
 
 	private readonly VertexArray _vertexArray;
 
@@ -25,7 +26,12 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 
 		_program = renderCoordinator.CreateStandardProgram(_vertexShaderSource, _fragmentShaderSource);
 
-		_outColorUniform = _renderer.GetUniformLocation(_program, "outColor");
+		_renderer.UseProgram(_program);
+
+		_projectionUniform = _renderer.GetUniformLocation(_program, "u_Projection");
+		_textureUniform = _renderer.GetUniformLocation(_program, "u_Texture");
+
+		_renderer.Uniform1i(_textureUniform, 0);
 
 		_vertexArray = _renderer.GenerateVertexArray();
 		_renderer.BindVertexArray(_vertexArray);
@@ -48,22 +54,26 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 		}
 		_renderer.BufferData(GL.ELEMENT_ARRAY_BUFFER, _indices.Length * sizeof(uint), _indices, GL.STATIC_DRAW, false);
 
-		_renderer.VertexAttribPointer(0, 3, GL.FLOAT, false, 3 * sizeof(float), 0);
+		_renderer.VertexAttribPointer(0, 2, GL.FLOAT, false, 8 * sizeof(float), 0);
 		_renderer.EnableVertexAttribArray(0);
+		_renderer.VertexAttribPointer(1, 4, GL.FLOAT, false, 8 * sizeof(float), 2 * sizeof(float));
+		_renderer.EnableVertexAttribArray(1);
+		_renderer.VertexAttribPointer(2, 2, GL.FLOAT, false, 8 * sizeof(float), 6 * sizeof(float));
+		_renderer.EnableVertexAttribArray(2);
 
 		_renderer.BindVertexArray(null);
 	}
 
 	private float[]? _vertices;
 	private int _nextVertex = 0;
-	private const int _vertexSize = 3;
+	private const int _vertexSize = 8;
 
-	public void Add(Rectangle rect)
+	public void Add(Rectangle rect, ColorQuad colorQuad)
 	{
-		Add(new DefaultQuadBatchVertex(new(rect.TopLeft, 0)));
-		Add(new DefaultQuadBatchVertex(new(rect.TopRight, 0)));
-		Add(new DefaultQuadBatchVertex(new(rect.BottomRight, 0)));
-		Add(new DefaultQuadBatchVertex(new(rect.BottomLeft, 0)));
+		Add(new DefaultQuadBatchVertex(rect.TopLeft, colorQuad.TopLeft, Vector2.Zero));
+		Add(new DefaultQuadBatchVertex(rect.TopRight, colorQuad.TopRight, new(1, 0)));
+		Add(new DefaultQuadBatchVertex(rect.BottomRight, colorQuad.BottomRight, Vector2.Zero));
+		Add(new DefaultQuadBatchVertex(rect.BottomLeft, colorQuad.BottomLeft, new(0, 1)));
 	}
 
 	public override void Add(DefaultQuadBatchVertex vertex)
@@ -72,23 +82,43 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 
 		_vertices[_nextVertex * _vertexSize] = vertex.Position.X;
 		_vertices[(_nextVertex * _vertexSize) + 1] = vertex.Position.Y;
-		_vertices[(_nextVertex * _vertexSize) + 2] = vertex.Position.Z;
+		_vertices[(_nextVertex * _vertexSize) + 2] = vertex.Color.RNormalized;
+		_vertices[(_nextVertex * _vertexSize) + 3] = vertex.Color.GNormalized;
+		_vertices[(_nextVertex * _vertexSize) + 4] = vertex.Color.BNormalized;
+		_vertices[(_nextVertex * _vertexSize) + 5] = vertex.Color.ANormalized;
+		_vertices[(_nextVertex * _vertexSize) + 6] = vertex.TextureCoordinate.X;
+		_vertices[(_nextVertex * _vertexSize) + 7] = vertex.TextureCoordinate.Y;
 
 		_nextVertex++;
 	}
+
+
+	private Vector2Int _lastScreenSize = Vector2Int.Zero;
 
 	internal override void Draw(RenderCommandQueue commandQueue)
 	{
 		if (_nextVertex is 0)
 			return;
 
-		commandQueue.UseProgram(_program);
-		var blueValue = MathUtils.Map(MathF.Sin(Time.TimeSinceStart), -1, 1, 0, 1);
-		commandQueue.Uniform4f(_outColorUniform, 0, blueValue, 1 - blueValue, 1);
+		if (_lastScreenSize != new Vector2Int(800, 600))
+		{
+			_lastScreenSize = new Vector2Int(800, 600);
+
+			var projectionMatrix = MainCamera.Instance.CreateProjectionMatrix(_lastScreenSize);
+			_renderer.BeginCommandGroup();
+
+			_renderer.UseProgram(_program);
+			_renderer.UniformMatrix4fv(_projectionUniform, 1, false, projectionMatrix);
+
+			_renderer.SubmitCommandGroup();
+		}
 
 		commandQueue.BindVertexArray(_vertexArray);
 
 		commandQueue.BufferData(GL.ARRAY_BUFFER, _nextVertex * _vertexSize * sizeof(float), _vertices, GL.DYNAMIC_DRAW, true);
+
+		commandQueue.UseProgram(_program);
+
 		commandQueue.DrawElements(GL.TRIANGLES, (_nextVertex / 4) * 6, GL.UNSIGNED_INT, 0);
 
 		commandQueue.BindVertexArray(null);
@@ -99,29 +129,43 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 
 	private const string _vertexShaderSource = """
 		#version 330 core
-		layout (location = 0) in vec3 aPos;
+		layout (location = 0) in vec2 vPos;
+		layout (location = 1) in vec4 vCol;
+		layout (location = 2) in vec2 vTex;
+
+		uniform mat4 u_Projection;
+
+		out vec4 oCol;
+		out vec2 oTex;
 
 		void main()
 		{
-			gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+			gl_Position = u_Projection * vec4(vPos.x, vPos.y, 1.0, 1.0);
+			oCol = vCol;
+			oTex = vTex;
 		}
 	""";
 
 	private const string _fragmentShaderSource = """
 		#version 330 core
-		out vec4 FragColor;
+		in vec4 oCol;
+		in vec2 oTex;
 
-		uniform vec4 outColor;
+		uniform sampler2D u_Texture;
+
+		out vec4 FragColor;
 
 		void main()
 		{
-			FragColor = outColor;
-		} 
+			FragColor = texture(u_Texture, oTex) * vec4(oCol.x, oCol.y, oCol.z, oCol.w);
+		}
 	""";
 }
 
 
-public readonly struct DefaultQuadBatchVertex(Vector3 position)
+public readonly struct DefaultQuadBatchVertex(Vector2 position, Color color, Vector2 textureCoordinate)
 {
-	public readonly Vector3 Position = position;
+	public readonly Vector2 Position = position;
+	public readonly Color Color = color;
+	public readonly Vector2 TextureCoordinate = textureCoordinate;
 }

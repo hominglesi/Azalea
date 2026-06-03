@@ -3,6 +3,7 @@ using Azalea.Native.OpenGL;
 using Azalea.Platform.Windowing;
 using System;
 using System.Diagnostics;
+using System.Numerics;
 using System.Text;
 
 namespace Azalea.Platform.Rendering.OpenGL;
@@ -165,10 +166,9 @@ internal partial class GLRenderer : PlatformRenderer
 				GL.GetProgramiv(program.Handle.GetValueOrDefault(), GL.LINK_STATUS, ref success);
 				if (success != 1)
 				{
-					var programInfoLogLength = 0;
-					var programInfoLog = new char[512];
-					GL.GetProgramInfoLog(program.Handle.GetValueOrDefault(), 512, ref programInfoLogLength, ref programInfoLog[0]);
-					Console.WriteLine("Program Compilation Error: " + new string(programInfoLog));
+					var programInfoLog = new StringBuilder(512);
+					GL.GetProgramInfoLog(program.Handle.GetValueOrDefault(), 512, out _, programInfoLog);
+					Console.WriteLine("Program Compilation Error: " + programInfoLog.ToString());
 				}
 				else
 					Console.WriteLine("Program Successfully Compiled!");
@@ -177,7 +177,11 @@ internal partial class GLRenderer : PlatformRenderer
 				success = 0;
 				GL.GetShaderiv(shader.Handle.GetValueOrDefault(), GL.COMPILE_STATUS, ref success);
 				if (success != 1)
-					Console.WriteLine("Shader Compilation Error!");
+				{
+					var shaderInfoLog = new StringBuilder(512);
+					GL.GetShaderInfoLog(shader.Handle.GetValueOrDefault(), 512, out _, shaderInfoLog);
+					Console.WriteLine("Shader Compilation Error: " + shaderInfoLog.ToString());
+				}
 				else
 					Console.WriteLine("Shader Successfully Compiled!");
 				break;
@@ -210,9 +214,17 @@ internal partial class GLRenderer : PlatformRenderer
 				GL.TexParameteri(target, parameter, value);
 				GL.BindTexture(target, 0);
 				break;
-			case Uniform4fCommand(var uniformLocation, var value0, var value1, var value2, var value3):
+			case Uniform1iCommand(var uniformLocation, var int0):
 				Debug.Assert(uniformLocation.Handle is not null);
-				GL.Uniform4f(uniformLocation.Handle.Value, value0, value1, value2, value3);
+				GL.Uniform1i(uniformLocation.Handle.Value, int0);
+				break;
+			case Uniform4fCommand(var uniformLocation, var float0, var float1, var float2, var float3):
+				Debug.Assert(uniformLocation.Handle is not null);
+				GL.Uniform4f(uniformLocation.Handle.Value, float0, float1, float2, float3);
+				break;
+			case UniformMatrix4fvCommand(var uniformLocation, var count, var transpose, Matrix4x4 value):
+				Debug.Assert(uniformLocation.Handle is not null);
+				GL.UniformMatrix4fv(uniformLocation.Handle.Value, count, transpose, ref value);
 				break;
 			case UseProgramCommand(var program):
 				Debug.Assert(program.Handle is not null);
@@ -225,10 +237,10 @@ internal partial class GLRenderer : PlatformRenderer
 				throw new NotImplementedException("Command handling hasn't been implemented");
 		}
 
-		/*
+
 
 		Console.WriteLine("Processed " + command.GetType().Name);
-
+		/*
 		int glError;
 
 		while ((glError = GL.GetError()) != 0)

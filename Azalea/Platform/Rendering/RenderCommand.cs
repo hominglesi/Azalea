@@ -1,6 +1,7 @@
 ﻿using Azalea.Graphics.Colors;
 using System;
 using System.Buffers;
+using System.Numerics;
 
 namespace Azalea.Platform.Rendering;
 internal abstract class RenderCommand
@@ -259,6 +260,13 @@ internal partial class TexParameteriCommand : RenderCommand
 }
 
 [RenderCommand]
+internal partial class Uniform1iCommand : RenderCommand
+{
+	public UniformLocation UniformLocation;
+	public int Int1;
+}
+
+[RenderCommand]
 internal partial class Uniform4fCommand : RenderCommand
 {
 	public UniformLocation UniformLocation;
@@ -266,6 +274,15 @@ internal partial class Uniform4fCommand : RenderCommand
 	public float Value1;
 	public float Value2;
 	public float Value3;
+}
+
+[RenderCommand]
+internal partial class UniformMatrix4fvCommand : RenderCommand
+{
+	public UniformLocation UniformLocation;
+	public int Count;
+	public bool Transpose;
+	public Matrix4x4 Value;
 }
 
 [RenderCommand]

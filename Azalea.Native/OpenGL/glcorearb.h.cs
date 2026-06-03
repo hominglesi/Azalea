@@ -1,4 +1,7 @@
-﻿namespace Azalea.Native.OpenGL;
+﻿using System.Numerics;
+using System.Text;
+
+namespace Azalea.Native.OpenGL;
 
 // Core Constants and Functions that were defined after OpenGL 1.0
 // They must be dynamically loaded
@@ -71,12 +74,15 @@ public static partial class GL
 	private delegate void GenVertexArraysDelegate(int n, ref uint arrays);
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetProgramInfoLog.xhtml")]
-	private delegate void GetProgramInfoLogDelegate(uint program, int maxLength, ref int length, ref char infoLog);
+	private delegate void GetProgramInfoLogDelegate(uint program, int maxLength, out int length, StringBuilder infoLog);
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetProgram.xhtml")]
 	private delegate void GetProgramivDelegate(uint program, int pname, ref int _params);
 
-	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenFramebuffers.xhtml")]
+	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetShaderInfoLog.xhtml")]
+	private delegate void GetShaderInfoLogDelegate(uint shader, int maxLength, out int length, StringBuilder infoLog);
+
+	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetShader.xhtml")]
 	private delegate void GetShaderivDelegate(uint shader, int pname, ref int _params);
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetUniformLocation.xhtml")]
@@ -89,7 +95,13 @@ public static partial class GL
 	private delegate void ShaderSourceDelegate(uint shader, int count, ref nint _string, in int length);
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml")]
+	private delegate void Uniform1iDelegate(int location, int v0);
+
+	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml")]
 	private delegate void Uniform4fDelegate(int location, float v0, float v1, float v2, float v3);
+
+	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml")]
+	private delegate void UniformMatrix4fvDelegate(int location, int count, bool transpose, ref Matrix4x4 value);
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUseProgram.xhtml")]
 	private delegate void UseProgramDelegate(uint program);

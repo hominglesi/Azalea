@@ -158,7 +158,7 @@ namespace Azalea.Native.OpenGL
 	{
 		private static GetProgramInfoLogDelegate? __GetProgramInfoLogDelegate;
 		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetProgramInfoLog.xhtml">Official Documentation</see></summary>
-		public static void GetProgramInfoLog(uint program, int maxLength, ref int length, ref char infoLog) => __GetProgramInfoLogDelegate!(program, maxLength, ref length, ref infoLog);
+		public static void GetProgramInfoLog(uint program, int maxLength, out int length, System.Text.StringBuilder infoLog) => __GetProgramInfoLogDelegate!(program, maxLength, out length, infoLog);
 	}
 }
 namespace Azalea.Native.OpenGL
@@ -174,8 +174,17 @@ namespace Azalea.Native.OpenGL
 {
 	public static partial class GL
 	{
+		private static GetShaderInfoLogDelegate? __GetShaderInfoLogDelegate;
+		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetShaderInfoLog.xhtml">Official Documentation</see></summary>
+		public static void GetShaderInfoLog(uint shader, int maxLength, out int length, System.Text.StringBuilder infoLog) => __GetShaderInfoLogDelegate!(shader, maxLength, out length, infoLog);
+	}
+}
+namespace Azalea.Native.OpenGL
+{
+	public static partial class GL
+	{
 		private static GetShaderivDelegate? __GetShaderivDelegate;
-		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenFramebuffers.xhtml">Official Documentation</see></summary>
+		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetShader.xhtml">Official Documentation</see></summary>
 		public static void GetShaderiv(uint shader, int pname, ref int _params) => __GetShaderivDelegate!(shader, pname, ref _params);
 	}
 }
@@ -210,9 +219,27 @@ namespace Azalea.Native.OpenGL
 {
 	public static partial class GL
 	{
+		private static Uniform1iDelegate? __Uniform1iDelegate;
+		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml">Official Documentation</see></summary>
+		public static void Uniform1i(int location, int v0) => __Uniform1iDelegate!(location, v0);
+	}
+}
+namespace Azalea.Native.OpenGL
+{
+	public static partial class GL
+	{
 		private static Uniform4fDelegate? __Uniform4fDelegate;
 		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml">Official Documentation</see></summary>
 		public static void Uniform4f(int location, float v0, float v1, float v2, float v3) => __Uniform4fDelegate!(location, v0, v1, v2, v3);
+	}
+}
+namespace Azalea.Native.OpenGL
+{
+	public static partial class GL
+	{
+		private static UniformMatrix4fvDelegate? __UniformMatrix4fvDelegate;
+		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml">Official Documentation</see></summary>
+		public static void UniformMatrix4fv(int location, int count, bool transpose, ref System.Numerics.Matrix4x4 value) => __UniformMatrix4fvDelegate!(location, count, transpose, ref value);
 	}
 }
 namespace Azalea.Native.OpenGL
@@ -278,11 +305,14 @@ namespace Azalea.Native.OpenGL
 			__GenVertexArraysDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GenVertexArraysDelegate>(getProcAddressMethod("glGenVertexArrays"));
 			__GetProgramInfoLogDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GetProgramInfoLogDelegate>(getProcAddressMethod("glGetProgramInfoLog"));
 			__GetProgramivDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GetProgramivDelegate>(getProcAddressMethod("glGetProgramiv"));
+			__GetShaderInfoLogDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GetShaderInfoLogDelegate>(getProcAddressMethod("glGetShaderInfoLog"));
 			__GetShaderivDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GetShaderivDelegate>(getProcAddressMethod("glGetShaderiv"));
 			__GetUniformLocationDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GetUniformLocationDelegate>(getProcAddressMethod("glGetUniformLocation"));
 			__LinkProgramDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<LinkProgramDelegate>(getProcAddressMethod("glLinkProgram"));
 			__ShaderSourceDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<ShaderSourceDelegate>(getProcAddressMethod("glShaderSource"));
+			__Uniform1iDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<Uniform1iDelegate>(getProcAddressMethod("glUniform1i"));
 			__Uniform4fDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<Uniform4fDelegate>(getProcAddressMethod("glUniform4f"));
+			__UniformMatrix4fvDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<UniformMatrix4fvDelegate>(getProcAddressMethod("glUniformMatrix4fv"));
 			__UseProgramDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<UseProgramDelegate>(getProcAddressMethod("glUseProgram"));
 			__VertexAttribPointerDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<VertexAttribPointerDelegate>(getProcAddressMethod("glVertexAttribPointer"));
 			__wglChoosePixelFormatARBDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<wglChoosePixelFormatARBDelegate>(getProcAddressMethod("wglChoosePixelFormatARB"));

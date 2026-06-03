@@ -1021,6 +1021,38 @@ namespace Azalea.Platform.Rendering
 }
 namespace Azalea.Platform.Rendering
 {
+	internal partial class Uniform1iCommand
+	{
+		private Uniform1iCommand(Azalea.Platform.Rendering.UniformLocation __UniformLocation, int __Int1)
+		{
+			UniformLocation = __UniformLocation;
+			Int1 = __Int1;
+		}
+		private static readonly System.Collections.Concurrent.ConcurrentBag<Uniform1iCommand> __commandPool = new();
+		public static Uniform1iCommand Borrow(Azalea.Platform.Rendering.UniformLocation __UniformLocation, int __Int1)
+		{
+			if (__commandPool.TryTake(out var command))
+			{
+				command.UniformLocation = __UniformLocation;
+				command.Int1 = __Int1;
+				return command;
+			}
+			return new Uniform1iCommand(__UniformLocation, __Int1);
+		}
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
+		public void Deconstruct(out Azalea.Platform.Rendering.UniformLocation __UniformLocation, out int __Int1)
+		{
+			__UniformLocation = UniformLocation;
+			__Int1 = Int1;
+		}
+	}
+}
+namespace Azalea.Platform.Rendering
+{
 	internal partial class Uniform4fCommand
 	{
 		private Uniform4fCommand(Azalea.Platform.Rendering.UniformLocation __UniformLocation, float __Value0, float __Value1, float __Value2, float __Value3)
@@ -1057,6 +1089,44 @@ namespace Azalea.Platform.Rendering
 			__Value1 = Value1;
 			__Value2 = Value2;
 			__Value3 = Value3;
+		}
+	}
+}
+namespace Azalea.Platform.Rendering
+{
+	internal partial class UniformMatrix4fvCommand
+	{
+		private UniformMatrix4fvCommand(Azalea.Platform.Rendering.UniformLocation __UniformLocation, int __Count, bool __Transpose, System.Numerics.Matrix4x4 __Value)
+		{
+			UniformLocation = __UniformLocation;
+			Count = __Count;
+			Transpose = __Transpose;
+			Value = __Value;
+		}
+		private static readonly System.Collections.Concurrent.ConcurrentBag<UniformMatrix4fvCommand> __commandPool = new();
+		public static UniformMatrix4fvCommand Borrow(Azalea.Platform.Rendering.UniformLocation __UniformLocation, int __Count, bool __Transpose, System.Numerics.Matrix4x4 __Value)
+		{
+			if (__commandPool.TryTake(out var command))
+			{
+				command.UniformLocation = __UniformLocation;
+				command.Count = __Count;
+				command.Transpose = __Transpose;
+				command.Value = __Value;
+				return command;
+			}
+			return new UniformMatrix4fvCommand(__UniformLocation, __Count, __Transpose, __Value);
+		}
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
+		public void Deconstruct(out Azalea.Platform.Rendering.UniformLocation __UniformLocation, out int __Count, out bool __Transpose, out System.Numerics.Matrix4x4 __Value)
+		{
+			__UniformLocation = UniformLocation;
+			__Count = Count;
+			__Transpose = Transpose;
+			__Value = Value;
 		}
 	}
 }

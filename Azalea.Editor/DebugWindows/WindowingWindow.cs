@@ -81,9 +81,9 @@ internal class WindowingWindow
 					var renderQueue = RenderCommandQueue.Borrow();
 					renderQueue.Clear(Palette.Beige);
 
-					defaultQuadBatch.Add(new Rectangle(new(0.4f, -0.6f), new(0.5f)));
-					defaultQuadBatch.Add(new Rectangle(new(-0.4f, -0.2f), new(0.6f)));
-					defaultQuadBatch.Add(new Rectangle(new(-0.9f, 0.4f), new(0.4f)));
+					defaultQuadBatch.Add(new Rectangle(new(100, 100), new(50)), Palette.Beige);
+					defaultQuadBatch.Add(new Rectangle(new(400, 150), new(150)), Palette.Beige);
+					defaultQuadBatch.Add(new Rectangle(new(50, 300), new(200)), Palette.Beige);
 
 					defaultQuadBatch.Draw(renderQueue);
 
