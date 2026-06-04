@@ -138,6 +138,15 @@ namespace Azalea.Native.OpenGL
 {
 	public static partial class GL
 	{
+		private static GenerateMipmapDelegate? __GenerateMipmapDelegate;
+		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenerateMipmap.xhtml">Official Documentation</see></summary>
+		public static void GenerateMipmap(int target) => __GenerateMipmapDelegate!(target);
+	}
+}
+namespace Azalea.Native.OpenGL
+{
+	public static partial class GL
+	{
 		private static GenFramebuffersDelegate? __GenFramebuffersDelegate;
 		/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenFramebuffers.xhtml">Official Documentation</see></summary>
 		public static void GenFramebuffers(int n, ref uint ids) => __GenFramebuffersDelegate!(n, ref ids);
@@ -301,6 +310,7 @@ namespace Azalea.Native.OpenGL
 			__EnableVertexAttribArrayDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<EnableVertexAttribArrayDelegate>(getProcAddressMethod("glEnableVertexAttribArray"));
 			__FramebufferTexture2DDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<FramebufferTexture2DDelegate>(getProcAddressMethod("glFramebufferTexture2D"));
 			__GenBuffersDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GenBuffersDelegate>(getProcAddressMethod("glGenBuffers"));
+			__GenerateMipmapDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GenerateMipmapDelegate>(getProcAddressMethod("glGenerateMipmap"));
 			__GenFramebuffersDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GenFramebuffersDelegate>(getProcAddressMethod("glGenFramebuffers"));
 			__GenVertexArraysDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GenVertexArraysDelegate>(getProcAddressMethod("glGenVertexArrays"));
 			__GetProgramInfoLogDelegate = System.Runtime.InteropServices.Marshal.GetDelegateForFunctionPointer<GetProgramInfoLogDelegate>(getProcAddressMethod("glGetProgramInfoLog"));

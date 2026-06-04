@@ -407,6 +407,10 @@ public static partial class GL
 	[LibraryImport(OpenGLPath, EntryPoint = "glBindTexture")]
 	public static partial void BindTexture(int target, uint texture);
 
+	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBlendFunc.xhtml">Official Documentation</see></summary>
+	[LibraryImport(OpenGLPath, EntryPoint = "glBlendFunc")]
+	public static partial void BlendFunc(int sfactor, int dfactor);
+
 	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/es2.0/xhtml/glClear.xml">Official Documentation</see></summary>
 	[LibraryImport(OpenGLPath, EntryPoint = "glClear")]
 	public static partial void Clear(int mask);

@@ -1,5 +1,7 @@
 ﻿using Azalea.Editor.Design.Gui;
+using Azalea.Graphics;
 using Azalea.Graphics.Colors;
+using Azalea.IO.Resources;
 using Azalea.Native.OpenGL;
 using Azalea.Numerics;
 using Azalea.Platform.Rendering;
@@ -67,8 +69,22 @@ internal class WindowingWindow
 
 				renderer.BeginCommandGroup();
 
-				renderer.Disable(GL.CULL_FACE);
+				renderer.Enable(GL.BLEND);
+				renderer.Enable(GL.CULL_FACE);
 				renderer.Disable(GL.DEPTH_TEST);
+				renderer.BlendFunction(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
+
+				var azaleaImage = Assets.MainStore.GetImage("Textures/azalea-icon.png")!;
+
+				var azaleaTexture = renderer.GenerateTexture();
+				renderer.BindTexture(GL.TEXTURE_2D, azaleaTexture);
+				renderer.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, azaleaImage.Width, azaleaImage.Height, 0, GL.RGBA, GL.UNSIGNED_BYTE, azaleaImage.Data);
+				renderer.GenerateMipmap(GL.TEXTURE_2D);
+
+				var whiteImage = new Image(1, 1, [byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue]);
+				var whiteTexture = renderer.GenerateTexture();
+				renderer.BindTexture(GL.TEXTURE_2D, whiteTexture);
+				renderer.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, whiteImage.Width, whiteImage.Height, 0, GL.RGBA, GL.UNSIGNED_BYTE, whiteImage.Data);
 
 				var defaultQuadBatch = new DefaultQuadBatch(renderer.GetCoordinator());
 
@@ -81,10 +97,15 @@ internal class WindowingWindow
 					var renderQueue = RenderCommandQueue.Borrow();
 					renderQueue.Clear(Palette.Beige);
 
-					defaultQuadBatch.Add(new Rectangle(new(100, 100), new(50)), Palette.Beige);
-					defaultQuadBatch.Add(new Rectangle(new(400, 150), new(150)), Palette.Beige);
-					defaultQuadBatch.Add(new Rectangle(new(50, 300), new(200)), Palette.Beige);
+					defaultQuadBatch.Add(new Rectangle(new(100, 100), new(50)), Palette.Blue);
+					defaultQuadBatch.Add(new Rectangle(new(400, 150), new(150)), Palette.Aqua);
 
+					renderQueue.BindTexture(GL.TEXTURE_2D, whiteTexture);
+					defaultQuadBatch.Draw(renderQueue);
+
+					defaultQuadBatch.Add(new Rectangle(new(50, 300), new(200)), Palette.White);
+
+					renderQueue.BindTexture(GL.TEXTURE_2D, azaleaTexture);
 					defaultQuadBatch.Draw(renderQueue);
 
 					renderQueue.PrintErrors();

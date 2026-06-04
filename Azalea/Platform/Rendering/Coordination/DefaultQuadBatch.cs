@@ -16,7 +16,7 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 
 	private readonly VertexArray _vertexArray;
 
-	public const int MaxQuadCount = 1000;
+	public const int MaxQuadCount = 100;
 	private readonly uint[] _indices;
 
 	public DefaultQuadBatch(RenderCoordinator renderCoordinator)
@@ -48,9 +48,9 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 			_indices[j] = i;
 			_indices[j + 1] = i + 1;
 			_indices[j + 2] = i + 3;
-			_indices[j + 3] = i + 1;
-			_indices[j + 4] = i + 2;
-			_indices[j + 5] = i + 3;
+			_indices[j + 3] = i + 2;
+			_indices[j + 4] = i + 3;
+			_indices[j + 5] = i + 1;
 		}
 		_renderer.BufferData(GL.ELEMENT_ARRAY_BUFFER, _indices.Length * sizeof(uint), _indices, GL.STATIC_DRAW, false);
 
@@ -70,10 +70,10 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 
 	public void Add(Rectangle rect, ColorQuad colorQuad)
 	{
-		Add(new DefaultQuadBatchVertex(rect.TopLeft, colorQuad.TopLeft, Vector2.Zero));
-		Add(new DefaultQuadBatchVertex(rect.TopRight, colorQuad.TopRight, new(1, 0)));
-		Add(new DefaultQuadBatchVertex(rect.BottomRight, colorQuad.BottomRight, Vector2.Zero));
-		Add(new DefaultQuadBatchVertex(rect.BottomLeft, colorQuad.BottomLeft, new(0, 1)));
+		Add(new DefaultQuadBatchVertex(rect.BottomLeft, colorQuad.BottomLeft, Rectangle.One.BottomLeft));
+		Add(new DefaultQuadBatchVertex(rect.BottomRight, colorQuad.BottomRight, Rectangle.One.BottomRight));
+		Add(new DefaultQuadBatchVertex(rect.TopRight, colorQuad.TopRight, Rectangle.One.TopRight));
+		Add(new DefaultQuadBatchVertex(rect.TopLeft, colorQuad.TopLeft, Rectangle.One.TopLeft));
 	}
 
 	public override void Add(DefaultQuadBatchVertex vertex)
@@ -91,7 +91,6 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 
 		_nextVertex++;
 	}
-
 
 	private Vector2Int _lastScreenSize = Vector2Int.Zero;
 

@@ -11,6 +11,14 @@ namespace Azalea.Native.OpenGL
 {
     public static unsafe partial class GL
     {
+        [global::System.Runtime.InteropServices.DllImportAttribute("opengl32.dll", EntryPoint = "glBlendFunc", ExactSpelling = true)]
+        public static extern partial void BlendFunc(int sfactor, int dfactor);
+    }
+}
+namespace Azalea.Native.OpenGL
+{
+    public static unsafe partial class GL
+    {
         [global::System.Runtime.InteropServices.DllImportAttribute("opengl32.dll", EntryPoint = "glClear", ExactSpelling = true)]
         public static extern partial void Clear(int mask);
     }

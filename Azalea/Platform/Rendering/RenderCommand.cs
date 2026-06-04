@@ -35,9 +35,23 @@ internal partial class BindBufferCommand : RenderCommand
 }
 
 [RenderCommand]
+internal partial class BindTextureCommand : RenderCommand
+{
+	public int Type;
+	public Texture Texture;
+}
+
+[RenderCommand]
 internal partial class BindVertexArrayCommand : RenderCommand
 {
 	public VertexArray? VertexArray;
+}
+
+[RenderCommand]
+internal partial class BlendFunctionCommand : RenderCommand
+{
+	public int SourceFactor;
+	public int DestinationFactor;
 }
 
 [RenderCommand]
@@ -165,6 +179,12 @@ internal partial class GenerateFramebufferCommand : RenderCommand
 }
 
 [RenderCommand]
+internal partial class GenerateMipmapCommand : RenderCommand
+{
+	public int Target;
+}
+
+[RenderCommand]
 internal partial class GenerateProgramCommand : RenderCommand
 {
 	public Program Program;
@@ -238,7 +258,6 @@ internal partial class SwapBuffersCommand : RenderCommand { }
 [RenderCommand]
 internal partial class TexImage2DCommand : RenderCommand
 {
-	public Texture Texture;
 	public int Target;
 	public int Level;
 	public int InternalFormat;

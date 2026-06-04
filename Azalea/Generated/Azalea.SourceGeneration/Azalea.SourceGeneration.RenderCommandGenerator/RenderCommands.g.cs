@@ -65,6 +65,38 @@ namespace Azalea.Platform.Rendering
 }
 namespace Azalea.Platform.Rendering
 {
+	internal partial class BindTextureCommand
+	{
+		private BindTextureCommand(int __Type, Azalea.Platform.Rendering.Texture __Texture)
+		{
+			Type = __Type;
+			Texture = __Texture;
+		}
+		private static readonly System.Collections.Concurrent.ConcurrentBag<BindTextureCommand> __commandPool = new();
+		public static BindTextureCommand Borrow(int __Type, Azalea.Platform.Rendering.Texture __Texture)
+		{
+			if (__commandPool.TryTake(out var command))
+			{
+				command.Type = __Type;
+				command.Texture = __Texture;
+				return command;
+			}
+			return new BindTextureCommand(__Type, __Texture);
+		}
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
+		public void Deconstruct(out int __Type, out Azalea.Platform.Rendering.Texture __Texture)
+		{
+			__Type = Type;
+			__Texture = Texture;
+		}
+	}
+}
+namespace Azalea.Platform.Rendering
+{
 	internal partial class BindVertexArrayCommand
 	{
 		private BindVertexArrayCommand(Azalea.Platform.Rendering.VertexArray? __VertexArray)
@@ -89,6 +121,38 @@ namespace Azalea.Platform.Rendering
 		public void Deconstruct(out Azalea.Platform.Rendering.VertexArray? __VertexArray)
 		{
 			__VertexArray = VertexArray;
+		}
+	}
+}
+namespace Azalea.Platform.Rendering
+{
+	internal partial class BlendFunctionCommand
+	{
+		private BlendFunctionCommand(int __SourceFactor, int __DestinationFactor)
+		{
+			SourceFactor = __SourceFactor;
+			DestinationFactor = __DestinationFactor;
+		}
+		private static readonly System.Collections.Concurrent.ConcurrentBag<BlendFunctionCommand> __commandPool = new();
+		public static BlendFunctionCommand Borrow(int __SourceFactor, int __DestinationFactor)
+		{
+			if (__commandPool.TryTake(out var command))
+			{
+				command.SourceFactor = __SourceFactor;
+				command.DestinationFactor = __DestinationFactor;
+				return command;
+			}
+			return new BlendFunctionCommand(__SourceFactor, __DestinationFactor);
+		}
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
+		public void Deconstruct(out int __SourceFactor, out int __DestinationFactor)
+		{
+			__SourceFactor = SourceFactor;
+			__DestinationFactor = DestinationFactor;
 		}
 	}
 }
@@ -566,6 +630,35 @@ namespace Azalea.Platform.Rendering
 }
 namespace Azalea.Platform.Rendering
 {
+	internal partial class GenerateMipmapCommand
+	{
+		private GenerateMipmapCommand(int __Target)
+		{
+			Target = __Target;
+		}
+		private static readonly System.Collections.Concurrent.ConcurrentBag<GenerateMipmapCommand> __commandPool = new();
+		public static GenerateMipmapCommand Borrow(int __Target)
+		{
+			if (__commandPool.TryTake(out var command))
+			{
+				command.Target = __Target;
+				return command;
+			}
+			return new GenerateMipmapCommand(__Target);
+		}
+		public override void Return()
+		{
+			
+			Cleanup();__commandPool.Add(this);
+		}
+		public void Deconstruct(out int __Target)
+		{
+			__Target = Target;
+		}
+	}
+}
+namespace Azalea.Platform.Rendering
+{
 	internal partial class GenerateProgramCommand
 	{
 		private GenerateProgramCommand(Azalea.Platform.Rendering.Program __Program)
@@ -929,9 +1022,8 @@ namespace Azalea.Platform.Rendering
 {
 	internal partial class TexImage2DCommand
 	{
-		private TexImage2DCommand(Azalea.Platform.Rendering.Texture __Texture, int __Target, int __Level, int __InternalFormat, int __Width, int __Height, int __Border, int __Format, int __Type, byte[]? __Pixels)
+		private TexImage2DCommand(int __Target, int __Level, int __InternalFormat, int __Width, int __Height, int __Border, int __Format, int __Type, byte[]? __Pixels)
 		{
-			Texture = __Texture;
 			Target = __Target;
 			Level = __Level;
 			InternalFormat = __InternalFormat;
@@ -943,11 +1035,10 @@ namespace Azalea.Platform.Rendering
 			Pixels = __Pixels;
 		}
 		private static readonly System.Collections.Concurrent.ConcurrentBag<TexImage2DCommand> __commandPool = new();
-		public static TexImage2DCommand Borrow(Azalea.Platform.Rendering.Texture __Texture, int __Target, int __Level, int __InternalFormat, int __Width, int __Height, int __Border, int __Format, int __Type, byte[]? __Pixels)
+		public static TexImage2DCommand Borrow(int __Target, int __Level, int __InternalFormat, int __Width, int __Height, int __Border, int __Format, int __Type, byte[]? __Pixels)
 		{
 			if (__commandPool.TryTake(out var command))
 			{
-				command.Texture = __Texture;
 				command.Target = __Target;
 				command.Level = __Level;
 				command.InternalFormat = __InternalFormat;
@@ -959,16 +1050,15 @@ namespace Azalea.Platform.Rendering
 				command.Pixels = __Pixels;
 				return command;
 			}
-			return new TexImage2DCommand(__Texture, __Target, __Level, __InternalFormat, __Width, __Height, __Border, __Format, __Type, __Pixels);
+			return new TexImage2DCommand(__Target, __Level, __InternalFormat, __Width, __Height, __Border, __Format, __Type, __Pixels);
 		}
 		public override void Return()
 		{
 			
 			Cleanup();__commandPool.Add(this);
 		}
-		public void Deconstruct(out Azalea.Platform.Rendering.Texture __Texture, out int __Target, out int __Level, out int __InternalFormat, out int __Width, out int __Height, out int __Border, out int __Format, out int __Type, out byte[]? __Pixels)
+		public void Deconstruct(out int __Target, out int __Level, out int __InternalFormat, out int __Width, out int __Height, out int __Border, out int __Format, out int __Type, out byte[]? __Pixels)
 		{
-			__Texture = Texture;
 			__Target = Target;
 			__Level = Level;
 			__InternalFormat = InternalFormat;

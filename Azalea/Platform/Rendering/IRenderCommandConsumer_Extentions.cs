@@ -15,6 +15,9 @@ public static class IRenderCommandConsumer_Extentions
 	public static void BindBuffer(this IRenderCommandConsumer consumer, int type, Buffer? buffer)
 		=> consumer.Enqueue(BindBufferCommand.Borrow(type, buffer));
 
+	public static void BindTexture(this IRenderCommandConsumer consumer, int type, Texture texture)
+		=> consumer.Enqueue(BindTextureCommand.Borrow(type, texture));
+
 	public static void BindVertexArray(this IRenderCommandConsumer consumer, VertexArray? vertexArray)
 		=> consumer.Enqueue(BindVertexArrayCommand.Borrow(vertexArray));
 

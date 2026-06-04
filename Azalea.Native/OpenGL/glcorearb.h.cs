@@ -67,6 +67,9 @@ public static partial class GL
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenBuffers.xhtml")]
 	private delegate void GenBuffersDelegate(int count, ref uint buffers);
 
+	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenerateMipmap.xhtml")]
+	private delegate void GenerateMipmapDelegate(int target);
+
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGenFramebuffers.xhtml")]
 	private delegate void GenFramebuffersDelegate(int n, ref uint ids);
 

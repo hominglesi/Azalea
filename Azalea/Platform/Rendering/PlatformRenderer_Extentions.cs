@@ -4,6 +4,9 @@ public static class PlatformRenderer_Extentions
 	public static void AttachShader(this PlatformRenderer renderer, Program program, Shader shader)
 		=> renderer.Enqueue(AttachShaderCommand.Borrow(program, shader));
 
+	public static void BlendFunction(this PlatformRenderer renderer, int sourceFactor, int destinationFactor)
+		=> renderer.Enqueue(BlendFunctionCommand.Borrow(sourceFactor, destinationFactor));
+
 	public static void CompileShader(this PlatformRenderer renderer, Shader shader)
 		=> renderer.Enqueue(CompileShaderCommand.Borrow(shader));
 
@@ -32,6 +35,9 @@ public static class PlatformRenderer_Extentions
 		renderer.Enqueue(GenerateFramebufferCommand.Borrow(framebuffer));
 		return framebuffer;
 	}
+
+	public static void GenerateMipmap(this PlatformRenderer renderer, int target)
+		=> renderer.Enqueue(GenerateMipmapCommand.Borrow(target));
 
 	public static Program GenerateProgram(this PlatformRenderer renderer)
 	{
@@ -82,6 +88,9 @@ public static class PlatformRenderer_Extentions
 
 	public static void ShaderSource(this PlatformRenderer renderer, Shader shader, string sourceCode)
 		=> renderer.Enqueue(ShaderSourceCommand.Borrow(shader, sourceCode));
+
+	public static void TexImage2D(this PlatformRenderer renderer, int target, int level, int internalFormat, int width, int height, int border, int format, int type, byte[]? pixels)
+		=> renderer.Enqueue(TexImage2DCommand.Borrow(target, level, internalFormat, width, height, border, format, type, pixels));
 
 	public static void VertexAttribPointer(this PlatformRenderer renderer, uint index, int size, int type, bool normalized, int stride, nint pointer)
 		=> renderer.Enqueue(VertexAttribPointerCommand.Borrow(index, size, type, normalized, stride, pointer));

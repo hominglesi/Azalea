@@ -20,7 +20,7 @@ internal class GLRenderer : RendererBase
 		: base(window)
 	{
 		GL.Enable(GLCapability.Blend);
-		GL.BlendFunc(GLBlendFunction.SrcAlpha, GLBlendFunction.OneMinusSrcAlpha);
+		Native.OpenGL.GL.BlendFunc(Native.OpenGL.GL.SRC_ALPHA, Native.OpenGL.GL.ONE_MINUS_SRC_ALPHA);
 	}
 
 	internal override void FinishFrame()

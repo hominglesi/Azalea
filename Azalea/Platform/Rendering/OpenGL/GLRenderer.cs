@@ -50,6 +50,10 @@ internal partial class GLRenderer : PlatformRenderer
 					GL.BindBuffer(type, buffer.Handle.Value);
 				}
 				break;
+			case BindTextureCommand(var type, var texture):
+				Debug.Assert(texture.Handle is not null);
+				GL.BindTexture(type, texture.Handle.Value);
+				break;
 			case BindVertexArrayCommand(var vertexArray):
 				if (vertexArray is null)
 					GL.BindVertexArray(0);
@@ -58,6 +62,9 @@ internal partial class GLRenderer : PlatformRenderer
 					Debug.Assert(vertexArray.Handle is not null);
 					GL.BindVertexArray(vertexArray.Handle.Value);
 				}
+				break;
+			case BlendFunctionCommand(var sourceFactor, var destinationFactor):
+				GL.BlendFunc(sourceFactor, destinationFactor);
 				break;
 			case BufferDataCommand(var type, var size, var data, var usage, var _):
 				if (data is null)
@@ -121,6 +128,9 @@ internal partial class GLRenderer : PlatformRenderer
 				uint framebufferHandle = 0;
 				GL.GenFramebuffers(1, ref framebufferHandle);
 				framebuffer.Initialize(framebufferHandle);
+				break;
+			case GenerateMipmapCommand(var target):
+				GL.GenerateMipmap(target);
 				break;
 			case GenerateProgramCommand(var program):
 				uint programHandle = GL.CreateProgram();
@@ -201,12 +211,11 @@ internal partial class GLRenderer : PlatformRenderer
 			case SwapBuffersCommand:
 				_context.SwapBuffers();
 				break;
-			case TexImage2DCommand(var texture, var target, var level, var internalFormat, var width, var height, var border, var format, var type, var pixels):
-				Debug.Assert(texture.Handle is not null);
-				GL.BindTexture(target, texture.Handle.Value);
-				if (pixels is null) GL.TexImage2D(target, level, internalFormat, width, height, border, format, type, IntPtr.Zero);
-				else GL.TexImage2D(target, level, internalFormat, width, height, border, format, type, in pixels[0]);
-				GL.BindTexture(target, 0);
+			case TexImage2DCommand(var target, var level, var internalFormat, var width, var height, var border, var format, var type, var pixels):
+				if (pixels is null)
+					GL.TexImage2D(target, level, internalFormat, width, height, border, format, type, IntPtr.Zero);
+				else
+					GL.TexImage2D(target, level, internalFormat, width, height, border, format, type, in pixels[0]);
 				break;
 			case TexParameteriCommand(var texture, var target, var parameter, var value):
 				Debug.Assert(texture.Handle is not null);
@@ -237,10 +246,10 @@ internal partial class GLRenderer : PlatformRenderer
 				throw new NotImplementedException("Command handling hasn't been implemented");
 		}
 
-
+		/*
 
 		Console.WriteLine("Processed " + command.GetType().Name);
-		/*
+		
 		int glError;
 
 		while ((glError = GL.GetError()) != 0)
