@@ -7,6 +7,8 @@ namespace Azalea;
 
 public abstract class AzaleaGame : Composition
 {
+	public static AzaleaGame? RENDERED_GAME;
+
 	public AzaleaGame()
 	{
 		RelativeSizeAxes = Axes.Both;

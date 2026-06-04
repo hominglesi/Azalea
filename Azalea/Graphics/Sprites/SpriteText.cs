@@ -2,6 +2,8 @@
 using Azalea.Text;
 using System;
 using System.Numerics;
+using Azalea.Platform.Rendering.Coordination;
+
 
 #if OLDTEXT
 using System.Numerics;
@@ -78,17 +80,22 @@ public class SpriteText : GameObject
 		set => throw new InvalidOperationException($"Cannot set {nameof(Size)} of {nameof(SpriteText)}");
 	}
 
-	public override void Draw(IRenderer renderer)
+	public override void Draw(IRenderer renderer, RenderCoordinator? coordinator)
 	{
-		renderer.BindShader(_textShader);
+		if (renderer is not null)
+			renderer.BindShader(_textShader);
 
 		foreach (var character in _layoutProvider.GetCharacters())
 		{
 			var quad = ToScreenSpace(character.DrawRectangle);
 
-			renderer.DrawQuad(character.Texture.GetNativeTexture(), quad, DrawColorInfo, character.Texture.GetUVCoordinates());
+			if (coordinator is not null)
+				coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorInfo.Color);
+			else
+				renderer.DrawQuad(character.Texture.GetNativeTexture(), quad, DrawColorInfo, character.Texture.GetUVCoordinates());
 		}
 
-		renderer.BindShader(renderer.DefaultQuadShader);
+		if (renderer is not null)
+			renderer.BindShader(renderer.DefaultQuadShader);
 	}
 }

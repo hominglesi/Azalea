@@ -1,7 +1,10 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.Colors;
+using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering;
 using Azalea.Layout;
+using Azalea.Numerics;
+using Azalea.Platform.Rendering.Coordination;
 
 namespace Azalea.Design.Containers;
 public partial class Composition
@@ -33,7 +36,7 @@ public partial class Composition
 		}
 	}
 
-	public virtual void DrawBackground(IRenderer renderer)
+	public virtual void DrawBackground(IRenderer renderer, RenderCoordinator? coordinator)
 	{
 		if (BackgroundColor is null)
 			return;
@@ -51,8 +54,11 @@ public partial class Composition
 			_backgroundColorBacking.Validate();
 		}
 
-		renderer.DrawQuad(renderer.WhitePixel.GetNativeTexture(), ScreenSpaceDrawQuad,
-			_backgroundDrawColorInfo);
+		if (coordinator is not null)
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, _backgroundDrawColorInfo.Color);
+		else
+			renderer.DrawQuad(renderer.WhitePixel.GetNativeTexture(), ScreenSpaceDrawQuad,
+				_backgroundDrawColorInfo);
 	}
 
 	private DrawColorInfo _borderDrawColorInfo;
@@ -92,7 +98,7 @@ public partial class Composition
 
 	public BorderAlignment BorderAlignment { get; set; } = BorderAlignment.Outer;
 
-	public virtual void DrawForeground(IRenderer renderer)
+	public virtual void DrawForeground(IRenderer renderer, RenderCoordinator? coordinator)
 	{
 		if (BorderColor is null && _borderThickness is null)
 			return;
@@ -112,8 +118,128 @@ public partial class Composition
 			_borderColorBacking.Validate();
 		}
 
-		renderer.DrawRectangle(DrawRectangle, DrawInfo.Matrix, BorderThickness,
-				_borderDrawColorInfo, BorderAlignment);
+		if (coordinator is not null)
+		{
+			var rect = DrawRectangle;
+			var thickness = BorderThickness;
+			var color = _borderDrawColorInfo;
+			var alignment = BorderAlignment;
+
+			var topRect = alignment switch
+			{
+				BorderAlignment.Outer => new Rectangle(
+					rect.Left - thickness.Left,
+					rect.Top - thickness.Top,
+					rect.Width + thickness.Left,
+					thickness.Top),
+				BorderAlignment.Inner => new Rectangle(
+					rect.Top,
+					rect.Left,
+					rect.Width - thickness.Right,
+					thickness.Top),
+				/* BorderAlignment.Center */
+				_ => new Rectangle(
+					rect.Left - (thickness.Left / 2),
+					rect.Top - (thickness.Top / 2),
+					rect.Width - (thickness.Right / 2) + (thickness.Left / 2),
+					thickness.Top),
+			};
+
+			var topColor = new ColorQuad(
+				color.Color.TopLeft,
+				color.Color.TopLeft,
+				color.Color.TopRight,
+				color.Color.TopRight);
+
+			var rightRect = alignment switch
+			{
+				BorderAlignment.Outer => new Rectangle(
+					rect.Width,
+					rect.Top - thickness.Top,
+					thickness.Right,
+					rect.Height + thickness.Top),
+				BorderAlignment.Inner => new Rectangle(
+					rect.Width - thickness.Right,
+					rect.Top,
+					thickness.Right,
+					rect.Height - thickness.Bottom),
+				/* BorderAlignment.Center */
+				_ => new Rectangle(
+					rect.Width - (thickness.Right / 2),
+					rect.Top - (thickness.Top / 2),
+					thickness.Right,
+					rect.Height - (thickness.Bottom / 2) + (thickness.Top / 2)),
+			};
+
+			var rightColor = new ColorQuad(
+				color.Color.TopRight,
+				color.Color.BottomRight,
+				color.Color.BottomRight,
+				color.Color.TopRight);
+
+			var bottomRect = alignment switch
+			{
+				BorderAlignment.Outer => new Rectangle(
+					rect.Left,
+					rect.Height,
+					rect.Width + thickness.Right,
+					thickness.Bottom),
+				BorderAlignment.Inner => new Rectangle(
+					rect.Left + thickness.Left,
+					rect.Height - thickness.Bottom,
+					rect.Width - thickness.Left,
+					thickness.Bottom),
+				/* BorderAlignment.Center */
+				_ => new Rectangle(
+					rect.Left + (thickness.Left / 2),
+					rect.Height - (thickness.Bottom / 2),
+					rect.Width - (thickness.Left / 2) + (thickness.Right / 2),
+					thickness.Bottom),
+			};
+
+			var bottomColor = new ColorQuad(
+				color.Color.BottomLeft,
+				color.Color.BottomLeft,
+				color.Color.BottomRight,
+				color.Color.BottomRight);
+
+			var leftRect = alignment switch
+			{
+				BorderAlignment.Outer => new Rectangle(
+					rect.Left - thickness.Left,
+					rect.Top,
+					thickness.Left,
+					rect.Height + thickness.Bottom),
+				BorderAlignment.Inner => new Rectangle(
+					rect.Left,
+					rect.Top + thickness.Top,
+					thickness.Left,
+					rect.Height - thickness.Top),
+				/* BorderAlignment.Center */
+				_ => new Rectangle(
+					rect.Left - (thickness.Left / 2),
+					rect.Top + (thickness.Top / 2),
+					thickness.Left,
+					rect.Height + (thickness.Bottom / 2) - (thickness.Top / 2)),
+			};
+
+			var leftColor = new ColorQuad(
+				color.Color.TopLeft,
+				color.Color.BottomLeft,
+				color.Color.BottomLeft,
+				color.Color.TopLeft);
+
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(topRect) * DrawInfo.Matrix, topColor);
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(rightRect) * DrawInfo.Matrix, rightColor);
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(bottomRect) * DrawInfo.Matrix, bottomColor);
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(leftRect) * DrawInfo.Matrix, leftColor);
+
+			return;
+		}
+		else
+			renderer.DrawRectangle(DrawRectangle, DrawInfo.Matrix, BorderThickness,
+					_borderDrawColorInfo, BorderAlignment);
+
 	}
 }
 

@@ -1,14 +1,46 @@
 ﻿using Azalea.Native.OpenGL;
+using System;
 
 namespace Azalea.Platform.Rendering.Coordination;
 public class RenderCoordinator
 {
 	public PlatformRenderer Renderer { get; }
 
+	public DefaultQuadBatch DefaultQuadBatch { get; }
+
 	public RenderCoordinator(PlatformRenderer renderer)
 	{
 		Renderer = renderer;
+
+		DefaultQuadBatch = new DefaultQuadBatch(this);
 	}
+
+	#region Queues
+
+	public RenderCommandQueue CommandQueue =>
+		_commandQueue is not null ? _commandQueue
+			: throw new Exception("A command queue has not been started!");
+
+	public RenderCommandQueue? _commandQueue;
+
+	public RenderCommandQueue BeginCommandQueue()
+	{
+		if (_commandQueue is not null)
+			throw new Exception("Only one command queue can be begun!");
+
+		return _commandQueue = RenderCommandQueue.Borrow();
+	}
+
+	public RenderCommandQueue EndCommandQueue()
+	{
+		if (_commandQueue is null)
+			throw new Exception("A command queue has not been started!");
+
+		var commandQueue = _commandQueue;
+		_commandQueue = null;
+		return commandQueue;
+	}
+	#endregion
 
 	public Program CreateStandardProgram(string vertexShaderSource, string fragmentShaderSource)
 	{

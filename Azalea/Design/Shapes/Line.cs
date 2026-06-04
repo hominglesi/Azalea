@@ -3,6 +3,7 @@ using Azalea.Graphics;
 using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering;
 using Azalea.Numerics;
+using Azalea.Platform.Rendering.Coordination;
 using Azalea.Utils;
 using System.Numerics;
 
@@ -15,9 +16,13 @@ public class Line : GameObject
 
 	public float Thickness { get; set; } = 3;
 
-	public override void Draw(IRenderer renderer)
+	public override void Draw(IRenderer renderer, RenderCoordinator? coordinator)
 	{
-		base.Draw(renderer);
+		if (coordinator is not null)
+		{
+
+			return;
+		}
 
 		var distance = MathUtils.DistanceBetween(StartPoint, EndPoint);
 		var rectangle = new Rectangle(Vector2.Zero, new(distance, Thickness));

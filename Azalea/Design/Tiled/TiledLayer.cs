@@ -2,6 +2,7 @@
 using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering;
 using Azalea.IO.Tiled;
+using Azalea.Platform.Rendering.Coordination;
 using System.Numerics;
 using static Azalea.IO.Tiled.Tilemap;
 
@@ -23,8 +24,14 @@ public class TiledLayer : GameObject
 	public TiledLayer(Tilemap tilemap, int layer)
 		: this(tilemap, tilemap.Layers[layer]) { }
 
-	public override void Draw(IRenderer renderer)
+	public override void Draw(IRenderer renderer, RenderCoordinator? coordinator)
 	{
+		if (coordinator is not null)
+		{
+
+			return;
+		}
+
 		var startPosition = ScreenSpaceDrawQuad.TopLeft;
 		var tileSize = ScreenSpaceDrawQuad.Size / new Vector2(Tilemap.Width, Tilemap.Height);
 

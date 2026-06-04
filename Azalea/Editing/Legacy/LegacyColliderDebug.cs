@@ -4,6 +4,7 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
+using Azalea.Platform.Rendering.Coordination;
 using Azalea.Simulations.Colliders;
 using System.Numerics;
 
@@ -21,10 +22,16 @@ public class LegacyColliderDebug : GameObject
 		IsShown = _isToggled || Input.GetKey(Keys.W).Pressed && Input.GetKey(Keys.ControlLeft).Pressed;
 	}
 
-	public override void Draw(IRenderer renderer)
+	public override void Draw(IRenderer renderer, RenderCoordinator? coordinator)
 	{
 		if (IsShown)
 		{
+			if (coordinator is not null)
+			{
+
+				return;
+			}
+
 			var color = new DrawColorInfo(new Color(45, 75, 23, 80));
 			var color2 = new DrawColorInfo(new Color(84, 42, 86, 140));
 

@@ -3,12 +3,11 @@ using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.IO.Resources;
 using Azalea.Native.OpenGL;
-using Azalea.Numerics;
 using Azalea.Platform.Rendering;
-using Azalea.Platform.Rendering.Coordination;
 using Azalea.Platform.Scheduling;
 using Azalea.Platform.Windowing;
 using Azalea.Platform.Windowing.Windows;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -86,7 +85,8 @@ internal class WindowingWindow
 				renderer.BindTexture(GL.TEXTURE_2D, whiteTexture);
 				renderer.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, whiteImage.Width, whiteImage.Height, 0, GL.RGBA, GL.UNSIGNED_BYTE, whiteImage.Data);
 
-				var defaultQuadBatch = new DefaultQuadBatch(renderer.GetCoordinator());
+				var coordinator = renderer.GetCoordinator();
+				var quadBatch = coordinator.DefaultQuadBatch;
 
 				renderer.PrintErrors();
 
@@ -94,25 +94,30 @@ internal class WindowingWindow
 
 				scheduler.InjectProtocol((win, rend) =>
 				{
-					var renderQueue = RenderCommandQueue.Borrow();
+					var renderQueue = coordinator.BeginCommandQueue();
 					renderQueue.Clear(Palette.Beige);
 
-					defaultQuadBatch.Add(new Rectangle(new(100, 100), new(50)), Palette.Blue);
-					defaultQuadBatch.Add(new Rectangle(new(400, 150), new(150)), Palette.Aqua);
+					if (AzaleaGame.RENDERED_GAME is not null)
+					{
+						try
+						{
+							AzaleaGame.RENDERED_GAME.Draw(null, renderer.GetCoordinator());
+						}
+						catch (Exception)
+						{
+							renderQueue.Return();
+							renderQueue = RenderCommandQueue.Borrow();
+							renderQueue.Clear(Palette.Beige);
+						}
+					}
 
-					renderQueue.BindTexture(GL.TEXTURE_2D, whiteTexture);
-					defaultQuadBatch.Draw(renderQueue);
-
-					defaultQuadBatch.Add(new Rectangle(new(50, 300), new(200)), Palette.White);
-
-					renderQueue.BindTexture(GL.TEXTURE_2D, azaleaTexture);
-					defaultQuadBatch.Draw(renderQueue);
+					quadBatch.Draw(renderQueue);
 
 					renderQueue.PrintErrors();
 
 					renderQueue.SwapBuffers();
 
-					renderer.StageQueue(renderQueue);
+					renderer.StageQueue(coordinator.EndCommandQueue());
 				});
 			});
 		}

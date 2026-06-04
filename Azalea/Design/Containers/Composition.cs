@@ -4,6 +4,7 @@ using Azalea.Graphics.Rendering;
 using Azalea.Layout;
 using Azalea.Lists;
 using Azalea.Numerics;
+using Azalea.Platform.Rendering.Coordination;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
@@ -284,11 +285,11 @@ public partial class Composition : GameObject
 			child.RemoveComponentTreeFromScene();
 	}
 
-	public override void Draw(IRenderer renderer)
+	public override void Draw(IRenderer renderer, RenderCoordinator? coordinator)
 	{
-		DrawBackground(renderer);
+		DrawBackground(renderer, coordinator);
 
-		if (Masking)
+		if (Masking && renderer is not null)
 		{
 			var newScissor = (RectangleInt)ScreenSpaceDrawQuad;
 			if (MaskingPadding != Boundary.Zero)
@@ -302,12 +303,12 @@ public partial class Composition : GameObject
 		}
 
 		foreach (var child in _internalChildren)
-			child.Draw(renderer);
+			child.Draw(renderer, coordinator);
 
-		if (Masking)
+		if (Masking && renderer is not null)
 			renderer.PopScissor();
 
-		DrawForeground(renderer);
+		DrawForeground(renderer, coordinator);
 	}
 
 	private Boundary _padding;

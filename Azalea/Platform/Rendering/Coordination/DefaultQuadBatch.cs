@@ -1,5 +1,6 @@
 ﻿using Azalea.Graphics.Camera;
 using Azalea.Graphics.Colors;
+using Azalea.Graphics.Primitives;
 using Azalea.Native.OpenGL;
 using Azalea.Numerics;
 using System.Buffers;
@@ -16,7 +17,7 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 
 	private readonly VertexArray _vertexArray;
 
-	public const int MaxQuadCount = 100;
+	public const int MaxQuadCount = 1000;
 	private readonly uint[] _indices;
 
 	public DefaultQuadBatch(RenderCoordinator renderCoordinator)
@@ -68,12 +69,15 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 	private int _nextVertex = 0;
 	private const int _vertexSize = 8;
 
-	public void Add(Rectangle rect, ColorQuad colorQuad)
+	public void Add(RenderCommandQueue commandQueue, Quad quad, ColorQuad colorQuad)
 	{
-		Add(new DefaultQuadBatchVertex(rect.BottomLeft, colorQuad.BottomLeft, Rectangle.One.BottomLeft));
-		Add(new DefaultQuadBatchVertex(rect.BottomRight, colorQuad.BottomRight, Rectangle.One.BottomRight));
-		Add(new DefaultQuadBatchVertex(rect.TopRight, colorQuad.TopRight, Rectangle.One.TopRight));
-		Add(new DefaultQuadBatchVertex(rect.TopLeft, colorQuad.TopLeft, Rectangle.One.TopLeft));
+		Add(new DefaultQuadBatchVertex(quad.BottomLeft, colorQuad.BottomLeft, Rectangle.One.BottomLeft));
+		Add(new DefaultQuadBatchVertex(quad.BottomRight, colorQuad.BottomRight, Rectangle.One.BottomRight));
+		Add(new DefaultQuadBatchVertex(quad.TopRight, colorQuad.TopRight, Rectangle.One.TopRight));
+		Add(new DefaultQuadBatchVertex(quad.TopLeft, colorQuad.TopLeft, Rectangle.One.TopLeft));
+
+		if (_nextVertex == MaxQuadCount * 4)
+			Draw(commandQueue);
 	}
 
 	public override void Add(DefaultQuadBatchVertex vertex)

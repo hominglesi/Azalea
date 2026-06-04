@@ -10,6 +10,7 @@ using Azalea.Graphics.Rendering;
 using Azalea.Inputs.Events;
 using Azalea.Layout;
 using Azalea.Numerics;
+using Azalea.Platform.Rendering.Coordination;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
@@ -631,7 +632,7 @@ public partial class GameObject : Amendable, IGameObject
 		}
 	}
 
-	public virtual void Draw(IRenderer renderer)
+	public virtual void Draw(IRenderer renderer, RenderCoordinator? coordinator)
 	{
 
 	}

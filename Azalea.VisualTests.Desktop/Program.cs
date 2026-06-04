@@ -8,7 +8,7 @@ internal class Program
 	[STAThread]
 	private static void Main(string[] args)
 	{
-		new HostBuilder()
+		var host = new HostBuilder()
 			.EnableEditor()
 			.SetTitle("Azalea Visual Tests")
 			.SetGameSize(new Vector2Int(1600, 900))
@@ -18,8 +18,10 @@ internal class Program
 			.SetupReflectedDirectory("../../../../../../Azalea.VisualTests/")
 			//.EnableTracing()
 			.SetupConfig()
-			.Create()
-			.Run(EditorWrapper.Wrap(new VisualTests()));
+			.Create();
+
+		AzaleaGame.RENDERED_GAME = EditorWrapper.Wrap(new VisualTests());
+		host.Run(AzaleaGame.RENDERED_GAME);
 	}
 }
 
