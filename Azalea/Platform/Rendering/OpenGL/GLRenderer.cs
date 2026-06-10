@@ -15,6 +15,8 @@ internal partial class GLRenderer : PlatformRenderer
 	internal GLRenderer(PlatformDeviceContext deviceContext)
 	{
 		_deviceContext = deviceContext;
+
+		StartRenderThread();
 	}
 
 	protected override void Initialize()

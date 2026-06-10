@@ -20,7 +20,10 @@ internal class AudioThread : GameThread
 	{
 		_host = host;
 
-		// We start the thread manually because it's necessary to create the audio manager
+		// We start the thread manually because otherwise we are uncertain
+		// that the AudioManager has been initialized.
+		// We could make a scaffold type AudioManager that just accepts commands
+		// and executes them once the actual manager is initialized
 		base.Start();
 		_readyGate.Wait();
 		Debug.Assert(AudioManager is not null);

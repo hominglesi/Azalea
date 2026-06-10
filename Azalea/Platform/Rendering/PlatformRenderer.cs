@@ -16,8 +16,9 @@ public abstract class PlatformRenderer : IRenderCommandConsumer
 		});
 
 		_thread = new RenderThread(this);
-		_thread.Start();
 	}
+
+	protected void StartRenderThread() => _thread.Start();
 
 	protected abstract void Initialize();
 	protected abstract void Update();

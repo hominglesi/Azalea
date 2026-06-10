@@ -23,18 +23,12 @@ internal abstract class GameThread
 	{
 		TargetInterval = targetInterval;
 
-		_running = true;
 		_thread = new Thread(threadLoop)
 		{
 			IsBackground = true,
 		};
 
 		ManagedThreadId = _thread.ManagedThreadId;
-
-		_thread.Start();
-
-		ActiveThreads.Add(this);
-		OnThreadStarted?.Invoke(this);
 	}
 
 	public virtual void Start()
@@ -44,6 +38,9 @@ internal abstract class GameThread
 
 		_running = true;
 		_thread.Start();
+
+		ActiveThreads.Add(this);
+		OnThreadStarted?.Invoke(this);
 	}
 
 	public void Stop()
