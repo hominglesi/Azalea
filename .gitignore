@@ -402,3 +402,6 @@ FodyWeavers.xsd
 
 # Obsidian workspace settings
 .obsidian/
+
+# Source Generated files
+*.g.cs
