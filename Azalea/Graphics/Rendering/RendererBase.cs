@@ -84,7 +84,9 @@ internal abstract class RendererBase : IRenderer
 		var nativeTexture = CreateNativeTexture(image.Width, image.Height);
 		nativeTexture.SetData(image);
 
-		return new Texture(nativeTexture);
+		var texture = new Texture(nativeTexture);
+		ITexture.LoadedTextures.Add(texture);
+		return texture;
 	}
 
 	protected abstract INativeShader CreateNativeShader(string vertexCode, string fragmentCode);

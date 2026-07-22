@@ -95,9 +95,13 @@ public class EditorWrapper : AzaleaGame
 		if (Input.GetKey(Keys.F1).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
 			CameraWindow.Toggle();
 		if (Input.GetKey(Keys.F2).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
-			WindowingWindow.Toggle();
+			GlobalWindow.Toggle();
 		if (Input.GetKey(Keys.F3).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
 			GameThreadWindow.Toggle();
+		if (Input.GetKey(Keys.F4).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
+			RenderWindow.Toggle();
+		if (Input.GetKey(Keys.F5).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
+			WindowingWindow.Toggle();
 	}
 
 	private class MissingGameDisplay : Composition

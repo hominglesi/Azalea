@@ -2,6 +2,7 @@
 using Azalea.Platform.Scheduling;
 using Azalea.Platform.Windowing.Windows;
 using Azalea.Threading;
+using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -71,26 +72,6 @@ public abstract class PlatformWindow
 
 	#endregion
 
-	#region Closing
-
-	public bool Closed = false;
-
-	public static event Action<PlatformWindow>? OnWindowClosed;
-	public void Close()
-	{
-		if (Closed) return;
-
-		_thread.Stop();
-		SubscribedRenderer?.Close();
-		SubscribedScheduler?.Close();
-
-		Closed = true;
-		_windows.Remove(this);
-		OnWindowClosed?.Invoke(this);
-	}
-
-	#endregion
-
 	#region DeviceContext
 
 	private readonly object _deviceContextOwnerLock = new();
@@ -114,10 +95,11 @@ public abstract class PlatformWindow
 
 	#endregion
 
-	#region Subscribers
+	public virtual string PlatformType => "Abstract Window";
+
+	public string Title => "Azalea Window";
 
 	public PlatformRenderer? SubscribedRenderer { get; private set; } = null;
-
 	internal void Subscribe(PlatformRenderer renderer)
 	{
 		if (SubscribedRenderer is not null)
@@ -127,7 +109,6 @@ public abstract class PlatformWindow
 	}
 
 	public PlatformScheduler? SubscribedScheduler { get; private set; } = null;
-
 	internal void Subscribe(PlatformScheduler scheduler)
 	{
 		if (SubscribedScheduler is not null)
@@ -136,8 +117,16 @@ public abstract class PlatformWindow
 		SubscribedScheduler = scheduler;
 	}
 
-	#endregion
+	public readonly ReadOnlyObservable<bool> Closed = new(false);
+	public void Close()
+	{
+		if (Closed) return;
 
-	public string Title => "Azalea Window";
-	public virtual string PlatformType => "Abstract Window";
+		_thread.Stop();
+		SubscribedRenderer?.Close();
+		SubscribedScheduler?.Stop();
+
+		Closed.Value = true;
+		_windows.Remove(this);
+	}
 }

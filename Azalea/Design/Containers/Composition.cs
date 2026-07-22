@@ -289,7 +289,7 @@ public partial class Composition : GameObject
 	{
 		DrawBackground(renderer, coordinator);
 
-		if (Masking && renderer is not null)
+		if (Masking)
 		{
 			var newScissor = (RectangleInt)ScreenSpaceDrawQuad;
 			if (MaskingPadding != Boundary.Zero)
@@ -299,14 +299,23 @@ public partial class Composition : GameObject
 				newScissor.Y -= MathUtils.Ceiling(MaskingPadding.Top);
 				newScissor.Height += MathUtils.Ceiling(MaskingPadding.Vertical);
 			}
-			renderer.PushScissor(newScissor);
+
+			if (renderer is not null)
+				renderer.PushScissor(newScissor);
+			else
+				coordinator?.PushScissor(newScissor);
 		}
 
 		foreach (var child in _internalChildren)
 			child.Draw(renderer, coordinator);
 
-		if (Masking && renderer is not null)
-			renderer.PopScissor();
+		if (Masking)
+		{
+			if (renderer is not null)
+				renderer.PopScissor();
+			else
+				coordinator?.PopScissor();
+		}
 
 		DrawForeground(renderer, coordinator);
 	}

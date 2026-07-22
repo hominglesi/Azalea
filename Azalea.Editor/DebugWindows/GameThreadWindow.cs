@@ -21,7 +21,7 @@ internal class GameThreadWindow
 	{
 		if (_window is null)
 		{
-			_window = GUIWindow.Create("Game Threads", new(400, 400));
+			_window = GUIWindow.Create("Game Threads", new(100), new(400, 400));
 			foreach (var thread in GameThread.ActiveThreads)
 				addThreadGroup(thread);
 
@@ -34,7 +34,6 @@ internal class GameThreadWindow
 		void addThreadGroup(GameThread thread)
 		{
 			var group = _window!.AddGroup(thread.DisplayName);
-			_window.AddLabel("Managed Thread Id: " + thread.ManagedThreadId);
 			_window.AddLabel($"Target Interval: {thread.TargetInterval}ms");
 			_window.FinishGroup();
 			_gameThreadGroups.Add(thread, group);

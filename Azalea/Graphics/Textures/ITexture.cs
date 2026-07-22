@@ -1,10 +1,13 @@
 ﻿using Azalea.Graphics.Rendering;
 using Azalea.Numerics;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Graphics.Textures;
 public interface ITexture
 {
+	public static readonly List<ITexture> LoadedTextures = [];
+
 	public INativeTexture GetNativeTexture(float time = 0);
 	public Rectangle GetUVCoordinates(float time = 0);
 

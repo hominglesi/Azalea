@@ -87,7 +87,7 @@ internal class GLRenderer : RendererBase
 
 		var framebufferHeight = Window.ClientSize.Y;
 
-		GL.Scissor(scissorRectangle.X, framebufferHeight - scissorRectangle.Y - scissorRectangle.Height, scissorRectangle.Width, scissorRectangle.Height);
+		Native.OpenGL.GL.Scissor(scissorRectangle.X, framebufferHeight - scissorRectangle.Y - scissorRectangle.Height, scissorRectangle.Width, scissorRectangle.Height);
 	}
 
 	protected override void SetScissorTestState(bool enabled)

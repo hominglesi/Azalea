@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics.Colors;
+using Azalea.Numerics;
 using System;
 using System.Buffers;
 using System.Numerics;
@@ -6,11 +7,13 @@ using System.Numerics;
 namespace Azalea.Platform.Rendering;
 internal abstract class RenderCommand
 {
-	private static int _totalCommands = 0;
+	internal static int TotalCreated = 0;
+	internal static Action<RenderCommand>? OnCommandCreated;
 
 	internal RenderCommand()
 	{
-		Console.WriteLine($"Created {GetType().Name}; Total commands {++_totalCommands};");
+		TotalCreated++;
+		OnCommandCreated?.Invoke(this);
 	}
 
 	public abstract void Return();
@@ -231,6 +234,9 @@ internal partial class PolygonModeCommand : RenderCommand
 }
 
 [RenderCommand]
+internal partial class PrepareRenderingCommand : RenderCommand { }
+
+[RenderCommand]
 internal partial class PrintErrorsCommand : RenderCommand { }
 
 [RenderCommand]
@@ -243,6 +249,12 @@ internal partial class PrintProgramCompileStatusCommand : RenderCommand
 internal partial class PrintShaderCompileStatusCommand : RenderCommand
 {
 	public Shader Shader;
+}
+
+[RenderCommand]
+internal partial class ScissorCommand : RenderCommand
+{
+	public RectangleInt? Rectangle;
 }
 
 [RenderCommand]

@@ -447,6 +447,10 @@ public static partial class GL
 	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glPolygonMode.xhtml">Official Documentation</see></summary>
 	public static partial void PolygonMode(int face, int mode);
 
+	[LibraryImport(OpenGLPath, EntryPoint = "glScissor")]
+	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glScissor.xhtml">Official Documentation</see></summary>
+	public static partial void Scissor(int x, int y, int width, int height);
+
 	[LibraryImport(OpenGLPath, EntryPoint = "glTexImage2D")]
 	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml">Official Documentation</see></summary>
 	public static partial void TexImage2D(int target, int level, int internalFormat, int width, int height, int border, int format, int type, in byte pixels);

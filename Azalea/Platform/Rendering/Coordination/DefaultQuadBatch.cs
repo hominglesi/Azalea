@@ -80,7 +80,7 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 			Draw(commandQueue);
 	}
 
-	public override void Add(DefaultQuadBatchVertex vertex)
+	internal override void AddImplementation(DefaultQuadBatchVertex vertex)
 	{
 		_vertices ??= ArrayPool<float>.Shared.Rent(MaxQuadCount * 4 * _vertexSize);
 

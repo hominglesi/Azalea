@@ -1,5 +1,7 @@
-﻿using Azalea.Graphics.Colors;
+﻿using Azalea.Graphics.Camera;
+using Azalea.Graphics.Colors;
 using Azalea.Native.OpenGL;
+using Azalea.Numerics;
 using Azalea.Platform.Windowing;
 using System;
 using System.Diagnostics;
@@ -33,6 +35,7 @@ internal partial class GLRenderer : PlatformRenderer
 	}
 
 	private Color? _clearColor = null;
+	private RectangleInt? _scissorRectangle = null;
 
 	internal override void HandleCommand(RenderCommand command)
 	{
@@ -173,6 +176,10 @@ internal partial class GLRenderer : PlatformRenderer
 					error = GL.GetError();
 				}
 				break;
+			case PrepareRenderingCommand():
+				GL.Disable(GL.SCISSOR_TEST);
+				_scissorRectangle = null;
+				break;
 			case PrintProgramCompileStatusCommand(Program program):
 				int success = 0;
 				GL.GetProgramiv(program.Handle.GetValueOrDefault(), GL.LINK_STATUS, ref success);
@@ -196,6 +203,32 @@ internal partial class GLRenderer : PlatformRenderer
 				}
 				else
 					Console.WriteLine("Shader Successfully Compiled!");
+				break;
+			case ScissorCommand(var rectangle):
+
+				if (_scissorRectangle == rectangle)
+					break;
+
+				if (_scissorRectangle is null && rectangle is not null)
+					GL.Enable(GL.SCISSOR_TEST);
+				else if (_scissorRectangle is not null && rectangle is null)
+					GL.Disable(GL.SCISSOR_TEST);
+
+				_scissorRectangle = rectangle;
+
+				if (_scissorRectangle is not null)
+				{
+					var screenRectangle =
+						MainCamera.Instance.ToWorldSpace(_scissorRectangle.Value);
+
+					if (screenRectangle.Width < 0) screenRectangle.Width = 0;
+					if (screenRectangle.Height < 0) screenRectangle.Height = 0;
+
+					// Hardcoded for now
+					var framebufferHeight = 561;
+
+					GL.Scissor(screenRectangle.X, framebufferHeight - screenRectangle.Y - screenRectangle.Height, screenRectangle.Width, screenRectangle.Height);
+				}
 				break;
 			case ShaderSourceCommand(var shader, var sourceCode):
 				Debug.Assert(shader.Handle is not null);

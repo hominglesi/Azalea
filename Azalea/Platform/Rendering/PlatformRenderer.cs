@@ -1,6 +1,7 @@
 ﻿using Azalea.Platform.Rendering.Coordination;
 using Azalea.Platform.Rendering.OpenGL;
 using Azalea.Threading;
+using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Threading.Channels;
@@ -23,9 +24,12 @@ public abstract class PlatformRenderer : IRenderCommandConsumer
 	protected abstract void Initialize();
 	protected abstract void Update();
 
+	public readonly ReadOnlyObservable<bool> Stopped = new(false);
+
 	internal void Close()
 	{
 		_thread.Stop();
+		Stopped.Value = true;
 	}
 
 	public static PlatformRenderer AttachRenderer(Windowing.PlatformWindow window)

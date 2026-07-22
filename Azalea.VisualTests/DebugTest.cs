@@ -8,7 +8,7 @@ public class DebugTest : TestScene
 
 	public DebugTest()
 	{
-		_debugWindow = GUIWindow.Create("Debug Window", new(400));
+		_debugWindow = GUIWindow.Create("Debug Window", new(100), new(400));
 		_debugWindow.AddLabel("Example debug text");
 		_debugWindow.AddCheckbox("Example checkbox");
 		_debugWindow.AddLabel("Example debug text 2");

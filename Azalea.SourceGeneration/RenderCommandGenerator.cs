@@ -85,6 +85,9 @@ internal class RenderCommandGenerator : IIncrementalGenerator
 		builder.Append(')');
 		beginNest();
 
+		builder.Append("TotalCreated++;");
+		newLine();
+
 		for (int i = 0; i < command.Properties.Count; i++)
 		{
 			var name = command.Properties[i].Item2;
@@ -108,7 +111,9 @@ internal class RenderCommandGenerator : IIncrementalGenerator
 		builder.Append("> __commandPool = new();");
 		newLine();
 
-		// Populate
+		// TotalCreated
+		builder.Append("internal static new int TotalCreated = 0;");
+		newLine();
 
 		// Borrow Method
 		builder.Append("public static ");
@@ -147,8 +152,8 @@ internal class RenderCommandGenerator : IIncrementalGenerator
 		// Return
 		builder.Append("public override void Return()");
 		beginNest();
-		newLine();
 		builder.Append("Cleanup();");
+		newLine();
 		builder.Append("__commandPool.Add(this);");
 		endNest();
 		newLine();

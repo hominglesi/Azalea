@@ -21,62 +21,65 @@ public class GUIWindow : BasicWindowContainer
 	private readonly ScrollableContainer _scrollable;
 	private readonly FlexContainer _content;
 
-	internal GUIWindow(string title, Vector2 size)
+	internal GUIWindow(string title, Vector2 position, Vector2 size)
 	{
 		Masking = true;
-		Position = new(100);
+		Position = position;
 		Size = _size = size;
-		AddRange([
-			_titleBar = new TitleBar(title, __titleBarHeight, new Color(41, 74, 122), true){
-				ExpandedChanged = expanded =>{
-					if(expanded)
-					{
-						Add(_scrollable!);
-						Size = _size;
-					}
-					else
-					{
-						Remove(_scrollable!);
-						Size = new(_size.X, __titleBarHeight);
-					}
+
+		// We don't use AddRange since it wouldn't use the overridden base.Add
+		base.Add(_titleBar = new TitleBar(title, __titleBarHeight, new Color(41, 74, 122), true)
+		{
+			ExpandedChanged = expanded =>
+			{
+				if (expanded)
+				{
+					base.Add(_scrollable!);
+					Size = _size;
 				}
-			},
-			_scrollable = new WindowScrollableContainer(){
-				RelativeSizeAxes = Axes.Both,
-				NegativeSize = new(0, __titleBarHeight),
-				Y = __titleBarHeight,
-				BackgroundColor = new Color(21, 22, 23),
-				Child = _content = new FlexContainer(){
-					RelativeSizeAxes = Axes.X,
-					AutoSizeAxes = Axes.Y,
-					Padding = new(top: 8, right: 5, bottom: 5, left: 5),
-					Direction = FlexDirection.Vertical,
-					Spacing = new(0, 4)
+				else
+				{
+					Remove(_scrollable!);
+					Size = new(_size.X, __titleBarHeight);
 				}
 			}
-
-		]);
+		});
+		base.Add(_scrollable = new WindowScrollableContainer()
+		{
+			RelativeSizeAxes = Axes.Both,
+			NegativeSize = new(0, __titleBarHeight),
+			Y = __titleBarHeight,
+			BackgroundColor = new Color(21, 22, 23),
+			Child = _content = new FlexContainer()
+			{
+				RelativeSizeAxes = Axes.X,
+				AutoSizeAxes = Axes.Y,
+				Padding = new(top: 8, right: 5, bottom: 5, left: 5),
+				Direction = FlexDirection.Vertical,
+				Spacing = new(0, 4)
+			}
+		});
 
 		AddDragableSurface(_titleBar);
 	}
 
-	public static GUIWindow Create(string title, Vector2 size)
+	public static GUIWindow Create(string title, Vector2 position, Vector2 size)
 	{
 		// EditorWrapper might have not been referenced yet 
 		// so the resources would not be loaded yet
 		_ = EditorWrapper.Instance;
 
-		var window = new GUIWindow(title, size);
+		var window = new GUIWindow(title, position, size);
 		EditorWrapper.Instance.Add(window);
 		return window;
 	}
 
-	private void addToWindow(GameObject obj)
+	public override void Add(GameObject gameObject)
 	{
 		if (_groupStack.Count == 0)
-			_content.Add(obj);
+			_content.Add(gameObject);
 		else
-			_groupStack.Peek().Add(obj);
+			_groupStack.Peek().Add(gameObject);
 	}
 
 	public void RemoveElement(GameObject obj) => obj.Parent!.Remove(obj);
@@ -86,41 +89,46 @@ public class GUIWindow : BasicWindowContainer
 	public GUIGroup AddGroup(string name)
 	{
 		var group = new GUIGroup(name);
-		addToWindow(group);
-		_groupStack.Push(group);
+		Add(group);
+		SelectGroup(group);
 		return group;
 	}
 
-	public void FinishGroup()
-	{
-		_groupStack.Pop();
-	}
+	public void SelectGroup(GUIGroup group) => _groupStack.Push(group);
+	public void FinishGroup() => _groupStack.Pop();
 
 	public GUILabel AddLabel(string text)
 	{
 		var label = new GUILabel(text);
-		addToWindow(label);
+		Add(label);
 		return label;
 	}
 
 	public GUILabelContinuous AddLabel(Func<string> textFunction)
 	{
 		var label = new GUILabelContinuous(textFunction);
-		addToWindow(label);
+		Add(label);
 		return label;
+	}
+
+	public GUICounter AddCounter(string text, int value)
+	{
+		var counter = new GUICounter(text, value);
+		Add(counter);
+		return counter;
 	}
 
 	public GUIButton AddButton(string text, Action clickAction)
 	{
 		var button = new GUIButton(text, clickAction);
-		addToWindow(button);
+		Add(button);
 		return button;
 	}
 
 	public GUICheckbox AddCheckbox(string name, bool @checked = false)
 	{
 		var checkbox = new GUICheckbox(name, @checked);
-		addToWindow(checkbox);
+		Add(checkbox);
 		return checkbox;
 	}
 
@@ -130,7 +138,7 @@ public class GUIWindow : BasicWindowContainer
 	{
 		var sliderFloat = new GUISliderFloat(
 			name, minValue, maxValue, initialValue, stringFormat, continuous);
-		addToWindow(sliderFloat);
+		Add(sliderFloat);
 		return sliderFloat;
 	}
 

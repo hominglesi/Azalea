@@ -19,7 +19,7 @@ internal static class CameraWindow
 	{
 		if (_window is null)
 		{
-			_window = GUIWindow.Create("Camera", new(400, 400));
+			_window = GUIWindow.Create("Camera", new(100), new(400, 400));
 			_window.AddSliderFloat("X Position", minValue: -1000, maxValue: 1000, initialValue: 0, continuous: false)
 				.OnValueChanged(x => MainCamera.Instance.Position = new(x, MainCamera.Instance.Position.Y));
 			_window.AddSliderFloat("Y Position", minValue: -1000, maxValue: 1000, initialValue: 0, continuous: false)

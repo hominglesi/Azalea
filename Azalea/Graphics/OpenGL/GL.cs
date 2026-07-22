@@ -70,9 +70,6 @@ internal static unsafe class GL
 		drawElements(mode, size, type, ((IntPtr)offset).ToPointer());
 	}
 
-	[DllImport(LibraryPath, EntryPoint = "glScissor")]
-	public static extern void Scissor(int x, int y, int width, int height);
-
 	[DllImport(LibraryPath, EntryPoint = "glEnable")]
 	public static extern void Enable(GLCapability capability);
 

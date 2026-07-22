@@ -6,6 +6,7 @@ using Azalea.Graphics;
 using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
 using Azalea.IO.Configs;
+using Azalea.Lists;
 using Azalea.Simulations;
 using Azalea.Sounds;
 using Azalea.Threading;
@@ -20,6 +21,8 @@ public abstract class GameHost
 
 	public static GameHost Main => _main ?? throw new Exception("GameHost hasn't been created yet.");
 	private static GameHost? _main;
+
+	public readonly ObservableList<Application> Applications = [];
 
 	public IWindow Window { get; }
 	public IRenderer Renderer { get; }
@@ -131,6 +134,16 @@ public abstract class GameHost
 		_root.FixedUpdateSubTree();
 
 		Physics.Update();
+	}
+
+	public Application CreateApplication()
+	{
+		var application = new Application();
+		Applications.Add(application);
+
+		application.OnClosed += () => Applications.Remove(application);
+
+		return application;
 	}
 
 	internal abstract IWindow CreateWindow(HostPreferences preferences);

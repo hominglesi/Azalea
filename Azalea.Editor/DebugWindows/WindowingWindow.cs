@@ -1,13 +1,6 @@
 ﻿using Azalea.Editor.Design.Gui;
-using Azalea.Graphics;
-using Azalea.Graphics.Colors;
-using Azalea.IO.Resources;
-using Azalea.Native.OpenGL;
-using Azalea.Platform.Rendering;
-using Azalea.Platform.Scheduling;
 using Azalea.Platform.Windowing;
 using Azalea.Platform.Windowing.Windows;
-using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -31,7 +24,7 @@ internal class WindowingWindow
 	{
 		if (_window is null)
 		{
-			_window = GUIWindow.Create("Windows", new(400, 400));
+			_window = GUIWindow.Create("Windows", new(100), new(400, 400));
 
 			PlatformWindow.OnWindowCreated += window =>
 			{
@@ -48,77 +41,22 @@ internal class WindowingWindow
 					_window.AddLabel("Handle: " + win.Handle);
 				}
 
+				window.Closed.OnValueChanged += _ =>
+				{
+					_window.RemoveElement(_windowGroups[window]);
+					_windowGroups.Remove(window);
+				};
+
 				_window.AddButton("Close", () => window.Close());
 				_window.FinishGroup();
 				_windowGroups.Add(window, group);
-			};
-			PlatformWindow.OnWindowClosed += window =>
-			{
-				_window.RemoveElement(_windowGroups[window]);
-				_windowGroups.Remove(window);
 			};
 
 			_window.AddLabel("Process Architecture: " + RuntimeInformation.ProcessArchitecture);
 			_window.AddButton("Create new Window", () => PlatformWindow.Create());
 			_window.AddButton("Create renderable new Window", () =>
 			{
-				var window = PlatformWindow.Create();
-				var renderer = PlatformRenderer.AttachRenderer(window);
-				var scheduler = PlatformScheduler.AttachScheduler(window);
-
-				renderer.BeginCommandGroup();
-
-				renderer.Enable(GL.BLEND);
-				renderer.Enable(GL.CULL_FACE);
-				renderer.Disable(GL.DEPTH_TEST);
-				renderer.BlendFunction(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
-
-				var azaleaImage = Assets.MainStore.GetImage("Textures/azalea-icon.png")!;
-
-				var azaleaTexture = renderer.GenerateTexture();
-				renderer.BindTexture(GL.TEXTURE_2D, azaleaTexture);
-				renderer.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, azaleaImage.Width, azaleaImage.Height, 0, GL.RGBA, GL.UNSIGNED_BYTE, azaleaImage.Data);
-				renderer.GenerateMipmap(GL.TEXTURE_2D);
-
-				var whiteImage = new Image(1, 1, [byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue]);
-				var whiteTexture = renderer.GenerateTexture();
-				renderer.BindTexture(GL.TEXTURE_2D, whiteTexture);
-				renderer.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, whiteImage.Width, whiteImage.Height, 0, GL.RGBA, GL.UNSIGNED_BYTE, whiteImage.Data);
-
-				var coordinator = renderer.GetCoordinator();
-				var quadBatch = coordinator.DefaultQuadBatch;
-
-				renderer.PrintErrors();
-
-				renderer.SubmitCommandGroup();
-
-				scheduler.InjectProtocol((win, rend) =>
-				{
-					var renderQueue = coordinator.BeginCommandQueue();
-					renderQueue.Clear(Palette.Beige);
-
-					if (AzaleaGame.RENDERED_GAME is not null)
-					{
-						try
-						{
-							AzaleaGame.RENDERED_GAME.Draw(null, renderer.GetCoordinator());
-						}
-						catch (Exception)
-						{
-							renderQueue.Return();
-							renderQueue = RenderCommandQueue.Borrow();
-							renderQueue.Clear(Palette.Beige);
-						}
-					}
-
-					quadBatch.Draw(renderQueue);
-
-					renderQueue.PrintErrors();
-
-					renderQueue.SwapBuffers();
-
-					renderer.StageQueue(coordinator.EndCommandQueue());
-				});
+				new Platform.Application();
 			});
 		}
 
