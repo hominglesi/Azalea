@@ -4,100 +4,41 @@ using Azalea.Platform.Windowing.Windows;
 using Azalea.Threading;
 using Azalea.Utils;
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Azalea.Platform.Windowing;
 public abstract class PlatformWindow
 {
-	#region Creation
-
-	private static List<PlatformWindow> _windows = [];
-	public static event Action<PlatformWindow>? OnWindowCreated;
-
-	protected PlatformWindow()
+	protected PlatformWindow(bool initiallyVisible)
 	{
-		_thread = new WindowThread(this);
-		_thread.Start();
+		Shown = new(initiallyVisible);
+
+		Thread = new WindowThread(this);
+		Thread.Start();
+
+		Thread.Initialized.WaitOne();
+		Thread.Initialized.Dispose();
 	}
 
-	public static PlatformWindow Create(bool visible = true)
+	public static PlatformWindow Create(bool initiallyVisible = true)
 	{
 		var newWindow = RuntimeInformation.ProcessArchitecture switch
 		{
-			Architecture.X64 or Architecture.X86 => new WindowsWindow(visible),
+			Architecture.X64 or Architecture.X86 => new WindowsWindow(initiallyVisible),
 			_ => throw new NotSupportedException(
 				$"Platform '{RuntimeInformation.ProcessArchitecture}' is not supported")
 		};
 
-		_windows.Add(newWindow);
-		OnWindowCreated?.Invoke(newWindow);
 		return newWindow;
 	}
 
-	public bool Initialized { get; private set; } = false;
 	protected abstract void Initialize();
 	protected abstract void Update();
 
-	private void assureInitialized()
-	{
-		while (Initialized == false)
-			Thread.Sleep(1);
-	}
-
-	#endregion
-
-	#region Thread
-
-	private readonly WindowThread _thread;
-
-	class WindowThread(PlatformWindow window) : GameThread(1)
-	{
-		public override string DisplayName => "Window Thread";
-
-		private readonly PlatformWindow _window = window;
-
-		protected override void Initialize()
-		{
-			_window.Initialize();
-			_window.Initialized = true;
-		}
-
-		protected override void Update()
-		{
-			_window.Update();
-		}
-	}
-
-	#endregion
-
-	#region DeviceContext
-
-	private readonly object _deviceContextOwnerLock = new();
-	private bool _deviceContextBorrowed = false;
-
-	public PlatformDeviceContext BorrowDeviceContext()
-	{
-		lock (_deviceContextOwnerLock)
-		{
-			if (_deviceContextBorrowed)
-				throw new InvalidOperationException("Device Context is already in use!");
-
-			_deviceContextBorrowed = true;
-
-			assureInitialized();
-			return GetDeviceContext();
-		}
-	}
-
-	protected abstract PlatformDeviceContext GetDeviceContext();
-
-	#endregion
-
 	public virtual string PlatformType => "Abstract Window";
-
 	public string Title => "Azalea Window";
+	public readonly ReadOnlyObservable<bool> Shown;
 
 	public PlatformRenderer? SubscribedRenderer { get; private set; } = null;
 	internal void Subscribe(PlatformRenderer renderer)
@@ -117,16 +58,57 @@ public abstract class PlatformWindow
 		SubscribedScheduler = scheduler;
 	}
 
+	internal bool DeviceContextBorrowed = false;
+	private readonly object _deviceContextOwnerLock = new();
+	protected abstract PlatformDeviceContext GetDeviceContext();
+	public PlatformDeviceContext BorrowDeviceContext()
+	{
+		lock (_deviceContextOwnerLock)
+		{
+			if (DeviceContextBorrowed)
+				throw new InvalidOperationException("Device Context is already in use!");
+
+			DeviceContextBorrowed = true;
+
+			return GetDeviceContext();
+		}
+	}
+
 	public readonly ReadOnlyObservable<bool> Closed = new(false);
 	public void Close()
 	{
 		if (Closed) return;
 
-		_thread.Stop();
+		Thread.Stop();
 		SubscribedRenderer?.Close();
 		SubscribedScheduler?.Stop();
 
 		Closed.Value = true;
-		_windows.Remove(this);
 	}
+
+	#region Thread
+
+	internal readonly WindowThread Thread;
+
+	internal class WindowThread(PlatformWindow window) : GameThread(1)
+	{
+		private readonly PlatformWindow _window = window;
+
+		public override string DisplayName => "Window Thread";
+
+		internal EventWaitHandle Initialized = new(false, EventResetMode.ManualReset);
+
+		protected override void Initialize()
+		{
+			_window.Initialize();
+			Initialized.Set();
+		}
+
+		protected override void Update()
+		{
+			_window.Update();
+		}
+	}
+
+	#endregion
 }

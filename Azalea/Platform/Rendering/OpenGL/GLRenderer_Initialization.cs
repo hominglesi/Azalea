@@ -15,8 +15,7 @@ internal partial class GLRenderer
 			if (_initialzed == true)
 				return;
 
-			// TODO: Remove declaration
-			var dummyWindow = Windowing.PlatformWindow.Create(visible: false);
+			var dummyWindow = Windowing.PlatformWindow.Create(initiallyVisible: false);
 			var dummyDeviceContext = dummyWindow.BorrowDeviceContext();
 
 			var dummyThread = new InitializationThread(dummyDeviceContext);

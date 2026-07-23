@@ -124,7 +124,7 @@ internal abstract class GameThread
 
 		_tickIndex = (_tickIndex + 1) % _tickList.Length;
 
-		if (_tickIndex % 10 == 0)
+		if (_tickIndex % 20 == 0)
 		{
 			AverageInterval.Value = _tickSum / _tickList.Length;
 			AverageFrequency.Value = 1000 / AverageInterval;
