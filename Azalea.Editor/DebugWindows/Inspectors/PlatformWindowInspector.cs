@@ -1,7 +1,6 @@
 ﻿using Azalea.Editor.Design.Gui;
 using Azalea.Platform.Windowing;
 using Azalea.Platform.Windowing.Windows;
-using Azalea.Threading;
 using System.Diagnostics;
 using System.Numerics;
 
@@ -24,9 +23,7 @@ internal class PlatformWindowInspector
 		}
 
 		guiWindow.AddLabel("Title: " + window.Title);
-		var shownLabel = guiWindow.AddLabel("Shown: " + window.Shown);
-		window.Shown.OnValueChanged += shown => Scheduler.Schedule(
-			() => shownLabel.Text = "Shown: " + shown);
+		guiWindow.AddObservingLabel("Shown", window.Shown);
 
 		// For now using a window without these doesn't make sense
 		// so we'll just assume that they are created
@@ -40,7 +37,7 @@ internal class PlatformWindowInspector
 
 		guiWindow.AddLabel("Device Context Borrowed: " + window.DeviceContextBorrowed);
 
-		guiWindow.AddLabel("Closed: " + window.Closed);
+		guiWindow.AddObservingLabel("Closed", window.Closed);
 		guiWindow.AddButton("Close", window.Close);
 
 		var thread = window.Thread;
@@ -48,7 +45,6 @@ internal class PlatformWindowInspector
 		GameThreadInspector.Inject(guiWindow, window.Thread);
 		guiWindow.FinishGroup();
 
-		window.Closed.OnValueChanged += _ => guiWindow.Hide();
 		return guiWindow;
 	}
 }

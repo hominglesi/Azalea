@@ -44,6 +44,12 @@ public class GUIWindow : BasicWindowContainer
 				}
 			}
 		});
+		base.Add(new CloseButton(__titleBarHeight)
+		{
+			Origin = Anchor.TopRight,
+			Anchor = Anchor.TopRight,
+			ClickAction = _ => Hide()
+		});
 		base.Add(_scrollable = new WindowScrollableContainer()
 		{
 			RelativeSizeAxes = Axes.Both,
@@ -116,6 +122,14 @@ public class GUIWindow : BasicWindowContainer
 		var counter = new GUICounter(text, value);
 		Add(counter);
 		return counter;
+	}
+
+	public GUIObservingLabel<T> AddObservingLabel<T>(string label, Utils.IObservable<T> observable)
+		where T : unmanaged
+	{
+		var observingLabel = new GUIObservingLabel<T>(label, observable);
+		Add(observingLabel);
+		return observingLabel;
 	}
 
 	public GUIButton AddButton(string text, Action clickAction)
@@ -206,7 +220,6 @@ public class GUIWindow : BasicWindowContainer
 				Size = new(20);
 				Add(_sprite = new Sprite()
 				{
-					Size = new(10),
 					Texture = Assets.GetTexture($"Gui/arrow-{(_expanded ? "down" : "up")}.png"),
 					Anchor = Anchor.Center,
 					Origin = Anchor.Center
@@ -223,6 +236,32 @@ public class GUIWindow : BasicWindowContainer
 			}
 		}
 	}
+
+	internal class CloseButton : Composition
+	{
+		public CloseButton(float size)
+		{
+			Size = new(size);
+			Add(new Sprite()
+			{
+				Texture = Assets.GetTexture($"Gui/cross.png"),
+				Origin = Anchor.Center,
+				Anchor = Anchor.Center
+			});
+		}
+
+		protected override bool OnHover(HoverEvent e)
+		{
+			BackgroundColor = new Color(255, 255, 255, 60);
+			return true;
+		}
+
+		protected override void OnHoverLost(HoverLostEvent e)
+		{
+			BackgroundColor = new Color(255, 255, 255, 0);
+		}
+	}
+
 	internal class WindowScrollableContainer : ScrollableContainer
 	{
 		protected override Slider CreateSlider()

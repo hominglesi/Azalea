@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Azalea.Utils;
-public class ReadOnlyObservable<T>(T initialValue) : IFormattable
+public class ReadOnlyObservable<T>(T initialValue) : IFormattable, IObservable<T>
 	where T : unmanaged
 {
 	private T _value = initialValue;
@@ -19,7 +19,7 @@ public class ReadOnlyObservable<T>(T initialValue) : IFormattable
 		}
 	}
 
-	public Action<T>? OnValueChanged;
+	public event Action<T>? OnValueChanged;
 
 	public static implicit operator T(ReadOnlyObservable<T> observable) => observable.Value;
 	public override string ToString() => _value.ToString()!;

@@ -12,7 +12,6 @@ internal class PlatformRendererInspector
 
 		window.AddLabel("Stopped: " + renderer.Stopped);
 
-		renderer.Stopped.OnValueChanged += _ => window.Hide();
 		return window;
 	}
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Azalea.Utils;
-public class Observable<T>(T initialValue)
+public class Observable<T>(T initialValue) : IFormattable, IObservable<T>
 	where T : unmanaged
 {
 	private T _value = initialValue;
@@ -19,7 +19,17 @@ public class Observable<T>(T initialValue)
 		}
 	}
 
-	public Action<T>? OnValueChanged;
+	public event Action<T>? OnValueChanged;
 
 	public static implicit operator T(Observable<T> observable) => observable.Value;
+	public override string ToString() => _value.ToString()!;
+	public string ToString(string? format, IFormatProvider? formatProvider)
+	{
+		if (format is null) return ToString();
+
+		if (_value is IFormattable formattable)
+			return formattable.ToString(format, formatProvider);
+
+		return ToString();
+	}
 }
