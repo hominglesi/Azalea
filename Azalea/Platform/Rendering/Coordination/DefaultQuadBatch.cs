@@ -124,7 +124,7 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 
 		commandQueue.DrawElements(GL.TRIANGLES, (_nextVertex / 4) * 6, GL.UNSIGNED_INT, 0);
 
-		commandQueue.BindVertexArray(null);
+		//commandQueue.BindVertexArray(null);
 
 		_vertices = null;
 		_nextVertex = 0;

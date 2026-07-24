@@ -16,6 +16,8 @@ internal abstract class RenderCommand
 		OnCommandCreated?.Invoke(this);
 	}
 
+	public override string ToString() => GetType().Name;
+
 	public abstract void Return();
 	protected virtual void Cleanup() { }
 }
@@ -48,6 +50,9 @@ internal partial class BindTextureCommand : RenderCommand
 internal partial class BindVertexArrayCommand : RenderCommand
 {
 	public VertexArray? VertexArray;
+
+	public override string ToString()
+		=> $"BindVertexArray({(VertexArray is null ? 0 : VertexArray.Handle)})";
 }
 
 [RenderCommand]
@@ -144,6 +149,8 @@ internal partial class DrawElementsCommand : RenderCommand
 	public int Count;
 	public int Type;
 	public int Offset;
+
+	public override string ToString() => $"DrawElements({Count})";
 }
 
 [RenderCommand]
@@ -255,6 +262,9 @@ internal partial class PrintShaderCompileStatusCommand : RenderCommand
 internal partial class ScissorCommand : RenderCommand
 {
 	public RectangleInt? Rectangle;
+
+	public override string ToString()
+		=> Rectangle is null ? $"Scissor(0)" : $"Scissor({Rectangle})";
 }
 
 [RenderCommand]
@@ -320,6 +330,8 @@ internal partial class UniformMatrix4fvCommand : RenderCommand
 internal partial class UseProgramCommand : RenderCommand
 {
 	public Program Program;
+
+	public override string ToString() => $"UseProgram({Program.Handle})";
 }
 
 [RenderCommand]

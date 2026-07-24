@@ -40,7 +40,7 @@ public sealed class Application
 		Renderer.BindTexture(GL.TEXTURE_2D, whiteTexture);
 		Renderer.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, whiteImage.Width, whiteImage.Height, 0, GL.RGBA, GL.UNSIGNED_BYTE, whiteImage.Data);
 
-		var coordinator = Renderer.GetCoordinator();
+		var coordinator = Renderer.Coordinator;
 		var quadBatch = coordinator.DefaultQuadBatch;
 
 		Renderer.PrintErrors();
@@ -57,7 +57,7 @@ public sealed class Application
 			{
 				try
 				{
-					AzaleaGame.RENDERED_GAME.Draw(null, Renderer.GetCoordinator());
+					AzaleaGame.RENDERED_GAME.Draw(null, Renderer.Coordinator);
 				}
 				catch (Exception)
 				{

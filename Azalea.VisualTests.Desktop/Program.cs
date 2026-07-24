@@ -13,7 +13,7 @@ internal class Program
 			.SetTitle("Azalea Visual Tests")
 			.SetGameSize(new Vector2Int(1600, 900))
 			.SetResizable(true)
-			.SetVSync(true)
+			.SetVSync(false)
 			.SetupPersistentDirectory("Azalea.VisualTests")
 			.SetupReflectedDirectory("../../../../../../Azalea.VisualTests/")
 			//.EnableTracing()

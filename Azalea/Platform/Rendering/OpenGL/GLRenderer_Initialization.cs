@@ -22,7 +22,7 @@ internal partial class GLRenderer
 			dummyThread.Start();
 
 			while (dummyThread.Initialized == false)
-				Thread.Sleep(1);
+				System.Threading.Thread.Sleep(1);
 
 			dummyWindow.Close();
 			dummyThread.Stop();

@@ -16,31 +16,19 @@ public abstract class PlatformRenderer : IRenderCommandConsumer
 			SingleReader = true
 		});
 
-		_thread = new RenderThread(this);
+		Thread = new RenderThread(this);
 	}
 
-	protected void StartRenderThread() => _thread.Start();
+	/// <summary> Called after a rendering implementation has finished constructing.</summary>
+	protected void StartRenderThread() => Thread.Start();
 
 	protected abstract void Initialize();
 	protected abstract void Update();
 
-	public readonly ReadOnlyObservable<bool> Stopped = new(false);
-
-	internal void Close()
+	private RenderCoordinator? _coordinator;
+	public RenderCoordinator Coordinator
 	{
-		_thread.Stop();
-		Stopped.Value = true;
-	}
-
-	public static PlatformRenderer AttachRenderer(Windowing.PlatformWindow window)
-	{
-		var deviceContext = window.BorrowDeviceContext();
-
-		// For now OpenGL is hardcoded
-		var renderer = new GLRenderer(deviceContext);
-
-		window.Subscribe(renderer);
-		return renderer;
+		get => _coordinator ??= new RenderCoordinator(this);
 	}
 
 	#region Commands
@@ -99,14 +87,25 @@ public abstract class PlatformRenderer : IRenderCommandConsumer
 	private RenderCommandQueue? _workingQueue = null;
 	private readonly object _workingQueueLock = new();
 
+	internal readonly ReadOnlyObservable<int> StagedQueueOverrides = new(0);
+	internal readonly ReadOnlyObservable<int> NoStagedQueueFrames = new(0);
+
 	internal void StageQueue(RenderCommandQueue queue)
 	{
 		lock (_stagedQueueLock)
 		{
-			_stagedQueue?.Return();
+			if (_stagedQueue is not null)
+			{
+				_stagedQueue.Return();
+				StagedQueueOverrides.Value++;
+			}
+
 			_stagedQueue = queue;
 		}
 	}
+
+	internal bool SnapshotNextFrame = false;
+	internal event Action<List<string>> CommandSnapshotCreated;
 
 	protected void ProcessStagedQueue()
 	{
@@ -114,25 +113,34 @@ public abstract class PlatformRenderer : IRenderCommandConsumer
 		{
 			lock (_stagedQueueLock)
 			{
-				if (_workingQueue == _stagedQueue)
+				if (_stagedQueue is null)
+				{
+					NoStagedQueueFrames.Value++;
 					return;
+				}
 
-				_workingQueue?.Return();
 				_workingQueue = _stagedQueue;
 				_stagedQueue = null;
 			}
 
-			if (_workingQueue is null)
-				return;
-
 			lock (_commandsLock)
 			{
+				var commandSnapshot = new List<string>();
 				var nextCommand = _workingQueue.Dequeue();
 
 				while (nextCommand is not null)
 				{
+					commandSnapshot.Add(nextCommand.ToString()!);
 					HandleCommand(nextCommand);
 					nextCommand = _workingQueue.Dequeue();
+				}
+
+				_workingQueue.Return();
+
+				if (SnapshotNextFrame)
+				{
+					CommandSnapshotCreated?.Invoke(commandSnapshot);
+					SnapshotNextFrame = false;
 				}
 			}
 		}
@@ -140,27 +148,24 @@ public abstract class PlatformRenderer : IRenderCommandConsumer
 
 	#endregion
 
-	#region Coordinator
-
-	private RenderCoordinator? _coordinator;
-
-	public RenderCoordinator GetCoordinator()
+	public readonly ReadOnlyObservable<bool> Stopped = new(false);
+	internal void Stop()
 	{
-		_coordinator ??= new RenderCoordinator(this);
-		return _coordinator;
+		if (Stopped) return;
+
+		Thread.Stop();
+		Stopped.Value = true;
 	}
 
-	#endregion
+	#region RenderThread
 
-	#region Thread
+	internal readonly RenderThread Thread;
 
-	private readonly RenderThread _thread;
-
-	class RenderThread(PlatformRenderer renderer) : GameThread(1)
+	internal class RenderThread(PlatformRenderer renderer) : GameThread(1)
 	{
-		public override string DisplayName => "Rendering Thread";
-
 		private readonly PlatformRenderer _renderer = renderer;
+
+		public override string DisplayName => "Rendering Thread";
 
 		protected override void Initialize()
 		{
@@ -176,4 +181,15 @@ public abstract class PlatformRenderer : IRenderCommandConsumer
 	}
 
 	#endregion
+
+	public static PlatformRenderer AttachRenderer(Windowing.PlatformWindow window)
+	{
+		var deviceContext = window.BorrowDeviceContext();
+
+		// For now OpenGL is hardcoded
+		var renderer = new GLRenderer(deviceContext);
+
+		window.Subscribe(renderer);
+		return renderer;
+	}
 }

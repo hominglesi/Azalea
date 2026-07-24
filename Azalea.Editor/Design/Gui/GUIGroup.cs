@@ -44,4 +44,5 @@ public class GUIGroup : Composition
 
 	public override void Add(GameObject gameObject) => _content.Add(gameObject);
 	public override bool Remove(GameObject gameObject) => _content.Remove(gameObject);
+	public override void Clear() => _content.Clear();
 }

@@ -11,10 +11,12 @@ public partial class RenderCommandQueue : IRenderCommandConsumer
 	private static readonly ConcurrentBag<RenderCommandQueue> _pool = [];
 	internal static RenderCommandQueue Borrow()
 	{
-		if (_pool.TryTake(out var pool))
+		if (_pool.TryTake(out var existing))
 		{
-			pool._commands.Clear();
-			return pool;
+			existing._commands.Clear();
+			existing._currentProgram = null;
+			existing._currentVertexArray = null;
+			return existing;
 		}
 
 		return new RenderCommandQueue();
@@ -30,8 +32,10 @@ public partial class RenderCommandQueue : IRenderCommandConsumer
 
 	#endregion
 
-
 	private readonly Queue<RenderCommand> _commands = [];
+
+	private Program? _currentProgram;
+	private VertexArray? _currentVertexArray;
 
 	internal RenderCommand? Dequeue()
 	{
@@ -41,8 +45,28 @@ public partial class RenderCommandQueue : IRenderCommandConsumer
 		return null;
 	}
 
-	internal void Enqueue(RenderCommand command) => _commands.Enqueue(command);
-	void IRenderCommandConsumer.Enqueue(RenderCommand command) => _commands.Enqueue(command);
+	internal void Enqueue(RenderCommand command)
+	{
+		// We avoid enqueuing commands that don't change state 
+		switch (command)
+		{
+			case BindVertexArrayCommand(var vertexArray):
+				if (_currentVertexArray == vertexArray) return;
+
+				_currentVertexArray = vertexArray;
+				break;
+			case UseProgramCommand(var program):
+				if (_currentProgram == program) return;
+
+				_currentProgram = program;
+				break;
+
+		}
+
+		_commands.Enqueue(command);
+	}
+
+	void IRenderCommandConsumer.Enqueue(RenderCommand command) => Enqueue(command);
 
 	internal void ReturnAllCommands()
 	{

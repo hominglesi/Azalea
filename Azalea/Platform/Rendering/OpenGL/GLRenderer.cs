@@ -27,6 +27,8 @@ internal partial class GLRenderer : PlatformRenderer
 
 		_context = GLContext.Create(_deviceContext);
 		_context.MakeCurrent();
+
+		GL.wglSwapIntervalEXT(0);
 	}
 
 	protected override void Update()

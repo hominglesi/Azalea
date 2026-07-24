@@ -80,13 +80,13 @@ public abstract class PlatformWindow
 		if (Closed) return;
 
 		Thread.Stop();
-		SubscribedRenderer?.Close();
+		SubscribedRenderer?.Stop();
 		SubscribedScheduler?.Stop();
 
 		Closed.Value = true;
 	}
 
-	#region Thread
+	#region WindowThread
 
 	internal readonly WindowThread Thread;
 

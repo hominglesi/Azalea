@@ -117,4 +117,7 @@ public static partial class GL
 
 	[OpenGLLoadedFunction(automaticPrefix: false, docs: "https://registry.khronos.org/OpenGL/extensions/ARB/WGL_ARB_create_context.txt")]
 	private delegate nint wglCreateContextAttribsARBDelegate(nint hDC, bool hShareContext, in int attribList);
+
+	[OpenGLLoadedFunction(automaticPrefix: false, docs: "https://registry.khronos.org/OpenGL/extensions/EXT/WGL_EXT_swap_control.txt")]
+	private delegate bool wglSwapIntervalEXTDelegate(int interval);
 }
