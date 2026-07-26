@@ -21,8 +21,8 @@ internal partial class GLRenderer
 			var dummyThread = new InitializationThread(dummyDeviceContext);
 			dummyThread.Start();
 
-			while (dummyThread.Initialized == false)
-				System.Threading.Thread.Sleep(1);
+			dummyThread.Initialized.WaitOne();
+			dummyThread.Initialized.Dispose();
 
 			dummyWindow.Close();
 			dummyThread.Stop();
@@ -33,11 +33,11 @@ internal partial class GLRenderer
 
 	class InitializationThread(PlatformDeviceContext deviceContext) : GameThread(1)
 	{
+		private readonly PlatformDeviceContext _deviceContext = deviceContext;
+
 		public override string DisplayName => "OpenGL Initialization Thread";
 
-		public bool Initialized { get; private set; } = false;
-
-		private readonly PlatformDeviceContext _deviceContext = deviceContext;
+		internal EventWaitHandle Initialized = new(false, EventResetMode.ManualReset);
 
 		protected override void Initialize()
 		{
@@ -46,7 +46,7 @@ internal partial class GLRenderer
 
 			GL.LoadDynamicFunctions(context.GetProcAddress);
 
-			Initialized = true;
+			Initialized.Set();
 		}
 
 		protected override void Update() { }
