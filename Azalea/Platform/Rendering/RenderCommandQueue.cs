@@ -50,13 +50,21 @@ public partial class RenderCommandQueue : IRenderCommandConsumer
 		// We avoid enqueuing commands that don't change state 
 		switch (command)
 		{
-			case BindVertexArrayCommand(var vertexArray):
-				if (_currentVertexArray == vertexArray) return;
+			case BindVertexArrayCommand(var vertexArray) bindVertexArrayCommand:
+				if (_currentVertexArray == vertexArray)
+				{
+					bindVertexArrayCommand.Return();
+					return;
+				}
 
 				_currentVertexArray = vertexArray;
 				break;
-			case UseProgramCommand(var program):
-				if (_currentProgram == program) return;
+			case UseProgramCommand(var program) useProgramCommand:
+				if (_currentProgram == program)
+				{
+					useProgramCommand.Return();
+					return;
+				}
 
 				_currentProgram = program;
 				break;

@@ -1,5 +1,6 @@
 ﻿using Azalea.Native.OpenGL;
 using Azalea.Native.Windows;
+using Azalea.Platform.Rendering.OpenGL.LoadingContext;
 using Azalea.Platform.Windowing;
 using Azalea.Platform.Windowing.Windows;
 using System;
@@ -34,7 +35,7 @@ internal class GLContext
 		throw new NotSupportedException("Device context is not supported");
 	}
 
-	public static GLContext Create(PlatformDeviceContext deviceContext)
+	public static GLContext Create(PlatformDeviceContext deviceContext, GLLoadingContext? shareContext = null)
 	{
 		if (deviceContext is WindowsDeviceContext winDeviceContext)
 		{
@@ -45,12 +46,18 @@ internal class GLContext
 				GL.WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
 				GL.WGL_CONTEXT_MINOR_VERSION_ARB, 3,
 				GL.WGL_CONTEXT_PROFILE_MASK_ARB, GL.WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-				0
+				0, 0
 			};
 
-			var context = GL.wglCreateContextAttribsARB(winDeviceContext.Handle, false, in openGLAttribs[0]);
+			shareContext?.ReleaseContext();
+
+			var shareContextHandle = shareContext is null ? nint.Zero : shareContext.Handle;
+
+			var context = GL.wglCreateContextAttribsARB(winDeviceContext.Handle, shareContextHandle, in openGLAttribs[0]);
 			if (context == nint.Zero)
 				throw new Exception($"Could not create context. (Error {Marshal.GetLastWin32Error()})");
+
+			shareContext?.RebindContext();
 
 			return new GLContext(context, deviceContext);
 		}
@@ -58,7 +65,7 @@ internal class GLContext
 		throw new NotSupportedException("Device context is not supported");
 	}
 
-	private readonly Dictionary<int, GLContext> _activeContexts = [];
+	private readonly Dictionary<int, GLContext?> _activeContexts = [];
 
 	public void MakeCurrent()
 	{
@@ -68,6 +75,20 @@ internal class GLContext
 				throw new Exception("Could not make context current");
 
 			_activeContexts[Environment.CurrentManagedThreadId] = this;
+			return;
+		}
+
+		throw new NotSupportedException("Device context is not supported");
+	}
+
+	public void Release()
+	{
+		if (DeviceContext is WindowsDeviceContext winDeviceContext)
+		{
+			if (Win32.wglMakeCurrent(winDeviceContext.Handle, 0) == false)
+				throw new Exception("Could not release context");
+
+			_activeContexts[Environment.CurrentManagedThreadId] = null;
 			return;
 		}
 

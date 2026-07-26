@@ -7,32 +7,42 @@ using System.Text;
 namespace Azalea.SourceGeneration;
 
 [Generator]
-internal class RenderCommandGenerator : IIncrementalGenerator
+internal class ThreadCommandGenerator : IIncrementalGenerator
 {
-	struct RenderCommandData(string name, string @namespace, Accessibility accessModifier,
-		List<(string, string)> properties)
+	struct ThreadCommandData(string name, string @namespace, string? parentClass,
+		Accessibility? parentAccessModifier, Accessibility accessModifier,
+		bool awaitable, List<(string, string)> properties)
 	{
 		public string Name { get; set; } = name;
 		public string Namespace { get; set; } = @namespace;
+		public string? ParentClass { get; set; } = parentClass;
+		public Accessibility? ParentAccessModifier { get; set; } = parentAccessModifier;
 		public Accessibility AccessModifier { get; set; } = accessModifier;
+		public bool Awaitable { get; set; } = awaitable;
 		public List<(string, string)> Properties { get; set; } = properties;
 	}
 
 	public void Initialize(IncrementalGeneratorInitializationContext context)
 	{
 		var provider = context.SyntaxProvider.ForAttributeWithMetadataName(
-			"Azalea.Platform.Rendering.RenderCommandAttribute",
+			"Azalea.Threading.ThreadCommandAttribute",
 			predicate: (node, _) => node is ClassDeclarationSyntax,
 			transform: (ctx, _) =>
 			{
+				var functionAttribute = ctx.Attributes.First(
+					a => a.AttributeClass?.Name == "ThreadCommandAttribute");
+
 				var symbol = (INamedTypeSymbol)ctx.TargetSymbol;
 
-				return new RenderCommandData(
+				return new ThreadCommandData(
 					name: symbol.Name,
 					@namespace: symbol.ContainingNamespace.IsGlobalNamespace ?
 						string.Empty
 						: symbol.ContainingNamespace.ToDisplayString(),
+					parentClass: symbol.ContainingType?.Name,
+					parentAccessModifier: symbol.ContainingType?.DeclaredAccessibility,
 					accessModifier: symbol.DeclaredAccessibility,
+					awaitable: (bool)functionAttribute.ConstructorArguments[0].Value!,
 					properties: [.. symbol.GetMembers()
 					.OfType<IFieldSymbol>()
 					.Select(p => (p.Type.ToDisplayString(), p.Name))]);
@@ -49,11 +59,11 @@ internal class RenderCommandGenerator : IIncrementalGenerator
 			if (builder.Length <= 25)
 				return;
 
-			ctx.AddSource("RenderCommands.g.cs", builder.ToString());
+			ctx.AddSource("ThreadCommands.g.cs", builder.ToString());
 		});
 	}
 
-	private string generateClass(RenderCommandData command)
+	private string generateClass(ThreadCommandData command)
 	{
 		var builder = new StringBuilder();
 
@@ -64,17 +74,23 @@ internal class RenderCommandGenerator : IIncrementalGenerator
 		builder.Append(command.Namespace);
 		beginNest();
 
-		// Class
-		builder.Append(command.AccessModifier switch
+		// Parent Class
+		if (command.ParentClass is not null)
 		{
-			Accessibility.Private => "private",
-			Accessibility.Public => "public ",
-			Accessibility.Internal => "internal",
-			_ => "public"
-		});
+			appendAccessModifier(command.ParentAccessModifier!.Value);
+			builder.Append(" partial class ");
+			builder.Append(command.ParentClass);
+			beginNest();
+		}
 
+
+		// Class
+		appendAccessModifier(command.AccessModifier);
 		builder.Append(" partial class ");
 		builder.Append(command.Name);
+		if (command.Awaitable)
+			builder.Append(" : Azalea.Threading.ICommandAwaitable");
+
 		beginNest();
 
 		// Constructor
@@ -102,6 +118,9 @@ internal class RenderCommandGenerator : IIncrementalGenerator
 				newLine();
 		}
 
+		builder.Append("OnCommandCreated?.Invoke(this);");
+		newLine();
+
 		endNest();
 		newLine();
 
@@ -112,7 +131,7 @@ internal class RenderCommandGenerator : IIncrementalGenerator
 		newLine();
 
 		// TotalCreated
-		builder.Append("internal static new int TotalCreated = 0;");
+		builder.Append("internal static volatile new int TotalCreated = 0;");
 		newLine();
 
 		// Borrow Method
@@ -154,6 +173,13 @@ internal class RenderCommandGenerator : IIncrementalGenerator
 		beginNest();
 		builder.Append("Cleanup();");
 		newLine();
+		if (command.Awaitable)
+		{
+			builder.Append("_completedEvent.Set();");
+			newLine();
+			builder.Append("_completedEvent.Reset();");
+			newLine();
+		}
 		builder.Append("__commandPool.Add(this);");
 		endNest();
 		newLine();
@@ -177,10 +203,25 @@ internal class RenderCommandGenerator : IIncrementalGenerator
 			if (i + 1 < command.Properties.Count)
 				newLine();
 		}
+		endNest();
+
+		if (command.Awaitable)
+		{
+			newLine();
+
+			// ManualResetEvent
+			builder.Append("private readonly System.Threading.ManualResetEvent _completedEvent = new(false);");
+			newLine();
+
+			// Await Method
+			builder.Append("public void Await() => _completedEvent.WaitOne();");
+		}
 
 		endNest();
 		endNest();
-		endNest();
+		if (command.ParentClass is not null)
+			endNest();
+
 		newLine();
 
 		return builder.ToString();
@@ -230,6 +271,17 @@ internal class RenderCommandGenerator : IIncrementalGenerator
 				if (i + 1 < command.Properties.Count)
 					builder.Append(", ");
 			}
+		}
+
+		void appendAccessModifier(Accessibility accessibility)
+		{
+			builder.Append(accessibility switch
+			{
+				Accessibility.Private => "private",
+				Accessibility.Public => "public ",
+				Accessibility.Internal => "internal",
+				_ => "public"
+			});
 		}
 	}
 }

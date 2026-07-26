@@ -2,10 +2,13 @@
 using Azalea.Editor.Design.Gui;
 using Azalea.Platform;
 using Azalea.Platform.Rendering;
+using Azalea.Platform.Rendering.OpenGL;
+using Azalea.Platform.Rendering.OpenGL.LoadingContext;
 using Azalea.Threading;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Azalea.Editor.DebugWindows;
@@ -21,12 +24,6 @@ internal static class GlobalWindow
 		else hide();
 	}
 
-	private static GUIGroup _applicationsGroup;
-	private static Dictionary<Application, GUIGroup> _applicationGroups = [];
-
-	private static GUILabel? _createdCommandsDisplay;
-	private static Dictionary<Type, GUICounter> _commandDisplays = [];
-
 	private static void show()
 	{
 		if (_window is null)
@@ -35,11 +32,12 @@ internal static class GlobalWindow
 
 			_window.AddGroup("Host");
 			_window.AddButton("Create Application", () => GameHost.Main.CreateApplication());
-			_applicationsGroup = _window.AddGroup("Applications");
+			var applicationsGroup = _window.AddGroup("Applications");
+			var applicationGroups = new Dictionary<Application, GUIGroup>();
 
 			void createApplicationGroup(Application application)
 			{
-				_window!.SelectGroup(_applicationsGroup);
+				_window!.SelectGroup(applicationsGroup);
 				var group = _window!.AddGroup("Application");
 				_window.AddButton("Close", () => application.Close());
 
@@ -52,14 +50,14 @@ internal static class GlobalWindow
 
 				_window.FinishGroup();
 				_window.FinishGroup();
-				_applicationGroups.Add(application, group);
+				applicationGroups.Add(application, group);
 			}
 
 			void removeApplicationGroup(Application application)
 			{
-				var group = _applicationGroups[application];
-				_applicationGroups.Remove(application);
-				_applicationsGroup.Remove(group);
+				var group = applicationGroups[application];
+				applicationGroups.Remove(application);
+				applicationsGroup.Remove(group);
 			}
 
 			foreach (var application in GameHost.Main.Applications)
@@ -73,29 +71,75 @@ internal static class GlobalWindow
 				() => removeApplicationGroup(application));
 
 			_window.FinishGroup();
+			_window.AddGroup("ThreadCommands");
+			var otherCommandsCount = 0;
+			var commandDisplays = new Dictionary<Type, GUICounter>();
+			var totalCreatedCounter = _window.AddCounter("Total Created: ", ThreadCommand.TotalCreated);
+			otherCommandsCount += ThreadCommand.TotalCreated;
 
-			_window.AddGroup("RenderCommands");
-			_createdCommandsDisplay = _window.AddLabel("Created RenderCommands: " + RenderCommand.TotalCreated);
-			_window.AddGroup("RenderCommand Types");
+			var renderCommands = _window.AddGroup("Render Commands");
+			var renderCreatedCounter = _window.AddCounter("Total Created: ", RenderCommand.TotalCreated);
+			otherCommandsCount -= RenderCommand.TotalCreated;
+			_window.FinishGroup();
 
-			foreach (var commandType in ReflectionUtils.GetAllChildrenOf(typeof(RenderCommand)))
+			var loadingCommands = _window.AddGroup("Loading Commands");
+			var loadingCreatedCounter = _window.AddCounter("Total Created: ", LoadingCommand.TotalCreated);
+			otherCommandsCount -= LoadingCommand.TotalCreated;
+			_window.FinishGroup();
+
+			var otherCommands = _window.AddGroup("Other Commands");
+			var otherCreatedCounter = _window.AddCounter("Total Created: ", otherCommandsCount);
+			_window.FinishGroup();
+
+			foreach (var commandType in ReflectionUtils.GetAllChildrenOf(typeof(ThreadCommand)))
 			{
+				if (commandType.IsAbstract)
+					continue;
+
 				var totalCreatedField = commandType.GetField("TotalCreated", BindingFlags.Static | BindingFlags.NonPublic)!;
+
+				if (commandType.IsSubclassOf(typeof(RenderCommand)))
+					_window.SelectGroup(renderCommands);
+				else if (commandType.IsSubclassOf(typeof(LoadingCommand)))
+					_window.SelectGroup(loadingCommands);
+				else
+					_window.SelectGroup(otherCommands);
+
 				var commandLabel = _window.AddCounter($"{commandType.Name}: ", (int)totalCreatedField.GetValue(null)!);
-				_commandDisplays.Add(commandType, commandLabel);
+				commandDisplays.Add(commandType, commandLabel);
+
+				_window.FinishGroup();
 			}
 
 			_window.FinishGroup();
-			_window.FinishGroup();
 
-			RenderCommand.OnCommandCreated += command =>
+			ThreadCommand.OnCommandCreated += command =>
 			{
-				Scheduler.Schedule(() =>
-				{
-					_createdCommandsDisplay.Text = "Created Commands: " + RenderCommand.TotalCreated;
-					_commandDisplays[command.GetType()].Value++;
-				});
+				totalCreatedCounter.Value = ThreadCommand.TotalCreated;
+				renderCreatedCounter.Value = RenderCommand.TotalCreated;
+				loadingCreatedCounter.Value = LoadingCommand.TotalCreated;
+				otherCreatedCounter.Value = ThreadCommand.TotalCreated
+					- RenderCommand.TotalCreated
+					- LoadingCommand.TotalCreated;
+
+				commandDisplays[command.GetType()].Value++;
 			};
+
+			if (GLRenderer.LoadingContext is not null)
+				addGLLoadingContext();
+			else
+				GLRenderer.LoadingContextCreated.OnValueChanged += _ => Scheduler.Schedule(
+					() => addGLLoadingContext());
+
+			void addGLLoadingContext()
+			{
+				var loadingContext = GLRenderer.LoadingContext;
+				Debug.Assert(_window is not null);
+				Debug.Assert(loadingContext is not null);
+				_window.AddGroup("GLLoadingContext");
+
+				_window.FinishGroup();
+			}
 		}
 
 		_window.Show();

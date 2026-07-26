@@ -35,7 +35,10 @@ internal class WindowsWindow(bool initiallyVisible) : PlatformWindow(initiallyVi
 
 		ClassAtom = Win32.RegisterClassExW(ref wndClass);
 
-		var styles = Win32.WindowStyles.OVERLAPPEDWINDOW | Win32.WindowStyles.VISIBLE;
+		var styles = Win32.WindowStyles.OVERLAPPEDWINDOW;
+
+		if (Shown)
+			styles |= Win32.WindowStyles.VISIBLE;
 
 		Handle = Win32.CreateWindowExWDLL(
 			Win32.WindowStylesExtended.APPWINDOW,

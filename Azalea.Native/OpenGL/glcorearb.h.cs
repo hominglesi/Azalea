@@ -116,7 +116,7 @@ public static partial class GL
 	private delegate bool wglChoosePixelFormatARBDelegate(nint hdc, in int piAttribIList, in float pfAttribFList, uint nMaxFormats, ref int piFormats, ref uint nNumFormats);
 
 	[OpenGLLoadedFunction(automaticPrefix: false, docs: "https://registry.khronos.org/OpenGL/extensions/ARB/WGL_ARB_create_context.txt")]
-	private delegate nint wglCreateContextAttribsARBDelegate(nint hDC, bool hShareContext, in int attribList);
+	private delegate nint wglCreateContextAttribsARBDelegate(nint hDC, nint hShareContext, in int attribList);
 
 	[OpenGLLoadedFunction(automaticPrefix: false, docs: "https://registry.khronos.org/OpenGL/extensions/EXT/WGL_EXT_swap_control.txt")]
 	private delegate bool wglSwapIntervalEXTDelegate(int interval);

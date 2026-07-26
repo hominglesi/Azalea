@@ -9,7 +9,7 @@ public class GUIObservingLabel<T> : TextContainer
 {
 	private readonly string _label;
 	private readonly IObservable<T> _observable;
-	private readonly Cached _valueValid = new();
+	private readonly Cached _displayedValue = new();
 
 	internal GUIObservingLabel(string label, IObservable<T> observable)
 		: base(spriteText => spriteText.Font = GUIConstants.Font)
@@ -20,15 +20,15 @@ public class GUIObservingLabel<T> : TextContainer
 		RelativeSizeAxes = Axes.X;
 		AutoSizeAxes = Axes.Y;
 
-		observable.OnValueChanged += _ => _valueValid.Invalidate();
+		observable.OnValueChanged += _ => _displayedValue.Invalidate();
 	}
 
 	protected override void Update()
 	{
-		if (_valueValid.IsValid == false)
+		if (_displayedValue.IsValid == false)
 		{
 			Text = $"{_label}: {_observable.Value}";
-			_valueValid.Validate();
+			_displayedValue.Validate();
 		}
 	}
 }

@@ -25,7 +25,7 @@ internal partial class GLRenderer : PlatformRenderer
 	{
 		assureGLInitialized();
 
-		_context = GLContext.Create(_deviceContext);
+		_context = GLContext.Create(_deviceContext, LoadingContext);
 		_context.MakeCurrent();
 
 		GL.wglSwapIntervalEXT(0);
