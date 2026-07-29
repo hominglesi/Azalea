@@ -4,6 +4,7 @@ using Azalea.IO.Resources;
 using Azalea.Native.OpenGL;
 using Azalea.Platform.Rendering;
 using Azalea.Platform.Scheduling;
+using Azalea.Utils;
 using System;
 
 namespace Azalea.Platform;
@@ -21,26 +22,27 @@ public sealed class Application
 
 		Window.Closed.OnValueChanged += _ => OnClosed?.Invoke();
 
-		using (var commandGroup = Renderer.BeginGroup())
-		{
-			Renderer.Enable(GL.BLEND, commandGroup);
-			Renderer.Enable(GL.CULL_FACE, commandGroup);
-			Renderer.Disable(GL.DEPTH_TEST, commandGroup);
-			Renderer.BlendFunction(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA, commandGroup);
+		var commandGroup = ObjectPool<RenderCommandGroup>.Borrow();
 
-			var azaleaImage = Assets.MainStore.GetImage("Textures/azalea-icon.png")!;
+		commandGroup.Enable(GL.BLEND);
+		commandGroup.Enable(GL.CULL_FACE);
+		commandGroup.Disable(GL.DEPTH_TEST);
+		commandGroup.BlendFunction(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
 
-			var azaleaTexture = Renderer.GenerateTexture(commandGroup);
+		var azaleaImage = Assets.MainStore.GetImage("Textures/azalea-icon.png")!;
 
-			Renderer.BindTexture(GL.TEXTURE_2D, azaleaTexture, commandGroup);
-			Renderer.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, azaleaImage.Width, azaleaImage.Height, 0, GL.RGBA, GL.UNSIGNED_BYTE, azaleaImage.Data, commandGroup);
-			Renderer.GenerateMipmap(GL.TEXTURE_2D, commandGroup);
+		var azaleaTexture = commandGroup.GenerateTexture();
 
-			var whiteImage = new Image(1, 1, [byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue]);
-			var whiteTexture = Renderer.GenerateTexture(commandGroup);
-			Renderer.BindTexture(GL.TEXTURE_2D, whiteTexture, commandGroup);
-			Renderer.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, whiteImage.Width, whiteImage.Height, 0, GL.RGBA, GL.UNSIGNED_BYTE, whiteImage.Data, commandGroup);
-		}
+		commandGroup.BindTexture(GL.TEXTURE_2D, azaleaTexture);
+		commandGroup.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, azaleaImage.Width, azaleaImage.Height, 0, GL.RGBA, GL.UNSIGNED_BYTE, azaleaImage.Data);
+		commandGroup.GenerateMipmap(GL.TEXTURE_2D);
+
+		var whiteImage = new Image(1, 1, [byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue]);
+		var whiteTexture = commandGroup.GenerateTexture();
+		commandGroup.BindTexture(GL.TEXTURE_2D, whiteTexture);
+		commandGroup.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, whiteImage.Width, whiteImage.Height, 0, GL.RGBA, GL.UNSIGNED_BYTE, whiteImage.Data);
+
+		Renderer.Thread.SubmitCommandGroup(commandGroup);
 
 		var coordinator = Renderer.Coordinator;
 		var quadBatch = coordinator.DefaultQuadBatch;
@@ -61,8 +63,8 @@ public sealed class Application
 				}
 				catch (Exception)
 				{
-					renderQueue.Return();
-					renderQueue = RenderCommandQueue.Borrow();
+					ObjectPool<RenderCommandGroup>.Return(renderQueue);
+					renderQueue = ObjectPool<RenderCommandGroup>.Borrow();
 					renderQueue.Clear(Palette.Beige);
 				}
 			}

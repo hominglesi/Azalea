@@ -18,11 +18,11 @@ public abstract class RenderBatch<T> : IRenderBatch
 
 	internal abstract void AddImplementation(T vertex);
 
-	internal abstract void Draw(RenderCommandQueue commandQueue);
-	void IRenderBatch.Draw(RenderCommandQueue commandQueue) => Draw(commandQueue);
+	internal abstract void Draw(RenderCommandGroup commandQueue);
+	void IRenderBatch.Draw(RenderCommandGroup commandQueue) => Draw(commandQueue);
 }
 
 internal interface IRenderBatch
 {
-	void Draw(RenderCommandQueue commandQueue);
+	void Draw(RenderCommandGroup commandQueue);
 }

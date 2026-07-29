@@ -27,3 +27,9 @@ public interface ICommandAwaitable
 {
 	public void Await();
 }
+
+public interface ICommandHandler<T>
+	where T : ThreadCommand
+{
+	public ICommandAwaitable? Enqueue(T command);
+}

@@ -3,6 +3,7 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Primitives;
 using Azalea.Native.OpenGL;
 using Azalea.Numerics;
+using Azalea.Utils;
 using System.Buffers;
 using System.Numerics;
 
@@ -24,54 +25,57 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 		: base(renderCoordinator)
 	{
 		_renderer = renderCoordinator.Renderer;
-		using (var group = _renderer.BeginGroup())
+		var commandGroup = ObjectPool<RenderCommandGroup>.Borrow();
+
+		_program = RenderCoordinator.CreateStandardProgram(commandGroup,
+			_vertexShaderSource, _fragmentShaderSource);
+
+		commandGroup.UseProgram(_program);
+
+		_projectionUniform = commandGroup.GetUniformLocation(_program, "u_Projection");
+		_textureUniform = commandGroup.GetUniformLocation(_program, "u_Texture");
+
+		commandGroup.Uniform1i(_textureUniform, 0);
+
+		_vertexArray = commandGroup.GenerateVertexArray();
+		commandGroup.BindVertexArray(_vertexArray);
+
+		var vertexBuffer = commandGroup.GenerateBuffer();
+		commandGroup.BindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
+
+		var indexArray = commandGroup.GenerateBuffer();
+		commandGroup.BindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexArray);
+
+		_indices = new uint[MaxQuadCount * 6];
+		for (uint i = 0, j = 0; i < MaxQuadCount * 4; i += 4, j += 6)
 		{
-			_program = renderCoordinator.CreateStandardProgram(_vertexShaderSource, _fragmentShaderSource, group);
-
-			_renderer.UseProgram(_program, group);
-
-			_projectionUniform = _renderer.GetUniformLocation(_program, "u_Projection", group);
-			_textureUniform = _renderer.GetUniformLocation(_program, "u_Texture", group);
-
-			_renderer.Uniform1i(_textureUniform, 0, group);
-
-			_vertexArray = _renderer.GenerateVertexArray(group);
-			_renderer.BindVertexArray(_vertexArray, group);
-
-			var vertexBuffer = _renderer.GenerateBuffer(group);
-			_renderer.BindBuffer(GL.ARRAY_BUFFER, vertexBuffer, group);
-
-			var indexArray = _renderer.GenerateBuffer(group);
-			_renderer.BindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexArray, group);
-
-			_indices = new uint[MaxQuadCount * 6];
-			for (uint i = 0, j = 0; i < MaxQuadCount * 4; i += 4, j += 6)
-			{
-				_indices[j] = i;
-				_indices[j + 1] = i + 1;
-				_indices[j + 2] = i + 3;
-				_indices[j + 3] = i + 2;
-				_indices[j + 4] = i + 3;
-				_indices[j + 5] = i + 1;
-			}
-			_renderer.BufferData(GL.ELEMENT_ARRAY_BUFFER, _indices.Length * sizeof(uint), _indices, GL.STATIC_DRAW, false, group);
-
-			_renderer.VertexAttribPointer(0, 2, GL.FLOAT, false, 8 * sizeof(float), 0, group);
-			_renderer.EnableVertexAttribArray(0, group);
-			_renderer.VertexAttribPointer(1, 4, GL.FLOAT, false, 8 * sizeof(float), 2 * sizeof(float), group);
-			_renderer.EnableVertexAttribArray(1, group);
-			_renderer.VertexAttribPointer(2, 2, GL.FLOAT, false, 8 * sizeof(float), 6 * sizeof(float), group);
-			_renderer.EnableVertexAttribArray(2, group);
-
-			_renderer.BindVertexArray(null, group);
+			_indices[j] = i;
+			_indices[j + 1] = i + 1;
+			_indices[j + 2] = i + 3;
+			_indices[j + 3] = i + 2;
+			_indices[j + 4] = i + 3;
+			_indices[j + 5] = i + 1;
 		}
+		commandGroup.BufferData(GL.ELEMENT_ARRAY_BUFFER, _indices.Length * sizeof(uint), _indices, GL.STATIC_DRAW, false);
+
+		commandGroup.VertexAttribPointer(0, 2, GL.FLOAT, false, 8 * sizeof(float), 0);
+		commandGroup.EnableVertexAttribArray(0);
+		commandGroup.VertexAttribPointer(1, 4, GL.FLOAT, false, 8 * sizeof(float), 2 * sizeof(float));
+		commandGroup.EnableVertexAttribArray(1);
+		commandGroup.VertexAttribPointer(2, 2, GL.FLOAT, false, 8 * sizeof(float), 6 * sizeof(float));
+		commandGroup.EnableVertexAttribArray(2);
+
+		commandGroup.BindVertexArray(null);
+
+		_renderer.Thread.SubmitCommandGroup(commandGroup);
+		ObjectPool<RenderCommandGroup>.Return(commandGroup);
 	}
 
 	private float[]? _vertices;
 	private int _nextVertex = 0;
 	private const int _vertexSize = 8;
 
-	public void Add(RenderCommandQueue commandQueue, Quad quad, ColorQuad colorQuad)
+	public void Add(RenderCommandGroup commandQueue, Quad quad, ColorQuad colorQuad)
 	{
 		Add(new DefaultQuadBatchVertex(quad.BottomLeft, colorQuad.BottomLeft, Rectangle.One.BottomLeft));
 		Add(new DefaultQuadBatchVertex(quad.BottomRight, colorQuad.BottomRight, Rectangle.One.BottomRight));
@@ -100,7 +104,7 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 
 	private Vector2Int _lastScreenSize = Vector2Int.Zero;
 
-	internal override void Draw(RenderCommandQueue commandQueue)
+	internal override void Draw(RenderCommandGroup commandQueue)
 	{
 		if (_nextVertex is 0)
 			return;
@@ -111,9 +115,11 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 
 			var projectionMatrix = MainCamera.Instance.CreateProjectionMatrix(_lastScreenSize);
 
-			using var group = _renderer.BeginGroup();
-			_renderer.UseProgram(_program, group);
-			_renderer.UniformMatrix4fv(_projectionUniform, 1, false, projectionMatrix, group);
+			var commandGroup = ObjectPool<RenderCommandGroup>.Borrow();
+			commandGroup.UseProgram(_program);
+			commandGroup.UniformMatrix4fv(_projectionUniform, 1, false, projectionMatrix);
+			_renderer.Thread.SubmitCommandGroup(commandGroup);
+			ObjectPool<RenderCommandGroup>.Return(commandGroup);
 		}
 
 		commandQueue.BindVertexArray(_vertexArray);

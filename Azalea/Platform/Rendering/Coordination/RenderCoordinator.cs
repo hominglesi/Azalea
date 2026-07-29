@@ -1,6 +1,7 @@
 ﻿using Azalea.Native.OpenGL;
 using Azalea.Numerics;
 using Azalea.Threading;
+using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,25 +23,25 @@ public class RenderCoordinator
 
 	#region CommandQueue
 
-	public RenderCommandQueue? _commandQueue;
+	public RenderCommandGroup? _commandQueue;
 	[MemberNotNull(nameof(_commandQueue))]
 	private void assertQueueExists() => Debug.Assert(_commandQueue is not null,
 		"Command queue does not exist!");
 	private void assertQueueDoesNotExist() => Debug.Assert(_commandQueue is null,
 		"Command queue already exists!");
 
-	public RenderCommandQueue CommandQueue =>
+	public RenderCommandGroup CommandQueue =>
 		_commandQueue is not null ? _commandQueue
 			: throw new Exception("A command queue has not been started!");
 
-	public RenderCommandQueue BeginCommandQueue()
+	public RenderCommandGroup BeginCommandQueue()
 	{
 		assertQueueDoesNotExist();
 
-		return _commandQueue = RenderCommandQueue.Borrow();
+		return _commandQueue = ObjectPool<RenderCommandGroup>.Borrow();
 	}
 
-	public RenderCommandQueue EndCommandQueue()
+	public RenderCommandGroup EndCommandQueue()
 	{
 		assertQueueExists();
 
@@ -110,26 +111,26 @@ public class RenderCoordinator
 
 	#endregion
 
-	public Program CreateStandardProgram(string vertexShaderSource, string fragmentShaderSource, ICommandGroup? commandGroup = null)
+	public static Program CreateStandardProgram(ICommandHandler<RenderCommand> handler, string vertexShaderSource, string fragmentShaderSource)
 	{
-		var vertexShader = Renderer.GenerateShader(GL.VERTEX_SHADER, commandGroup);
-		Renderer.ShaderSource(vertexShader, vertexShaderSource, commandGroup);
-		Renderer.CompileShader(vertexShader, commandGroup);
-		Renderer.PrintShaderCompileStatus(vertexShader, commandGroup);
+		var vertexShader = handler.GenerateShader(GL.VERTEX_SHADER);
+		handler.ShaderSource(vertexShader, vertexShaderSource);
+		handler.CompileShader(vertexShader);
+		handler.PrintShaderCompileStatus(vertexShader);
 
-		var fragmentShader = Renderer.GenerateShader(GL.FRAGMENT_SHADER, commandGroup);
-		Renderer.ShaderSource(fragmentShader, fragmentShaderSource, commandGroup);
-		Renderer.CompileShader(fragmentShader, commandGroup);
-		Renderer.PrintShaderCompileStatus(fragmentShader, commandGroup);
+		var fragmentShader = handler.GenerateShader(GL.FRAGMENT_SHADER);
+		handler.ShaderSource(fragmentShader, fragmentShaderSource);
+		handler.CompileShader(fragmentShader);
+		handler.PrintShaderCompileStatus(fragmentShader);
 
-		var program = Renderer.GenerateProgram(commandGroup);
-		Renderer.AttachShader(program, vertexShader, commandGroup);
-		Renderer.AttachShader(program, fragmentShader, commandGroup);
-		Renderer.LinkProgram(program, commandGroup);
-		Renderer.PrintProgramCompileStatus(program, commandGroup);
+		var program = handler.GenerateProgram();
+		handler.AttachShader(program, vertexShader);
+		handler.AttachShader(program, fragmentShader);
+		handler.LinkProgram(program);
+		handler.PrintProgramCompileStatus(program);
 
-		Renderer.DeleteShader(vertexShader, commandGroup);
-		Renderer.DeleteShader(fragmentShader, commandGroup);
+		handler.DeleteShader(vertexShader);
+		handler.DeleteShader(fragmentShader);
 
 		return program;
 	}

@@ -2,8 +2,6 @@
 using Azalea.Platform.Windows;
 using Azalea.Utils;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Channels;
 
@@ -13,7 +11,7 @@ internal abstract class GameThread(int targetInterval)
 	: GameThread<ThreadCommand>(targetInterval)
 { }
 
-internal abstract class GameThread<T>
+internal abstract class GameThread<T> : ICommandHandler<T>
 	where T : ThreadCommand
 {
 	public readonly Thread NativeThread;
@@ -33,6 +31,7 @@ internal abstract class GameThread<T>
 
 		NativeThread = new Thread(threadLoop)
 		{
+			Name = DisplayName,
 			IsBackground = true,
 		};
 	}
@@ -97,16 +96,9 @@ internal abstract class GameThread<T>
 	);
 	private readonly object _pendingCommandsLock = new();
 
-	public ICommandAwaitable? Enqueue(T command, ICommandGroup? commandGroup = null)
+	public ICommandAwaitable? Enqueue(T command)
 	{
-		if (commandGroup is not null)
-		{
-			if (commandGroup is not CommandGroup group)
-				throw new InvalidOperationException("Command group mismatch");
-
-			group.Enqueue(command);
-		}
-		else if (_pendingCommands.Writer.TryWrite(command) == false)
+		if (_pendingCommands.Writer.TryWrite(command) == false)
 			throw new Exception("Could not write command!");
 
 		if (command is ICommandAwaitable awaitable)
@@ -126,66 +118,15 @@ internal abstract class GameThread<T>
 		}
 	}
 
-	public ICommandGroup CreateCommandGroup() => CommandGroup.Borrow(this);
-	public void SubmitCommandGroup(ICommandGroup commandGroup)
+	public void SubmitCommandGroup(CommandGroup<T> commandGroup)
 	{
 		lock (_pendingCommandsLock)
 		{
-			if (commandGroup is not CommandGroup group)
-				throw new InvalidOperationException("Command group mismatch!");
+			T? nextCommand;
+			while ((nextCommand = commandGroup.Dequeue()) is not null)
+				Enqueue(nextCommand);
 
-			foreach (var command in group.Commands)
-				Enqueue(command);
 		}
-	}
-
-	public class CommandGroup : ICommandGroup
-	{
-		private readonly object _commandsLock = new();
-		private readonly List<T> _commands = [];
-
-		internal void Enqueue(T command)
-		{
-			lock (_commandsLock)
-				_commands.Add(command);
-		}
-
-		internal IEnumerable<T> Commands => _commands;
-
-		#region Pooling
-		public static ConcurrentBag<CommandGroup>? Pool;
-
-		private GameThread<T> _owner;
-		private CommandGroup(GameThread<T> owner) { _owner = owner; }
-
-		public static CommandGroup Borrow(GameThread<T> owner)
-		{
-			if (Pool is not null && Pool.IsEmpty == false)
-			{
-				if (Pool.TryTake(out var existing) == false)
-					throw new Exception();
-
-				existing._owner = owner;
-				return existing;
-			}
-
-			return new CommandGroup(owner);
-		}
-
-		public static void Return(CommandGroup group)
-		{
-			Pool ??= [];
-			Pool.Add(group);
-		}
-
-		public void Dispose()
-		{
-			_owner.SubmitCommandGroup(this);
-			_commands.Clear();
-			Return(this);
-		}
-
-		#endregion
 	}
 
 	#endregion
@@ -234,5 +175,3 @@ internal abstract class GameThread<T>
 
 	#endregion
 }
-
-public interface ICommandGroup : IDisposable { }

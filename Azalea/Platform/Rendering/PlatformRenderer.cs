@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Azalea.Platform.Rendering;
-public abstract partial class PlatformRenderer : IRenderCommandConsumer
+public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 {
 	protected PlatformRenderer()
 	{
@@ -27,23 +27,20 @@ public abstract partial class PlatformRenderer : IRenderCommandConsumer
 
 	#region Commands
 
-	void IRenderCommandConsumer.Enqueue(RenderCommand command, ICommandGroup? group)
-		=> Thread.Enqueue(command, group);
+	public ICommandAwaitable? Enqueue(RenderCommand command) => Thread.Enqueue(command);
 
-	public ICommandGroup BeginGroup() => Thread.CreateCommandGroup();
-
-	private RenderCommandQueue? _stagedQueue = null;
+	private RenderCommandGroup? _stagedQueue = null;
 	private readonly object _stagedQueueLock = new();
 
 	internal readonly ReadOnlyObservable<int> StagedQueueOverrides = new(0);
 
-	internal void StageQueue(RenderCommandQueue queue)
+	internal void StageQueue(RenderCommandGroup queue)
 	{
 		lock (_stagedQueueLock)
 		{
 			if (_stagedQueue is not null)
 			{
-				_stagedQueue.Return();
+				ObjectPool<RenderCommandGroup>.Return(_stagedQueue);
 				StagedQueueOverrides.Value++;
 			}
 
@@ -51,7 +48,7 @@ public abstract partial class PlatformRenderer : IRenderCommandConsumer
 		}
 	}
 
-	internal RenderCommandQueue? RequestQueue()
+	internal RenderCommandGroup? RequestQueue()
 	{
 		lock (_stagedQueueLock)
 		{
@@ -116,7 +113,7 @@ public abstract partial class PlatformRenderer : IRenderCommandConsumer
 				nextCommand = stagedQueue.Dequeue();
 			}
 
-			stagedQueue.Return();
+			ObjectPool<RenderCommandGroup>.Return(stagedQueue);
 
 			if (commandSnapshot is not null)
 			{
