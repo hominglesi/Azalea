@@ -8,7 +8,6 @@ using Azalea.Threading;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
 
 namespace Azalea.Editor.DebugWindows;
@@ -126,20 +125,10 @@ internal static class GlobalWindow
 			};
 
 			if (GLRenderer.LoadingContext is not null)
-				addGLLoadingContext();
+				GLLoadingContextInspector.Inject(_window, GLRenderer.LoadingContext);
 			else
 				GLRenderer.LoadingContextCreated.OnValueChanged += _ => Scheduler.Schedule(
-					() => addGLLoadingContext());
-
-			void addGLLoadingContext()
-			{
-				var loadingContext = GLRenderer.LoadingContext;
-				Debug.Assert(_window is not null);
-				Debug.Assert(loadingContext is not null);
-				_window.AddGroup("GLLoadingContext");
-
-				_window.FinishGroup();
-			}
+					() => GLLoadingContextInspector.Inject(_window, GLRenderer.LoadingContext!));
 		}
 
 		_window.Show();

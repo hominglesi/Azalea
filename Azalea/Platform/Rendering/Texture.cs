@@ -1,17 +1,37 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 
 namespace Azalea.Platform.Rendering;
 public class Texture
 {
-	internal uint? Handle { get; private set; }
+	internal INativeTexture? NativeTexture { get; private set; }
 
 	internal Texture() { }
 
-	internal void Initialize(uint handle)
+	internal void Initialize(INativeTexture nativeTexture)
 	{
-		if (Handle is not null)
+		if (NativeTexture is not null)
 			throw new Exception("Texture cannot be initialized multiple times!");
 
-		Handle = handle;
+		NativeTexture = nativeTexture;
+		_initializedEvent.Set();
 	}
+
+	private ManualResetEvent _initializedEvent = new(false);
+	[MemberNotNull(nameof(NativeTexture))]
+	internal void AssureInitialized()
+	{
+		if (NativeTexture is not null)
+			return;
+
+		var startTime = Time.GetCurrentPreciseTime();
+		_initializedEvent.WaitOne();
+		Console.WriteLine($"Waited for texture initialization {Time.GetPreciseMilisecondsSince(startTime)}ms");
+	}
+}
+
+internal interface INativeTexture
+{
+	public uint Handle { get; }
 }

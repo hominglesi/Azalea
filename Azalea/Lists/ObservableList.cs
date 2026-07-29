@@ -12,11 +12,14 @@ public class ObservableList<T> : IEnumerable<T>
 		_list = [];
 	}
 
+	public Action? OnChanged;
+
 	public Action<T>? OnItemAdded;
 	public void Add(T item)
 	{
 		_list.Add(item);
 		OnItemAdded?.Invoke(item);
+		OnChanged?.Invoke();
 	}
 
 	public Action<T>? OnItemRemoved;
@@ -24,6 +27,7 @@ public class ObservableList<T> : IEnumerable<T>
 	{
 		_list.Remove(item);
 		OnItemRemoved?.Invoke(item);
+		OnChanged?.Invoke();
 	}
 
 	public Action? OnCleared;
@@ -31,6 +35,7 @@ public class ObservableList<T> : IEnumerable<T>
 	{
 		_list.Clear();
 		OnCleared?.Invoke();
+		OnChanged?.Invoke();
 	}
 
 	public int Count => _list.Count;

@@ -12,7 +12,13 @@ public abstract class LoadingCommand : ThreadCommand
 }
 
 [ThreadCommand(awaitable: true)]
-internal partial class ReleaseContextCommand : LoadingCommand { }
+internal partial class GenerateTextureCommand : LoadingCommand
+{
+	internal Texture Texture;
+}
 
 [ThreadCommand(awaitable: true)]
 internal partial class RebindContextCommand : LoadingCommand { }
+
+[ThreadCommand(awaitable: true)]
+internal partial class ReleaseContextCommand : LoadingCommand { }

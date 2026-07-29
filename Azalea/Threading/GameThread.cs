@@ -96,7 +96,7 @@ internal abstract class GameThread<T> : ICommandHandler<T>
 	);
 	private readonly object _pendingCommandsLock = new();
 
-	public ICommandAwaitable? Enqueue(T command)
+	public virtual ICommandAwaitable? Enqueue(T command)
 	{
 		if (_pendingCommands.Writer.TryWrite(command) == false)
 			throw new Exception("Could not write command!");

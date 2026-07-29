@@ -4,6 +4,7 @@ using Azalea.Threading;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Azalea.Platform.Rendering;
 public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
@@ -13,10 +14,8 @@ public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 		Thread = new RenderThread(this);
 	}
 
-	/// <summary> Called after a rendering implementation has finished constructing. </summary>
-	protected void StartRenderThread() => Thread.Start();
-
 	protected abstract void InitializationLogic();
+	internal virtual bool TryHandleCommand(RenderCommand command) => false;
 	internal abstract void HandleCommandLogic(RenderCommand command);
 
 	private RenderCoordinator? _coordinator;
@@ -84,7 +83,19 @@ public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 
 		public override string DisplayName => "Rendering Thread";
 
-		protected override void Initialize() => _renderer.InitializationLogic();
+		public ManualResetEvent InitializedEvent = new(false);
+		protected override void Initialize()
+		{
+			_renderer.InitializationLogic();
+			InitializedEvent.Set();
+		}
+		public override ICommandAwaitable? Enqueue(RenderCommand command)
+		{
+			if (_renderer.TryHandleCommand(command))
+				return null;
+
+			return base.Enqueue(command);
+		}
 		protected override void HandleCommand(RenderCommand command)
 			=> _renderer.HandleCommandLogic(command);
 

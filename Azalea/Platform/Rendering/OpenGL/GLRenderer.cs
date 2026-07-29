@@ -2,6 +2,7 @@
 using Azalea.Graphics.Colors;
 using Azalea.Native.OpenGL;
 using Azalea.Numerics;
+using Azalea.Platform.Rendering.OpenGL.LoadingContext;
 using Azalea.Platform.Windowing;
 using System;
 using System.Diagnostics;
@@ -18,7 +19,8 @@ internal partial class GLRenderer : PlatformRenderer
 	{
 		_deviceContext = deviceContext;
 
-		StartRenderThread();
+		Thread.Start();
+		Thread.InitializedEvent.WaitOne();
 	}
 
 	protected override void InitializationLogic()
@@ -29,6 +31,18 @@ internal partial class GLRenderer : PlatformRenderer
 		_context.MakeCurrent();
 
 		GL.wglSwapIntervalEXT(0);
+	}
+
+	internal override bool TryHandleCommand(RenderCommand command)
+	{
+		switch (command)
+		{
+			case GenerateTextureCommand(var texture):
+				LoadingContext!.GenerateTexture(texture);
+				return true;
+		}
+
+		return false;
 	}
 
 	private Color? _clearColor = null;
@@ -53,8 +67,8 @@ internal partial class GLRenderer : PlatformRenderer
 				}
 				break;
 			case BindTextureCommand(var type, var texture):
-				Debug.Assert(texture.Handle is not null);
-				GL.BindTexture(type, texture.Handle.Value);
+				texture.AssureInitialized();
+				GL.BindTexture(type, texture.NativeTexture.Handle);
 				break;
 			case BindVertexArrayCommand(var vertexArray):
 				if (vertexArray is null)
@@ -116,9 +130,9 @@ internal partial class GLRenderer : PlatformRenderer
 				break;
 			case FramebufferTexture2DCommand(var framebuffer, var texture, var target, var attachment, var textarget, var level):
 				Debug.Assert(framebuffer.Handle is not null);
-				Debug.Assert(texture.Handle is not null);
+				texture.AssureInitialized();
 				GL.BindFramebuffer(target, framebuffer.Handle.Value);
-				GL.FramebufferTexture2D(target, attachment, textarget, texture.Handle.Value, level);
+				GL.FramebufferTexture2D(target, attachment, textarget, texture.NativeTexture.Handle, level);
 				GL.BindFramebuffer(target, 0);
 				break;
 			case GenerateBufferCommand(var buffer):
@@ -141,11 +155,6 @@ internal partial class GLRenderer : PlatformRenderer
 			case GenerateShaderCommand(var shader, var type):
 				uint shaderHandle = GL.CreateShader(type);
 				shader.Initialize(shaderHandle);
-				break;
-			case GenerateTextureCommand(var texture):
-				uint textureHandle = 0;
-				GL.GenTextures(1, ref textureHandle);
-				texture.Initialize(textureHandle);
 				break;
 			case GenerateVertexArrayCommand(var vertexArray):
 				uint vertexArrayHandle = 0;
@@ -250,8 +259,8 @@ internal partial class GLRenderer : PlatformRenderer
 					GL.TexImage2D(target, level, internalFormat, width, height, border, format, type, in pixels[0]);
 				break;
 			case TexParameteriCommand(var texture, var target, var parameter, var value):
-				Debug.Assert(texture.Handle is not null);
-				GL.BindTexture(target, texture.Handle.Value);
+				texture.AssureInitialized();
+				GL.BindTexture(target, texture.NativeTexture.Handle);
 				GL.TexParameteri(target, parameter, value);
 				GL.BindTexture(target, 0);
 				break;
