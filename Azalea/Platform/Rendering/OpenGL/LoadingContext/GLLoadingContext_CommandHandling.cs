@@ -3,7 +3,7 @@ internal partial class GLLoadingContext
 {
 	internal partial class GLLoadingThread
 	{
-		private void handleCommand(LoadingCommand command)
+		protected override void HandleCommand(LoadingCommand command)
 		{
 			switch (command)
 			{

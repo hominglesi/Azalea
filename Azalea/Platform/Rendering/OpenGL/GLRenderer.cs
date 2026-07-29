@@ -21,7 +21,7 @@ internal partial class GLRenderer : PlatformRenderer
 		StartRenderThread();
 	}
 
-	protected override void Initialize()
+	protected override void InitializationLogic()
 	{
 		assureGLInitialized();
 
@@ -31,15 +31,10 @@ internal partial class GLRenderer : PlatformRenderer
 		GL.wglSwapIntervalEXT(0);
 	}
 
-	protected override void Update()
-	{
-
-	}
-
 	private Color? _clearColor = null;
 	private RectangleInt? _scissorRectangle = null;
 
-	internal override void HandleCommand(RenderCommand command)
+	internal override void HandleCommandLogic(RenderCommand command)
 	{
 		switch (command)
 		{
@@ -282,17 +277,6 @@ internal partial class GLRenderer : PlatformRenderer
 			default:
 				throw new NotImplementedException("Command handling hasn't been implemented");
 		}
-
-		/*
-
-		Console.WriteLine("Processed " + command.GetType().Name);
-		
-		int glError;
-
-		while ((glError = GL.GetError()) != 0)
-			Console.WriteLine("GL ERROR: " + glError);
-
-		*/
 
 		command.Return();
 	}

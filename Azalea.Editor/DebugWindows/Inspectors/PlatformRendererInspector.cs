@@ -12,15 +12,14 @@ internal class PlatformRendererInspector
 		var window = GUIWindow.Create("PlatformRenderer", position, new(400, 400));
 
 		window.AddObservingLabel("Staged Queue Overrides", renderer.StagedQueueOverrides);
-		window.AddObservingLabel("No Staged Queue Frames", renderer.NoStagedQueueFrames);
+		window.AddObservingLabel("No Staged Queue Frames", renderer.Thread.NoStagedQueueFrames);
 
 		GUIGroup? commandsGroup = null;
 		window.AddButton("Snapshot Frame Commands", () =>
 		{
-
-			renderer.SnapshotNextFrame = true;
+			renderer.Thread.SnapshotNextFrame = true;
 		});
-		renderer.CommandSnapshotCreated += commands => Scheduler.Schedule(
+		renderer.Thread.CommandSnapshotCreated += commands => Scheduler.Schedule(
 			() =>
 			{
 				commandsGroup!.Clear();

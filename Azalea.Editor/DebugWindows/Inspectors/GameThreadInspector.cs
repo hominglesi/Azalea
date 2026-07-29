@@ -4,7 +4,8 @@ using Azalea.Threading;
 namespace Azalea.Editor.DebugWindows.Inspectors;
 internal class GameThreadInspector
 {
-	public static void Inject(GUIWindow window, GameThread thread)
+	public static void Inject<T>(GUIWindow window, GameThread<T> thread)
+		where T : ThreadCommand
 	{
 		window.AddGroup("Game Thread");
 

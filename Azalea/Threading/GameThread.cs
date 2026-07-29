@@ -2,16 +2,20 @@
 using Azalea.Platform.Windows;
 using Azalea.Utils;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Channels;
 
 namespace Azalea.Threading;
-internal abstract class GameThread
-{
-	public static readonly List<GameThread> ActiveThreads = [];
-	public static event Action<GameThread>? OnThreadStarted;
-	public static event Action<GameThread>? OnThreadStopped;
 
+internal abstract class GameThread(int targetInterval)
+	: GameThread<ThreadCommand>(targetInterval)
+{ }
+
+internal abstract class GameThread<T>
+	where T : ThreadCommand
+{
 	public readonly Thread NativeThread;
 
 	private volatile bool _running;
@@ -41,9 +45,6 @@ internal abstract class GameThread
 		_running = true;
 		NativeThread.Start();
 		Running.Value = true;
-
-		ActiveThreads.Add(this);
-		OnThreadStarted?.Invoke(this);
 	}
 
 	public void Stop()
@@ -54,9 +55,6 @@ internal abstract class GameThread
 		_running = false;
 		NativeThread.Join();
 		Running.Value = false;
-
-		ActiveThreads.Remove(this);
-		OnThreadStopped?.Invoke(this);
 	}
 
 	private void threadLoop()
@@ -75,6 +73,7 @@ internal abstract class GameThread
 			while (_running)
 			{
 				_workBeginTime = Time.GetCurrentPreciseTime();
+				HandleCommands();
 				Update();
 
 				updateActualInterval();
@@ -91,7 +90,107 @@ internal abstract class GameThread
 	protected abstract void Initialize();
 	protected abstract void Update();
 
-	#region ActualInterval
+	#region Thread Commands
+
+	private readonly Channel<T> _pendingCommands = Channel.CreateUnbounded<T>(
+		new() { SingleReader = true }
+	);
+	private readonly object _pendingCommandsLock = new();
+
+	public ICommandAwaitable? Enqueue(T command, ICommandGroup? commandGroup = null)
+	{
+		if (commandGroup is not null)
+		{
+			if (commandGroup is not CommandGroup group)
+				throw new InvalidOperationException("Command group mismatch");
+
+			group.Enqueue(command);
+		}
+		else if (_pendingCommands.Writer.TryWrite(command) == false)
+			throw new Exception("Could not write command!");
+
+		if (command is ICommandAwaitable awaitable)
+			return awaitable;
+
+		return null;
+	}
+
+	protected virtual void HandleCommand(T command) { }
+
+	protected virtual void HandleCommands()
+	{
+		lock (_pendingCommandsLock)
+		{
+			while (_pendingCommands.Reader.TryRead(out var command))
+				HandleCommand(command);
+		}
+	}
+
+	public ICommandGroup CreateCommandGroup() => CommandGroup.Borrow(this);
+	public void SubmitCommandGroup(ICommandGroup commandGroup)
+	{
+		lock (_pendingCommandsLock)
+		{
+			if (commandGroup is not CommandGroup group)
+				throw new InvalidOperationException("Command group mismatch!");
+
+			foreach (var command in group.Commands)
+				Enqueue(command);
+		}
+	}
+
+	public class CommandGroup : ICommandGroup
+	{
+		private readonly object _commandsLock = new();
+		private readonly List<T> _commands = [];
+
+		internal void Enqueue(T command)
+		{
+			lock (_commandsLock)
+				_commands.Add(command);
+		}
+
+		internal IEnumerable<T> Commands => _commands;
+
+		#region Pooling
+		public static ConcurrentBag<CommandGroup>? Pool;
+
+		private GameThread<T> _owner;
+		private CommandGroup(GameThread<T> owner) { _owner = owner; }
+
+		public static CommandGroup Borrow(GameThread<T> owner)
+		{
+			if (Pool is not null && Pool.IsEmpty == false)
+			{
+				if (Pool.TryTake(out var existing) == false)
+					throw new Exception();
+
+				existing._owner = owner;
+				return existing;
+			}
+
+			return new CommandGroup(owner);
+		}
+
+		public static void Return(CommandGroup group)
+		{
+			Pool ??= [];
+			Pool.Add(group);
+		}
+
+		public void Dispose()
+		{
+			_owner.SubmitCommandGroup(this);
+			_commands.Clear();
+			Return(this);
+		}
+
+		#endregion
+	}
+
+	#endregion
+
+	#region Interval Calculations
 
 	private int _tickIndex = 0;
 	private double _tickSum = 0;
@@ -135,3 +234,5 @@ internal abstract class GameThread
 
 	#endregion
 }
+
+public interface ICommandGroup : IDisposable { }

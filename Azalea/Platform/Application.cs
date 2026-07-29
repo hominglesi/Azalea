@@ -21,31 +21,31 @@ public sealed class Application
 
 		Window.Closed.OnValueChanged += _ => OnClosed?.Invoke();
 
-		Renderer.BeginCommandGroup();
+		using (var commandGroup = Renderer.BeginGroup())
+		{
+			Renderer.Enable(GL.BLEND, commandGroup);
+			Renderer.Enable(GL.CULL_FACE, commandGroup);
+			Renderer.Disable(GL.DEPTH_TEST, commandGroup);
+			Renderer.BlendFunction(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA, commandGroup);
 
-		Renderer.Enable(GL.BLEND);
-		Renderer.Enable(GL.CULL_FACE);
-		Renderer.Disable(GL.DEPTH_TEST);
-		Renderer.BlendFunction(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
+			var azaleaImage = Assets.MainStore.GetImage("Textures/azalea-icon.png")!;
 
-		var azaleaImage = Assets.MainStore.GetImage("Textures/azalea-icon.png")!;
+			var azaleaTexture = Renderer.GenerateTexture(commandGroup);
 
-		var azaleaTexture = Renderer.GenerateTexture();
-		Renderer.BindTexture(GL.TEXTURE_2D, azaleaTexture);
-		Renderer.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, azaleaImage.Width, azaleaImage.Height, 0, GL.RGBA, GL.UNSIGNED_BYTE, azaleaImage.Data);
-		Renderer.GenerateMipmap(GL.TEXTURE_2D);
+			Renderer.BindTexture(GL.TEXTURE_2D, azaleaTexture, commandGroup);
+			Renderer.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, azaleaImage.Width, azaleaImage.Height, 0, GL.RGBA, GL.UNSIGNED_BYTE, azaleaImage.Data, commandGroup);
+			Renderer.GenerateMipmap(GL.TEXTURE_2D, commandGroup);
 
-		var whiteImage = new Image(1, 1, [byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue]);
-		var whiteTexture = Renderer.GenerateTexture();
-		Renderer.BindTexture(GL.TEXTURE_2D, whiteTexture);
-		Renderer.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, whiteImage.Width, whiteImage.Height, 0, GL.RGBA, GL.UNSIGNED_BYTE, whiteImage.Data);
+			var whiteImage = new Image(1, 1, [byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue]);
+			var whiteTexture = Renderer.GenerateTexture(commandGroup);
+			Renderer.BindTexture(GL.TEXTURE_2D, whiteTexture, commandGroup);
+			Renderer.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, whiteImage.Width, whiteImage.Height, 0, GL.RGBA, GL.UNSIGNED_BYTE, whiteImage.Data, commandGroup);
+		}
 
 		var coordinator = Renderer.Coordinator;
 		var quadBatch = coordinator.DefaultQuadBatch;
 
 		Renderer.PrintErrors();
-
-		Renderer.SubmitCommandGroup();
 
 		Scheduler.InjectProtocol((win, rend) =>
 		{

@@ -1,97 +1,99 @@
-﻿namespace Azalea.Platform.Rendering;
-public static class PlatformRenderer_Extentions
+﻿using Azalea.Threading;
+
+namespace Azalea.Platform.Rendering;
+public abstract partial class PlatformRenderer : IRenderCommandConsumer
 {
-	public static void AttachShader(this PlatformRenderer renderer, Program program, Shader shader)
-		=> renderer.Enqueue(AttachShaderCommand.Borrow(program, shader));
+	public void AttachShader(Program program, Shader shader, ICommandGroup? commandGroup = null)
+		=> Thread.Enqueue(AttachShaderCommand.Borrow(program, shader), commandGroup);
 
-	public static void BlendFunction(this PlatformRenderer renderer, int sourceFactor, int destinationFactor)
-		=> renderer.Enqueue(BlendFunctionCommand.Borrow(sourceFactor, destinationFactor));
+	public void BlendFunction(int sourceFactor, int destinationFactor, ICommandGroup? commandGroup = null)
+		=> Thread.Enqueue(BlendFunctionCommand.Borrow(sourceFactor, destinationFactor), commandGroup);
 
-	public static void CompileShader(this PlatformRenderer renderer, Shader shader)
-		=> renderer.Enqueue(CompileShaderCommand.Borrow(shader));
+	public void CompileShader(Shader shader, ICommandGroup? commandGroup = null)
+		=> Thread.Enqueue(CompileShaderCommand.Borrow(shader), commandGroup);
 
-	public static void DeleteShader(this PlatformRenderer renderer, Shader shader)
-		=> renderer.Enqueue(DeleteShaderCommand.Borrow(shader));
+	public void DeleteShader(Shader shader, ICommandGroup? commandGroup = null)
+		=> Thread.Enqueue(DeleteShaderCommand.Borrow(shader), commandGroup);
 
-	public static void Disable(this PlatformRenderer renderer, int capability)
-		=> renderer.Enqueue(DisableCommand.Borrow(capability));
+	public void Disable(int capability, ICommandGroup? commandGroup = null)
+		=> Thread.Enqueue(DisableCommand.Borrow(capability), commandGroup);
 
-	public static void Enable(this PlatformRenderer renderer, int capability)
-		=> renderer.Enqueue(EnableCommand.Borrow(capability));
+	public void Enable(int capability, ICommandGroup? commandGroup = null)
+		=> Thread.Enqueue(EnableCommand.Borrow(capability), commandGroup);
 
-	public static void EnableVertexAttribArray(this PlatformRenderer renderer, uint index)
-		=> renderer.Enqueue(EnableVertexAttribArrayCommand.Borrow(index));
+	public void EnableVertexAttribArray(uint index, ICommandGroup? commandGroup = null)
+		=> Thread.Enqueue(EnableVertexAttribArrayCommand.Borrow(index), commandGroup);
 
-	public static Buffer GenerateBuffer(this PlatformRenderer renderer)
+	public Buffer GenerateBuffer(ICommandGroup? commandGroup = null)
 	{
 		var buffer = new Buffer();
-		renderer.Enqueue(GenerateBufferCommand.Borrow(buffer));
+		Thread.Enqueue(GenerateBufferCommand.Borrow(buffer), commandGroup);
 		return buffer;
 	}
 
-	public static Framebuffer GenerateFramebuffer(this PlatformRenderer renderer)
+	public Framebuffer GenerateFramebuffer(ICommandGroup? commandGroup = null)
 	{
 		var framebuffer = new Framebuffer();
-		renderer.Enqueue(GenerateFramebufferCommand.Borrow(framebuffer));
+		Thread.Enqueue(GenerateFramebufferCommand.Borrow(framebuffer), commandGroup);
 		return framebuffer;
 	}
 
-	public static void GenerateMipmap(this PlatformRenderer renderer, int target)
-		=> renderer.Enqueue(GenerateMipmapCommand.Borrow(target));
+	public void GenerateMipmap(int target, ICommandGroup? commandGroup = null)
+		=> Thread.Enqueue(GenerateMipmapCommand.Borrow(target), commandGroup);
 
-	public static Program GenerateProgram(this PlatformRenderer renderer)
+	public Program GenerateProgram(ICommandGroup? commandGroup = null)
 	{
 		var program = new Program();
-		renderer.Enqueue(GenerateProgramCommand.Borrow(program));
+		Thread.Enqueue(GenerateProgramCommand.Borrow(program), commandGroup);
 		return program;
 	}
 
-	public static Shader GenerateShader(this PlatformRenderer renderer, int type)
+	public Shader GenerateShader(int type, ICommandGroup? commandGroup = null)
 	{
 		var shader = new Shader();
-		renderer.Enqueue(GenerateShaderCommand.Borrow(shader, type));
+		Thread.Enqueue(GenerateShaderCommand.Borrow(shader, type), commandGroup);
 		return shader;
 	}
 
-	public static Texture GenerateTexture(this PlatformRenderer renderer)
+	public Texture GenerateTexture(ICommandGroup? commandGroup = null)
 	{
 		var texture = new Texture();
-		renderer.Enqueue(GenerateTextureCommand.Borrow(texture));
+		Thread.Enqueue(GenerateTextureCommand.Borrow(texture), commandGroup);
 		return texture;
 	}
 
-	public static VertexArray GenerateVertexArray(this PlatformRenderer renderer)
+	public VertexArray GenerateVertexArray(ICommandGroup? commandGroup = null)
 	{
 		var vertexArray = new VertexArray();
-		renderer.Enqueue(GenerateVertexArrayCommand.Borrow(vertexArray));
+		Thread.Enqueue(GenerateVertexArrayCommand.Borrow(vertexArray), commandGroup);
 		return vertexArray;
 	}
 
-	public static UniformLocation GetUniformLocation(this PlatformRenderer renderer, Program program, string name)
+	public UniformLocation GetUniformLocation(Program program, string name, ICommandGroup? commandGroup = null)
 	{
 		var uniformLocation = new UniformLocation();
-		renderer.Enqueue(GetUniformLocationCommand.Borrow(uniformLocation, program, name));
+		Thread.Enqueue(GetUniformLocationCommand.Borrow(uniformLocation, program, name), commandGroup);
 		return uniformLocation;
 	}
 
-	public static void LinkProgram(this PlatformRenderer renderer, Program program)
-		=> renderer.Enqueue(LinkProgramCommand.Borrow(program));
+	public void LinkProgram(Program program, ICommandGroup? commandGroup = null)
+		=> Thread.Enqueue(LinkProgramCommand.Borrow(program), commandGroup);
 
-	public static void PolygonMode(this PlatformRenderer renderer, int face, int mode)
-		=> renderer.Enqueue(PolygonModeCommand.Borrow(face, mode));
+	public void PolygonMode(int face, int mode, ICommandGroup? commandGroup = null)
+		=> Thread.Enqueue(PolygonModeCommand.Borrow(face, mode), commandGroup);
 
-	public static void PrintProgramCompileStatus(this PlatformRenderer renderer, Program program)
-		=> renderer.Enqueue(PrintProgramCompileStatusCommand.Borrow(program));
+	public void PrintProgramCompileStatus(Program program, ICommandGroup? commandGroup = null)
+		=> Thread.Enqueue(PrintProgramCompileStatusCommand.Borrow(program), commandGroup);
 
-	public static void PrintShaderCompileStatus(this PlatformRenderer renderer, Shader shader)
-		=> renderer.Enqueue(PrintShaderCompileStatusCommand.Borrow(shader));
+	public void PrintShaderCompileStatus(Shader shader, ICommandGroup? commandGroup = null)
+		=> Thread.Enqueue(PrintShaderCompileStatusCommand.Borrow(shader), commandGroup);
 
-	public static void ShaderSource(this PlatformRenderer renderer, Shader shader, string sourceCode)
-		=> renderer.Enqueue(ShaderSourceCommand.Borrow(shader, sourceCode));
+	public void ShaderSource(Shader shader, string sourceCode, ICommandGroup? commandGroup = null)
+		=> Thread.Enqueue(ShaderSourceCommand.Borrow(shader, sourceCode), commandGroup);
 
-	public static void TexImage2D(this PlatformRenderer renderer, int target, int level, int internalFormat, int width, int height, int border, int format, int type, byte[]? pixels)
-		=> renderer.Enqueue(TexImage2DCommand.Borrow(target, level, internalFormat, width, height, border, format, type, pixels));
+	public void TexImage2D(int target, int level, int internalFormat, int width, int height, int border, int format, int type, byte[]? pixels, ICommandGroup? commandGroup = null)
+		=> Thread.Enqueue(TexImage2DCommand.Borrow(target, level, internalFormat, width, height, border, format, type, pixels), commandGroup);
 
-	public static void VertexAttribPointer(this PlatformRenderer renderer, uint index, int size, int type, bool normalized, int stride, nint pointer)
-		=> renderer.Enqueue(VertexAttribPointerCommand.Borrow(index, size, type, normalized, stride, pointer));
+	public void VertexAttribPointer(uint index, int size, int type, bool normalized, int stride, nint pointer, ICommandGroup? commandGroup = null)
+		=> Thread.Enqueue(VertexAttribPointerCommand.Borrow(index, size, type, normalized, stride, pointer), commandGroup);
 }

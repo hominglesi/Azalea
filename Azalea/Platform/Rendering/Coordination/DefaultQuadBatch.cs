@@ -24,45 +24,47 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 		: base(renderCoordinator)
 	{
 		_renderer = renderCoordinator.Renderer;
-
-		_program = renderCoordinator.CreateStandardProgram(_vertexShaderSource, _fragmentShaderSource);
-
-		_renderer.UseProgram(_program);
-
-		_projectionUniform = _renderer.GetUniformLocation(_program, "u_Projection");
-		_textureUniform = _renderer.GetUniformLocation(_program, "u_Texture");
-
-		_renderer.Uniform1i(_textureUniform, 0);
-
-		_vertexArray = _renderer.GenerateVertexArray();
-		_renderer.BindVertexArray(_vertexArray);
-
-		var vertexBuffer = _renderer.GenerateBuffer();
-		_renderer.BindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
-
-		var indexArray = _renderer.GenerateBuffer();
-		_renderer.BindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexArray);
-
-		_indices = new uint[MaxQuadCount * 6];
-		for (uint i = 0, j = 0; i < MaxQuadCount * 4; i += 4, j += 6)
+		using (var group = _renderer.BeginGroup())
 		{
-			_indices[j] = i;
-			_indices[j + 1] = i + 1;
-			_indices[j + 2] = i + 3;
-			_indices[j + 3] = i + 2;
-			_indices[j + 4] = i + 3;
-			_indices[j + 5] = i + 1;
+			_program = renderCoordinator.CreateStandardProgram(_vertexShaderSource, _fragmentShaderSource, group);
+
+			_renderer.UseProgram(_program, group);
+
+			_projectionUniform = _renderer.GetUniformLocation(_program, "u_Projection", group);
+			_textureUniform = _renderer.GetUniformLocation(_program, "u_Texture", group);
+
+			_renderer.Uniform1i(_textureUniform, 0, group);
+
+			_vertexArray = _renderer.GenerateVertexArray(group);
+			_renderer.BindVertexArray(_vertexArray, group);
+
+			var vertexBuffer = _renderer.GenerateBuffer(group);
+			_renderer.BindBuffer(GL.ARRAY_BUFFER, vertexBuffer, group);
+
+			var indexArray = _renderer.GenerateBuffer(group);
+			_renderer.BindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexArray, group);
+
+			_indices = new uint[MaxQuadCount * 6];
+			for (uint i = 0, j = 0; i < MaxQuadCount * 4; i += 4, j += 6)
+			{
+				_indices[j] = i;
+				_indices[j + 1] = i + 1;
+				_indices[j + 2] = i + 3;
+				_indices[j + 3] = i + 2;
+				_indices[j + 4] = i + 3;
+				_indices[j + 5] = i + 1;
+			}
+			_renderer.BufferData(GL.ELEMENT_ARRAY_BUFFER, _indices.Length * sizeof(uint), _indices, GL.STATIC_DRAW, false, group);
+
+			_renderer.VertexAttribPointer(0, 2, GL.FLOAT, false, 8 * sizeof(float), 0, group);
+			_renderer.EnableVertexAttribArray(0, group);
+			_renderer.VertexAttribPointer(1, 4, GL.FLOAT, false, 8 * sizeof(float), 2 * sizeof(float), group);
+			_renderer.EnableVertexAttribArray(1, group);
+			_renderer.VertexAttribPointer(2, 2, GL.FLOAT, false, 8 * sizeof(float), 6 * sizeof(float), group);
+			_renderer.EnableVertexAttribArray(2, group);
+
+			_renderer.BindVertexArray(null, group);
 		}
-		_renderer.BufferData(GL.ELEMENT_ARRAY_BUFFER, _indices.Length * sizeof(uint), _indices, GL.STATIC_DRAW, false);
-
-		_renderer.VertexAttribPointer(0, 2, GL.FLOAT, false, 8 * sizeof(float), 0);
-		_renderer.EnableVertexAttribArray(0);
-		_renderer.VertexAttribPointer(1, 4, GL.FLOAT, false, 8 * sizeof(float), 2 * sizeof(float));
-		_renderer.EnableVertexAttribArray(1);
-		_renderer.VertexAttribPointer(2, 2, GL.FLOAT, false, 8 * sizeof(float), 6 * sizeof(float));
-		_renderer.EnableVertexAttribArray(2);
-
-		_renderer.BindVertexArray(null);
 	}
 
 	private float[]? _vertices;
@@ -108,12 +110,10 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 			_lastScreenSize = new Vector2Int(800, 600);
 
 			var projectionMatrix = MainCamera.Instance.CreateProjectionMatrix(_lastScreenSize);
-			_renderer.BeginCommandGroup();
 
-			_renderer.UseProgram(_program);
-			_renderer.UniformMatrix4fv(_projectionUniform, 1, false, projectionMatrix);
-
-			_renderer.SubmitCommandGroup();
+			using var group = _renderer.BeginGroup();
+			_renderer.UseProgram(_program, group);
+			_renderer.UniformMatrix4fv(_projectionUniform, 1, false, projectionMatrix, group);
 		}
 
 		commandQueue.BindVertexArray(_vertexArray);

@@ -1,5 +1,6 @@
 ﻿using Azalea.Native.OpenGL;
 using Azalea.Numerics;
+using Azalea.Threading;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -109,26 +110,26 @@ public class RenderCoordinator
 
 	#endregion
 
-	public Program CreateStandardProgram(string vertexShaderSource, string fragmentShaderSource)
+	public Program CreateStandardProgram(string vertexShaderSource, string fragmentShaderSource, ICommandGroup? commandGroup = null)
 	{
-		var vertexShader = Renderer.GenerateShader(GL.VERTEX_SHADER);
-		Renderer.ShaderSource(vertexShader, vertexShaderSource);
-		Renderer.CompileShader(vertexShader);
-		Renderer.PrintShaderCompileStatus(vertexShader);
+		var vertexShader = Renderer.GenerateShader(GL.VERTEX_SHADER, commandGroup);
+		Renderer.ShaderSource(vertexShader, vertexShaderSource, commandGroup);
+		Renderer.CompileShader(vertexShader, commandGroup);
+		Renderer.PrintShaderCompileStatus(vertexShader, commandGroup);
 
-		var fragmentShader = Renderer.GenerateShader(GL.FRAGMENT_SHADER);
-		Renderer.ShaderSource(fragmentShader, fragmentShaderSource);
-		Renderer.CompileShader(fragmentShader);
-		Renderer.PrintShaderCompileStatus(fragmentShader);
+		var fragmentShader = Renderer.GenerateShader(GL.FRAGMENT_SHADER, commandGroup);
+		Renderer.ShaderSource(fragmentShader, fragmentShaderSource, commandGroup);
+		Renderer.CompileShader(fragmentShader, commandGroup);
+		Renderer.PrintShaderCompileStatus(fragmentShader, commandGroup);
 
-		var program = Renderer.GenerateProgram();
-		Renderer.AttachShader(program, vertexShader);
-		Renderer.AttachShader(program, fragmentShader);
-		Renderer.LinkProgram(program);
-		Renderer.PrintProgramCompileStatus(program);
+		var program = Renderer.GenerateProgram(commandGroup);
+		Renderer.AttachShader(program, vertexShader, commandGroup);
+		Renderer.AttachShader(program, fragmentShader, commandGroup);
+		Renderer.LinkProgram(program, commandGroup);
+		Renderer.PrintProgramCompileStatus(program, commandGroup);
 
-		Renderer.DeleteShader(vertexShader);
-		Renderer.DeleteShader(fragmentShader);
+		Renderer.DeleteShader(vertexShader, commandGroup);
+		Renderer.DeleteShader(fragmentShader, commandGroup);
 
 		return program;
 	}

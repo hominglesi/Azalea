@@ -1,5 +1,7 @@
-﻿namespace Azalea.Platform.Rendering;
+﻿using Azalea.Threading;
+
+namespace Azalea.Platform.Rendering;
 public interface IRenderCommandConsumer
 {
-	internal void Enqueue(RenderCommand command);
+	internal void Enqueue(RenderCommand command, ICommandGroup? commandGroup);
 }

@@ -1,5 +1,7 @@
-﻿using System.Collections.Concurrent;
+﻿using Azalea.Threading;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Azalea.Platform.Rendering;
 public partial class RenderCommandQueue : IRenderCommandConsumer
@@ -45,8 +47,10 @@ public partial class RenderCommandQueue : IRenderCommandConsumer
 		return null;
 	}
 
-	internal void Enqueue(RenderCommand command)
+	internal void Enqueue(RenderCommand command, ICommandGroup? commandGroup = null)
 	{
+		Debug.Assert(commandGroup is null);
+
 		// We avoid enqueuing commands that don't change state 
 		switch (command)
 		{
@@ -68,13 +72,13 @@ public partial class RenderCommandQueue : IRenderCommandConsumer
 
 				_currentProgram = program;
 				break;
-
 		}
 
 		_commands.Enqueue(command);
 	}
 
-	void IRenderCommandConsumer.Enqueue(RenderCommand command) => Enqueue(command);
+	void IRenderCommandConsumer.Enqueue(RenderCommand command, ICommandGroup? commandGroup)
+		=> Enqueue(command, commandGroup);
 
 	internal void ReturnAllCommands()
 	{

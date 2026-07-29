@@ -1,7 +1,5 @@
 ﻿using Azalea.Threading;
-using System;
 using System.Threading;
-using System.Threading.Channels;
 
 namespace Azalea.Platform.Rendering.OpenGL.LoadingContext;
 
@@ -28,7 +26,7 @@ internal partial class GLLoadingContext
 
 	internal readonly GLLoadingThread Thread;
 
-	internal partial class GLLoadingThread() : GameThread(1)
+	internal partial class GLLoadingThread() : GameThread<LoadingCommand>(1)
 	{
 		private Windowing.PlatformWindow? _window;
 		internal GLContext? Context;
@@ -45,33 +43,7 @@ internal partial class GLLoadingContext
 			Initialized.Set();
 		}
 
-		private readonly Channel<LoadingCommand> _commands = Channel.CreateUnbounded<LoadingCommand>(new()
-		{
-			SingleReader = true
-		});
-		private readonly object _commandsLock = new();
-		internal ICommandAwaitable? Enqueue(LoadingCommand command)
-		{
-			lock (_commandsLock)
-			{
-				if (_commands.Writer.TryWrite(command) == false)
-					throw new Exception("Could not write command");
-
-				if (command is ICommandAwaitable awaitable)
-					return awaitable;
-
-				return null;
-			}
-		}
-
-		protected override void Update()
-		{
-			lock (_commandsLock)
-			{
-				while (_commands.Reader.TryRead(out var command))
-					handleCommand(command);
-			}
-		}
+		protected override void Update() { }
 	}
 
 	#endregion
