@@ -32,15 +32,13 @@ public sealed class Application
 		var azaleaImage = Assets.MainStore.GetImage("Textures/azalea-icon.png")!;
 
 		var azaleaTexture = commandGroup.GenerateTexture();
-
-		commandGroup.BindTexture(GL.TEXTURE_2D, azaleaTexture);
-		commandGroup.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, azaleaImage.Width, azaleaImage.Height, 0, GL.RGBA, GL.UNSIGNED_BYTE, azaleaImage.Data);
-		commandGroup.GenerateMipmap(GL.TEXTURE_2D);
+		commandGroup.TexImage2D(azaleaTexture, azaleaImage.Width, azaleaImage.Height, azaleaImage.Data, true);
 
 		var whiteImage = new Image(1, 1, [byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue]);
 		var whiteTexture = commandGroup.GenerateTexture();
+		commandGroup.TexImage2D(whiteTexture, whiteImage.Width, whiteImage.Height, whiteImage.Data, false);
+
 		commandGroup.BindTexture(GL.TEXTURE_2D, whiteTexture);
-		commandGroup.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, whiteImage.Width, whiteImage.Height, 0, GL.RGBA, GL.UNSIGNED_BYTE, whiteImage.Data);
 
 		Renderer.Thread.SubmitCommandGroup(commandGroup);
 

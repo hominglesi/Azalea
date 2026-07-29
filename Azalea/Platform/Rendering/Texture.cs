@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
@@ -15,19 +16,41 @@ public class Texture
 			throw new Exception("Texture cannot be initialized multiple times!");
 
 		NativeTexture = nativeTexture;
-		_initializedEvent.Set();
+		FinishLoadingOperation();
 	}
 
-	private ManualResetEvent _initializedEvent = new(false);
+	private volatile int _loadingOperations = 1;
+	private readonly ManualResetEvent _readyEvent = new(false);
 	[MemberNotNull(nameof(NativeTexture))]
-	internal void AssureInitialized()
+	internal void AssureReady()
 	{
-		if (NativeTexture is not null)
+		if (_loadingOperations == 0)
+		{
+			Debug.Assert(NativeTexture is not null);
 			return;
+		}
 
 		var startTime = Time.GetCurrentPreciseTime();
-		_initializedEvent.WaitOne();
-		Console.WriteLine($"Waited for texture initialization {Time.GetPreciseMilisecondsSince(startTime)}ms");
+		_readyEvent.WaitOne();
+		Console.WriteLine($"Waited for texture {Time.GetPreciseMilisecondsSince(startTime)}ms");
+
+		Debug.Assert(NativeTexture is not null);
+	}
+
+	internal void BeginLoadingOperation()
+	{
+		if (_loadingOperations == 0)
+			_readyEvent.Reset();
+
+		_loadingOperations++;
+	}
+
+	internal void FinishLoadingOperation()
+	{
+		_loadingOperations--;
+
+		if (_loadingOperations == 0)
+			_readyEvent.Set();
 	}
 }
 

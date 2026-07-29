@@ -435,6 +435,10 @@ public static partial class GL
 	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glEnable.xhtml">Official Documentation</see></summary>
 	public static partial void Enable(int cap);
 
+	[LibraryImport(OpenGLPath, EntryPoint = "glFlush")]
+	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glFlush.xhtml">Official Documentation</see></summary>
+	public static partial void Flush();
+
 	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetError.xhtml">Official Documentation</see></summary>
 	[LibraryImport(OpenGLPath, EntryPoint = "glGetError")]
 	public static partial int GetError();

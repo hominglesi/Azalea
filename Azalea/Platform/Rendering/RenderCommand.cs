@@ -340,15 +340,11 @@ internal partial class SwapBuffersCommand : RenderCommand { }
 [ThreadCommand]
 internal partial class TexImage2DCommand : RenderCommand
 {
-	public int Target;
-	public int Level;
-	public int InternalFormat;
+	public Texture Texture;
 	public int Width;
 	public int Height;
-	public int Border;
-	public int Format;
-	public int Type;
 	public byte[]? Pixels;
+	public bool GenerateMipmap;
 }
 
 [ThreadCommand]

@@ -11,7 +11,7 @@ public abstract class LoadingCommand : ThreadCommand
 	}
 }
 
-[ThreadCommand(awaitable: true)]
+[ThreadCommand()]
 internal partial class GenerateTextureCommand : LoadingCommand
 {
 	internal Texture Texture;
@@ -22,3 +22,13 @@ internal partial class RebindContextCommand : LoadingCommand { }
 
 [ThreadCommand(awaitable: true)]
 internal partial class ReleaseContextCommand : LoadingCommand { }
+
+[ThreadCommand()]
+internal partial class TexImage2DCommand : LoadingCommand
+{
+	public Texture Texture;
+	public int Width;
+	public int Height;
+	public byte[]? Pixels;
+	public bool GenerateMipmap;
+}

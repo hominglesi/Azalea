@@ -40,6 +40,10 @@ internal partial class GLRenderer : PlatformRenderer
 			case GenerateTextureCommand(var texture):
 				LoadingContext!.GenerateTexture(texture);
 				return true;
+			case TexImage2DCommand(var texture, var width, var height, var pixels, var generateMipmap):
+				LoadingContext!.TexImage2D(texture, width, height, pixels, generateMipmap);
+				texture.BeginLoadingOperation();
+				return true;
 		}
 
 		return false;
@@ -67,7 +71,7 @@ internal partial class GLRenderer : PlatformRenderer
 				}
 				break;
 			case BindTextureCommand(var type, var texture):
-				texture.AssureInitialized();
+				texture.AssureReady();
 				GL.BindTexture(type, texture.NativeTexture.Handle);
 				break;
 			case BindVertexArrayCommand(var vertexArray):
@@ -130,7 +134,7 @@ internal partial class GLRenderer : PlatformRenderer
 				break;
 			case FramebufferTexture2DCommand(var framebuffer, var texture, var target, var attachment, var textarget, var level):
 				Debug.Assert(framebuffer.Handle is not null);
-				texture.AssureInitialized();
+				texture.AssureReady();
 				GL.BindFramebuffer(target, framebuffer.Handle.Value);
 				GL.FramebufferTexture2D(target, attachment, textarget, texture.NativeTexture.Handle, level);
 				GL.BindFramebuffer(target, 0);
@@ -252,14 +256,8 @@ internal partial class GLRenderer : PlatformRenderer
 			case SwapBuffersCommand:
 				_context.SwapBuffers();
 				break;
-			case TexImage2DCommand(var target, var level, var internalFormat, var width, var height, var border, var format, var type, var pixels):
-				if (pixels is null)
-					GL.TexImage2D(target, level, internalFormat, width, height, border, format, type, IntPtr.Zero);
-				else
-					GL.TexImage2D(target, level, internalFormat, width, height, border, format, type, in pixels[0]);
-				break;
 			case TexParameteriCommand(var texture, var target, var parameter, var value):
-				texture.AssureInitialized();
+				texture.AssureReady();
 				GL.BindTexture(target, texture.NativeTexture.Handle);
 				GL.TexParameteri(target, parameter, value);
 				GL.BindTexture(target, 0);

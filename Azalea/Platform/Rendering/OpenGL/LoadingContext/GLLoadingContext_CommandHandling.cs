@@ -1,5 +1,6 @@
 ﻿using Azalea.Lists;
 using Azalea.Native.OpenGL;
+using System;
 
 namespace Azalea.Platform.Rendering.OpenGL.LoadingContext;
 internal partial class GLLoadingContext
@@ -23,6 +24,23 @@ internal partial class GLLoadingContext
 					break;
 				case ReleaseContextCommand():
 					Context!.Release();
+					break;
+				case TexImage2DCommand(var texture, var width, var height, var pixels, var generateMipmap):
+					if (texture.NativeTexture is not GLTexture glTexture)
+						throw new Exception();
+
+					GL.BindTexture(glTexture.Target, glTexture.Handle);
+
+					if (pixels is null)
+						GL.TexImage2D(glTexture.Target, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, IntPtr.Zero);
+					else
+						GL.TexImage2D(glTexture.Target, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, in pixels[0]);
+
+					if (generateMipmap)
+						GL.GenerateMipmap(glTexture.Target);
+
+					GL.Flush();
+					texture.FinishLoadingOperation();
 					break;
 			}
 
