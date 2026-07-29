@@ -7,7 +7,7 @@ namespace Azalea.Platform.Rendering.OpenGL.LoadingContext;
 /// An OpenGL context used for loading assets which all other contexts
 /// use as a shared context.
 /// </summary>
-internal partial class GLLoadingContext
+internal partial class GLLoadingContext : ICommandHandler<LoadingCommand>
 {
 	public readonly nint Handle;
 
@@ -21,6 +21,8 @@ internal partial class GLLoadingContext
 
 		Handle = Thread.Context!.Handle;
 	}
+
+	public ICommandAwaitable? Enqueue(LoadingCommand command) => Thread.Enqueue(command);
 
 	#region LoadingThread
 

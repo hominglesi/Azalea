@@ -9,17 +9,19 @@ namespace Azalea.SourceGeneration;
 [Generator]
 internal class ThreadCommandGenerator : IIncrementalGenerator
 {
-	struct ThreadCommandData(string name, string @namespace, string? parentClass,
-		Accessibility? parentAccessModifier, Accessibility accessModifier,
-		bool awaitable, List<(string, string)> properties)
+	readonly struct ThreadCommandData(string name, string @namespace,
+		Accessibility accessModifier, string parentClass, bool awaitable,
+		bool generateHandler, string? displayName, List<(string, string)> properties)
 	{
-		public string Name { get; set; } = name;
-		public string Namespace { get; set; } = @namespace;
-		public string? ParentClass { get; set; } = parentClass;
-		public Accessibility? ParentAccessModifier { get; set; } = parentAccessModifier;
-		public Accessibility AccessModifier { get; set; } = accessModifier;
-		public bool Awaitable { get; set; } = awaitable;
-		public List<(string, string)> Properties { get; set; } = properties;
+		public string Name { get; } = name;
+		public string Namespace { get; } = @namespace;
+		public Accessibility AccessModifier { get; } = accessModifier;
+		public string ParentClass { get; } = parentClass;
+		public bool Awaitable { get; } = awaitable;
+		public bool GenerateHandler { get; } = generateHandler;
+		public string DisplayName { get; } = displayName is not null ? displayName :
+			(name.EndsWith("Command") ? name.Substring(0, name.Length - 7) : name);
+		public List<(string, string)> Properties { get; } = properties;
 	}
 
 	public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -39,10 +41,11 @@ internal class ThreadCommandGenerator : IIncrementalGenerator
 					@namespace: symbol.ContainingNamespace.IsGlobalNamespace ?
 						string.Empty
 						: symbol.ContainingNamespace.ToDisplayString(),
-					parentClass: symbol.ContainingType?.Name,
-					parentAccessModifier: symbol.ContainingType?.DeclaredAccessibility,
 					accessModifier: symbol.DeclaredAccessibility,
+					parentClass: symbol.BaseType!.Name,
 					awaitable: (bool)functionAttribute.ConstructorArguments[0].Value!,
+					generateHandler: (bool)functionAttribute.ConstructorArguments[1].Value!,
+					displayName: (string?)functionAttribute.ConstructorArguments[2].Value!,
 					properties: [.. symbol.GetMembers()
 					.OfType<IFieldSymbol>()
 					.Select(p => (p.Type.ToDisplayString(), p.Name))]);
@@ -73,16 +76,6 @@ internal class ThreadCommandGenerator : IIncrementalGenerator
 		builder.Append("namespace ");
 		builder.Append(command.Namespace);
 		beginNest();
-
-		// Parent Class
-		if (command.ParentClass is not null)
-		{
-			appendAccessModifier(command.ParentAccessModifier!.Value);
-			builder.Append(" partial class ");
-			builder.Append(command.ParentClass);
-			beginNest();
-		}
-
 
 		// Class
 		appendAccessModifier(command.AccessModifier);
@@ -218,9 +211,29 @@ internal class ThreadCommandGenerator : IIncrementalGenerator
 		}
 
 		endNest();
-		endNest();
-		if (command.ParentClass is not null)
+
+		if (command.GenerateHandler)
+		{
+			newLine();
+			builder.Append($"public static class {command.Name}_Handler");
+			beginNest();
+			builder.Append($"public static {(command.Awaitable ? "Azalea.Threading.ICommandAwaitable" : "void")} {command.DisplayName}(this Azalea.Threading.ICommandHandler<{command.ParentClass}> handler");
+
+			if (command.Properties.Count > 0)
+			{
+				builder.Append(", ");
+				appendAllParameters();
+			}
+
+			builder.Append(")");
+			newLine();
+			builder.Append($"\t=> handler.Enqueue({command.Name}.Borrow(");
+			appendAllParameters(types: false);
+			builder.Append("));");
 			endNest();
+		}
+
+		endNest();
 
 		newLine();
 

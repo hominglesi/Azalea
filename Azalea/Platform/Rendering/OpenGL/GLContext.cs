@@ -49,7 +49,7 @@ internal class GLContext
 				0, 0
 			};
 
-			shareContext?.ReleaseContext();
+			shareContext?.ReleaseContext().Await();
 
 			var shareContextHandle = shareContext is null ? nint.Zero : shareContext.Handle;
 
@@ -57,7 +57,7 @@ internal class GLContext
 			if (context == nint.Zero)
 				throw new Exception($"Could not create context. (Error {Marshal.GetLastWin32Error()})");
 
-			shareContext?.RebindContext();
+			shareContext?.RebindContext().Await();
 
 			return new GLContext(context, deviceContext);
 		}

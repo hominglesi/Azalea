@@ -18,9 +18,11 @@ public abstract class ThreadCommand
 }
 
 [AttributeUsage(AttributeTargets.Class)]
-public sealed class ThreadCommandAttribute(bool awaitable = false) : Attribute
+public sealed class ThreadCommandAttribute(bool awaitable = false, bool generateHandler = true, string? displayName = null) : Attribute
 {
 	private bool _awaitable = awaitable;
+	private bool _generateHandler = generateHandler;
+	private string? _displayName = displayName;
 }
 
 public interface ICommandAwaitable

@@ -68,7 +68,7 @@ internal partial class BufferDataCommand : RenderCommand
 	}
 }
 
-[ThreadCommand]
+[ThreadCommand(displayName: "BufferData")]
 internal partial class BufferDataFloatCommand : RenderCommand
 {
 	public int Type;
@@ -84,7 +84,7 @@ internal partial class BufferDataFloatCommand : RenderCommand
 	}
 }
 
-[ThreadCommand]
+[ThreadCommand(displayName: "BufferData")]
 internal partial class BufferDataUIntCommand : RenderCommand
 {
 	public int Type;
@@ -166,16 +166,36 @@ internal partial class FramebufferTexture2DCommand : RenderCommand
 	public int Level;
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: false)]
 internal partial class GenerateBufferCommand : RenderCommand
 {
 	public Buffer Buffer;
 }
 
-[ThreadCommand]
+internal static class GenerateBufferComand_Handler
+{
+	public static Buffer GenerateBuffer(this ICommandHandler<RenderCommand> consumer)
+	{
+		var buffer = new Buffer();
+		consumer.Enqueue(GenerateBufferCommand.Borrow(buffer));
+		return buffer;
+	}
+}
+
+[ThreadCommand(generateHandler: false)]
 internal partial class GenerateFramebufferCommand : RenderCommand
 {
 	public Framebuffer Framebuffer;
+}
+
+internal static class GenerateFramebufferCommand_Handler
+{
+	public static Framebuffer GenerateFramebuffer(this ICommandHandler<RenderCommand> consumer)
+	{
+		var framebuffer = new Framebuffer();
+		consumer.Enqueue(GenerateFramebufferCommand.Borrow(framebuffer));
+		return framebuffer;
+	}
 }
 
 [ThreadCommand]
@@ -184,37 +204,87 @@ internal partial class GenerateMipmapCommand : RenderCommand
 	public int Target;
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: false)]
 internal partial class GenerateProgramCommand : RenderCommand
 {
 	public Program Program;
 }
 
-[ThreadCommand]
+internal static class GenerateProgramCommand_Handler
+{
+	public static Program GenerateProgram(this ICommandHandler<RenderCommand> consumer)
+	{
+		var program = new Program();
+		consumer.Enqueue(GenerateProgramCommand.Borrow(program));
+		return program;
+	}
+}
+
+[ThreadCommand(generateHandler: false)]
 internal partial class GenerateShaderCommand : RenderCommand
 {
 	public Shader Shader;
 	public int ShaderType;
 }
 
-[ThreadCommand]
+internal static class GenerateShaderCommand_Handler
+{
+	public static Shader GenerateShader(this ICommandHandler<RenderCommand> consumer, int type)
+	{
+		var shader = new Shader();
+		consumer.Enqueue(GenerateShaderCommand.Borrow(shader, type));
+		return shader;
+	}
+}
+
+[ThreadCommand(generateHandler: false)]
 internal partial class GenerateTextureCommand : RenderCommand
 {
 	public Texture Texture;
 }
 
-[ThreadCommand]
+internal static class GenerateTextureCommand_Handler
+{
+	public static Texture GenerateTexture(this ICommandHandler<RenderCommand> consumer)
+	{
+		var texture = new Texture();
+		consumer.Enqueue(GenerateTextureCommand.Borrow(texture));
+		return texture;
+	}
+}
+
+[ThreadCommand(generateHandler: false)]
 internal partial class GenerateVertexArrayCommand : RenderCommand
 {
 	public VertexArray VertexArray;
 }
 
-[ThreadCommand]
+internal static class GenerateVertexArrayCommand_Handler
+{
+	public static VertexArray GenerateVertexArray(this ICommandHandler<RenderCommand> consumer)
+	{
+		var vertexArray = new VertexArray();
+		consumer.Enqueue(GenerateVertexArrayCommand.Borrow(vertexArray));
+		return vertexArray;
+	}
+}
+
+[ThreadCommand(generateHandler: false)]
 internal partial class GetUniformLocationCommand : RenderCommand
 {
 	public UniformLocation UniformLocation;
 	public Program Program;
 	public string Name;
+}
+
+internal static class GetUniformLocationCommand_Handler
+{
+	public static UniformLocation GetUniformLocation(this ICommandHandler<RenderCommand> consumer, Program program, string name)
+	{
+		var uniformLocation = new UniformLocation();
+		consumer.Enqueue(GetUniformLocationCommand.Borrow(uniformLocation, program, name));
+		return uniformLocation;
+	}
 }
 
 [ThreadCommand]
