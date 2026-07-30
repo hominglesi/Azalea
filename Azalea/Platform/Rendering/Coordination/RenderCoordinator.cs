@@ -1,5 +1,4 @@
 ﻿using Azalea.Graphics.Camera;
-using Azalea.Graphics.Shaders;
 using Azalea.Native.OpenGL;
 using Azalea.Numerics;
 using Azalea.Platform.Rendering.OpenGL;
@@ -10,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace Azalea.Platform.Rendering.Coordination;
 public class RenderCoordinator
@@ -19,6 +19,8 @@ public class RenderCoordinator
 	public DefaultQuadBatch DefaultQuadBatch { get; }
 	public Program DefaultQuadProgram { get; }
 
+	public Program DefaultTextProgram { get; }
+
 	public RenderCoordinator(PlatformRenderer renderer)
 	{
 		Renderer = renderer;
@@ -27,26 +29,26 @@ public class RenderCoordinator
 
 		DefaultQuadProgram = new Program();
 		GLRenderer.LoadingContext.GenerateProgram(DefaultQuadProgram,
-			_vertexShaderSource, _fragmentShaderSource);
+			_quadVertexShaderSource, _quadFragmentShaderSource);
+
+		DefaultTextProgram = new Program();
+		GLRenderer.LoadingContext.GenerateProgram(DefaultTextProgram,
+			_quadVertexShaderSource, _textFragmentShaderSource);
 
 		var shaderGroup = ObjectPool<RenderCommandGroup>.Borrow();
 
-		var textProgram = ShaderLibrary.GetShader("TextShader").NewProgram!;
-		shaderGroup.UseProgram(textProgram);
+		var projectionMatrix = MainCamera.Instance.CreateProjectionMatrix(new Vector2(800, 600));
 
-		var projectionUniform = shaderGroup.GetUniformLocation(textProgram, "u_Projection");
-		var textureUniform = shaderGroup.GetUniformLocation(textProgram, "u_Texture");
+		var uniformBuffer = shaderGroup.GenerateBuffer();
+		shaderGroup.BindBuffer(GL.UNIFORM_BUFFER, uniformBuffer);
+		shaderGroup.BufferData(GL.UNIFORM_BUFFER, Marshal.SizeOf(projectionMatrix), GL.STATIC_DRAW);
+		shaderGroup.BufferSubData(GL.UNIFORM_BUFFER, 0, projectionMatrix);
+		shaderGroup.BindBuffer(GL.UNIFORM_BUFFER, null);
 
-		shaderGroup.UniformMatrix4fv(projectionUniform, 1, false, MainCamera.Instance.CreateProjectionMatrix(new Vector2(800, 600)));
-		shaderGroup.Uniform1i(textureUniform, 0);
+		shaderGroup.BindBufferRange(GL.UNIFORM_BUFFER, 0, uniformBuffer, 0, Marshal.SizeOf(projectionMatrix));
 
 		shaderGroup.UseProgram(DefaultQuadProgram);
 
-		projectionUniform = shaderGroup.GetUniformLocation(DefaultQuadProgram, "u_Projection");
-		textureUniform = shaderGroup.GetUniformLocation(DefaultQuadProgram, "u_Texture");
-
-		shaderGroup.UniformMatrix4fv(projectionUniform, 1, false, MainCamera.Instance.CreateProjectionMatrix(new Vector2(800, 600)));
-		shaderGroup.Uniform1i(textureUniform, 0);
 		Renderer.Thread.SubmitCommandGroup(shaderGroup);
 		ObjectPool<RenderCommandGroup>.Return(shaderGroup);
 
@@ -172,26 +174,31 @@ public class RenderCoordinator
 
 	#endregion
 
-	private const string _vertexShaderSource = """
+	private const string _quadVertexShaderSource = """
 		#version 330 core
+		#extension GL_ARB_shading_language_420pack : enable
+
 		layout (location = 0) in vec2 vPos;
 		layout (location = 1) in vec4 vCol;
 		layout (location = 2) in vec2 vTex;
 
-		uniform mat4 u_Projection;
+		layout (std140, binding = 0) uniform Matrices
+		{
+			mat4 projection;
+		};
 
 		out vec4 oCol;
 		out vec2 oTex;
 
 		void main()
 		{
-			gl_Position = u_Projection * vec4(vPos.x, vPos.y, 1.0, 1.0);
+			gl_Position = projection * vec4(vPos.x, vPos.y, 1.0, 1.0);
 			oCol = vCol;
 			oTex = vTex;
 		}
 	""";
 
-	private const string _fragmentShaderSource = """
+	private const string _quadFragmentShaderSource = """
 		#version 330 core
 		in vec4 oCol;
 		in vec2 oTex;
@@ -203,6 +210,35 @@ public class RenderCoordinator
 		void main()
 		{
 			FragColor = texture(u_Texture, oTex) * vec4(oCol.x, oCol.y, oCol.z, oCol.w);
+		}
+	""";
+
+	private const string _textFragmentShaderSource = """
+		#version 330 core
+		in vec4 oCol;
+		in vec2 oTex;
+
+		uniform sampler2D u_Texture;
+
+		out vec4 FragColor;
+
+		float median(float r, float g, float b) {
+		    return max(min(r, g), min(max(r, g), b));
+		}
+
+		float screenPxRange() {
+		    vec2 unitRange = vec2(2.0) / vec2(textureSize(u_Texture, 0));
+		    vec2 screenTexSize = vec2(1.0) / fwidth(oTex);
+		    return max(0.5 * dot(unitRange, screenTexSize), 1.0);
+		}
+
+		void main()
+		{
+		    vec3 msd = texture(u_Texture, oTex).rgb;
+		    float sd = median(msd.r, msd.g, msd.b);
+		    float screenPxDistance = screenPxRange()*(sd - 0.5);
+		    float opacity = clamp(screenPxDistance + 0.5, 0.0, 1.0);
+		    FragColor = vec4(oCol.x, oCol.y, oCol.z, oCol.w * opacity);
 		}
 	""";
 }

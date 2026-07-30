@@ -23,6 +23,16 @@ internal partial class BindBufferCommand : RenderCommand
 }
 
 [ThreadCommand]
+internal partial class BindBufferRangeCommand : RenderCommand
+{
+	public int Type;
+	public uint Index;
+	public Buffer Buffer;
+	public nint Offset;
+	public nint Size;
+}
+
+[ThreadCommand]
 internal partial class BindTextureCommand : RenderCommand
 {
 	public int Type;
@@ -50,7 +60,7 @@ internal partial class BufferDataCommand : RenderCommand
 {
 	public int Type;
 	public nint Size;
-	public byte[]? Data;
+	public byte[] Data;
 	public int Hint;
 	public bool FreeData;
 
@@ -62,11 +72,19 @@ internal partial class BufferDataCommand : RenderCommand
 }
 
 [ThreadCommand(displayName: "BufferData")]
+internal partial class BufferDataEmptyCommand : RenderCommand
+{
+	public int Type;
+	public nint Size;
+	public int Hint;
+}
+
+[ThreadCommand(displayName: "BufferData")]
 internal partial class BufferDataFloatCommand : RenderCommand
 {
 	public int Type;
 	public nint Size;
-	public float[]? Data;
+	public float[] Data;
 	public int Hint;
 	public bool FreeData;
 
@@ -82,7 +100,7 @@ internal partial class BufferDataUIntCommand : RenderCommand
 {
 	public int Type;
 	public nint Size;
-	public uint[]? Data;
+	public uint[] Data;
 	public int Hint;
 	public bool FreeData;
 
@@ -91,6 +109,14 @@ internal partial class BufferDataUIntCommand : RenderCommand
 		if (FreeData && Data is not null)
 			ArrayPool<uint>.Shared.Return(Data);
 	}
+}
+
+[ThreadCommand(displayName: "BufferSubData")]
+internal partial class BufferSubDataMatrix4x4Command : RenderCommand
+{
+	public int Type;
+	public nint Offset;
+	public Matrix4x4 Data;
 }
 
 [ThreadCommand]

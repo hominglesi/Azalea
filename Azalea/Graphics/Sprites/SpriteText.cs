@@ -72,7 +72,7 @@ public class SpriteText : GameObject
 	public override void Draw(IRenderer renderer, RenderCoordinator? coordinator)
 	{
 		if (coordinator is not null)
-			coordinator.BindProgram(_textShader.NewProgram!);
+			coordinator.BindProgram(coordinator.DefaultTextProgram);
 		else
 			renderer?.BindShader(_textShader);
 

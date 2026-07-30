@@ -61,7 +61,7 @@ internal partial class GLRenderer : PlatformRenderer
 	private Color? _clearColor = null;
 	private RectangleInt? _scissorRectangle = null;
 
-	internal override void HandleCommandLogic(RenderCommand command)
+	internal unsafe override void HandleCommandLogic(RenderCommand command)
 	{
 		switch (command)
 		{
@@ -73,6 +73,10 @@ internal partial class GLRenderer : PlatformRenderer
 					Debug.Assert(buffer.Handle is not null);
 					GL.BindBuffer(type, buffer.Handle.Value);
 				}
+				break;
+			case BindBufferRangeCommand(var type, var index, var buffer, var offset, var size):
+				Debug.Assert(buffer.Handle is not null);
+				GL.BindBufferRange(type, index, buffer.Handle.Value, offset, size);
 				break;
 			case BindTextureCommand(var type, var texture):
 				texture.AssureReady();
@@ -91,22 +95,19 @@ internal partial class GLRenderer : PlatformRenderer
 				GL.BlendFunc(sourceFactor, destinationFactor);
 				break;
 			case BufferDataCommand(var type, var size, var data, var usage, var _):
-				if (data is null)
-					GL.BufferData(type, size, IntPtr.Zero, usage);
-				else
-					GL.BufferData(type, size, in data[0], usage);
+				GL.BufferData(type, size, in data[0], usage);
+				break;
+			case BufferDataEmptyCommand(var type, var size, var usage):
+				GL.BufferData(type, size, nint.Zero, usage);
 				break;
 			case BufferDataFloatCommand(var type, var size, var data, var usage, var _):
-				if (data is null)
-					GL.BufferData(type, size, IntPtr.Zero, usage);
-				else
-					GL.BufferData(type, size, in data[0], usage);
+				GL.BufferData(type, size, in data[0], usage);
 				break;
 			case BufferDataUIntCommand(var type, var size, var data, var usage, var _):
-				if (data is null)
-					GL.BufferData(type, size, IntPtr.Zero, usage);
-				else
-					GL.BufferData(type, size, in data[0], usage);
+				GL.BufferData(type, size, in data[0], usage);
+				break;
+			case BufferSubDataMatrix4x4Command(var type, var offset, var data):
+				GL.BufferSubData(type, offset, Marshal.SizeOf<Matrix4x4>(), (nint)(&data));
 				break;
 			case ClearCommand(var color):
 				if (_clearColor != color)

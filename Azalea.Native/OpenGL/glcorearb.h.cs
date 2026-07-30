@@ -21,6 +21,8 @@ public static partial class GL
 	public const int DEBUG_SEVERITY_LOW = 0x9148;
 	public const int DEBUG_SEVERITY_NOTIFICATION = 0x826B;
 
+	public const int UNIFORM_BUFFER = 0x8A11;
+
 	[AttributeUsage(AttributeTargets.Delegate)]
 	public sealed class OpenGLLoadedFunctionAttribute(
 		string? docs = null, string? overrideName = null, bool automaticPrefix = true) : Attribute
@@ -36,6 +38,9 @@ public static partial class GL
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindBuffer.xhtml")]
 	private delegate void BindBufferDelegate(int target, uint buffer);
 
+	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindBufferRange.xhtml")]
+	private delegate void BindBufferRangeDelegate(int target, uint index, uint buffer, nint offset, nint size);
+
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindFramebuffer.xhtml")]
 	private delegate void BindFramebufferDelegate(int target, uint framebuffer);
 
@@ -43,7 +48,7 @@ public static partial class GL
 	private delegate void BindVertexArrayDelegate(uint array);
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml")]
-	private delegate void BufferDataDelegate(int target, nint size, IntPtr data, int usage);
+	private delegate void BufferDataDelegate(int target, nint size, nint data, int usage);
 
 	[OpenGLLoadedFunction(overrideName: "BufferData", docs: "https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml")]
 	private delegate void BufferData2Delegate(int target, nint size, in byte data, int usage);
@@ -53,6 +58,9 @@ public static partial class GL
 
 	[OpenGLLoadedFunction(overrideName: "BufferData", docs: "https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml")]
 	private delegate void BufferData4Delegate(int target, nint size, in uint data, int usage);
+
+	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferSubData.xhtml")]
+	private delegate void BufferSubDataDelegate(int target, nint offset, nint size, nint data);
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCreateProgram.xhtml")]
 	private delegate uint CreateProgramDelegate();

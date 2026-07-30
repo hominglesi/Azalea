@@ -6,8 +6,6 @@ namespace Azalea.Graphics.Shaders;
 
 public class Shader
 {
-	internal Platform.Rendering.Program? NewProgram { get; set; }
-
 	internal virtual INativeShader NativeShader { get; }
 
 	internal Shader(INativeShader nativeShader)
