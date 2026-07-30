@@ -4,6 +4,7 @@ using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
 using Azalea.Platform;
 using Azalea.Platform.Rendering.Coordination;
+using Azalea.Platform.Rendering.OpenGL;
 using System;
 using System.Numerics;
 
@@ -48,7 +49,14 @@ public class Sprite : GameObject
 
 		if (coordinator is not null)
 		{
-			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorInfo.Color);
+			if (Texture.NewTexture is not null)
+				coordinator.BindTexture(Texture.NewTexture!);
+			else
+				coordinator.BindTexture(GLRenderer.LoadingContext!.WhitePixel);
+
+			coordinator.BindProgram(coordinator.DefaultQuadProgram);
+
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorInfo.Color, Texture.GetUVCoordinates(Time));
 
 			return;
 		}

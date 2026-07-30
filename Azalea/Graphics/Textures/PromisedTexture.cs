@@ -11,6 +11,8 @@ public class PromisedTexture : ITexture
 
 	public bool IsResolved => _promise.IsResolved;
 
+	public Platform.Rendering.Texture? NewTexture => null;
+
 	public PromisedTexture(ValuePromise<ITexture> promise, ITexture? loadingTexture = null)
 	{
 		_loadingTexture = loadingTexture ?? Assets.MissingTexture;

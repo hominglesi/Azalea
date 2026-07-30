@@ -1,11 +1,15 @@
-﻿using Azalea.Native.OpenGL;
+﻿using Azalea.Graphics.Camera;
+using Azalea.Graphics.Shaders;
+using Azalea.Native.OpenGL;
 using Azalea.Numerics;
-using Azalea.Threading;
+using Azalea.Platform.Rendering.OpenGL;
+using Azalea.Platform.Rendering.OpenGL.LoadingContext;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 
 namespace Azalea.Platform.Rendering.Coordination;
 public class RenderCoordinator
@@ -13,12 +17,40 @@ public class RenderCoordinator
 	public PlatformRenderer Renderer { get; }
 
 	public DefaultQuadBatch DefaultQuadBatch { get; }
+	public Program DefaultQuadProgram { get; }
 
 	public RenderCoordinator(PlatformRenderer renderer)
 	{
 		Renderer = renderer;
 
 		DefaultQuadBatch = new DefaultQuadBatch(this);
+
+		DefaultQuadProgram = new Program();
+		GLRenderer.LoadingContext.GenerateProgram(DefaultQuadProgram,
+			_vertexShaderSource, _fragmentShaderSource);
+
+		var shaderGroup = ObjectPool<RenderCommandGroup>.Borrow();
+
+		var textProgram = ShaderLibrary.GetShader("TextShader").NewProgram!;
+		shaderGroup.UseProgram(textProgram);
+
+		var projectionUniform = shaderGroup.GetUniformLocation(textProgram, "u_Projection");
+		var textureUniform = shaderGroup.GetUniformLocation(textProgram, "u_Texture");
+
+		shaderGroup.UniformMatrix4fv(projectionUniform, 1, false, MainCamera.Instance.CreateProjectionMatrix(new Vector2(800, 600)));
+		shaderGroup.Uniform1i(textureUniform, 0);
+
+		shaderGroup.UseProgram(DefaultQuadProgram);
+
+		projectionUniform = shaderGroup.GetUniformLocation(DefaultQuadProgram, "u_Projection");
+		textureUniform = shaderGroup.GetUniformLocation(DefaultQuadProgram, "u_Texture");
+
+		shaderGroup.UniformMatrix4fv(projectionUniform, 1, false, MainCamera.Instance.CreateProjectionMatrix(new Vector2(800, 600)));
+		shaderGroup.Uniform1i(textureUniform, 0);
+		Renderer.Thread.SubmitCommandGroup(shaderGroup);
+		ObjectPool<RenderCommandGroup>.Return(shaderGroup);
+
+		_boundProgram = DefaultQuadProgram;
 	}
 
 	#region CommandQueue
@@ -83,6 +115,35 @@ public class RenderCoordinator
 	}
 
 	#endregion
+	#region Program
+	private Program? _boundProgram;
+	internal void BindProgram(Program program)
+	{
+		if (_boundProgram == program)
+			return;
+
+		assertQueueExists();
+		FlushRenderBatch();
+
+		_commandQueue.UseProgram(program);
+		_boundProgram = program;
+	}
+	#endregion
+	#region Texture
+	private Texture? _boundTexture;
+	internal void BindTexture(Texture texture)
+	{
+		if (_boundTexture == texture)
+			return;
+
+		assertQueueExists();
+		FlushRenderBatch();
+
+		_commandQueue.BindTexture(GL.TEXTURE_2D, texture);
+		_boundTexture = texture;
+	}
+
+	#endregion
 	#region RenderBatch
 
 	private IRenderBatch? _activeRenderBatch;
@@ -111,27 +172,37 @@ public class RenderCoordinator
 
 	#endregion
 
-	public static Program CreateStandardProgram(ICommandHandler<RenderCommand> handler, string vertexShaderSource, string fragmentShaderSource)
-	{
-		var vertexShader = handler.GenerateShader(GL.VERTEX_SHADER);
-		handler.ShaderSource(vertexShader, vertexShaderSource);
-		handler.CompileShader(vertexShader);
-		handler.PrintShaderCompileStatus(vertexShader);
+	private const string _vertexShaderSource = """
+		#version 330 core
+		layout (location = 0) in vec2 vPos;
+		layout (location = 1) in vec4 vCol;
+		layout (location = 2) in vec2 vTex;
 
-		var fragmentShader = handler.GenerateShader(GL.FRAGMENT_SHADER);
-		handler.ShaderSource(fragmentShader, fragmentShaderSource);
-		handler.CompileShader(fragmentShader);
-		handler.PrintShaderCompileStatus(fragmentShader);
+		uniform mat4 u_Projection;
 
-		var program = handler.GenerateProgram();
-		handler.AttachShader(program, vertexShader);
-		handler.AttachShader(program, fragmentShader);
-		handler.LinkProgram(program);
-		handler.PrintProgramCompileStatus(program);
+		out vec4 oCol;
+		out vec2 oTex;
 
-		handler.DeleteShader(vertexShader);
-		handler.DeleteShader(fragmentShader);
+		void main()
+		{
+			gl_Position = u_Projection * vec4(vPos.x, vPos.y, 1.0, 1.0);
+			oCol = vCol;
+			oTex = vTex;
+		}
+	""";
 
-		return program;
-	}
+	private const string _fragmentShaderSource = """
+		#version 330 core
+		in vec4 oCol;
+		in vec2 oTex;
+
+		uniform sampler2D u_Texture;
+
+		out vec4 FragColor;
+
+		void main()
+		{
+			FragColor = texture(u_Texture, oTex) * vec4(oCol.x, oCol.y, oCol.z, oCol.w);
+		}
+	""";
 }

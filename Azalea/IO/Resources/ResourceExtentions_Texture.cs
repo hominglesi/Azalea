@@ -1,5 +1,7 @@
 ﻿using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Textures;
+using Azalea.Platform.Rendering.OpenGL;
+using Azalea.Platform.Rendering.OpenGL.LoadingContext;
 using Azalea.Threading;
 using System;
 
@@ -21,6 +23,12 @@ public static partial class ResourceStoreExtentions
 		var texture = Renderer.CreateTexture(data);
 		texture.SetFiltering(filtering, filtering);
 		_textureCache.AddValue(store, path, texture);
+
+		Platform.Rendering.OpenGL.GLRenderer.TempAssureGLInitialized();
+		var newTexture = new Platform.Rendering.Texture();
+		GLRenderer.LoadingContext!.GenerateTexture(newTexture);
+		GLRenderer.LoadingContext!.TexImage2D(newTexture, data.Width, data.Height, data.Data, false);
+		texture.NewTexture = newTexture;
 
 		return texture;
 	}

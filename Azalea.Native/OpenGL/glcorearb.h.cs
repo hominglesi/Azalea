@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Azalea.Native.OpenGL;
@@ -12,6 +13,13 @@ public static partial class GL
 	public const int UNSIGNED_INT = 0x1405;
 	public const int LINE = 0x1B01;
 	public const int POINT = 0x1B00;
+
+	public const int DEBUG_OUTPUT_SYNCHRONOUS = 0x8242;
+	public const int DEBUG_OUTPUT = 0x92E0;
+	public const int DEBUG_SEVERITY_HIGH = 0x9146;
+	public const int DEBUG_SEVERITY_MEDIUM = 0x9147;
+	public const int DEBUG_SEVERITY_LOW = 0x9148;
+	public const int DEBUG_SEVERITY_NOTIFICATION = 0x826B;
 
 	[AttributeUsage(AttributeTargets.Delegate)]
 	public sealed class OpenGLLoadedFunctionAttribute(
@@ -54,6 +62,12 @@ public static partial class GL
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glCompileShader.xhtml")]
 	private delegate uint CompileShaderDelegate(uint shader);
+
+	[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+	public delegate void DebugProc(uint source, uint type, uint id, uint severity, int length, nint message, nint userParam);
+
+	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDebugMessageCallback.xhtml")]
+	private delegate uint DebugMessageCallbackDelegate(DebugProc callback, nint userParam);
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDeleteShader.xhtml")]
 	private delegate uint DeleteShaderDelegate(uint shader);
@@ -111,6 +125,9 @@ public static partial class GL
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUseProgram.xhtml")]
 	private delegate void UseProgramDelegate(uint program);
+
+	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glValidateProgram.xhtml")]
+	private delegate void ValidateProgramDelegate(uint program);
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glVertexAttribPointer.xhtml")]
 	private delegate void VertexAttribPointerDelegate(uint index, int size, int type, bool normalized, int stride, nint pointer);

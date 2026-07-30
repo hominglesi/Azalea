@@ -37,6 +37,8 @@ internal partial class GLRenderer
 		}
 	}
 
+	public static void TempAssureGLInitialized() => assureGLInitialized();
+
 	class InitializationThread(PlatformDeviceContext deviceContext) : GameThread(1)
 	{
 		private readonly PlatformDeviceContext _deviceContext = deviceContext;

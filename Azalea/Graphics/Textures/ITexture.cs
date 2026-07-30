@@ -6,6 +6,8 @@ using System.Numerics;
 namespace Azalea.Graphics.Textures;
 public interface ITexture
 {
+	public Platform.Rendering.Texture? NewTexture { get; }
+
 	public static readonly List<ITexture> LoadedTextures = [];
 
 	public INativeTexture GetNativeTexture(float time = 0);

@@ -34,6 +34,7 @@ public class Texture
 		_readyEvent.WaitOne();
 		Console.WriteLine($"Waited for texture {Time.GetPreciseMilisecondsSince(startTime)}ms");
 
+		Debug.Assert(_loadingOperations == 0);
 		Debug.Assert(NativeTexture is not null);
 	}
 

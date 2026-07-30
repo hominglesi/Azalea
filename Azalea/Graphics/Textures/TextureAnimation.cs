@@ -9,6 +9,8 @@ public class TextureAnimation : ITexture
 	private readonly List<(ITexture, float)> _frames = [];
 	private float _totalDuration;
 
+	public Platform.Rendering.Texture? NewTexture => null;
+
 	public TextureAnimation() { }
 
 	public TextureAnimation(IEnumerable<ITexture> frames, float duration)

@@ -1,8 +1,6 @@
-﻿using Azalea.Graphics.Camera;
-using Azalea.Graphics.Colors;
+﻿using Azalea.Graphics.Colors;
 using Azalea.Graphics.Primitives;
 using Azalea.Native.OpenGL;
-using Azalea.Numerics;
 using Azalea.Utils;
 using System.Buffers;
 using System.Numerics;
@@ -12,7 +10,6 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 {
 	private readonly PlatformRenderer _renderer;
 
-	private readonly Program _program;
 	private readonly UniformLocation _projectionUniform;
 	private readonly UniformLocation _textureUniform;
 
@@ -26,16 +23,6 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 	{
 		_renderer = renderCoordinator.Renderer;
 		var commandGroup = ObjectPool<RenderCommandGroup>.Borrow();
-
-		_program = RenderCoordinator.CreateStandardProgram(commandGroup,
-			_vertexShaderSource, _fragmentShaderSource);
-
-		commandGroup.UseProgram(_program);
-
-		_projectionUniform = commandGroup.GetUniformLocation(_program, "u_Projection");
-		_textureUniform = commandGroup.GetUniformLocation(_program, "u_Texture");
-
-		commandGroup.Uniform1i(_textureUniform, 0);
 
 		_vertexArray = commandGroup.GenerateVertexArray();
 		commandGroup.BindVertexArray(_vertexArray);
@@ -75,12 +62,12 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 	private int _nextVertex = 0;
 	private const int _vertexSize = 8;
 
-	public void Add(RenderCommandGroup commandQueue, Quad quad, ColorQuad colorQuad)
+	public void Add(RenderCommandGroup commandQueue, Quad quad, ColorQuad colorQuad, Quad uvCoordinated)
 	{
-		Add(new DefaultQuadBatchVertex(quad.BottomLeft, colorQuad.BottomLeft, Rectangle.One.BottomLeft));
-		Add(new DefaultQuadBatchVertex(quad.BottomRight, colorQuad.BottomRight, Rectangle.One.BottomRight));
-		Add(new DefaultQuadBatchVertex(quad.TopRight, colorQuad.TopRight, Rectangle.One.TopRight));
-		Add(new DefaultQuadBatchVertex(quad.TopLeft, colorQuad.TopLeft, Rectangle.One.TopLeft));
+		Add(new DefaultQuadBatchVertex(quad.BottomLeft, colorQuad.BottomLeft, uvCoordinated.BottomLeft));
+		Add(new DefaultQuadBatchVertex(quad.BottomRight, colorQuad.BottomRight, uvCoordinated.BottomRight));
+		Add(new DefaultQuadBatchVertex(quad.TopRight, colorQuad.TopRight, uvCoordinated.TopRight));
+		Add(new DefaultQuadBatchVertex(quad.TopLeft, colorQuad.TopLeft, uvCoordinated.TopLeft));
 
 		if (_nextVertex == MaxQuadCount * 4)
 			Draw(commandQueue);
@@ -102,73 +89,21 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 		_nextVertex++;
 	}
 
-	private Vector2Int _lastScreenSize = Vector2Int.Zero;
-
 	internal override void Draw(RenderCommandGroup commandQueue)
 	{
 		if (_nextVertex is 0)
 			return;
 
-		if (_lastScreenSize != new Vector2Int(800, 600))
-		{
-			_lastScreenSize = new Vector2Int(800, 600);
-
-			var projectionMatrix = MainCamera.Instance.CreateProjectionMatrix(_lastScreenSize);
-
-			var commandGroup = ObjectPool<RenderCommandGroup>.Borrow();
-			commandGroup.UseProgram(_program);
-			commandGroup.UniformMatrix4fv(_projectionUniform, 1, false, projectionMatrix);
-			_renderer.Thread.SubmitCommandGroup(commandGroup);
-			ObjectPool<RenderCommandGroup>.Return(commandGroup);
-		}
-
 		commandQueue.BindVertexArray(_vertexArray);
 
 		commandQueue.BufferData(GL.ARRAY_BUFFER, _nextVertex * _vertexSize * sizeof(float), _vertices, GL.DYNAMIC_DRAW, true);
-
-		commandQueue.UseProgram(_program);
 
 		commandQueue.DrawElements(GL.TRIANGLES, (_nextVertex / 4) * 6, GL.UNSIGNED_INT, 0);
 
 		_vertices = null;
 		_nextVertex = 0;
 	}
-
-	private const string _vertexShaderSource = """
-		#version 330 core
-		layout (location = 0) in vec2 vPos;
-		layout (location = 1) in vec4 vCol;
-		layout (location = 2) in vec2 vTex;
-
-		uniform mat4 u_Projection;
-
-		out vec4 oCol;
-		out vec2 oTex;
-
-		void main()
-		{
-			gl_Position = u_Projection * vec4(vPos.x, vPos.y, 1.0, 1.0);
-			oCol = vCol;
-			oTex = vTex;
-		}
-	""";
-
-	private const string _fragmentShaderSource = """
-		#version 330 core
-		in vec4 oCol;
-		in vec2 oTex;
-
-		uniform sampler2D u_Texture;
-
-		out vec4 FragColor;
-
-		void main()
-		{
-			FragColor = texture(u_Texture, oTex) * vec4(oCol.x, oCol.y, oCol.z, oCol.w);
-		}
-	""";
 }
-
 
 public readonly struct DefaultQuadBatchVertex(Vector2 position, Color color, Vector2 textureCoordinate)
 {

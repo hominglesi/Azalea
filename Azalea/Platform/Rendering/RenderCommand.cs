@@ -16,13 +16,6 @@ public abstract class RenderCommand : ThreadCommand
 }
 
 [ThreadCommand]
-internal partial class AttachShaderCommand : RenderCommand
-{
-	public Program Program;
-	public Shader Shader;
-}
-
-[ThreadCommand]
 internal partial class BindBufferCommand : RenderCommand
 {
 	public int Type;
@@ -104,18 +97,6 @@ internal partial class BufferDataUIntCommand : RenderCommand
 internal partial class ClearCommand : RenderCommand
 {
 	public Color Color;
-}
-
-[ThreadCommand]
-internal partial class CompileShaderCommand : RenderCommand
-{
-	public Shader Shader;
-}
-
-[ThreadCommand]
-internal partial class DeleteShaderCommand : RenderCommand
-{
-	public Shader Shader;
 }
 
 [ThreadCommand]
@@ -208,32 +189,17 @@ internal partial class GenerateMipmapCommand : RenderCommand
 internal partial class GenerateProgramCommand : RenderCommand
 {
 	public Program Program;
+	public string VertexShaderCode;
+	public string FragmentShaderCode;
 }
 
 internal static class GenerateProgramCommand_Handler
 {
-	public static Program GenerateProgram(this ICommandHandler<RenderCommand> consumer)
+	public static Program GenerateProgram(this ICommandHandler<RenderCommand> consumer, string vertexShaderCode, string fragmentShaderCode)
 	{
 		var program = new Program();
-		consumer.Enqueue(GenerateProgramCommand.Borrow(program));
+		consumer.Enqueue(GenerateProgramCommand.Borrow(program, vertexShaderCode, fragmentShaderCode));
 		return program;
-	}
-}
-
-[ThreadCommand(generateHandler: false)]
-internal partial class GenerateShaderCommand : RenderCommand
-{
-	public Shader Shader;
-	public int ShaderType;
-}
-
-internal static class GenerateShaderCommand_Handler
-{
-	public static Shader GenerateShader(this ICommandHandler<RenderCommand> consumer, int type)
-	{
-		var shader = new Shader();
-		consumer.Enqueue(GenerateShaderCommand.Borrow(shader, type));
-		return shader;
 	}
 }
 
@@ -288,12 +254,6 @@ internal static class GetUniformLocationCommand_Handler
 }
 
 [ThreadCommand]
-internal partial class LinkProgramCommand : RenderCommand
-{
-	public Program Program;
-}
-
-[ThreadCommand]
 internal partial class PolygonModeCommand : RenderCommand
 {
 	public int Face;
@@ -307,31 +267,12 @@ internal partial class PrepareRenderingCommand : RenderCommand { }
 internal partial class PrintErrorsCommand : RenderCommand { }
 
 [ThreadCommand]
-internal partial class PrintProgramCompileStatusCommand : RenderCommand
-{
-	public Program Program;
-}
-
-[ThreadCommand]
-internal partial class PrintShaderCompileStatusCommand : RenderCommand
-{
-	public Shader Shader;
-}
-
-[ThreadCommand]
 internal partial class ScissorCommand : RenderCommand
 {
 	public RectangleInt? Rectangle;
 
 	public override string ToString()
 		=> Rectangle is null ? $"Scissor(0)" : $"Scissor({Rectangle})";
-}
-
-[ThreadCommand]
-internal partial class ShaderSourceCommand : RenderCommand
-{
-	public Shader Shader;
-	public string SourceCode;
 }
 
 [ThreadCommand]

@@ -122,10 +122,13 @@ public partial class HollowBox : GameObject
 				color.Color.BottomLeft,
 				color.Color.TopLeft);
 
-			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(topRect) * DrawInfo.Matrix, topColor);
-			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(rightRect) * DrawInfo.Matrix, rightColor);
-			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(bottomRect) * DrawInfo.Matrix, bottomColor);
-			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(leftRect) * DrawInfo.Matrix, leftColor);
+			coordinator.BindTexture(Platform.Rendering.OpenGL.GLRenderer.LoadingContext!.WhitePixel);
+			coordinator.BindProgram(coordinator.DefaultQuadProgram);
+
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(topRect) * DrawInfo.Matrix, topColor, Rectangle.One);
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(rightRect) * DrawInfo.Matrix, rightColor, Rectangle.One);
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(bottomRect) * DrawInfo.Matrix, bottomColor, Rectangle.One);
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(leftRect) * DrawInfo.Matrix, leftColor, Rectangle.One);
 
 			return;
 		}

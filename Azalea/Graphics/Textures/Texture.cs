@@ -6,6 +6,8 @@ namespace Azalea.Graphics.Textures;
 
 public class Texture : Disposable, ITexture
 {
+	public Platform.Rendering.Texture? NewTexture { get; internal set; }
+
 	private readonly INativeTexture _nativeTexture;
 
 	private Rectangle _uvCoordinates = Rectangle.One;
@@ -61,7 +63,10 @@ public class Texture : Disposable, ITexture
 	}
 
 	public Texture(ITexture other)
-		: this(other.GetNativeTexture()) { }
+		: this(other.GetNativeTexture())
+	{
+		NewTexture = other.NewTexture;
+	}
 
 	internal Texture(INativeTexture nativeTexture)
 	{

@@ -16,6 +16,10 @@ internal class GLLoadingContextInspector
 		thread.LoadedTextures.OnChanged += () => Scheduler.Schedule(
 			() => textureCount.Value = thread.LoadedTextures.Count);
 
+		var programCount = window.AddCounter("LoadedPrograms: ", thread.LoadedPrograms.Count);
+		thread.LoadedPrograms.OnChanged += () => Scheduler.Schedule(
+			() => programCount.Value = thread.LoadedPrograms.Count);
+
 		GameThreadInspector.Inject(window, thread);
 
 		window.FinishGroup();

@@ -1,8 +1,8 @@
-﻿using Azalea.Graphics;
-using Azalea.Graphics.Colors;
+﻿using Azalea.Graphics.Colors;
 using Azalea.IO.Resources;
 using Azalea.Native.OpenGL;
 using Azalea.Platform.Rendering;
+using Azalea.Platform.Rendering.OpenGL;
 using Azalea.Platform.Scheduling;
 using Azalea.Utils;
 using System;
@@ -34,11 +34,7 @@ public sealed class Application
 		var azaleaTexture = commandGroup.GenerateTexture();
 		commandGroup.TexImage2D(azaleaTexture, azaleaImage.Width, azaleaImage.Height, azaleaImage.Data, true);
 
-		var whiteImage = new Image(1, 1, [byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue]);
-		var whiteTexture = commandGroup.GenerateTexture();
-		commandGroup.TexImage2D(whiteTexture, whiteImage.Width, whiteImage.Height, whiteImage.Data, false);
-
-		commandGroup.BindTexture(GL.TEXTURE_2D, whiteTexture);
+		commandGroup.BindTexture(GL.TEXTURE_2D, GLRenderer.LoadingContext!.WhitePixel);
 
 		Renderer.Thread.SubmitCommandGroup(commandGroup);
 

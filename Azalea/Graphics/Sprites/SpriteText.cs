@@ -1,21 +1,10 @@
 ﻿using Azalea.Graphics.Rendering;
+using Azalea.Graphics.Shaders;
+using Azalea.IO.Resources;
+using Azalea.Platform.Rendering.Coordination;
 using Azalea.Text;
 using System;
 using System.Numerics;
-using Azalea.Platform.Rendering.Coordination;
-
-
-#if OLDTEXT
-using System.Numerics;
-using System.Collections.Generic;
-using Azalea.Layout;
-using Azalea.Graphics.Primitives;
-using Azalea.Graphics.Textures;
-using System.Diagnostics;
-#else
-using Azalea.Graphics.Shaders;
-using Azalea.IO.Resources;
-#endif
 
 namespace Azalea.Graphics.Sprites;
 
@@ -82,20 +71,26 @@ public class SpriteText : GameObject
 
 	public override void Draw(IRenderer renderer, RenderCoordinator? coordinator)
 	{
-		if (renderer is not null)
-			renderer.BindShader(_textShader);
+		if (coordinator is not null)
+			coordinator.BindProgram(_textShader.NewProgram!);
+		else
+			renderer?.BindShader(_textShader);
 
 		foreach (var character in _layoutProvider.GetCharacters())
 		{
 			var quad = ToScreenSpace(character.DrawRectangle);
 
 			if (coordinator is not null)
-				coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorInfo.Color);
+			{
+				if (character.Texture.NewTexture is not null)
+					coordinator.BindTexture(character.Texture.NewTexture!);
+
+				coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorInfo.Color, character.Texture.GetUVCoordinates());
+			}
 			else
-				renderer.DrawQuad(character.Texture.GetNativeTexture(), quad, DrawColorInfo, character.Texture.GetUVCoordinates());
+				renderer?.DrawQuad(character.Texture.GetNativeTexture(), quad, DrawColorInfo, character.Texture.GetUVCoordinates());
 		}
 
-		if (renderer is not null)
-			renderer.BindShader(renderer.DefaultQuadShader);
+		renderer?.BindShader(renderer.DefaultQuadShader);
 	}
 }

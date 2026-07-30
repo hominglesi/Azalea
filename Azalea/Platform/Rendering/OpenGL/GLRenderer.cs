@@ -7,11 +7,14 @@ using Azalea.Platform.Windowing;
 using System;
 using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Azalea.Platform.Rendering.OpenGL;
 internal partial class GLRenderer : PlatformRenderer
 {
+	private static readonly GL.DebugProc _debugCallback = onDebugMessage;
+
 	private readonly PlatformDeviceContext _deviceContext;
 	private GLContext _context;
 
@@ -30,6 +33,10 @@ internal partial class GLRenderer : PlatformRenderer
 		_context = GLContext.Create(_deviceContext, LoadingContext);
 		_context.MakeCurrent();
 
+		GL.Enable(GL.DEBUG_OUTPUT);
+		GL.Enable(GL.DEBUG_OUTPUT_SYNCHRONOUS);
+		GL.DebugMessageCallback(_debugCallback, nint.Zero);
+
 		GL.wglSwapIntervalEXT(0);
 	}
 
@@ -37,12 +44,14 @@ internal partial class GLRenderer : PlatformRenderer
 	{
 		switch (command)
 		{
+			case GenerateProgramCommand(var program, var vertexShaderCode, var fragmentShaderCode):
+				LoadingContext!.GenerateProgram(program, vertexShaderCode, fragmentShaderCode);
+				return true;
 			case GenerateTextureCommand(var texture):
 				LoadingContext!.GenerateTexture(texture);
 				return true;
 			case TexImage2DCommand(var texture, var width, var height, var pixels, var generateMipmap):
 				LoadingContext!.TexImage2D(texture, width, height, pixels, generateMipmap);
-				texture.BeginLoadingOperation();
 				return true;
 		}
 
@@ -56,11 +65,6 @@ internal partial class GLRenderer : PlatformRenderer
 	{
 		switch (command)
 		{
-			case AttachShaderCommand(var program, var shader):
-				Debug.Assert(program.Handle is not null);
-				Debug.Assert(shader.Handle is not null);
-				GL.AttachShader(program.Handle.Value, shader.Handle.Value);
-				break;
 			case BindBufferCommand(var type, var buffer):
 				if (buffer is null)
 					GL.BindBuffer(type, 0);
@@ -109,14 +113,6 @@ internal partial class GLRenderer : PlatformRenderer
 					GL.ClearColor(color.RNormalized, color.GNormalized, color.BNormalized, color.ANormalized);
 				GL.Clear(GL.COLOR_BUFFER_BIT);
 				break;
-			case CompileShaderCommand(var shader):
-				Debug.Assert(shader.Handle is not null);
-				GL.CompileShader(shader.Handle.Value);
-				break;
-			case DeleteShaderCommand(var shader):
-				Debug.Assert(shader.Handle is not null);
-				GL.DeleteShader(shader.Handle.Value);
-				break;
 			case DisableCommand(var capability):
 				GL.Disable(capability);
 				break;
@@ -152,28 +148,16 @@ internal partial class GLRenderer : PlatformRenderer
 			case GenerateMipmapCommand(var target):
 				GL.GenerateMipmap(target);
 				break;
-			case GenerateProgramCommand(var program):
-				uint programHandle = GL.CreateProgram();
-				program.Initialize(programHandle);
-				break;
-			case GenerateShaderCommand(var shader, var type):
-				uint shaderHandle = GL.CreateShader(type);
-				shader.Initialize(shaderHandle);
-				break;
 			case GenerateVertexArrayCommand(var vertexArray):
 				uint vertexArrayHandle = 0;
 				GL.GenVertexArrays(1, ref vertexArrayHandle);
 				vertexArray.Initialize(vertexArrayHandle);
 				break;
 			case GetUniformLocationCommand(var uniformLocation, var program, var name):
-				Debug.Assert(program.Handle is not null);
+				program.AssureInitialized();
 				var nameBytes = Encoding.UTF8.GetBytes(name + "\0");
 				int uniformLocationHandle = GL.GetUniformLocation(program.Handle.Value, nameBytes);
 				uniformLocation.Initialize(uniformLocationHandle);
-				break;
-			case LinkProgramCommand(var program):
-				Debug.Assert(program.Handle is not null);
-				GL.LinkProgram(program.Handle.Value);
 				break;
 			case PolygonModeCommand(var face, var mode):
 				GL.PolygonMode(face, mode);
@@ -189,30 +173,6 @@ internal partial class GLRenderer : PlatformRenderer
 			case PrepareRenderingCommand():
 				GL.Disable(GL.SCISSOR_TEST);
 				_scissorRectangle = null;
-				break;
-			case PrintProgramCompileStatusCommand(Program program):
-				int success = 0;
-				GL.GetProgramiv(program.Handle.GetValueOrDefault(), GL.LINK_STATUS, ref success);
-				if (success != 1)
-				{
-					var programInfoLog = new StringBuilder(512);
-					GL.GetProgramInfoLog(program.Handle.GetValueOrDefault(), 512, out _, programInfoLog);
-					Console.WriteLine("Program Compilation Error: " + programInfoLog.ToString());
-				}
-				else
-					Console.WriteLine("Program Successfully Compiled!");
-				break;
-			case PrintShaderCompileStatusCommand(Shader shader):
-				success = 0;
-				GL.GetShaderiv(shader.Handle.GetValueOrDefault(), GL.COMPILE_STATUS, ref success);
-				if (success != 1)
-				{
-					var shaderInfoLog = new StringBuilder(512);
-					GL.GetShaderInfoLog(shader.Handle.GetValueOrDefault(), 512, out _, shaderInfoLog);
-					Console.WriteLine("Shader Compilation Error: " + shaderInfoLog.ToString());
-				}
-				else
-					Console.WriteLine("Shader Successfully Compiled!");
 				break;
 			case ScissorCommand(var rectangle):
 
@@ -240,19 +200,6 @@ internal partial class GLRenderer : PlatformRenderer
 					GL.Scissor(screenRectangle.X, framebufferHeight - screenRectangle.Y - screenRectangle.Height, screenRectangle.Width, screenRectangle.Height);
 				}
 				break;
-			case ShaderSourceCommand(var shader, var sourceCode):
-				Debug.Assert(shader.Handle is not null);
-				unsafe
-				{
-					var sourceBuffer = Encoding.UTF8.GetBytes(sourceCode);
-					fixed (byte* p = &sourceBuffer[0])
-					{
-						var length = sourceBuffer.Length;
-						var intPointer = (IntPtr)p;
-						GL.ShaderSource(shader.Handle.Value, 1, ref intPointer, in length);
-					}
-				}
-				break;
 			case SwapBuffersCommand:
 				_context.SwapBuffers();
 				break;
@@ -275,7 +222,7 @@ internal partial class GLRenderer : PlatformRenderer
 				GL.UniformMatrix4fv(uniformLocation.Handle.Value, count, transpose, ref value);
 				break;
 			case UseProgramCommand(var program):
-				Debug.Assert(program.Handle is not null);
+				program.AssureInitialized();
 				GL.UseProgram(program.Handle.Value);
 				break;
 			case VertexAttribPointerCommand(var index, var size, var type, var normalized, int stride, nint pointer):
@@ -288,4 +235,11 @@ internal partial class GLRenderer : PlatformRenderer
 		command.Return();
 	}
 
+	private static void onDebugMessage(uint source, uint type, uint id, uint severity, int length, nint message, nint userParam)
+	{
+		if (severity == GL.DEBUG_SEVERITY_NOTIFICATION)
+			return;
+
+		Console.WriteLine(Marshal.PtrToStringAnsi(message, length));
+	}
 }

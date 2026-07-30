@@ -11,6 +11,8 @@ internal partial class GLLoadingContext : ICommandHandler<LoadingCommand>
 {
 	public readonly nint Handle;
 
+	public readonly Texture WhitePixel;
+
 	public GLLoadingContext()
 	{
 		Thread = new GLLoadingThread();
@@ -18,6 +20,10 @@ internal partial class GLLoadingContext : ICommandHandler<LoadingCommand>
 
 		Thread.Initialized.WaitOne();
 		Thread.Initialized.Dispose();
+
+		WhitePixel = new Texture();
+		this.GenerateTexture(WhitePixel);
+		this.TexImage2D(WhitePixel, 1, 1, [byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue], false);
 
 		Handle = Thread.Context!.Handle;
 	}
