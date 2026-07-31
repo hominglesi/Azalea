@@ -9,7 +9,7 @@ public class ObjectPool<T>
 
 	public static T Borrow()
 	{
-		if (_pool is null || _pool.IsEmpty == false)
+		if (_pool is null || _pool.IsEmpty == true)
 			return new T();
 
 		if (_pool.TryTake(out T? existing))

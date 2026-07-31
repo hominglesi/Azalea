@@ -20,7 +20,7 @@ internal partial class GLRenderer
 			if (LoadingContext is not null)
 				return;
 
-			var dummyWindow = Windowing.PlatformWindow.Create(initiallyVisible: false);
+			var dummyWindow = Windowing.PlatformWindow.Create(Vector2Int.Zero, initiallyVisible: false);
 			var dummyDeviceContext = dummyWindow.BorrowDeviceContext();
 
 			var dummyThread = new InitializationThread(dummyDeviceContext);
@@ -39,9 +39,9 @@ internal partial class GLRenderer
 
 	public static void TempAssureGLInitialized() => assureGLInitialized();
 
-	class InitializationThread(PlatformDeviceContext deviceContext) : GameThread(1)
+	class InitializationThread(IPlatformDeviceContext deviceContext) : GameThread(1)
 	{
-		private readonly PlatformDeviceContext _deviceContext = deviceContext;
+		private readonly IPlatformDeviceContext _deviceContext = deviceContext;
 
 		public override string DisplayName => "OpenGL Initialization Thread";
 

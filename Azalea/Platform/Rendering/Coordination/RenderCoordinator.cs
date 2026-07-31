@@ -1,5 +1,4 @@
-﻿using Azalea.Graphics.Camera;
-using Azalea.Native.OpenGL;
+﻿using Azalea.Native.OpenGL;
 using Azalea.Numerics;
 using Azalea.Platform.Rendering.OpenGL;
 using Azalea.Platform.Rendering.OpenGL.LoadingContext;
@@ -8,8 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Numerics;
-using System.Runtime.InteropServices;
 
 namespace Azalea.Platform.Rendering.Coordination;
 public class RenderCoordinator
@@ -36,16 +33,6 @@ public class RenderCoordinator
 			_quadVertexShaderSource, _textFragmentShaderSource);
 
 		var shaderGroup = ObjectPool<RenderCommandGroup>.Borrow();
-
-		var projectionMatrix = MainCamera.Instance.CreateProjectionMatrix(new Vector2(800, 600));
-
-		var uniformBuffer = shaderGroup.GenerateBuffer();
-		shaderGroup.BindBuffer(GL.UNIFORM_BUFFER, uniformBuffer);
-		shaderGroup.BufferData(GL.UNIFORM_BUFFER, Marshal.SizeOf(projectionMatrix), GL.STATIC_DRAW);
-		shaderGroup.BufferSubData(GL.UNIFORM_BUFFER, 0, projectionMatrix);
-		shaderGroup.BindBuffer(GL.UNIFORM_BUFFER, null);
-
-		shaderGroup.BindBufferRange(GL.UNIFORM_BUFFER, 0, uniformBuffer, 0, Marshal.SizeOf(projectionMatrix));
 
 		shaderGroup.UseProgram(DefaultQuadProgram);
 

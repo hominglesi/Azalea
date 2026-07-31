@@ -10,9 +10,10 @@ using System.Threading;
 namespace Azalea.Platform.Windowing;
 public abstract class PlatformWindow
 {
-	protected PlatformWindow(bool initiallyVisible)
+	protected PlatformWindow(Vector2Int clientSize, bool initiallyVisible)
 	{
 		Shown = new(initiallyVisible);
+		ClientSize = new(clientSize);
 
 		Thread = new WindowThread(this);
 		Thread.Start();
@@ -21,11 +22,11 @@ public abstract class PlatformWindow
 		Thread.Initialized.Dispose();
 	}
 
-	public static PlatformWindow Create(bool initiallyVisible = true)
+	public static PlatformWindow Create(Vector2Int size, bool initiallyVisible = true)
 	{
 		var newWindow = RuntimeInformation.ProcessArchitecture switch
 		{
-			Architecture.X64 or Architecture.X86 => new WindowsWindow(initiallyVisible),
+			Architecture.X64 or Architecture.X86 => new WindowsWindow(size, initiallyVisible),
 			_ => throw new NotSupportedException(
 				$"Platform '{RuntimeInformation.ProcessArchitecture}' is not supported")
 		};
@@ -33,12 +34,14 @@ public abstract class PlatformWindow
 		return newWindow;
 	}
 
-	protected abstract void Initialize();
-	protected abstract void Update();
-
 	public virtual string PlatformType => "Abstract Window";
 	public string Title => "Azalea Window";
 	public readonly ReadOnlyObservable<bool> Shown;
+
+	public ReadOnlyObservable<Vector2Int> ClientSize { get; }
+
+	protected abstract void Initialize();
+	protected abstract void Update();
 
 	public PlatformRenderer? SubscribedRenderer { get; private set; } = null;
 	internal void Subscribe(PlatformRenderer renderer)
@@ -60,8 +63,8 @@ public abstract class PlatformWindow
 
 	internal bool DeviceContextBorrowed = false;
 	private readonly object _deviceContextOwnerLock = new();
-	protected abstract PlatformDeviceContext GetDeviceContext();
-	public PlatformDeviceContext BorrowDeviceContext()
+	protected abstract IPlatformDeviceContext GetDeviceContext();
+	public IPlatformDeviceContext BorrowDeviceContext()
 	{
 		lock (_deviceContextOwnerLock)
 		{

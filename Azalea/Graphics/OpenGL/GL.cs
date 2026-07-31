@@ -50,9 +50,6 @@ internal static unsafe class GL
 		}
 	}
 
-	[DllImport(LibraryPath, EntryPoint = "glViewport")]
-	public static extern void Viewport(int x, int y, int width, int height);
-
 	[DllImport(LibraryPath, EntryPoint = "glBegin")]
 	public static extern void Begin(GLBeginMode mode);
 

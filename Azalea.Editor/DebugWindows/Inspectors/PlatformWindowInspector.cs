@@ -25,6 +25,8 @@ internal class PlatformWindowInspector
 		guiWindow.AddLabel("Title: " + window.Title);
 		guiWindow.AddObservingLabel("Shown", window.Shown);
 
+		guiWindow.AddObservingLabel("Client Size", window.ClientSize);
+
 		// For now using a window without these doesn't make sense
 		// so we'll just assume that they are created
 		Debug.Assert(window.SubscribedRenderer is not null);

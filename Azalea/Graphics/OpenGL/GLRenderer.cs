@@ -35,7 +35,7 @@ internal class GLRenderer : RendererBase
 
 	protected override void SetViewportImplementation(Vector2Int size)
 	{
-		GL.Viewport(0, 0, size.X, size.Y);
+		Native.OpenGL.GL.Viewport(0, 0, size.X, size.Y);
 	}
 
 	protected internal override void SetClearColor(Color value)

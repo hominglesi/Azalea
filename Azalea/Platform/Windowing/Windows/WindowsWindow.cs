@@ -1,12 +1,14 @@
 ﻿using Azalea.Native.Windows;
 using Azalea.Platform.Windows;
 using Azalea.Threading;
+using Azalea.Utils;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Azalea.Platform.Windowing.Windows;
-internal class WindowsWindow(bool initiallyVisible) : PlatformWindow(initiallyVisible)
+internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
+	: PlatformWindow(clientSize, initiallyVisible)
 {
 	private static int _nextClassId = 0;
 	private Win32.WNDPROC? _windowProcedure;
@@ -36,19 +38,23 @@ internal class WindowsWindow(bool initiallyVisible) : PlatformWindow(initiallyVi
 		ClassAtom = Win32.RegisterClassExW(ref wndClass);
 
 		var styles = Win32.WindowStyles.OVERLAPPEDWINDOW;
+		if (Shown) styles |= Win32.WindowStyles.VISIBLE;
 
-		if (Shown)
-			styles |= Win32.WindowStyles.VISIBLE;
+		var extendedStyles = Win32.WindowStylesExtended.APPWINDOW;
+
+
+		Win32.RECT windowSize = new(100, 100, ClientSize.Value.X, ClientSize.Value.Y);
+		Win32.AdjustWindowRectEx(ref windowSize, styles, false, extendedStyles);
 
 		Handle = Win32.CreateWindowExWDLL(
-			Win32.WindowStylesExtended.APPWINDOW,
+			extendedStyles,
 			ClassAtom,
 			Title,
 			styles,
-			100,
-			100,
-			800,
-			600,
+			windowSize.left,
+			windowSize.top,
+			windowSize.Width,
+			windowSize.Height,
 			IntPtr.Zero,
 			IntPtr.Zero,
 			processHandle,
@@ -73,17 +79,24 @@ internal class WindowsWindow(bool initiallyVisible) : PlatformWindow(initiallyVi
 	{
 		switch (uMsg)
 		{
+			case 5 /* WM_SIZE */:
+				var clientSize = BitwiseUtils.SplitValue(lParam);
+				ClientSize.Value = clientSize;
+				break;
+			case 15 /* WM_PAINT */:
+				Console.WriteLine("PAINT: " + Time.TimeSinceStart);
+				break;
 			case 16 /* WM_CLOSE */:
 				Scheduler.Schedule(Close);
-				return IntPtr.Zero;
+				return 0;
 		}
 
 		return Win32.DefWindowProcW(hWnd, uMsg, wParam, lParam);
 	}
 
-	protected override PlatformDeviceContext GetDeviceContext()
+	protected override IPlatformDeviceContext GetDeviceContext()
 	{
 		var deviceContext = Win32.GetDC(Handle);
-		return new WindowsDeviceContext(deviceContext);
+		return new WindowsDeviceContext(deviceContext, ClientSize);
 	}
 }

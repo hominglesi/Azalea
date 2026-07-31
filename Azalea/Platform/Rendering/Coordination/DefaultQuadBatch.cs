@@ -73,9 +73,12 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 			Draw(commandQueue);
 	}
 
+	public static readonly ArrayPool<float> ArrayPool = ArrayPool<float>.Create(
+		maxArrayLength: 32768, maxArraysPerBucket: 600);
+
 	internal override void AddImplementation(DefaultQuadBatchVertex vertex)
 	{
-		_vertices ??= ArrayPool<float>.Shared.Rent(MaxQuadCount * 4 * _vertexSize);
+		_vertices ??= ArrayPool.Rent(MaxQuadCount * 4 * _vertexSize);
 
 		_vertices[_nextVertex * _vertexSize] = vertex.Position.X;
 		_vertices[(_nextVertex * _vertexSize) + 1] = vertex.Position.Y;

@@ -1,5 +1,6 @@
 ﻿using Azalea.Graphics.Colors;
 using Azalea.Numerics;
+using Azalea.Platform.Rendering.Coordination;
 using Azalea.Threading;
 using System.Buffers;
 using System.Numerics;
@@ -30,6 +31,13 @@ internal partial class BindBufferRangeCommand : RenderCommand
 	public Buffer Buffer;
 	public nint Offset;
 	public nint Size;
+}
+
+[ThreadCommand]
+internal partial class BindFramebufferCommand : RenderCommand
+{
+	public int Type;
+	public Framebuffer Framebuffer;
 }
 
 [ThreadCommand]
@@ -91,7 +99,7 @@ internal partial class BufferDataFloatCommand : RenderCommand
 	protected override void Cleanup()
 	{
 		if (FreeData && Data is not null)
-			ArrayPool<float>.Shared.Return(Data);
+			DefaultQuadBatch.ArrayPool.Return(Data);
 	}
 }
 
@@ -347,6 +355,12 @@ internal partial class UniformMatrix4fvCommand : RenderCommand
 	public int Count;
 	public bool Transpose;
 	public Matrix4x4 Value;
+}
+
+[ThreadCommand]
+internal partial class UpdateClientSizeCommand : RenderCommand
+{
+	public Vector2Int ClientSize;
 }
 
 [ThreadCommand]

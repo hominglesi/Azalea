@@ -466,4 +466,7 @@ public static partial class GL
 	[LibraryImport(OpenGLPath, EntryPoint = "glTexParameteri")]
 	/// <summary><see href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glTexParameter.xhtml">Official Documentation</see></summary>
 	public static partial void TexParameteri(int target, int pname, int param);
+
+	[LibraryImport(OpenGLPath, EntryPoint = "glViewport")]
+	public static partial void Viewport(int x, int y, int width, int height);
 }

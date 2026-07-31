@@ -1,0 +1,168 @@
+﻿<Post>
+	
+	<Title>PATCH HIGHLIGHTS</Title>
+	<Section>
+		<Image>Textures/Scheme/img.jpg</Image>
+	</Section>
+	
+	<Title>ROTATING SHOP AND CHAPTER 2 PASS</Title>
+	<Section>
+		<SubTitle>ROTATING SHOP</SubTitle>
+		<Paragraph>The Rotating Shop arrives with patch 14.11. To learn more about it, click here!</Paragraph>
+		<Image>Textures/Scheme/img2.jpg</Image>
+		<LineBreak />
+		<SubTitle>ROTATION UPDATE</SubTitle>
+		<Paragraph>Prestige Chibi Dragonmancer Yasuo and Chibi Divine Sword Irelia are swinging by this patch, but you'll also get to meet the new Chibi Battle Academia Ezreal on his home turf: the Ultimate Showdown Arena. </Paragraph>
+		<LineBreak />
+		<SubTitle>CHIBI EZREAL</SubTitle>
+		<Paragraph>Rotating Shop may be stealing the show, but we've got a new Chibi available for Direct Purchase for 1900RP. Chibi Ezreal will also come with his boom Trueshot Barrage!</Paragraph>
+		<Image>Textures/Scheme/img3.jpg</Image>
+		<LineBreak />
+		<SubTitle>INKBORN FABLES CHAPTER 2 PASS</SubTitle>
+		<Paragraph>The second Chapter of your journey through Inkborn Fables begins with patch 14.11 on May 30th, at 11 AM PT. The Pass+ is available for purchase for 1295 RP.</Paragraph>
+		<Image>Textures/Scheme/img4.jpg</Image>
+	</Section>
+	
+	<Title>5-YEAR BASH!</Title>
+	<Section>
+		<Paragraph>Starting patch 14.12 (next patch), you're invited to celebrate TFT's 5th birthday with the 5-Year Bash event. The event brings a heap of login rewards, a free Event Pass with some very special rewards (including Treasure Tokens and a particularly talented Pengu), new Tacticians, and a brand new chaotic-yet-nostalgic game mode called Pengu's Party!! All this comes June 12th and ends with the conclusion of patch 14.14 (July 15). For more information check out our overview article here!</Paragraph>
+	</Section>
+	
+	<Title>RANKED</Title>
+	<Section>
+		<Paragraph>Very applicable to all my readers.</Paragraph>
+		<UnorderedList>
+			<ListItem>TFT players who are Master+ can now queue with one other player who is within 400 LP of them</ListItem>
+		</UnorderedList>
+	</Section>
+	
+	<Title>MIDDLE EAST (ME) SERVER</Title>
+	<Section>
+		<Paragraph>The ME server opens its digital doors on June 25, 2024 at around 8 PM PT. Qualified accounts can transfer to the ME server for 1 Blue Essence from the moment the server opens until September 2, 2024. After that, the price will increase to the usual 2600 RP for a one-way transfer. Note that TFT Mobile will arrive at a later date further into the year.</Paragraph>
+	</Section>
+	
+	<Title>TEAM PLANNER</Title>
+	<Section>
+		<Paragraph>You can now access Team Planner in TFT Mobile lobbies! Plan your strategy while you're queuing up.</Paragraph>
+	</Section>
+	
+	<Title>LARGE CHANGES</Title>
+	<Section>
+		<Paragraph>Large, like our 5-Year Bash coming next patch!</Paragraph>
+		<LineBreak />
+		<SubTitle>TRAITS</SubTitle>
+		<Paragraph>From Tickleshot to Trickshot.</Paragraph>
+		<UnorderedList>
+			<ListItem>Trickshot Ricochet damage: 40/55% ⇒ 40/60%</ListItem>
+		</UnorderedList>
+		<LineBreak />
+		<SubTitle>UNITS: TIER 1</SubTitle>
+		<Paragraph>The kings of the early-game need to make way for Yasuo, who is bringing back reroll Fated one Stoneplate at a time.</Paragraph>
+		<UnorderedList>
+			<ListItem>Darius Ability damage: 200/300/450% AP ⇒ 190/285/450% AP</ListItem>
+			<ListItem>Garen Mana nerf: 30/70 ⇒ 30/80</ListItem>
+			<ListItem>Yasuo Passive damage while shielded: 40/40/45% Armor/MR ⇒ 30/45/70% Armor/MR</ListItem>
+		</UnorderedList>
+		<LineBreak />
+		<SubTitle>UNITS: TIER 2</SubTitle>
+		<Paragraph>This is a buff to longer fight duration Gnar, allowing him to clean fights up with even more AD from his passive.</Paragraph>
+		<UnorderedList>
+			<ListItem>Gnar Passive maximum stacks: 40 ⇒ 45</ListItem>
+			<ListItem>Qiyana AD: 55 ⇒ 50</ListItem>
+		</UnorderedList>
+		<LineBreak />
+		<SubTitle>UNITS: TIER 4</SubTitle>
+		<Paragraph>Syndra's been through the meta-wringer a few times as of late, most recently resulting in her being slightly weaker than we'd like. With this adjustment, she'll be relatively unchanged at 1-star, but stronger at 2-stars.</Paragraph>
+		<UnorderedList>
+			<ListItem>Nautilus Mana: 60/160 ⇒ 60/170</ListItem>
+			<ListItem>Syndra Ability starting butterflies: 7/7/10 ⇒ 6/6/10</ListItem>
+			<ListItem>Syndra Ability damage: 40/60/180% AP ⇒ 45/70/180% AP</ListItem>
+		</UnorderedList>
+		<LineBreak />
+		<SubTitle>UNITS: TIER 5</SubTitle>
+		<Paragraph>Now that she's not throwing 3 item tanks to the backline like they're sportsballs at a sportsball reference, we're able to fill her Porcelain cup with even more damage!</Paragraph>
+		<UnorderedList>
+			<ListItem>Lissandra Ability damage: 640/960/8888% AP ⇒ 660/990/8888% AP</ListItem>
+		</UnorderedList>
+		<LineBreak />
+		<SubTitle>AUGMENTS</SubTitle>
+		<Paragraph>Throughout the set, Built Different has been as strong as our 4-cost Champions. With our 4-costs coming down in power after 14.9, we're building up this Augment to help one of the weirder playstyles that Augments enable.</Paragraph>
+		<Paragraph>As one of our worst performing Augments, Grim Harvest has been more grim than intended. Gaining early access to Yone, as well as an extra 1% Omnivamp per takedown, should make this a worthwhile pick.</Paragraph>
+		<Paragraph>A few of our Hero Augments are over-performing a bit as their comps continue to be optimized. We're nerfing Kobuko's Hero Augment here, but expecting Storied Champion (Garen) to come down in power with our nerf to the yelling Demacian himself.</Paragraph>
+		<UnorderedList>
+			<ListItem>Cybernetic Bulk and Cybernetic Uplink (all ranks) are no longer offered on 2-1</ListItem>
+			<ListItem>Built Different II Bonus HP: HP: 220/280/340/400 ⇒ 220/300/380/480</ListItem>
+			<ListItem>Built Different II Bonus AS: 35/40/45/50% ⇒ 40/45/50/55%</ListItem>
+			<ListItem>Grim Harvest (Reaper): Get a Kha'Zix and Kindred ⇒ Get a Kindred and Yone</ListItem>
+			<ListItem>Grim Harvest (Reaper): Omnivamp per stack: 4% ⇒ 5% </ListItem>
+			<ListItem>Lucky Paws (Kobuko) Damage: 250% ⇒ 225%</ListItem>
+			<ListItem>Two Healthy bonus Health: 99 ⇒ 90</ListItem>
+			<ListItem>Dragonlord Crown: Get a Janna ⇒ Get a Janna and Diana</ListItem>
+			<ListItem>Final Ascension is no longer offered on 2-1</ListItem>
+			<ListItem>Porcelain Crown: Get a Lux ⇒ Get an Amumu</ListItem>
+		</UnorderedList>
+		<LineBreak />
+		<SubTitle>ARTIFACTS</SubTitle>
+		<Paragraph>We originally planned to ship Cursed Blade alongside the rest of our Artifacts in 14.9, but a critical bug that proved tricky to fix left this truly cursed item in the vault. Lucky for you, and unlucky for your foes' reroll comp, Cursed Blade is making its awaited return!</Paragraph>
+		<UnorderedList>
+			<ListItem>Cursed Blade has been added!</ListItem>
+			<ListItem>Cursed Blade Attack Speed: 15%</ListItem>
+			<ListItem>Cursed Blade Magic Resist: 20</ListItem>
+			<ListItem>Cursed Blade: Attacks reduce the target's max Health by 3%. 13 attacks on the same target reduce their star level by 1.</ListItem>
+			<ListItem>Diamond Hands Health: 400 ⇒ 300</ListItem>
+		</UnorderedList>
+		<LineBreak />
+		<SubTitle>SUPPORT ITEMS</SubTitle>
+		<Paragraph>Moonstone currently provides too much value throughout a fight, especially with how flexibly it fits into most comps.</Paragraph>
+		<UnorderedList>
+			<ListItem>Moonstone Renewer Shielding: 100 + 50 per stage ⇒ 60 + 50 per stage</ListItem>
+			<ListItem>Moonstone Renewer Max shield: 400 ⇒ 360</ListItem>
+			<ListItem>Needlessly Big Gem Health: 250 ⇒ 300</ListItem>
+		</UnorderedList>
+	</Section>
+	
+	<Title>SMALL CHANGES</Title>
+	<Section>
+		<Paragraph>Small, like the moments we should appreciate more.</Paragraph>
+		<LineBreak />
+		<SubTitle>AUGMENTS</SubTitle>
+		<Paragraph>Putting the scare factor back into Ghostly 8.</Paragraph>
+		<UnorderedList>
+			<ListItem>Ghostly Damage increase per specter: 5/10/16/32% ⇒ 5/10/16/36%</ListItem>
+		</UnorderedList>
+		<LineBreak />
+		<SubTitle>UNITS</SubTitle>
+		<Paragraph>Small tweaks to push a few of our lower-performing champions back into the meta. Much of our focus here is on 3-star carry potential with reroll carries that have either never had success in Inkborn Fables, or have been suffering from a Reaper-less meta.</Paragraph>
+		<UnorderedList>
+			<ListItem>Kha'Zix Ability AD ratio: 340% ⇒ 340/340/350%</ListItem>
+			<ListItem>Sivir Ability AD buff: 95/95/100% ⇒ 95/95/110%</ListItem>
+			<ListItem>Sivir Ability AS buff: 15/20/25% ⇒ 15/20/30%</ListItem>
+			<ListItem>Aatrox Ability healing: 120/140/180% AP ⇒ 120/150/200% AP</ListItem>
+			<ListItem>Senna Ability AD ratio: 230/230/240% AD ⇒ 230/230/245% AD</ListItem>
+			<ListItem>Senna Ability AD buff: 20/25/30% ⇒ 20/25/35%</ListItem>
+			<ListItem>Diana Ability damage reduction: 30% ⇒ 30/30/35%</ListItem>
+			<ListItem>Diana Ability on hit damage: 75/110/170% AP ⇒ 75/110/180% AP</ListItem>
+			<ListItem>Yone Ability shield: 250/300/350% AP ⇒ 250/300/375% AP</ListItem>
+			<ListItem>Yone Ability damage: 165/165/175% AD ⇒ 165/165/180% AD</ListItem>
+			<ListItem>Kayn HP: 1100 ⇒ 1150</ListItem>
+		</UnorderedList>
+	</Section>
+	
+	<Title>BUG FIXES</Title>
+	<Section>
+		<UnorderedList>
+			<ListItem>Burning truth: More More-ellonomicon and Crest of Cinders now burn for 2% like their tooltip says.</ListItem>
+			<ListItem>PVE monsters now have the 140% intended Critical Strike Damage instead of 150%</ListItem>
+			<ListItem>Wait, that's nothing: Branching Out no longer says “after 0 player combats”</ListItem>
+			<ListItem>Suspicious Trench Coat copies now have the proper amount of Health and Attack Damage from their Star Level</ListItem>
+			<ListItem>Suspicious Trench Coat Fixed various issues where the copy's Health could be inconsistent if they were having their health increased by other sources (like Bruiser)</ListItem>
+			<ListItem>Fixed the triangle shadow on the Summoner's Arena</ListItem>
+			<ListItem>Fixed the Poro and cannon disappearing when zooming in on Bilgewater Bay</ListItem>
+			<ListItem>Justice is blind: Fixed the Fields of Justice splash icon being blank in Loadout</ListItem>
+			<ListItem>Umm… bro?: Umbral will no longer fail to work if the player puts an Umbral Emblem on a unit right before combat begins.</ListItem>
+			<ListItem>Irelia's ability now critically strikes at the correct rate.</ListItem>
+			<ListItem>Start of game Portals will no longer sometimes fail to work if a player leaves the voting area early.</ListItem>
+		</UnorderedList>
+	</Section>
+	
+</Post>

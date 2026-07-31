@@ -44,7 +44,7 @@ internal partial class GLLoadingContext : ICommandHandler<LoadingCommand>
 
 		protected override void Initialize()
 		{
-			_window = Windowing.PlatformWindow.Create(initiallyVisible: false);
+			_window = Windowing.PlatformWindow.Create(Vector2Int.Zero, initiallyVisible: false);
 			Context = GLContext.Create(_window.BorrowDeviceContext());
 			Context.MakeCurrent();
 

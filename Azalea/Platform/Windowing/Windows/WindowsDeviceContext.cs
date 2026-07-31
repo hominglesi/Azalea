@@ -1,13 +1,16 @@
 ﻿using Azalea.Native.Windows;
+using Azalea.Utils;
 
 namespace Azalea.Platform.Windowing.Windows;
-internal class WindowsDeviceContext : PlatformDeviceContext
+internal class WindowsDeviceContext : IPlatformDeviceContext
 {
 	public nint Handle { get; private init; }
+	public ReadOnlyObservable<Vector2Int> ClientSize { get; }
 
-	internal WindowsDeviceContext(nint handle)
+	internal WindowsDeviceContext(nint handle, ReadOnlyObservable<Vector2Int> clientSize)
 	{
 		Handle = handle;
+		ClientSize = clientSize;
 	}
 
 	public void SetDefaultPixelFormat()

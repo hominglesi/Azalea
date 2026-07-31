@@ -125,7 +125,6 @@ internal abstract class GameThread<T> : ICommandHandler<T>
 			T? nextCommand;
 			while ((nextCommand = commandGroup.Dequeue()) is not null)
 				Enqueue(nextCommand);
-
 		}
 	}
 

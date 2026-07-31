@@ -11,15 +11,15 @@ namespace Azalea.Platform.Rendering.OpenGL;
 internal class GLContext
 {
 	public nint Handle { get; init; }
-	public PlatformDeviceContext DeviceContext { get; init; }
+	public IPlatformDeviceContext DeviceContext { get; init; }
 
-	private GLContext(nint handle, PlatformDeviceContext deviceContext)
+	private GLContext(nint handle, IPlatformDeviceContext deviceContext)
 	{
 		Handle = handle;
 		DeviceContext = deviceContext;
 	}
 
-	public static GLContext CreateSimple(PlatformDeviceContext deviceContext)
+	public static GLContext CreateSimple(IPlatformDeviceContext deviceContext)
 	{
 		if (deviceContext is WindowsDeviceContext winDeviceContext)
 		{
@@ -35,7 +35,7 @@ internal class GLContext
 		throw new NotSupportedException("Device context is not supported");
 	}
 
-	public static GLContext Create(PlatformDeviceContext deviceContext, GLLoadingContext? shareContext = null)
+	public static GLContext Create(IPlatformDeviceContext deviceContext, GLLoadingContext? shareContext = null)
 	{
 		if (deviceContext is WindowsDeviceContext winDeviceContext)
 		{
@@ -106,7 +106,7 @@ internal class GLContext
 		throw new NotSupportedException("Device context is not supported");
 	}
 
-	public static void SetPixelFormat(PlatformDeviceContext deviceContext)
+	public static void SetPixelFormat(IPlatformDeviceContext deviceContext)
 	{
 		assertDynamicFunctionsLoaded();
 
@@ -122,6 +122,7 @@ internal class GLContext
 				GL.WGL_COLOR_BITS_ARB, 32,
 				GL.WGL_DEPTH_BITS_ARB, 24,
 				GL.WGL_STENCIL_BITS_ARB, 8,
+				GL.WGL_SWAP_METHOD_ARB, GL.WGL_SWAP_COPY_ARB,
 				0
 			};
 
@@ -145,8 +146,6 @@ internal class GLContext
 
 		throw new NotSupportedException("Device context is not supported");
 	}
-
-	private static bool _dynamicFunctionsLoaded = false;
 
 	private static void assertDynamicFunctionsLoaded()
 	{

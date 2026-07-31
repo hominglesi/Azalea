@@ -10,6 +10,10 @@ public static partial class Win32
 	[LibraryImport(Gdi32Path)]
 	public static partial int ChoosePixelFormat(nint hdc, in PIXELFORMATDESCRIPTOR descriptor);
 
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createsolidbrush">Official Documentation</see></summary>
+	[LibraryImport(Gdi32Path)]
+	public static partial nint CreateSolidBrush(uint colorRef);
+
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-describepixelformat">Official Documentation</see></summary>
 	[LibraryImport(Gdi32Path)]
 	public static partial int DescribePixelFormat(nint hdc, int iPixelFormat, uint nBytes, ref PIXELFORMATDESCRIPTOR ppfd);
