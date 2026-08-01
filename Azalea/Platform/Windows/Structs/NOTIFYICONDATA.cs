@@ -10,7 +10,7 @@ internal unsafe struct NOTIFYICONDATA
 	public IntPtr hWnd;
 	public uint uID;
 	public uint uFlags;
-	public WindowMessage uCallbackMessage;
+	public uint uCallbackMessage;
 	public IntPtr hIcon;
 	private fixed char _szTip[128];
 	public uint dwState;

@@ -184,14 +184,14 @@ internal class Win32Window : PlatformWindow
 
 	private IntPtr windowProcedure(IntPtr window, uint message, IntPtr wParam, IntPtr lParam)
 	{
-		switch ((WindowMessage)message)
+		switch ((Win32.WindowMessage)message)
 		{
-			case WindowMessage.Move:
+			case Win32.WindowMessage.MOVE:
 				var windowPosition = WinAPI.GetWindowRect(Handle).Position;
 				var clientPosition = BitwiseUtils.SplitValue(lParam);
 				UpdatePosition(windowPosition, clientPosition);
 				break;
-			case WindowMessage.Size:
+			case Win32.WindowMessage.SIZE:
 				var windowSize = WinAPI.GetWindowRect(Handle).Size;
 				var clientSize = BitwiseUtils.SplitValue(lParam);
 				UpdateSize(windowSize, clientSize);
@@ -212,48 +212,48 @@ internal class Win32Window : PlatformWindow
 					_ => WindowState.Normal,
 				});
 				break;
-			case WindowMessage.Close:
+			case Win32.WindowMessage.CLOSE:
 				Close();
 				return IntPtr.Zero;
 
 			//Mouse Input
-			case WindowMessage.LeftButtonDown:
+			case Win32.WindowMessage.LBUTTONDOWN:
 				Input.ExecuteMouseButtonStateChange(MouseButton.Left, true);
 				WinAPI.SetCapture(Handle);
 				break;
-			case WindowMessage.LeftButtonUp:
+			case Win32.WindowMessage.LBUTTONUP:
 				Input.ExecuteMouseButtonStateChange(MouseButton.Left, false);
 				WinAPI.ReleaseCapture();
 				break;
-			case WindowMessage.RightButtonDown:
+			case Win32.WindowMessage.RBUTTONDOWN:
 				Input.ExecuteMouseButtonStateChange(MouseButton.Right, true); break;
-			case WindowMessage.RightButtonUp:
+			case Win32.WindowMessage.RBUTTONUP:
 				Input.ExecuteMouseButtonStateChange(MouseButton.Right, false); break;
-			case WindowMessage.MiddleButtonDown:
+			case Win32.WindowMessage.MBUTTONDOWN:
 				Input.ExecuteMouseButtonStateChange(MouseButton.Middle, true); break;
-			case WindowMessage.MiddleButtonUp:
+			case Win32.WindowMessage.MBUTTONUP:
 				Input.ExecuteMouseButtonStateChange(MouseButton.Middle, false); break;
-			case WindowMessage.XButtonDown:
+			case Win32.WindowMessage.XBUTTONDOWN:
 				var xButtonDown = MouseButton.Middle + BitwiseUtils.GetHighOrderValue(wParam);
 				Input.ExecuteMouseButtonStateChange(xButtonDown, true); break;
-			case WindowMessage.XButtonUp:
+			case Win32.WindowMessage.XBUTTONUP:
 				var xButtonUp = MouseButton.Middle + BitwiseUtils.GetHighOrderValue(wParam);
 				Input.ExecuteMouseButtonStateChange(xButtonUp, false); break;
-			case WindowMessage.MouseWheel:
+			case Win32.WindowMessage.MOUSEWHEEL:
 				var delta = BitwiseUtils.GetHighOrderValue(wParam) / 120;
 				Input.ExecuteScroll(delta); break;
 
 			//Keyboad Input
-			case WindowMessage.Char:
+			case Win32.WindowMessage.CHAR:
 				Input.ExecuteTextInput((char)wParam); break;
-			case WindowMessage.KeyDown:
+			case Win32.WindowMessage.KEYDOWN:
 				var isRepeat = BitwiseUtils.GetSpecificBit(lParam, 31);
 				var downKey = WindowsExtentions.KeycodeToKey((int)wParam);
 				handleKeyDown(downKey, isRepeat);
 				break;
-			case WindowMessage.KeyUp:
+			case Win32.WindowMessage.KEYUP:
 				Input.ExecuteKeyboardKeyStateChange(WindowsExtentions.KeycodeToKey((int)wParam), false); break;
-			case WindowMessage.SysKeyDown:
+			case Win32.WindowMessage.SYSKEYDOWN:
 				var downSysKey = WindowsExtentions.KeycodeToKey((int)wParam);
 
 				if (downSysKey == Keys.F10 || downSysKey == Keys.AltLeft)
@@ -264,35 +264,35 @@ internal class Win32Window : PlatformWindow
 				}
 
 				break;
-			case WindowMessage.TrayIcon:
+			case Win32.WindowMessage.AZ_TRAYICON:
 				var iconId = (uint)wParam;
-				var iconEvent = (WindowMessage)BitwiseUtils.GetLowOrderValue(lParam);
+				var iconEvent = (Win32.WindowMessage)BitwiseUtils.GetLowOrderValue(lParam);
 
 				if (_trayIcons.TryGetValue(iconId, out var icon))
 				{
 					switch (iconEvent)
 					{
-						case WindowMessage.MouseMove:
-						case WindowMessage.LeftButtonDown:
-						case WindowMessage.RightButtonDown:
-						case WindowMessage.MiddleButtonDown:
+						case Win32.WindowMessage.MOUSEMOVE:
+						case Win32.WindowMessage.LBUTTONDOWN:
+						case Win32.WindowMessage.RBUTTONDOWN:
+						case Win32.WindowMessage.MBUTTONDOWN:
 							break;
-						case WindowMessage.LeftButtonUp:
+						case Win32.WindowMessage.LBUTTONUP:
 							icon.InvokeClick(MouseButton.Left);
 							break;
-						case WindowMessage.RightButtonUp:
+						case Win32.WindowMessage.RBUTTONUP:
 							icon.InvokeClick(MouseButton.Right);
 							break;
-						case WindowMessage.MiddleButtonUp:
+						case Win32.WindowMessage.MBUTTONUP:
 							icon.InvokeClick(MouseButton.Middle);
 							break;
-						case WindowMessage.LeftButtonDoubleClick:
+						case Win32.WindowMessage.LBUTTONDBLCLK:
 							icon.InvokeDoubleClick(MouseButton.Left);
 							break;
-						case WindowMessage.RightButtonDoubleClick:
+						case Win32.WindowMessage.RBUTTONDBLCLK:
 							icon.InvokeDoubleClick(MouseButton.Right);
 							break;
-						case WindowMessage.MiddleButtonDoubleClick:
+						case Win32.WindowMessage.MBUTTONDBLCLK:
 							icon.InvokeDoubleClick(MouseButton.Middle);
 							break;
 					}
@@ -470,8 +470,8 @@ internal class Win32Window : PlatformWindow
 		if (data is not null)
 			icon = WinAPI.CreateIconFromImage(DeviceContext, data);
 
-		WinAPI.SendMessage(Handle, WindowMessage.SetIcon, IntPtr.Zero, icon);
-		WinAPI.SendMessage(Handle, WindowMessage.SetIcon, IntPtr.Zero + 1, icon);
+		WinAPI.SendMessage(Handle, Win32.WindowMessage.SETICON, IntPtr.Zero, icon);
+		WinAPI.SendMessage(Handle, Win32.WindowMessage.SETICON, IntPtr.Zero + 1, icon);
 
 		if (icon != IntPtr.Zero)
 			WinAPI.DeleteObject(icon);

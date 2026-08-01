@@ -234,7 +234,7 @@ internal static partial class WinAPI
 	public static extern bool ScreenToClient(IntPtr window, ref Vector2Int point);
 
 	[DllImport(User32Path, EntryPoint = "SendMessage")]
-	public static extern IntPtr SendMessage(IntPtr window, WindowMessage message, IntPtr wParam, IntPtr lParam);
+	public static extern IntPtr SendMessage(IntPtr window, Win32.WindowMessage message, IntPtr wParam, IntPtr lParam);
 
 	[DllImport(User32Path, EntryPoint = "SetCapture")]
 	public static extern IntPtr SetCapture(IntPtr window);

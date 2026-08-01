@@ -1,5 +1,6 @@
 ﻿using Azalea.Graphics;
 using Azalea.Inputs;
+using Azalea.Native.Windows;
 using Azalea.Platform.Windows.Structs;
 using System;
 using System.Runtime.InteropServices;
@@ -30,7 +31,7 @@ internal unsafe partial class WindowsTrayIcon : ITrayIcon
 		nid.hWnd = window.Handle;
 		nid.uID = Handle;
 		nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-		nid.uCallbackMessage = WindowMessage.TrayIcon;
+		nid.uCallbackMessage = (uint)Win32.WindowMessage.AZ_TRAYICON;
 		nid.hIcon = iconHandle;
 		nid.szTip = iconName;
 

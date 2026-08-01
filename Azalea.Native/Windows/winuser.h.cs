@@ -82,6 +82,47 @@ public static partial class Win32
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static partial bool TranslateMessage(in MSG lpMsg);
 
+	public enum WindowMessage : uint
+	{
+		MOVE = 3,
+		SIZE = 5,
+		PAINT = 15,
+		CLOSE = 16,
+		SETCURSOR = 32,
+		WINDOWPOSCHANGING = 70,
+		SETICON = 128,
+		NCCALCSIZE = 131,
+		NCHITTEST = 132,
+		SYNCPAINT = 136,
+		NCLBUTTONUP = 162,
+		INPUT_DEVICE_CHANGE = 254,
+		INPUT = 255,
+		KEYDOWN = 256,
+		KEYUP = 257,
+		CHAR = 258,
+		SYSKEYDOWN = 260,
+		SYSKEYUP = 261,
+		SYSCOMMAND = 274,
+		MOUSEMOVE = 512,
+		LBUTTONDOWN = 513,
+		LBUTTONUP = 514,
+		LBUTTONDBLCLK = 515,
+		RBUTTONDOWN = 516,
+		RBUTTONUP = 517,
+		RBUTTONDBLCLK = 518,
+		MBUTTONDOWN = 519,
+		MBUTTONUP = 520,
+		MBUTTONDBLCLK = 521,
+		MOUSEWHEEL = 522,
+		XBUTTONDOWN = 523,
+		XBUTTONUP = 524,
+		XBUTTONDBLCLK = 525,
+		DROPFILES = 563,
+
+		// Azalea Defined Messages
+		AZ_TRAYICON = 1025
+	}
+
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/winmsg/window-styles">Official Documentation</see></summary>
 	[Flags]
 	public enum WindowStyles : uint
