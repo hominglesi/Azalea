@@ -64,7 +64,7 @@ internal partial class GLRenderer : PlatformRenderer
 			// the rendering thread so it can use the screen framebuffer
 			// and blit it to the window on resize
 
-			if (_redrawOnResize == false)
+			if (_redrawOnResize == false || newClientSize == Vector2Int.Zero)
 				return;
 
 			Monitor.Enter(_windowRedrawingLock);
@@ -154,7 +154,7 @@ internal partial class GLRenderer : PlatformRenderer
 		return false;
 	}
 
-	private Vector2Int _clientSize;
+	private Vector2Int _intendedClientSize;
 	private Color? _clearColor = null;
 	private RectangleInt? _scissorRectangle = null;
 
@@ -286,15 +286,14 @@ internal partial class GLRenderer : PlatformRenderer
 					error = GL.GetError();
 				}
 				break;
-			case PrepareRenderingCommand():
+			case PrepareRenderingCommand(var intendedClientSize):
 				var screenFramebuffer = _screenFramebuffers[_activeScreenFramebuffer];
 				Monitor.Enter(screenFramebuffer.TextureLock);
 				screenFramebuffer.Texture.AssureReady();
 
-				_clientSize = _deviceContext.ClientSize;
-
+				_intendedClientSize = intendedClientSize;
 				var targetFramebufferSize = FramebufferSize ==
-					Vector2Int.Zero ? _clientSize : FramebufferSize;
+					Vector2Int.Zero ? _intendedClientSize : FramebufferSize;
 
 				if (screenFramebuffer.Size != targetFramebufferSize)
 				{
@@ -342,7 +341,7 @@ internal partial class GLRenderer : PlatformRenderer
 
 				screenFramebuffer = _screenFramebuffers[_activeScreenFramebuffer];
 
-				if (_clientSize != _deviceContext.ClientSize)
+				if (_intendedClientSize != _deviceContext.ClientSize)
 				{
 					// This means the current frame is invalid and we'll
 					// simply redraw it next frame
@@ -352,20 +351,20 @@ internal partial class GLRenderer : PlatformRenderer
 
 				if (Monitor.TryEnter(_windowRedrawingLock))
 				{
-					if (_clientSize == _deviceContext.ClientSize)
+					if (_intendedClientSize == _deviceContext.ClientSize)
 					{
 						Debug.Assert(screenFramebuffer.Framebuffer.Handle.HasValue);
 						GL.BindFramebuffer(GL.READ_FRAMEBUFFER, screenFramebuffer.Framebuffer.Handle.Value);
 						GL.BindFramebuffer(GL.DRAW_FRAMEBUFFER, 0);
 
-						GL.Viewport(0, 0, _clientSize.X, _clientSize.Y);
+						GL.Viewport(0, 0, _intendedClientSize.X, _intendedClientSize.Y);
 						// We need to make sure that the window hasn't been resized in the mean time
-						if (_clientSize == _deviceContext.ClientSize)
+						if (_intendedClientSize == _deviceContext.ClientSize)
 							GL.BlitFramebuffer(0, 0, screenFramebuffer.Size.X, screenFramebuffer.Size.Y,
-								0, 0, _clientSize.X, _clientSize.Y,
+								0, 0, _intendedClientSize.X, _intendedClientSize.Y,
 								GL.COLOR_BUFFER_BIT, GL.NEAREST);
 
-						if (_clientSize == _deviceContext.ClientSize)
+						if (_intendedClientSize == _deviceContext.ClientSize)
 							_context.SwapBuffers();
 					}
 

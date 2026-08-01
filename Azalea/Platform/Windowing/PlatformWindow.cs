@@ -15,6 +15,7 @@ public abstract class PlatformWindow
 		Shown = new(initiallyVisible);
 		Position = new(new Vector2Int(100, 100));
 		ClientPosition = new(new Vector2Int(100, 100));
+		Size = new(clientSize);
 		ClientSize = new(clientSize);
 
 		Thread = new WindowThread(this);
@@ -42,6 +43,7 @@ public abstract class PlatformWindow
 
 	public ReadOnlyObservable<Vector2Int> Position { get; }
 	public ReadOnlyObservable<Vector2Int> ClientPosition { get; }
+	public ReadOnlyObservable<Vector2Int> Size { get; }
 	public ReadOnlyObservable<Vector2Int> ClientSize { get; }
 
 	protected abstract void Initialize();

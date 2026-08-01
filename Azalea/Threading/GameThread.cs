@@ -52,7 +52,12 @@ internal abstract class GameThread<T> : ICommandHandler<T>
 			return;
 
 		_running = false;
-		NativeThread.Join();
+
+		if (Environment.CurrentManagedThreadId != NativeThread.ManagedThreadId)
+			NativeThread.Join();
+		else
+			Console.WriteLine($"{DisplayName} closed itself!");
+
 		Running.Value = false;
 	}
 

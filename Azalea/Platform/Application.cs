@@ -70,8 +70,13 @@ public sealed class Application
 
 		Scheduler.InjectProtocol((win, rend) =>
 		{
+			var clientSize = win.ClientSize;
+
+			if (clientSize == Vector2Int.Zero)
+				return;
+
 			var renderQueue = coordinator.BeginCommandQueue();
-			renderQueue.PrepareRendering();
+			renderQueue.PrepareRendering(clientSize);
 			renderQueue.Clear(Palette.Flowers.Azalea);
 
 			if (mimicMainWindow)
@@ -85,7 +90,7 @@ public sealed class Application
 				{
 					ObjectPool<RenderCommandGroup>.Return(renderQueue);
 					renderQueue = ObjectPool<RenderCommandGroup>.Borrow();
-					renderQueue.PrepareRendering();
+					renderQueue.PrepareRendering(clientSize);
 					renderQueue.Clear(Palette.Flowers.Azalea);
 				}
 			}

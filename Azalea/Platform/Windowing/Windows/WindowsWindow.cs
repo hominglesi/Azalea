@@ -1,6 +1,5 @@
 ﻿using Azalea.Native.Windows;
 using Azalea.Platform.Windows;
-using Azalea.Threading;
 using Azalea.Utils;
 using System;
 using System.Diagnostics;
@@ -70,6 +69,7 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 		// Set actual window position
 		Win32.GetWindowRect(Handle, out windowRect);
 		Position.Value = new Vector2Int(windowRect.X, windowRect.Y);
+		Size.Value = new Vector2Int(windowRect.Width, windowRect.Height);
 	}
 
 	protected override void Update()
@@ -91,12 +91,13 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 				ClientPosition.Value = BitwiseUtils.SplitValue(lParam);
 				break;
 			case Win32.WindowMessage.SIZE:
-				var clientSize = BitwiseUtils.SplitValue(lParam);
-				ClientSize.Value = clientSize;
+				Win32.GetWindowRect(Handle, out rect);
+				Size.Value = new Vector2Int(rect.Width, rect.Height);
+				ClientSize.Value = BitwiseUtils.SplitValue(lParam);
 				break;
 			case Win32.WindowMessage.CLOSE:
-				Scheduler.Schedule(Close);
-				return 0;
+				Close();
+				return nint.Zero;
 			case Win32.WindowMessage.ERASEBKGND:
 				return 1;
 		}

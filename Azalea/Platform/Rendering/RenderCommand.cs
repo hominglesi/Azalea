@@ -295,7 +295,10 @@ internal partial class PolygonModeCommand : RenderCommand
 }
 
 [ThreadCommand]
-internal partial class PrepareRenderingCommand : RenderCommand { }
+internal partial class PrepareRenderingCommand : RenderCommand
+{
+	public Vector2Int IntendedClientSize;
+}
 
 [ThreadCommand]
 internal partial class PrintErrorsCommand : RenderCommand { }
