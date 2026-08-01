@@ -60,16 +60,6 @@ public class Texture
 		if (_loadingOperations == 0)
 			_readyEvent.Set();
 	}
-
-	[MemberNotNull(nameof(NativeTexture))]
-	internal void Borrow()
-	{
-		lock (_lock)
-		{
-			AssureReady();
-			BeginLoadingOperation();
-		}
-	}
 }
 
 internal interface INativeTexture

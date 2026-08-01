@@ -47,7 +47,11 @@ public sealed class Application
 			BackgroundColor = new Color(24, 19, 38)
 		};
 
-		if (mimicMainWindow == false)
+		if (mimicMainWindow)
+		{
+			//Renderer.FramebufferSize = (Vector2Int)AzaleaGame.RENDERED_GAME.DrawSize;
+		}
+		else
 		{
 			var schemeFormatter = new SchemeFormatter();
 			schemeFormatter.AddScheme("Post", createPost);
@@ -68,7 +72,7 @@ public sealed class Application
 		{
 			var renderQueue = coordinator.BeginCommandQueue();
 			renderQueue.PrepareRendering();
-			renderQueue.Clear(Palette.Beige);
+			renderQueue.Clear(Palette.Flowers.Azalea);
 
 			if (mimicMainWindow)
 			{
@@ -81,7 +85,7 @@ public sealed class Application
 				{
 					ObjectPool<RenderCommandGroup>.Return(renderQueue);
 					renderQueue = ObjectPool<RenderCommandGroup>.Borrow();
-					renderQueue.Clear(Palette.Beige);
+					renderQueue.Clear(Palette.Flowers.Azalea);
 				}
 			}
 			else

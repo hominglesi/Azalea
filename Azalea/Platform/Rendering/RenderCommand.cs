@@ -358,12 +358,6 @@ internal partial class UniformMatrix4fvCommand : RenderCommand
 }
 
 [ThreadCommand]
-internal partial class UpdateClientSizeCommand : RenderCommand
-{
-	public Vector2Int ClientSize;
-}
-
-[ThreadCommand]
 internal partial class UseProgramCommand : RenderCommand
 {
 	public Program Program;

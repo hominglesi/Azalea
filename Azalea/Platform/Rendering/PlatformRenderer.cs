@@ -24,6 +24,17 @@ public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 		get => _coordinator ??= new RenderCoordinator(this);
 	}
 
+	public Vector2Int FramebufferSize { get; set; } = Vector2Int.Zero;
+
+	public readonly ReadOnlyObservable<bool> Stopped = new(false);
+	internal void Stop()
+	{
+		if (Stopped) return;
+
+		Thread.Stop();
+		Stopped.Value = true;
+	}
+
 	#region Commands
 
 	public ICommandAwaitable? Enqueue(RenderCommand command) => Thread.Enqueue(command);
@@ -58,15 +69,6 @@ public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 	}
 
 	#endregion
-
-	public readonly ReadOnlyObservable<bool> Stopped = new(false);
-	internal void Stop()
-	{
-		if (Stopped) return;
-
-		Thread.Stop();
-		Stopped.Value = true;
-	}
 
 	#region RenderThread
 
