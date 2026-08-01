@@ -19,31 +19,38 @@ public class Texture
 		FinishLoadingOperation();
 	}
 
+	private readonly object _lock = new();
 	private volatile int _loadingOperations = 1;
 	private readonly ManualResetEvent _readyEvent = new(false);
 	[MemberNotNull(nameof(NativeTexture))]
 	internal void AssureReady()
 	{
-		if (_loadingOperations == 0)
+		lock (_lock)
 		{
+			if (_loadingOperations == 0)
+			{
+				Debug.Assert(NativeTexture is not null);
+				return;
+			}
+
+			var startTime = Time.GetCurrentPreciseTime();
+			_readyEvent.WaitOne();
+			Console.WriteLine($"Waited for texture {Time.GetPreciseMilisecondsSince(startTime)}ms");
+
+			Debug.Assert(_loadingOperations == 0);
 			Debug.Assert(NativeTexture is not null);
-			return;
 		}
-
-		var startTime = Time.GetCurrentPreciseTime();
-		_readyEvent.WaitOne();
-		Console.WriteLine($"Waited for texture {Time.GetPreciseMilisecondsSince(startTime)}ms");
-
-		Debug.Assert(_loadingOperations == 0);
-		Debug.Assert(NativeTexture is not null);
 	}
 
 	internal void BeginLoadingOperation()
 	{
-		if (_loadingOperations == 0)
-			_readyEvent.Reset();
+		lock (_lock)
+		{
+			if (_loadingOperations == 0)
+				_readyEvent.Reset();
 
-		_loadingOperations++;
+			_loadingOperations++;
+		}
 	}
 
 	internal void FinishLoadingOperation()
@@ -52,6 +59,16 @@ public class Texture
 
 		if (_loadingOperations == 0)
 			_readyEvent.Set();
+	}
+
+	[MemberNotNull(nameof(NativeTexture))]
+	internal void Borrow()
+	{
+		lock (_lock)
+		{
+			AssureReady();
+			BeginLoadingOperation();
+		}
 	}
 }
 

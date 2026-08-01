@@ -25,7 +25,7 @@ public static partial class Win32
 		public readonly uint nSize = (uint)Marshal.SizeOf<PIXELFORMATDESCRIPTOR>();
 		public uint nVersion = 1;
 		[Flags]
-		internal enum Flags
+		public enum Flags : uint
 		{
 			DRAW_TO_WINDOW = 0x00000004,
 			DRAW_TO_BITMAP = 0x00000008,
@@ -39,7 +39,7 @@ public static partial class Win32
 			STEREO = 0x00000002,
 			SWAP_LAYER_BUFFERS = 0x00000800,
 		}
-		public int dwFlags = (int)(Flags.DRAW_TO_WINDOW | Flags.SUPPORT_OPENGL | Flags.DOUBLEBUFFER);
+		public Flags dwFlags = Flags.DRAW_TO_WINDOW | Flags.SUPPORT_OPENGL | Flags.DOUBLEBUFFER;
 		public byte iPixelType;
 		public byte cColorBits = 32;
 		public byte cRedBits;

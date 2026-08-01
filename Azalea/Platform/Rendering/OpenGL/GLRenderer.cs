@@ -9,11 +9,12 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
 namespace Azalea.Platform.Rendering.OpenGL;
 internal partial class GLRenderer : PlatformRenderer
 {
-	private const bool _useFramebuffer = true;
+	private const bool _redrawOnResize = true;
 
 	private static readonly GL.DebugProc _debugCallback = onDebugMessage;
 
@@ -22,11 +23,15 @@ internal partial class GLRenderer : PlatformRenderer
 
 	private Buffer _uniformBuffer;
 
-	private Program _screenShader;
-	private VertexArray _screenVertexArray;
-	private Texture _screenColorbuffer;
-	private Framebuffer _screenFramebuffer;
+	private int _activeScreenFramebuffer = 0;
+	private int _lastActiveScreenFramebuffer = 0;
+	private const int __screenFramebufferCount = 3;
+	private readonly ScreenFramebuffer[] _screenFramebuffers = new ScreenFramebuffer[__screenFramebufferCount];
 
+	private GLContext? _windowContext;
+	private Framebuffer? _windowFramebuffer;
+
+	private readonly object _windowRedrawingLock = new();
 
 	internal GLRenderer(IPlatformDeviceContext deviceContext)
 	{
@@ -42,38 +47,80 @@ internal partial class GLRenderer : PlatformRenderer
 
 		Thread.BindBufferRange(GL.UNIFORM_BUFFER, 0, _uniformBuffer, 0, Marshal.SizeOf<Matrix4x4>());
 
-		_screenShader = new Program();
-		LoadingContext.GenerateProgram(_screenShader, _screenVertexShader, _screenFragmentShader);
+		for (int i = 0; i < __screenFramebufferCount; i++)
+		{
+			var colorbuffer = Thread.GenerateTexture();
+			Thread.TexImage2D(colorbuffer, deviceContext.ClientSize.Value.X, deviceContext.ClientSize.Value.Y, null, false);
+			var framebuffer = Thread.GenerateFramebuffer();
+			Thread.FramebufferTexture2D(framebuffer, colorbuffer, GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, 0);
 
-		float[] screenVertices = [
-		-1.0f,  1.0f,  0.0f, 1.0f,
-		-1.0f, -1.0f,  0.0f, 0.0f,
-		 1.0f, -1.0f,  1.0f, 0.0f,
-
-		-1.0f,  1.0f,  0.0f, 1.0f,
-		 1.0f, -1.0f,  1.0f, 0.0f,
-		 1.0f,  1.0f,  1.0f, 1.0f
-		];
-
-		_screenVertexArray = Thread.GenerateVertexArray();
-		Thread.BindVertexArray(_screenVertexArray);
-		var screenVertexBuffer = Thread.GenerateBuffer();
-		Thread.BindBuffer(GL.ARRAY_BUFFER, screenVertexBuffer);
-		Thread.BufferData(GL.ARRAY_BUFFER, sizeof(float) * screenVertices.Length, screenVertices, GL.STATIC_DRAW, false);
-		Thread.EnableVertexAttribArray(0);
-		Thread.VertexAttribPointer(0, 2, GL.FLOAT, false, 4 * sizeof(float), 0);
-		Thread.EnableVertexAttribArray(1);
-		Thread.VertexAttribPointer(1, 2, GL.FLOAT, false, 4 * sizeof(float), 2 * sizeof(float));
-		Thread.BindVertexArray(null);
-
-		_screenColorbuffer = Thread.GenerateTexture();
-		Thread.TexImage2D(_screenColorbuffer, deviceContext.ClientSize.Value.X, deviceContext.ClientSize.Value.Y, null, false);
-
-		_screenFramebuffer = Thread.GenerateFramebuffer();
-		Thread.FramebufferTexture2D(_screenFramebuffer, _screenColorbuffer, GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, 0);
+			_screenFramebuffers[i] = new(framebuffer, colorbuffer, deviceContext.ClientSize);
+		}
 
 		Thread.UpdateClientSize(deviceContext.ClientSize);
 		deviceContext.ClientSize.OnValueChanged += Thread.UpdateClientSize;
+
+		deviceContext.ClientSize.OnValueChanged += newClientSize =>
+		{
+			// This code is gonna be run on the window thread
+			// since that's the thread that changes the client size
+			// We have a separate glContext that shares its resources with
+			// the rendering thread so it can use the screen framebuffer
+			// and blit it to the window on resize
+
+			if (_redrawOnResize == false)
+				return;
+
+			Monitor.Enter(_windowRedrawingLock);
+
+			if (_windowContext is null)
+			{
+				_windowContext = GLContext.Create(_deviceContext, LoadingContext);
+				_windowContext.MakeCurrent();
+
+				_windowFramebuffer = new Framebuffer();
+				uint windowFramebufferHandle = 0;
+				GL.GenFramebuffers(1, ref windowFramebufferHandle);
+				_windowFramebuffer.Initialize(windowFramebufferHandle);
+			}
+
+			var lastActiveFramebuffer = _screenFramebuffers[_lastActiveScreenFramebuffer];
+
+			if (Monitor.TryEnter(lastActiveFramebuffer.TextureLock) == false)
+			{
+				Console.WriteLine($"Window redraw failed to enter lock!");
+				Monitor.Enter(lastActiveFramebuffer.TextureLock);
+			}
+
+			lastActiveFramebuffer.Texture.AssureReady();
+
+			Debug.Assert(_windowFramebuffer is not null);
+			Debug.Assert(_windowFramebuffer.Handle.HasValue);
+			GL.BindFramebuffer(GL.FRAMEBUFFER, _windowFramebuffer.Handle.Value);
+			GL.FramebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0,
+				GL.TEXTURE_2D, lastActiveFramebuffer.Texture.NativeTexture.Handle, 0);
+
+			GL.BindFramebuffer(GL.READ_FRAMEBUFFER, _windowFramebuffer.Handle.Value);
+			GL.BindFramebuffer(GL.DRAW_FRAMEBUFFER, 0);
+
+			var colorbufferSize = lastActiveFramebuffer.Size;
+
+			GL.Viewport(0, 0, newClientSize.X, newClientSize.Y);
+			GL.BlitFramebuffer(0, colorbufferSize.Y - Math.Min(colorbufferSize.Y, newClientSize.Y), Math.Min(colorbufferSize.X, newClientSize.X), colorbufferSize.Y,
+				0, newClientSize.Y - Math.Min(colorbufferSize.Y, newClientSize.Y), Math.Min(colorbufferSize.X, newClientSize.X), newClientSize.Y,
+				GL.COLOR_BUFFER_BIT, GL.LINEAR);
+
+			GL.BindFramebuffer(GL.FRAMEBUFFER, _windowFramebuffer.Handle.Value);
+			GL.FramebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0,
+				GL.TEXTURE_2D, 0, 0);
+			GL.BindFramebuffer(GL.FRAMEBUFFER, 0);
+
+			_windowContext.SwapBuffers();
+			GL.Flush();
+
+			Monitor.Exit(lastActiveFramebuffer.TextureLock);
+			Monitor.Exit(_windowRedrawingLock);
+		};
 	}
 
 	protected override void InitializationLogic()
@@ -126,7 +173,7 @@ internal partial class GLRenderer : PlatformRenderer
 				break;
 			case BindFramebufferCommand(var type, var framebuffer):
 				Debug.Assert(framebuffer.Handle is not null);
-				GL.BindFramebuffer(GL.FRAMEBUFFER, framebuffer.Handle.Value);
+				GL.BindFramebuffer(type, framebuffer.Handle.Value);
 				break;
 			case BindTextureCommand(var type, var texture):
 				texture.AssureReady();
@@ -232,6 +279,10 @@ internal partial class GLRenderer : PlatformRenderer
 				}
 				break;
 			case PrepareRenderingCommand():
+				var screenFramebuffer = _screenFramebuffers[_activeScreenFramebuffer];
+				Monitor.Enter(screenFramebuffer.TextureLock);
+				screenFramebuffer.Texture.AssureReady();
+
 				if (_lastClientSize != _clientSize)
 				{
 					GL.Viewport(0, 0, _clientSize.X, _clientSize.Y);
@@ -240,19 +291,19 @@ internal partial class GLRenderer : PlatformRenderer
 					GL.BufferSubData(GL.UNIFORM_BUFFER, 0, Marshal.SizeOf<Matrix4x4>(), (nint)(&projectionMatrix));
 					GL.BindBuffer(GL.UNIFORM_BUFFER, 0);
 
-					_screenColorbuffer.AssureReady();
-					GL.BindTexture(GL.TEXTURE_2D, _screenColorbuffer.NativeTexture.Handle);
-					GL.TexImage2D(GL.TEXTURE_2D, 0, GL.RGB, _clientSize.X, _clientSize.Y, 0, GL.RGB, GL.UNSIGNED_BYTE, nint.Zero);
-					GL.BindTexture(GL.TEXTURE_2D, 0);
-
 					_lastClientSize = _clientSize;
 				}
 
-				if (_useFramebuffer)
+				if (screenFramebuffer.Size != _clientSize)
 				{
-					Debug.Assert(_screenFramebuffer.Handle is not null);
-					GL.BindFramebuffer(GL.FRAMEBUFFER, _screenFramebuffer.Handle.Value);
+					GL.BindTexture(GL.TEXTURE_2D, screenFramebuffer.Texture.NativeTexture.Handle);
+					GL.TexImage2D(GL.TEXTURE_2D, 0, GL.RGB, _clientSize.X, _clientSize.Y, 0, GL.RGB, GL.UNSIGNED_BYTE, nint.Zero);
+					_screenFramebuffers[_activeScreenFramebuffer].Size = _clientSize;
+					GL.BindTexture(GL.TEXTURE_2D, 0);
 				}
+
+				Debug.Assert(screenFramebuffer.Framebuffer.Handle.HasValue);
+				GL.BindFramebuffer(GL.FRAMEBUFFER, screenFramebuffer.Framebuffer.Handle.Value);
 				break;
 			case ScissorCommand(var rectangle):
 				if (_scissorRectangle == rectangle)
@@ -280,22 +331,39 @@ internal partial class GLRenderer : PlatformRenderer
 				GL.Disable(GL.SCISSOR_TEST);
 				_scissorRectangle = null;
 
-				if (_useFramebuffer)
-				{
-					GL.BindFramebuffer(GL.FRAMEBUFFER, 0);
-					GL.ClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-					GL.Clear(GL.COLOR_BUFFER_BIT);
+				screenFramebuffer = _screenFramebuffers[_activeScreenFramebuffer];
 
-					_screenShader.AssureInitialized();
-					GL.UseProgram(_screenShader.Handle.Value);
-					Debug.Assert(_screenVertexArray.Handle is not null);
-					GL.BindVertexArray(_screenVertexArray.Handle.Value);
-					_screenColorbuffer.AssureReady();
-					GL.BindTexture(GL.TEXTURE_2D, _screenColorbuffer.NativeTexture.Handle);
-					GL.DrawArrays(GL.TRIANGLES, 0, 6);
+				if (screenFramebuffer.Size != _deviceContext.ClientSize)
+				{
+					Monitor.Exit(screenFramebuffer.TextureLock);
+					break;
 				}
 
-				_context.SwapBuffers();
+				if (Monitor.TryEnter(_windowRedrawingLock))
+				{
+					if (screenFramebuffer.Size == _deviceContext.ClientSize)
+					{
+						Debug.Assert(screenFramebuffer.Framebuffer.Handle.HasValue);
+						GL.BindFramebuffer(GL.READ_FRAMEBUFFER, screenFramebuffer.Framebuffer.Handle.Value);
+						GL.BindFramebuffer(GL.DRAW_FRAMEBUFFER, 0);
+
+						// We need to make sure that the window hasn't been resized in the mean time
+						if (screenFramebuffer.Size == _deviceContext.ClientSize)
+							GL.BlitFramebuffer(0, 0, screenFramebuffer.Size.X, screenFramebuffer.Size.Y,
+								0, 0, screenFramebuffer.Size.X, screenFramebuffer.Size.Y,
+								GL.COLOR_BUFFER_BIT, GL.LINEAR);
+
+						if (screenFramebuffer.Size == _deviceContext.ClientSize)
+							_context.SwapBuffers();
+					}
+
+					Monitor.Exit(_windowRedrawingLock);
+				}
+
+				GL.Flush();
+				_lastActiveScreenFramebuffer = _activeScreenFramebuffer;
+				_activeScreenFramebuffer = (_activeScreenFramebuffer + 1) % __screenFramebufferCount;
+				Monitor.Exit(screenFramebuffer.TextureLock);
 				break;
 			case TexImage2DCommand(var texture, var width, var height, var pixels, var generateMipmap):
 				if (texture.NativeTexture is not GLTexture glTexture)
@@ -354,31 +422,18 @@ internal partial class GLRenderer : PlatformRenderer
 		Console.WriteLine(Marshal.PtrToStringAnsi(message, length));
 	}
 
-	private const string _screenVertexShader = """
-		#version 330 core
-		layout (location = 0) in vec2 aPos;
-		layout (location = 1) in vec2 aTexCoords;
+	private struct ScreenFramebuffer
+	{
+		public readonly Framebuffer Framebuffer;
+		public readonly Texture Texture;
+		public object TextureLock = new();
+		public Vector2Int Size;
 
-		out vec2 TexCoords;
-
-		void main()
+		public ScreenFramebuffer(Framebuffer framebuffer, Texture texture, Vector2Int size)
 		{
-		    gl_Position = vec4(aPos.x, aPos.y, 0.0, 1.0); 
-		    TexCoords = aTexCoords;
-		}  
-	""";
-
-	private const string _screenFragmentShader = """
-		#version 330 core
-		out vec4 FragColor;
-
-		in vec2 TexCoords;
-
-		uniform sampler2D screenTexture;
-
-		void main()
-		{ 
-			FragColor = texture(screenTexture, TexCoords);
+			Framebuffer = framebuffer;
+			Texture = texture;
+			Size = size;
 		}
-	""";
+	}
 }

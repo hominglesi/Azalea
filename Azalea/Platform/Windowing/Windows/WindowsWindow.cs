@@ -42,7 +42,6 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 
 		var extendedStyles = Win32.WindowStylesExtended.APPWINDOW;
 
-
 		Win32.RECT windowSize = new(100, 100, ClientSize.Value.X, ClientSize.Value.Y);
 		Win32.AdjustWindowRectEx(ref windowSize, styles, false, extendedStyles);
 
@@ -83,12 +82,11 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 				var clientSize = BitwiseUtils.SplitValue(lParam);
 				ClientSize.Value = clientSize;
 				break;
-			case 15 /* WM_PAINT */:
-				Console.WriteLine("PAINT: " + Time.TimeSinceStart);
-				break;
 			case 16 /* WM_CLOSE */:
 				Scheduler.Schedule(Close);
 				return 0;
+			case 0x0014 /* WM_ERASEBKGND */:
+				return 1;
 		}
 
 		return Win32.DefWindowProcW(hWnd, uMsg, wParam, lParam);

@@ -47,6 +47,9 @@ public static partial class GL
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindVertexArray.xhtml")]
 	private delegate void BindVertexArrayDelegate(uint array);
 
+	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBlitFramebuffer.xhtml")]
+	private delegate void BlitFramebufferDelegate(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, int mask, int filter);
+
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBufferData.xhtml")]
 	private delegate void BufferDataDelegate(int target, nint size, nint data, int usage);
 

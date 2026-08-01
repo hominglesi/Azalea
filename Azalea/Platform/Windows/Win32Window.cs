@@ -104,7 +104,7 @@ internal class Win32Window : PlatformWindow
 		uint formatCount = 0;
 		GL.ChoosePixelFormatARB(DeviceContext, ref pixelFormatAttribs[0], IntPtr.Zero, 1, ref pixelFormat, ref formatCount);
 
-		Win32.PIXELFORMATDESCRIPTOR pixelFormatDescriptor = default;
+		Win32.PIXELFORMATDESCRIPTOR pixelFormatDescriptor = new();
 		_ = Win32.DescribePixelFormat(DeviceContext, pixelFormat, pixelFormatDescriptor.nSize, ref pixelFormatDescriptor);
 		Win32.SetPixelFormat(DeviceContext, pixelFormat, in pixelFormatDescriptor);
 

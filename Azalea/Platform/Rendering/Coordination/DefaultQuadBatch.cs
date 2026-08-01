@@ -14,6 +14,7 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 	private readonly UniformLocation _textureUniform;
 
 	private readonly VertexArray _vertexArray;
+	private readonly Buffer _vertexArrayVertices;
 
 	public const int MaxQuadCount = 1000;
 	private readonly uint[] _indices;
@@ -27,8 +28,8 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 		_vertexArray = commandGroup.GenerateVertexArray();
 		commandGroup.BindVertexArray(_vertexArray);
 
-		var vertexBuffer = commandGroup.GenerateBuffer();
-		commandGroup.BindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
+		_vertexArrayVertices = commandGroup.GenerateBuffer();
+		commandGroup.BindBuffer(GL.ARRAY_BUFFER, _vertexArrayVertices);
 
 		var indexArray = commandGroup.GenerateBuffer();
 		commandGroup.BindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexArray);
@@ -52,6 +53,7 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 		commandGroup.VertexAttribPointer(2, 2, GL.FLOAT, false, 8 * sizeof(float), 6 * sizeof(float));
 		commandGroup.EnableVertexAttribArray(2);
 
+		commandGroup.BindBuffer(GL.ARRAY_BUFFER, null);
 		commandGroup.BindVertexArray(null);
 
 		_renderer.Thread.SubmitCommandGroup(commandGroup);
@@ -98,6 +100,7 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 			return;
 
 		commandQueue.BindVertexArray(_vertexArray);
+		commandQueue.BindBuffer(GL.ARRAY_BUFFER, _vertexArrayVertices);
 
 		commandQueue.BufferData(GL.ARRAY_BUFFER, _nextVertex * _vertexSize * sizeof(float), _vertices, GL.DYNAMIC_DRAW, true);
 

@@ -130,7 +130,7 @@ internal class GLContext
 			uint formatCount = 0;
 			GL.wglChoosePixelFormatARB(winDeviceContext.Handle, in pixelFormatAttribs[0], IntPtr.Zero, 1, ref pixelFormat, ref formatCount);
 
-			Win32.PIXELFORMATDESCRIPTOR pixelFormatDescriptor = default;
+			Win32.PIXELFORMATDESCRIPTOR pixelFormatDescriptor = new();
 			Win32.DescribePixelFormat(winDeviceContext.Handle, pixelFormat, pixelFormatDescriptor.nSize, ref pixelFormatDescriptor);
 			Win32.SetPixelFormat(winDeviceContext.Handle, pixelFormat, in pixelFormatDescriptor);
 			return;
