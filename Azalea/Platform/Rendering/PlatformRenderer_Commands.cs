@@ -6,6 +6,7 @@ using System.Buffers;
 using System.Numerics;
 
 namespace Azalea.Platform.Rendering;
+
 public abstract class RenderCommand : ThreadCommand
 {
 	internal static volatile new int TotalCreated = 0;
