@@ -13,6 +13,8 @@ public abstract class PlatformWindow
 	protected PlatformWindow(Vector2Int clientSize, bool initiallyVisible)
 	{
 		Shown = new(initiallyVisible);
+		Position = new(new Vector2Int(100, 100));
+		ClientPosition = new(new Vector2Int(100, 100));
 		ClientSize = new(clientSize);
 
 		Thread = new WindowThread(this);
@@ -38,6 +40,8 @@ public abstract class PlatformWindow
 	public string Title => "Azalea Window";
 	public readonly ReadOnlyObservable<bool> Shown;
 
+	public ReadOnlyObservable<Vector2Int> Position { get; }
+	public ReadOnlyObservable<Vector2Int> ClientPosition { get; }
 	public ReadOnlyObservable<Vector2Int> ClientSize { get; }
 
 	protected abstract void Initialize();

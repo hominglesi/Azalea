@@ -169,15 +169,6 @@ internal static partial class WinAPI
 	[DllImport(User32Path, EntryPoint = "GetWindowLongW", CharSet = CharSet.Unicode)]
 	public static extern int GetWindowLong(IntPtr window, int index);
 
-	[DllImport(User32Path, EntryPoint = "GetWindowRect")]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	private static extern bool getWindowRect(IntPtr window, out Win32.RECT rect);
-	public static RectangleInt GetWindowRect(IntPtr window)
-	{
-		getWindowRect(window, out var rect);
-		return (RectangleInt)rect;
-	}
-
 	[DllImport(Kernel32Path, EntryPoint = "GlobalAlloc")]
 	public static extern IntPtr GlobalAlloc(uint flags, UIntPtr bytes);
 

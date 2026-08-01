@@ -120,7 +120,8 @@ internal class Win32Window : PlatformWindow
 		Win32.wglMakeCurrent(DeviceContext, glContext);
 
 		//Sync values with PlatformWindow
-		var windowSize = WinAPI.GetWindowRect(Handle).Size;
+		Win32.GetWindowRect(Handle, out windowRect);
+		var windowSize = new Vector2Int(windowRect.Width, windowRect.Height);
 		UpdateSize(windowSize, clientSize);
 	}
 
@@ -187,12 +188,14 @@ internal class Win32Window : PlatformWindow
 		switch ((Win32.WindowMessage)message)
 		{
 			case Win32.WindowMessage.MOVE:
-				var windowPosition = WinAPI.GetWindowRect(Handle).Position;
+				Win32.GetWindowRect(Handle, out var rect);
+				var windowPosition = new Vector2Int(rect.X, rect.Y);
 				var clientPosition = BitwiseUtils.SplitValue(lParam);
 				UpdatePosition(windowPosition, clientPosition);
 				break;
 			case Win32.WindowMessage.SIZE:
-				var windowSize = WinAPI.GetWindowRect(Handle).Size;
+				Win32.GetWindowRect(Handle, out rect);
+				var windowSize = new Vector2Int(rect.Width, rect.Height);
 				var clientSize = BitwiseUtils.SplitValue(lParam);
 				UpdateSize(windowSize, clientSize);
 

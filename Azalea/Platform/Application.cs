@@ -85,6 +85,7 @@ public sealed class Application
 				{
 					ObjectPool<RenderCommandGroup>.Return(renderQueue);
 					renderQueue = ObjectPool<RenderCommandGroup>.Borrow();
+					renderQueue.PrepareRendering();
 					renderQueue.Clear(Palette.Flowers.Azalea);
 				}
 			}

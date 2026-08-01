@@ -25,6 +25,8 @@ internal class PlatformWindowInspector
 		guiWindow.AddLabel("Title: " + window.Title);
 		guiWindow.AddObservingLabel("Shown", window.Shown);
 
+		guiWindow.AddObservingLabel("Position", window.Position);
+		guiWindow.AddObservingLabel("Client Position", window.ClientPosition);
 		guiWindow.AddObservingLabel("Client Size", window.ClientSize);
 
 		// For now using a window without these doesn't make sense

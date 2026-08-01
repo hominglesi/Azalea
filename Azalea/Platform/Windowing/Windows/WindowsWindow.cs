@@ -13,6 +13,9 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 	private static int _nextClassId = 0;
 	private Win32.WNDPROC? _windowProcedure;
 
+	private Win32.WindowStyles _windowStyles;
+	private Win32.WindowStylesExtended _windowExtendedStyles;
+
 	public override string PlatformType => "Windows";
 
 	internal ushort ClassAtom { get; private set; }
@@ -37,23 +40,23 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 
 		ClassAtom = Win32.RegisterClassExW(ref wndClass);
 
-		var styles = Win32.WindowStyles.OVERLAPPEDWINDOW;
-		if (Shown) styles |= Win32.WindowStyles.VISIBLE;
+		_windowStyles = Win32.WindowStyles.OVERLAPPEDWINDOW;
+		if (Shown) _windowStyles |= Win32.WindowStyles.VISIBLE;
 
-		var extendedStyles = Win32.WindowStylesExtended.APPWINDOW;
+		_windowExtendedStyles = Win32.WindowStylesExtended.APPWINDOW;
 
-		Win32.RECT windowSize = new(100, 100, ClientSize.Value.X, ClientSize.Value.Y);
-		Win32.AdjustWindowRectEx(ref windowSize, styles, false, extendedStyles);
+		Win32.RECT windowRect = new(ClientPosition.Value.X, ClientPosition.Value.Y, ClientSize.Value.X, ClientSize.Value.Y);
+		Win32.AdjustWindowRectEx(ref windowRect, _windowStyles, false, _windowExtendedStyles);
 
 		Handle = Win32.CreateWindowExWDLL(
-			extendedStyles,
+			_windowExtendedStyles,
 			ClassAtom,
 			Title,
-			styles,
-			windowSize.left,
-			windowSize.top,
-			windowSize.Width,
-			windowSize.Height,
+			_windowStyles,
+			windowRect.left,
+			windowRect.top,
+			windowRect.Width,
+			windowRect.Height,
 			IntPtr.Zero,
 			IntPtr.Zero,
 			processHandle,
@@ -63,6 +66,10 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 			throw new Exception($"Could not create Window. (Error {Marshal.GetLastWin32Error()})");
 
 		Marshal.FreeHGlobal(classNamePtr);
+
+		// Set actual window position
+		Win32.GetWindowRect(Handle, out windowRect);
+		Position.Value = new Vector2Int(windowRect.X, windowRect.Y);
 	}
 
 	protected override void Update()
@@ -76,16 +83,21 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 
 	private nint windowProcedure(nint hWnd, uint uMsg, nint wParam, nint lParam)
 	{
-		switch (uMsg)
+		switch ((Win32.WindowMessage)uMsg)
 		{
-			case 5 /* WM_SIZE */:
+			case Win32.WindowMessage.MOVE:
+				Win32.GetWindowRect(Handle, out var rect);
+				Position.Value = new Vector2Int(rect.X, rect.Y);
+				ClientPosition.Value = BitwiseUtils.SplitValue(lParam);
+				break;
+			case Win32.WindowMessage.SIZE:
 				var clientSize = BitwiseUtils.SplitValue(lParam);
 				ClientSize.Value = clientSize;
 				break;
-			case 16 /* WM_CLOSE */:
+			case Win32.WindowMessage.CLOSE:
 				Scheduler.Schedule(Close);
 				return 0;
-			case 0x0014 /* WM_ERASEBKGND */:
+			case Win32.WindowMessage.ERASEBKGND:
 				return 1;
 		}
 

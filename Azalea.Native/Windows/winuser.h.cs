@@ -58,6 +58,10 @@ public static partial class Win32
 	[LibraryImport(User32Path)]
 	public static partial nint GetDC(nint hWnd);
 
+	[LibraryImport(User32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool GetWindowRect(nint window, out RECT rect);
+
 	[StructLayout(LayoutKind.Sequential, Pack = 8)]
 	public struct MSG
 	{
@@ -88,6 +92,7 @@ public static partial class Win32
 		SIZE = 5,
 		PAINT = 15,
 		CLOSE = 16,
+		ERASEBKGND = 20,
 		SETCURSOR = 32,
 		WINDOWPOSCHANGING = 70,
 		SETICON = 128,
