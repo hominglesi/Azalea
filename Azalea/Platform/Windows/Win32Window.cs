@@ -391,13 +391,13 @@ internal class Win32Window : PlatformWindow
 	}
 
 	protected override void MinimizeImplementation()
-		=> WinAPI.ShowWindow(Handle, ShowWindowCommand.Minimize);
+		=> Win32.ShowWindow(Handle, Win32.ShowWindowCommand.MINIMIZE);
 
 	protected override void MaximizeImplementation()
-		=> WinAPI.ShowWindow(Handle, ShowWindowCommand.Maximize);
+		=> Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOWMAXIMIZED);
 
 	protected override void RestoreImplementation()
-		=> WinAPI.ShowWindow(Handle, ShowWindowCommand.Restore);
+		=> Win32.ShowWindow(Handle, Win32.ShowWindowCommand.RESTORE);
 
 	protected override void FullscreenImplementation()
 	{
@@ -417,7 +417,7 @@ internal class Win32Window : PlatformWindow
 	}
 
 	protected override void SetTitleImplementation(string title)
-		=> WinAPI.SetWindowText(Handle, title);
+		=> Win32.SetWindowTextW(Handle, title);
 
 	protected override void SetResizableImplementation(bool enabled)
 	{
@@ -487,26 +487,26 @@ internal class Win32Window : PlatformWindow
 	{
 		if (firstTime == false)
 		{
-			WinAPI.ShowWindow(Handle, ShowWindowCommand.Show);
+			Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOW);
 			return;
 		}
 
 		switch (_initialShowState)
 		{
 			case WindowState.Normal:
-				WinAPI.ShowWindow(Handle, ShowWindowCommand.ShowNormal); return;
+				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOWNORMAL); return;
 			case WindowState.Maximized:
-				WinAPI.ShowWindow(Handle, ShowWindowCommand.ShowMaximized); return;
+				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOWMAXIMIZED); return;
 			case WindowState.Minimized:
-				WinAPI.ShowWindow(Handle, ShowWindowCommand.ShowMinimized); return;
+				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOWMINIMIZED); return;
 			case WindowState.Fullscreen:
-				WinAPI.ShowWindow(Handle, ShowWindowCommand.ShowNormal);
+				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOWNORMAL);
 				State = WindowState.Fullscreen; return;
 		}
 	}
 
 	public override void Hide()
-		=> WinAPI.ShowWindow(Handle, ShowWindowCommand.Hide);
+		=> Win32.ShowWindow(Handle, Win32.ShowWindowCommand.HIDE);
 
 	private Vector2Int _mousePosition;
 	public override void ProcessEvents()

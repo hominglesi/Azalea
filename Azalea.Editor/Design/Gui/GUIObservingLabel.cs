@@ -5,7 +5,6 @@ using Azalea.Utils;
 
 namespace Azalea.Editor.Design.Gui;
 public class GUIObservingLabel<T> : TextContainer
-	where T : unmanaged
 {
 	private readonly string _label;
 	private readonly IObservable<T> _observable;

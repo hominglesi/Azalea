@@ -22,13 +22,19 @@ internal class PlatformWindowInspector
 			guiWindow.FinishGroup();
 		}
 
-		guiWindow.AddLabel("Title: " + window.Title);
+		guiWindow.AddObservingLabel("Title", window.Title);
+		guiWindow.AddButton("Set Random Title", () => window.SetTitle("Random Title"));
 		guiWindow.AddObservingLabel("Shown", window.Shown);
-
+		guiWindow.AddButton("Show", window.Show);
+		guiWindow.AddButton("Hide", window.Hide);
 		guiWindow.AddObservingLabel("Position", window.Position);
 		guiWindow.AddObservingLabel("Client Position", window.ClientPosition);
 		guiWindow.AddObservingLabel("Size", window.Size);
 		guiWindow.AddObservingLabel("Client Size", window.ClientSize);
+
+		guiWindow.AddButton("Restore", window.Restore);
+		guiWindow.AddButton("Maximize", window.Maximize);
+		guiWindow.AddButton("Minimize", window.Minimize);
 
 		// For now using a window without these doesn't make sense
 		// so we'll just assume that they are created

@@ -8,10 +8,11 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Azalea.Platform.Windowing;
-public abstract class PlatformWindow
+public abstract class PlatformWindow : ICommandHandler<WindowCommand>
 {
 	protected PlatformWindow(Vector2Int clientSize, bool initiallyVisible)
 	{
+		Title = new("Azalea Window");
 		Shown = new(initiallyVisible);
 		Position = new(new Vector2Int(100, 100));
 		ClientPosition = new(new Vector2Int(100, 100));
@@ -25,29 +26,19 @@ public abstract class PlatformWindow
 		Thread.Initialized.Dispose();
 	}
 
-	public static PlatformWindow Create(Vector2Int size, bool initiallyVisible = true)
-	{
-		var newWindow = RuntimeInformation.ProcessArchitecture switch
-		{
-			Architecture.X64 or Architecture.X86 => new WindowsWindow(size, initiallyVisible),
-			_ => throw new NotSupportedException(
-				$"Platform '{RuntimeInformation.ProcessArchitecture}' is not supported")
-		};
-
-		return newWindow;
-	}
+	protected abstract void InitializationLogic();
+	protected abstract void UpdateLogic();
+	protected abstract void HandleCommandLogic(WindowCommand command);
 
 	public virtual string PlatformType => "Abstract Window";
-	public string Title => "Azalea Window";
-	public readonly ReadOnlyObservable<bool> Shown;
 
+	public ReadOnlyObservable<string> Title { get; }
+	public ReadOnlyObservable<bool> Shown { get; }
 	public ReadOnlyObservable<Vector2Int> Position { get; }
 	public ReadOnlyObservable<Vector2Int> ClientPosition { get; }
 	public ReadOnlyObservable<Vector2Int> Size { get; }
 	public ReadOnlyObservable<Vector2Int> ClientSize { get; }
 
-	protected abstract void Initialize();
-	protected abstract void Update();
 
 	public PlatformRenderer? SubscribedRenderer { get; private set; } = null;
 	internal void Subscribe(PlatformRenderer renderer)
@@ -95,11 +86,13 @@ public abstract class PlatformWindow
 		Closed.Value = true;
 	}
 
+	public ICommandAwaitable? Enqueue(WindowCommand command) => Thread.Enqueue(command);
+
 	#region WindowThread
 
 	internal readonly WindowThread Thread;
 
-	internal class WindowThread(PlatformWindow window) : GameThread(1)
+	internal class WindowThread(PlatformWindow window) : GameThread<WindowCommand>(1)
 	{
 		private readonly PlatformWindow _window = window;
 
@@ -109,15 +102,30 @@ public abstract class PlatformWindow
 
 		protected override void Initialize()
 		{
-			_window.Initialize();
+			_window.InitializationLogic();
 			Initialized.Set();
 		}
 
 		protected override void Update()
 		{
-			_window.Update();
+			_window.UpdateLogic();
 		}
+
+		protected override void HandleCommand(WindowCommand command)
+			=> _window.HandleCommandLogic(command);
 	}
 
 	#endregion
+
+	public static PlatformWindow Create(Vector2Int size, bool initiallyVisible = true)
+	{
+		var newWindow = RuntimeInformation.ProcessArchitecture switch
+		{
+			Architecture.X64 or Architecture.X86 => new WindowsWindow(size, initiallyVisible),
+			_ => throw new NotSupportedException(
+				$"Platform '{RuntimeInformation.ProcessArchitecture}' is not supported")
+		};
+
+		return newWindow;
+	}
 }

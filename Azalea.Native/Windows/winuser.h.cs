@@ -81,6 +81,32 @@ public static partial class Win32
 	[LibraryImport(User32Path)]
 	public static partial ushort RegisterClassExW(ref WNDCLASSEXW windowClass);
 
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowtextw">Official Documentation</see></summary>
+	[LibraryImport(User32Path, StringMarshalling = StringMarshalling.Utf16)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool SetWindowTextW(nint hWnd, string lpString);
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showwindow">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool ShowWindow(nint hWnd, ShowWindowCommand nCmdShow);
+
+	public enum ShowWindowCommand : int
+	{
+		HIDE = 0,
+		SHOWNORMAL = 1,
+		SHOWMINIMIZED = 2,
+		SHOWMAXIMIZED = 3,
+		SHOWNOACTIVATE = 4,
+		SHOW = 5,
+		MINIMIZE = 6,
+		SHOWMINNOACTIVE = 7,
+		SHOWNA = 8,
+		RESTORE = 9,
+		SHOWDEFAULT = 10,
+		FORCEMINIMIZE = 11
+	}
+
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-translatemessage">Official Documentation</see></summary>
 	[LibraryImport(User32Path)]
 	[return: MarshalAs(UnmanagedType.Bool)]
@@ -93,6 +119,7 @@ public static partial class Win32
 		PAINT = 15,
 		CLOSE = 16,
 		ERASEBKGND = 20,
+		SHOWWINDOW = 24,
 		SETCURSOR = 32,
 		WINDOWPOSCHANGING = 70,
 		SETICON = 128,

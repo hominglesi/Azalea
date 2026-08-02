@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Azalea.Utils;
 public class ReadOnlyObservable<T>(T initialValue) : IFormattable, IObservable<T>
-	where T : unmanaged
 {
 	private T _value = initialValue;
 
@@ -11,7 +11,7 @@ public class ReadOnlyObservable<T>(T initialValue) : IFormattable, IObservable<T
 		get => _value;
 		internal set
 		{
-			if (_value.Equals(value))
+			if (EqualityComparer<T>.Default.Equals(value, _value))
 				return;
 
 			_value = value;
@@ -22,7 +22,7 @@ public class ReadOnlyObservable<T>(T initialValue) : IFormattable, IObservable<T
 	public event Action<T>? OnValueChanged;
 
 	public static implicit operator T(ReadOnlyObservable<T> observable) => observable.Value;
-	public override string ToString() => _value.ToString()!;
+	public override string ToString() => _value is null ? "Null" : _value.ToString()!;
 	public string ToString(string? format, IFormatProvider? formatProvider)
 	{
 		if (format is null) return ToString();

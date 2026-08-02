@@ -260,16 +260,8 @@ internal static partial class WinAPI
 			Console.WriteLine("Couldn't set window style");
 	}
 
-	[DllImport(User32Path, EntryPoint = "SetWindowTextW", CharSet = CharSet.Unicode)]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	public static extern bool SetWindowText(IntPtr window, string text);
-
 	[DllImport(User32Path, EntryPoint = "ShowCursor")]
 	public static extern int ShowCursor(bool show);
-
-	[DllImport(User32Path, EntryPoint = "ShowWindow")]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	public static extern bool ShowWindow(IntPtr window, ShowWindowCommand showCommand);
 
 	[DllImport(User32Path, EntryPoint = "SystemParametersInfoW", CharSet = CharSet.Unicode)]
 	private static extern bool systemParametersInfoRect(

@@ -125,7 +125,6 @@ public class GUIWindow : BasicWindowContainer
 	}
 
 	public GUIObservingLabel<T> AddObservingLabel<T>(string label, Utils.IObservable<T> observable)
-		where T : unmanaged
 	{
 		var observingLabel = new GUIObservingLabel<T>(label, observable);
 		Add(observingLabel);

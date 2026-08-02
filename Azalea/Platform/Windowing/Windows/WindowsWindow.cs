@@ -20,7 +20,7 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 	internal ushort ClassAtom { get; private set; }
 	internal nint Handle { get; private set; }
 
-	protected override void Initialize()
+	protected override void InitializationLogic()
 	{
 		var processHandle = Process.GetCurrentProcess().Handle;
 		_windowProcedure = windowProcedure;
@@ -72,13 +72,43 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 		Size.Value = new Vector2Int(windowRect.Width, windowRect.Height);
 	}
 
-	protected override void Update()
+	protected override void UpdateLogic()
 	{
 		while (Win32.PeekMessageW(out Win32.MSG message, Handle, 0, 0, 0x0001) != 0)
 		{
 			Win32.TranslateMessage(in message);
 			Win32.DispatchMessageW(in message);
 		}
+	}
+
+	protected override void HandleCommandLogic(WindowCommand command)
+	{
+		switch (command)
+		{
+			case HideCommand:
+				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.HIDE);
+				break;
+			case MaximizeCommand:
+				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOWMAXIMIZED);
+				break;
+			case MinimizeCommand:
+				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOWMINIMIZED);
+				break;
+			case RestoreCommand:
+				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOWNORMAL);
+				break;
+			case SetTitleCommand(var title):
+				Win32.SetWindowTextW(Handle, title);
+				Title.Value = title;
+				break;
+			case ShowCommand:
+				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOW);
+				break;
+			default:
+				throw new NotImplementedException("Command handling hasn't been implemented");
+		}
+
+		command.Return();
 	}
 
 	private nint windowProcedure(nint hWnd, uint uMsg, nint wParam, nint lParam)
@@ -94,6 +124,9 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 				Win32.GetWindowRect(Handle, out rect);
 				Size.Value = new Vector2Int(rect.Width, rect.Height);
 				ClientSize.Value = BitwiseUtils.SplitValue(lParam);
+				break;
+			case Win32.WindowMessage.SHOWWINDOW:
+				Shown.Value = wParam != nint.Zero;
 				break;
 			case Win32.WindowMessage.CLOSE:
 				Close();

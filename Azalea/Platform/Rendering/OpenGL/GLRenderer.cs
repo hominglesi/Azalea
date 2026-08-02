@@ -19,7 +19,7 @@ internal partial class GLRenderer : PlatformRenderer
 	private static readonly GL.DebugProc _debugCallback = onDebugMessage;
 
 	private readonly IPlatformDeviceContext _deviceContext;
-	private GLContext _context;
+	private GLContext? _context;
 
 	private Buffer _uniformBuffer;
 
@@ -142,23 +142,11 @@ internal partial class GLRenderer : PlatformRenderer
 		GL.wglSwapIntervalEXT(0);
 	}
 
-	internal override bool TryHandleCommand(RenderCommand command)
-	{
-		switch (command)
-		{
-			case GenerateProgramCommand(var program, var vertexShaderCode, var fragmentShaderCode):
-				LoadingContext!.GenerateProgram(program, vertexShaderCode, fragmentShaderCode);
-				return true;
-		}
-
-		return false;
-	}
-
 	private Vector2Int _intendedClientSize;
 	private Color? _clearColor = null;
 	private RectangleInt? _scissorRectangle = null;
 
-	internal unsafe override void HandleCommandLogic(RenderCommand command)
+	protected unsafe override void HandleCommandLogic(RenderCommand command)
 	{
 		switch (command)
 		{
@@ -365,7 +353,11 @@ internal partial class GLRenderer : PlatformRenderer
 								GL.COLOR_BUFFER_BIT, GL.NEAREST);
 
 						if (_intendedClientSize == _deviceContext.ClientSize)
+						{
+							Debug.Assert(_context is not null);
 							_context.SwapBuffers();
+						}
+
 					}
 
 					Monitor.Exit(_windowRedrawingLock);
@@ -420,6 +412,18 @@ internal partial class GLRenderer : PlatformRenderer
 		}
 
 		command.Return();
+	}
+
+	protected override bool TryHandleCommand(RenderCommand command)
+	{
+		switch (command)
+		{
+			case GenerateProgramCommand(var program, var vertexShaderCode, var fragmentShaderCode):
+				LoadingContext!.GenerateProgram(program, vertexShaderCode, fragmentShaderCode);
+				return true;
+		}
+
+		return false;
 	}
 
 	private static void onDebugMessage(uint source, uint type, uint id, uint severity, int length, nint message, nint userParam)

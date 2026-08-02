@@ -9,14 +9,12 @@ using System.Threading;
 namespace Azalea.Platform.Rendering;
 public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 {
-	protected PlatformRenderer()
+	internal PlatformRenderer()
 	{
 		Thread = new RenderThread(this);
 	}
 
 	protected abstract void InitializationLogic();
-	internal virtual bool TryHandleCommand(RenderCommand command) => false;
-	internal abstract void HandleCommandLogic(RenderCommand command);
 
 	private RenderCoordinator? _coordinator;
 	public RenderCoordinator Coordinator
@@ -37,7 +35,17 @@ public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 
 	#region Commands
 
-	public ICommandAwaitable? Enqueue(RenderCommand command) => Thread.Enqueue(command);
+	protected abstract void HandleCommandLogic(RenderCommand command);
+
+	public ICommandAwaitable? Enqueue(RenderCommand command)
+	{
+		if (TryHandleCommand(command))
+			return null;
+
+		return Thread.Enqueue(command);
+	}
+
+	protected virtual bool TryHandleCommand(RenderCommand command) => false;
 
 	private RenderCommandGroup? _stagedQueue = null;
 	private readonly object _stagedQueueLock = new();
@@ -91,20 +99,14 @@ public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 			_renderer.InitializationLogic();
 			InitializedEvent.Set();
 		}
-		public override ICommandAwaitable? Enqueue(RenderCommand command)
-		{
-			if (_renderer.TryHandleCommand(command))
-				return null;
-
-			return base.Enqueue(command);
-		}
-		protected override void HandleCommand(RenderCommand command)
-			=> _renderer.HandleCommandLogic(command);
 
 		protected override void Update()
 		{
 			processStagedQueue();
 		}
+
+		protected override void HandleCommand(RenderCommand command)
+			=> _renderer.HandleCommandLogic(command);
 
 		private void processStagedQueue()
 		{
