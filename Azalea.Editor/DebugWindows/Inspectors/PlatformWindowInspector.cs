@@ -43,6 +43,7 @@ internal class PlatformWindowInspector
 		guiWindow.AddButton("Restore", window.Restore);
 		guiWindow.AddButton("Maximize", window.Maximize);
 		guiWindow.AddButton("Minimize", window.Minimize);
+		guiWindow.AddButton("Fullscreen", window.Fullscreen);
 		guiWindow.AddButton("Center", window.Center);
 		guiWindow.AddButton("Request Attention", window.RequestAttention);
 		guiWindow.AddButton("Set Azalea icon", () => window.SetIcon(Assets.MainStore.GetImage("Textures/azalea-icon.png")));

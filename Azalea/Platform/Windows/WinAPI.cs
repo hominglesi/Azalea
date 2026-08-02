@@ -51,15 +51,6 @@ internal static partial class WinAPI
 	[DllImport(User32Path, EntryPoint = "GetClassLongPtrW", CharSet = CharSet.Unicode)]
 	public static extern IntPtr GetClassLongPtr(IntPtr window, ClassLongValue index);
 
-	[DllImport(User32Path, EntryPoint = "GetClientRect")]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	private static extern bool getClientRect(IntPtr window, out Win32.RECT rect);
-	public static RectangleInt GetClientRect(IntPtr window)
-	{
-		getClientRect(window, out var rect);
-		return (RectangleInt)rect;
-	}
-
 	[DllImport(User32Path, EntryPoint = "GetClipboardData")]
 	public static extern IntPtr GetClipboardData(uint format);
 
@@ -146,15 +137,6 @@ internal static partial class WinAPI
 
 	[DllImport(User32Path, EntryPoint = "SetClipboardData")]
 	public static extern IntPtr SetClipboardData(uint format, IntPtr memoryObject);
-
-	[DllImport(User32Path, EntryPoint = "SetWindowLongW", CharSet = CharSet.Unicode)]
-	public static extern uint SetWindowLong(IntPtr window, WindowLongValue index, uint newValue);
-
-	public static void SetWindowStyle(IntPtr window, Win32.WindowStyles style)
-	{
-		if (SetWindowLong(window, WindowLongValue.Style, (uint)style) == 0)
-			Console.WriteLine("Couldn't set window style");
-	}
 
 	[DllImport(User32Path, EntryPoint = "SystemParametersInfoW", CharSet = CharSet.Unicode)]
 	private static extern bool systemParametersInfoRect(

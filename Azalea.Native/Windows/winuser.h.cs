@@ -19,6 +19,11 @@ public static partial class Win32
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static partial bool BringWindowToTop(nint hWnd);
 
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-clienttoscreen">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool ClientToScreen(nint hWnd, ref POINT lpPoint);
+
 	/// <summary> Helper method to simplify creating icons. </summary>
 	public static IntPtr CreateIconFromPixelArray(IntPtr deviceContext, int width, int height, byte[] data)
 	{
@@ -109,6 +114,11 @@ public static partial class Win32
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static partial bool FlashWindow(nint hWnd, [MarshalAs(UnmanagedType.Bool)] bool bInvert);
 
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getclientrect">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool GetClientRect(nint window, out RECT rect);
+
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdc">Official Documentation</see></summary>
 	[LibraryImport(User32Path)]
 	public static partial nint GetDC(nint hWnd);
@@ -117,6 +127,11 @@ public static partial class Win32
 	[LibraryImport(User32Path, EntryPoint = "GetMonitorInfoW", StringMarshalling = StringMarshalling.Utf16)]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static partial bool GetMonitorInfoW(IntPtr monitor, ref MonitorInfo info);
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowplacement">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool GetWindowPlacement(nint hWnd, ref WINDOWPLACEMENT lpwndpl);
 
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowrect">Official Documentation</see></summary>
 	[LibraryImport(User32Path)]
@@ -139,6 +154,11 @@ public static partial class Win32
 			hbmColor = color;
 		}
 	}
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-isiconic">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool IsIconic(nint hwnd);
 
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-monitorfromwindow">Official Documentation</see></summary>
 	[LibraryImport(User32Path)]
@@ -201,6 +221,26 @@ public static partial class Win32
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static partial bool SetForegroundWindow(nint window);
 
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowlongptrw">Official Documentation</see></summary>
+	[LibraryImport(User32Path, StringMarshalling = StringMarshalling.Utf16)]
+	public static partial nint SetWindowLongPtrW(nint hWnd, WindowLongValue nIndex, nint dwNewLong);
+
+	public enum WindowLongValue : int
+	{
+		ExStyle = -20,
+		HInstance = -6,
+		HWndParent = -8,
+		Id = -12,
+		Style = -16,
+		UserData = -21,
+		WndProc = -4
+	}
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowplacement">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool SetWindowPlacement(nint hWnd, in WINDOWPLACEMENT lpwndpl);
+
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowpos">Official Documentation</see></summary>
 	[LibraryImport(User32Path)]
 	[return: MarshalAs(UnmanagedType.Bool)]
@@ -241,7 +281,7 @@ public static partial class Win32
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static partial bool ShowWindow(nint hWnd, ShowWindowCommand nCmdShow);
 
-	public enum ShowWindowCommand : int
+	public enum ShowWindowCommand : uint
 	{
 		HIDE = 0,
 		SHOWNORMAL = 1,
@@ -264,6 +304,7 @@ public static partial class Win32
 
 	public enum WindowMessage : uint
 	{
+		CREATE = 1,
 		MOVE = 3,
 		SIZE = 5,
 		PAINT = 15,
@@ -271,10 +312,16 @@ public static partial class Win32
 		ERASEBKGND = 20,
 		SHOWWINDOW = 24,
 		SETCURSOR = 32,
+		GETMINMAXINFO = 36,
 		WINDOWPOSCHANGING = 70,
+		WINDOWPOSCHANGED = 71,
+		STYLECHANGING = 124,
+		STYLECHANGED = 125,
 		SETICON = 128,
+		NCCREATE = 129,
 		NCCALCSIZE = 131,
 		NCHITTEST = 132,
+		NCPAINT = 133,
 		SYNCPAINT = 136,
 		NCLBUTTONUP = 162,
 		INPUT_DEVICE_CHANGE = 254,
@@ -300,9 +347,41 @@ public static partial class Win32
 		XBUTTONUP = 524,
 		XBUTTONDBLCLK = 525,
 		DROPFILES = 563,
+		DWMNCRENDERINGCHANGED = 799,
 
 		// Azalea Defined Messages
 		AZ_TRAYICON = 1025
+	}
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-windowplacement">Official Documentation</see></summary>
+	[StructLayout(LayoutKind.Sequential)]
+	public struct WINDOWPLACEMENT
+	{
+		public readonly uint length = (uint)Marshal.SizeOf<WINDOWPLACEMENT>();
+		public uint flags;
+		public ShowWindowCommand showCmd;
+		public POINT ptMinPosition;
+		public POINT ptMaxPosition;
+		public RECT rcNormalPosition;
+		public RECT rcDevice;
+
+		public WINDOWPLACEMENT()
+		{
+
+		}
+	}
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-windowpos">Official Documentation</see></summary>
+	[StructLayout(LayoutKind.Sequential)]
+	public readonly struct WINDOWPOS
+	{
+		public readonly nint hwnd;
+		public readonly nint hwndInsertAfter;
+		public readonly int x;
+		public readonly int y;
+		public readonly int cx;
+		public readonly int cy;
+		public readonly SetWindowPosFlags flags;
 	}
 
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/winmsg/window-styles">Official Documentation</see></summary>

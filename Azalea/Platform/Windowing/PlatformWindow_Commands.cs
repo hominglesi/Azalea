@@ -20,6 +20,9 @@ internal partial class CenterCommand : WindowCommand { }
 internal partial class FocusCommand : WindowCommand { }
 
 [ThreadCommand]
+internal partial class FullscreenCommand : WindowCommand { }
+
+[ThreadCommand]
 internal partial class HideCommand : WindowCommand { }
 
 [ThreadCommand]

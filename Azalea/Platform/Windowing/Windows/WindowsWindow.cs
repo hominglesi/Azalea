@@ -81,6 +81,9 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 		}
 	}
 
+	private Win32.WINDOWPLACEMENT _preFullscreenPlacement = new();
+	private bool _fullscreen = false;
+
 	protected override void HandleCommandLogic(WindowCommand command)
 	{
 		switch (command)
@@ -100,10 +103,42 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 				Win32.SetForegroundWindow(Handle);
 				Win32.SetFocus(Handle);
 				break;
+			case FullscreenCommand:
+				if (_fullscreen)
+				{
+					Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOWNORMAL);
+					return;
+				}
+
+				// We show the window as maximized:
+				// 1. In case the window was minimized
+				// 2. To get the resize animation of going fullscreen
+				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOWMAXIMIZED);
+
+				Win32.GetWindowPlacement(Handle, ref _preFullscreenPlacement);
+
+				var fullscreenStyles = _windowStyles & ~(Win32.WindowStyles.CAPTION |
+					Win32.WindowStyles.THICKFRAME | Win32.WindowStyles.MINIMIZEBOX |
+					Win32.WindowStyles.MAXIMIZEBOX | Win32.WindowStyles.SYSMENU);
+
+				Win32.SetWindowLongPtrW(Handle, Win32.WindowLongValue.Style, (nint)fullscreenStyles);
+
+				monitor = Win32.MonitorFromWindow(Handle, Win32.MonitorFromWindowFlags.DEFAULTTONEAREST);
+				monitorInfo = new Win32.MonitorInfo();
+				Win32.GetMonitorInfoW(monitor, ref monitorInfo);
+				var monitorSize = monitorInfo.rcMonitor;
+
+				Win32.SetWindowPos(Handle, nint.Zero, monitorSize.X, monitorSize.Y,
+					monitorSize.Width, monitorSize.Height, Win32.SetWindowPosFlags.FRAMECHANGED);
+
+				_fullscreen = true;
+				break;
 			case HideCommand:
 				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.HIDE);
 				break;
 			case MaximizeCommand:
+				if (_fullscreen) exitFullscreen();
+
 				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOWMAXIMIZED);
 				break;
 			case MinimizeCommand:
@@ -113,6 +148,8 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 				Win32.FlashWindow(Handle, true);
 				break;
 			case RestoreCommand:
+				if (_fullscreen) exitFullscreen();
+
 				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOWNORMAL);
 				break;
 			case SetClientPositionCommand(var clientPosition):
@@ -161,22 +198,50 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 		}
 
 		command.Return();
+
+		void exitFullscreen()
+		{
+			Win32.SetWindowLongPtrW(Handle, Win32.WindowLongValue.Style, (nint)_windowStyles);
+			Win32.SetWindowPlacement(Handle, in _preFullscreenPlacement);
+			Win32.SetWindowPos(Handle, nint.Zero, 0, 0, 0, 0,
+				Win32.SetWindowPosFlags.NOMOVE | Win32.SetWindowPosFlags.NOSIZE |
+				Win32.SetWindowPosFlags.NOZORDER | Win32.SetWindowPosFlags.NOOWNERZORDER |
+				Win32.SetWindowPosFlags.FRAMECHANGED);
+
+			_fullscreen = false;
+		}
 	}
 
 	private nint windowProcedure(nint hWnd, uint uMsg, nint wParam, nint lParam)
 	{
 		switch ((Win32.WindowMessage)uMsg)
 		{
+			case Win32.WindowMessage.WINDOWPOSCHANGED:
+				var windosPos = Marshal.PtrToStructure<Win32.WINDOWPOS>(lParam);
+				var clientPosition = new Win32.POINT();
+
+				Win32.GetClientRect(Handle, out var rect);
+				Win32.ClientToScreen(Handle, ref clientPosition);
+
+				Size.Value = new Vector2Int(windosPos.cx, windosPos.cy);
+				ClientSize.Value = new Vector2Int(rect.Width, rect.Height);
+
+				Position.Value = new Vector2Int(windosPos.x, windosPos.y);
+				ClientPosition.Value = new Vector2Int(clientPosition.x, clientPosition.y);
+
+				return 0;
 			case Win32.WindowMessage.MOVE:
-				Win32.GetWindowRect(Handle, out var rect);
-				Position.Value = new Vector2Int(rect.X, rect.Y);
+				// WM_WINDOWPOSCHANGED handles position changes but
+				// it can miss when client position is changed.
+
 				ClientPosition.Value = BitwiseUtils.SplitValue(lParam);
-				break;
+				return 0;
 			case Win32.WindowMessage.SIZE:
-				Win32.GetWindowRect(Handle, out rect);
-				Size.Value = new Vector2Int(rect.Width, rect.Height);
+				// WM_WINDOWPOSCHANGED handles size changes but
+				// it can miss when client size is changed.
+
 				ClientSize.Value = BitwiseUtils.SplitValue(lParam);
-				break;
+				return 0;
 			case Win32.WindowMessage.SHOWWINDOW:
 				Shown.Value = wParam != nint.Zero;
 				break;

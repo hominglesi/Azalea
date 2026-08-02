@@ -403,7 +403,7 @@ internal class Win32Window : PlatformWindow
 	{
 		var monitor = getCurrentMonitorInfo().rcMonitor;
 		var newStyle = getCurrentStyle() & ~(Win32.WindowStyles.CAPTION | Win32.WindowStyles.SIZEBOX);
-		WinAPI.SetWindowStyle(Handle, newStyle);
+		Win32.SetWindowLongPtrW(Handle, Win32.WindowLongValue.Style, (nint)newStyle);
 		Win32.SetWindowPos(Handle, IntPtr.Zero, monitor.X, monitor.Y, monitor.Width, monitor.Height,
 			Win32.SetWindowPosFlags.NOZORDER | Win32.SetWindowPosFlags.NOACTIVATE | Win32.SetWindowPosFlags.FRAMECHANGED);
 	}
@@ -411,7 +411,7 @@ internal class Win32Window : PlatformWindow
 	protected override void RestoreFullscreenImplementation(Vector2Int lastPosition, Vector2Int lastSize)
 	{
 		var newStyle = getCurrentStyle() | Win32.WindowStyles.CAPTION | Win32.WindowStyles.SIZEBOX;
-		WinAPI.SetWindowStyle(Handle, newStyle);
+		Win32.SetWindowLongPtrW(Handle, Win32.WindowLongValue.Style, (nint)newStyle);
 		Win32.SetWindowPos(Handle, IntPtr.Zero, lastPosition.X, lastPosition.Y, lastSize.X, lastSize.Y,
 			Win32.SetWindowPosFlags.NOZORDER | Win32.SetWindowPosFlags.NOACTIVATE | Win32.SetWindowPosFlags.FRAMECHANGED);
 	}
@@ -427,7 +427,7 @@ internal class Win32Window : PlatformWindow
 		else
 			newStyle &= ~(Win32.WindowStyles.SIZEBOX | Win32.WindowStyles.MAXIMIZEBOX);
 
-		WinAPI.SetWindowStyle(Handle, newStyle);
+		Win32.SetWindowLongPtrW(Handle, Win32.WindowLongValue.Style, (nint)newStyle);
 	}
 
 	protected override void SetVSyncImplementation(bool enabled)
@@ -528,8 +528,8 @@ internal class Win32Window : PlatformWindow
 
 	#endregion
 
-	private Win32.WindowStyles getCurrentStyle() => (Win32.WindowStyles)WinAPI.GetWindowLong(Handle, (int)WindowLongValue.Style);
-	private Win32.WindowStylesExtended getCurrentStyleEx() => (Win32.WindowStylesExtended)WinAPI.GetWindowLong(Handle, (int)WindowLongValue.ExStyle);
+	private Win32.WindowStyles getCurrentStyle() => (Win32.WindowStyles)WinAPI.GetWindowLong(Handle, (int)Win32.WindowLongValue.Style);
+	private Win32.WindowStylesExtended getCurrentStyleEx() => (Win32.WindowStylesExtended)WinAPI.GetWindowLong(Handle, (int)Win32.WindowLongValue.ExStyle);
 	private IntPtr getCurrentMonitor() => Win32.MonitorFromWindow(Handle, Win32.MonitorFromWindowFlags.DEFAULTTONEAREST);
 	private Win32.MonitorInfo getCurrentMonitorInfo()
 	{
