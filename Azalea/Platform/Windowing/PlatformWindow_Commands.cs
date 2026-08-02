@@ -1,4 +1,5 @@
-﻿using Azalea.Threading;
+﻿using Azalea.Graphics;
+using Azalea.Threading;
 
 namespace Azalea.Platform.Windowing;
 
@@ -13,6 +14,12 @@ public abstract class WindowCommand : ThreadCommand
 }
 
 [ThreadCommand]
+internal partial class CenterCommand : WindowCommand { }
+
+[ThreadCommand]
+internal partial class FocusCommand : WindowCommand { }
+
+[ThreadCommand]
 internal partial class HideCommand : WindowCommand { }
 
 [ThreadCommand]
@@ -22,7 +29,46 @@ internal partial class MaximizeCommand : WindowCommand { }
 internal partial class MinimizeCommand : WindowCommand { }
 
 [ThreadCommand]
+internal partial class RequestAttentionCommand : WindowCommand { }
+
+[ThreadCommand]
 internal partial class RestoreCommand : WindowCommand { }
+
+[ThreadCommand]
+internal partial class SetClientPositionCommand : WindowCommand
+{
+	public Vector2Int ClientPosition;
+}
+
+[ThreadCommand]
+internal partial class SetClientSizeCommand : WindowCommand
+{
+	public Vector2Int ClientSize;
+}
+
+[ThreadCommand]
+internal partial class SetCursorVisibleCommand : WindowCommand
+{
+	public bool IsVisible;
+}
+
+[ThreadCommand]
+internal partial class SetIconCommand : WindowCommand
+{
+	public Image? Image;
+}
+
+[ThreadCommand]
+internal partial class SetPositionCommand : WindowCommand
+{
+	public Vector2Int Position;
+}
+
+[ThreadCommand]
+internal partial class SetSizeCommand : WindowCommand
+{
+	public Vector2Int Size;
+}
 
 [ThreadCommand]
 internal partial class SetTitleCommand : WindowCommand

@@ -1,5 +1,4 @@
-﻿using Azalea.Graphics;
-using Azalea.Native.Windows;
+﻿using Azalea.Native.Windows;
 using Azalea.Numerics;
 using Azalea.Platform.Windows.Com;
 using Azalea.Platform.Windows.Enums;
@@ -20,26 +19,11 @@ internal static partial class WinAPI
 	private const string Shell32Path = "shell32.dll";
 	private const string User32Path = "user32.dll";
 
-	[DllImport(User32Path, EntryPoint = "BringWindowToTop")]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	public static extern bool BringWindowToTop(IntPtr window);
-
 	[DllImport(User32Path, EntryPoint = "CloseClipboard")]
 	public static extern bool CloseClipboard();
 
 	[DllImport(Kernel32Path, EntryPoint = "RtlCopyMemory")]
 	public static extern void CopyMemory(IntPtr destination, IntPtr source, uint length);
-
-	[DllImport(Gdi32Path, EntryPoint = "CreateBitmap")]
-	public static extern IntPtr CreateBitmap(
-		int width,
-		int height,
-		uint planes,
-		uint bitCount,
-		ref byte data);
-
-	[DllImport(Gdi32Path, EntryPoint = "CreateCompatibleBitmap")]
-	public static extern IntPtr CreateCompatibleBitmap(IntPtr deviceContext, int width, int height);
 
 	[DllImport(Kernel32Path, EntryPoint = "CreateFileW")]
 	public static extern SafeFileHandle CreateFile(
@@ -50,54 +34,6 @@ internal static partial class WinAPI
 		[MarshalAs(UnmanagedType.U4)] CreationDisposition creationDisposition,
 		[MarshalAs(UnmanagedType.U4)] FileFlagAttributes flagsAndAttributes,
 		IntPtr templateFile);
-
-	public static IntPtr CreateIconFromImage(IntPtr deviceContext, Image image)
-	{
-		//Windows expects BGRA pixels so we have to swap them
-		var swappedBuffer = new byte[image.Data.Length];
-
-		for (int i = 0; i < image.Data.Length; i += 4)
-		{
-			swappedBuffer[i] = image.Data[i + 2];
-			swappedBuffer[i + 1] = image.Data[i + 1];
-			swappedBuffer[i + 2] = image.Data[i];
-			swappedBuffer[i + 3] = image.Data[i + 3];
-		}
-
-		IntPtr color = CreateBitmap(image.Width, image.Height, 1, 32, ref swappedBuffer[0]);
-		if (color == IntPtr.Zero)
-		{
-			Console.WriteLine("Failed to create bitmap");
-			return IntPtr.Zero;
-		}
-
-		IntPtr mask = CreateCompatibleBitmap(deviceContext, image.Width, image.Height);
-		if (mask == IntPtr.Zero)
-		{
-			Console.WriteLine("Failed to create mask");
-			DeleteObject(color);
-			return IntPtr.Zero;
-		}
-
-		var iconInfo = new IconInfo(true, mask, color);
-
-		var hIcon = CreateIconIndirect(ref iconInfo);
-		if (mask == IntPtr.Zero)
-		{
-			Console.WriteLine("Failed to create icon");
-		}
-		DeleteObject(color);
-		DeleteObject(mask);
-
-		return hIcon;
-	}
-
-	[DllImport(User32Path, EntryPoint = "CreateIconIndirect")]
-	public static extern IntPtr CreateIconIndirect(ref IconInfo info);
-
-	[DllImport(Gdi32Path, EntryPoint = "DeleteObject")]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	public static extern bool DeleteObject(IntPtr obj);
 
 	[DllImport(User32Path, EntryPoint = "DestroyWindow")]
 	public static extern bool DestroyWindow(IntPtr window);
@@ -111,10 +47,6 @@ internal static partial class WinAPI
 	[DllImport(User32Path, EntryPoint = "EnableWindow")]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static extern bool EnableWindow(IntPtr window, bool enable);
-
-	[DllImport(User32Path, EntryPoint = "FlashWindow")]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	public static extern bool FlashWindow(IntPtr window, bool invert);
 
 	[DllImport(User32Path, EntryPoint = "GetClassLongPtrW", CharSet = CharSet.Unicode)]
 	public static extern IntPtr GetClassLongPtr(IntPtr window, ClassLongValue index);
@@ -141,18 +73,6 @@ internal static partial class WinAPI
 	[DllImport(User32Path, EntryPoint = "GetMessageW", CharSet = CharSet.Unicode)]
 	private static extern sbyte getMessage(out Win32.MSG message, IntPtr window, uint wMsgFilterMin, uint wMsgFilterMax);
 	public static sbyte GetMessage(out Win32.MSG message, IntPtr window) => getMessage(out message, window, 0, 0);
-
-	[DllImport(User32Path, EntryPoint = "GetMonitorInfoW", CharSet = CharSet.Unicode)]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	private static extern bool getMonitorInfo(IntPtr monitor, ref MonitorInfo info);
-	public static MonitorInfo GetMonitorInfo(IntPtr monitor)
-	{
-		var info = new MonitorInfo();
-		if (getMonitorInfo(monitor, ref info) == false)
-			Console.WriteLine("GetMonitorInfo failed");
-
-		return info;
-	}
 
 	[DllImport(User32Path, EntryPoint = "GetRawInputData")]
 	public static extern uint GetRawInputData(IntPtr rawInput, RawInputCommand command, IntPtr data, ref uint dataSize, uint headerSize);
@@ -188,9 +108,6 @@ internal static partial class WinAPI
 	[DllImport(User32Path, EntryPoint = "LoadCursorW", CharSet = CharSet.Unicode)]
 	public static extern IntPtr LoadCursor(IntPtr instance, uint cursorValue);
 
-	[DllImport(User32Path, EntryPoint = "MonitorFromWindow")]
-	public static extern IntPtr MonitorFromWindow(IntPtr window, MonitorFromFlags flags);
-
 	[DllImport(Ole32Path, EntryPoint = "OleInitialize")]
 	public static extern uint OleInitialize(nint reserved);
 
@@ -224,44 +141,20 @@ internal static partial class WinAPI
 	[DllImport(User32Path, EntryPoint = "ScreenToClient")]
 	public static extern bool ScreenToClient(IntPtr window, ref Vector2Int point);
 
-	[DllImport(User32Path, EntryPoint = "SendMessage")]
-	public static extern IntPtr SendMessage(IntPtr window, Win32.WindowMessage message, IntPtr wParam, IntPtr lParam);
-
 	[DllImport(User32Path, EntryPoint = "SetCapture")]
 	public static extern IntPtr SetCapture(IntPtr window);
 
 	[DllImport(User32Path, EntryPoint = "SetClipboardData")]
 	public static extern IntPtr SetClipboardData(uint format, IntPtr memoryObject);
 
-	[DllImport(User32Path, EntryPoint = "SetFocus")]
-	public static extern IntPtr SetFocus(IntPtr window);
-
-	[DllImport(User32Path, EntryPoint = "SetForegroundWindow")]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	public static extern bool SetForegroundWindow(IntPtr window);
-
 	[DllImport(User32Path, EntryPoint = "SetWindowLongW", CharSet = CharSet.Unicode)]
 	public static extern uint SetWindowLong(IntPtr window, WindowLongValue index, uint newValue);
-
-	[DllImport(User32Path, EntryPoint = "SetWindowPos")]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	public static extern bool SetWindowPos(
-		IntPtr window,
-		IntPtr insertAfter,
-		int x,
-		int y,
-		int width,
-		int height,
-		SetWindowPosFlags flags);
 
 	public static void SetWindowStyle(IntPtr window, Win32.WindowStyles style)
 	{
 		if (SetWindowLong(window, WindowLongValue.Style, (uint)style) == 0)
 			Console.WriteLine("Couldn't set window style");
 	}
-
-	[DllImport(User32Path, EntryPoint = "ShowCursor")]
-	public static extern int ShowCursor(bool show);
 
 	[DllImport(User32Path, EntryPoint = "SystemParametersInfoW", CharSet = CharSet.Unicode)]
 	private static extern bool systemParametersInfoRect(

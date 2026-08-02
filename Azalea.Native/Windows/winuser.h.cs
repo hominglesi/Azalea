@@ -14,6 +14,56 @@ public static partial class Win32
 		[MarshalAs(UnmanagedType.Bool)] bool bMenu,
 		WindowStylesExtended dwExStyle);
 
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-bringwindowtotop">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool BringWindowToTop(nint hWnd);
+
+	/// <summary> Helper method to simplify creating icons. </summary>
+	public static IntPtr CreateIconFromPixelArray(IntPtr deviceContext, int width, int height, byte[] data)
+	{
+		//Windows expects BGRA pixels so we have to swap them
+		var swappedBuffer = new byte[data.Length];
+
+		for (int i = 0; i < data.Length; i += 4)
+		{
+			swappedBuffer[i] = data[i + 2];
+			swappedBuffer[i + 1] = data[i + 1];
+			swappedBuffer[i + 2] = data[i];
+			swappedBuffer[i + 3] = data[i + 3];
+		}
+
+		nint color = CreateBitmap(width, height, 1, 32, ref swappedBuffer[0]);
+		if (color == nint.Zero)
+		{
+			Console.WriteLine("Failed to create bitmap");
+			return nint.Zero;
+		}
+
+		nint mask = CreateCompatibleBitmap(deviceContext, width, height);
+		if (mask == nint.Zero)
+		{
+			Console.WriteLine("Failed to create mask");
+			DeleteObject(color);
+			return nint.Zero;
+		}
+
+		var iconInfo = new ICONINFO(mask, color);
+
+		var hIcon = CreateIconIndirect(ref iconInfo);
+		if (mask == nint.Zero)
+			Console.WriteLine("Failed to create icon");
+
+		DeleteObject(color);
+		DeleteObject(mask);
+
+		return hIcon;
+	}
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createiconindirect">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	public static partial nint CreateIconIndirect(ref ICONINFO piconinfo);
+
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw">Official Documentation</see></summary>
 	[DllImport(User32Path, CharSet = CharSet.Unicode, EntryPoint = "CreateWindowExW", SetLastError = true)]
 	public static extern nint CreateWindowExWDLL(
@@ -54,13 +104,70 @@ public static partial class Win32
 	[LibraryImport(User32Path)]
 	public static partial nint DispatchMessageW(in MSG message);
 
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-flashwindow">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool FlashWindow(nint hWnd, [MarshalAs(UnmanagedType.Bool)] bool bInvert);
+
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdc">Official Documentation</see></summary>
 	[LibraryImport(User32Path)]
 	public static partial nint GetDC(nint hWnd);
 
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getmonitorinfow">Official Documentation</see></summary>
+	[LibraryImport(User32Path, EntryPoint = "GetMonitorInfoW", StringMarshalling = StringMarshalling.Utf16)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool GetMonitorInfoW(IntPtr monitor, ref MonitorInfo info);
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowrect">Official Documentation</see></summary>
 	[LibraryImport(User32Path)]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	public static partial bool GetWindowRect(nint window, out RECT rect);
+	public static partial bool GetWindowRect(nint hWnd, out RECT lpRect);
+
+	[StructLayout(LayoutKind.Sequential)]
+	public readonly struct ICONINFO
+	{
+		// We have to use int instead of bool since C# doesn't want to marshal bool
+		private readonly int fIcon = 1;
+		public readonly uint xHotspot = 0;
+		public readonly uint yHotspot = 0;
+		public readonly nint hbmMask;
+		public readonly nint hbmColor;
+
+		public ICONINFO(nint mask, nint color)
+		{
+			hbmMask = mask;
+			hbmColor = color;
+		}
+	}
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-monitorfromwindow">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	public static partial nint MonitorFromWindow(nint hwnd, MonitorFromWindowFlags dwFlags);
+
+	[Flags]
+	public enum MonitorFromWindowFlags : uint
+	{
+		DEFAULTTONULL = 0x00000000,
+		DEFAULTTOPRIMARY = 0x00000001,
+		DEFAULTTONEAREST = 0x00000002,
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	public readonly struct MonitorInfo
+	{
+		private readonly uint cbSize;
+		public readonly RECT rcMonitor;
+		public readonly RECT rcWork;
+		public readonly uint dwFlags;
+
+		public MonitorInfo()
+		{
+			cbSize = (uint)Marshal.SizeOf<MonitorInfo>();
+			rcMonitor = new RECT();
+			rcWork = new RECT();
+			dwFlags = 0;
+		}
+	}
 
 	[StructLayout(LayoutKind.Sequential, Pack = 8)]
 	public struct MSG
@@ -81,10 +188,53 @@ public static partial class Win32
 	[LibraryImport(User32Path)]
 	public static partial ushort RegisterClassExW(ref WNDCLASSEXW windowClass);
 
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-sendmessage">Official Documentation</see></summary>
+	[LibraryImport(User32Path, StringMarshalling = StringMarshalling.Utf16)]
+	public static partial nint SendMessageW(nint window, WindowMessage message, nint wParam, nint lParam);
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setfocus">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	public static partial nint SetFocus(nint hWnd);
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setforegroundwindow">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool SetForegroundWindow(nint window);
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowpos">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int X,
+		int Y, int cx, int cy, SetWindowPosFlags uFlags);
+
+	[Flags]
+	public enum SetWindowPosFlags : uint
+	{
+		ASYNCWINDOWPOS = 0x4000,
+		DEFERERASE = 0x2000,
+		DRAWFRAME = 0x0020,
+		FRAMECHANGED = DRAWFRAME,
+		HIDEWINDOW = 0x0080,
+		NOACTIVATE = 0x0010,
+		NOCOPYBITS = 0x0100,
+		NOMOVE = 0x0002,
+		NOOWNERZORDER = 0x0200,
+		NOREDRAW = 0x0008,
+		NOREPOSITION = 0x0200,
+		NOSENDCHANGING = 0x0400,
+		NOSIZE = 0x0001,
+		NOZORDER = 0x0004,
+		SHOWWINDOW = 0x0040
+	}
+
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowtextw">Official Documentation</see></summary>
 	[LibraryImport(User32Path, StringMarshalling = StringMarshalling.Utf16)]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static partial bool SetWindowTextW(nint hWnd, string lpString);
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showcursor">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	public static partial int ShowCursor([MarshalAs(UnmanagedType.Bool)] bool show);
 
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showwindow">Official Documentation</see></summary>
 	[LibraryImport(User32Path)]

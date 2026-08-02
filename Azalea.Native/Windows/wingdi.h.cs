@@ -10,9 +10,23 @@ public static partial class Win32
 	[LibraryImport(Gdi32Path)]
 	public static partial int ChoosePixelFormat(nint hdc, in PIXELFORMATDESCRIPTOR descriptor);
 
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createbitmap">Official Documentation</see></summary>
+	[LibraryImport(Gdi32Path)]
+	public static partial nint CreateBitmap(int nWidth, int nHeight,
+		uint nPlanes, uint nBitCount, ref byte lpBits);
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createcompatiblebitmap">Official Documentation</see></summary>
+	[LibraryImport(Gdi32Path)]
+	public static partial nint CreateCompatibleBitmap(nint hdc, int cx, int cy);
+
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createsolidbrush">Official Documentation</see></summary>
 	[LibraryImport(Gdi32Path)]
 	public static partial nint CreateSolidBrush(uint colorRef);
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteobject">Official Documentation</see></summary>
+	[LibraryImport(Gdi32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool DeleteObject(nint ho);
 
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-describepixelformat">Official Documentation</see></summary>
 	[LibraryImport(Gdi32Path)]

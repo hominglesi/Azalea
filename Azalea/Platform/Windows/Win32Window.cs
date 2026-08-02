@@ -199,7 +199,7 @@ internal class Win32Window : PlatformWindow
 				var clientSize = BitwiseUtils.SplitValue(lParam);
 				UpdateSize(windowSize, clientSize);
 
-				var monitor = getCurrentMonitorInfo().Monitor;
+				var monitor = getCurrentMonitorInfo().rcMonitor;
 				var monitorSize = new Vector2Int(monitor.Width, monitor.Height);
 				var resizeReason = (ResizeReason)wParam;
 				if (monitorSize == windowSize && (getCurrentStyle() & Win32.WindowStyles.CAPTION) == 0)
@@ -371,23 +371,23 @@ internal class Win32Window : PlatformWindow
 	#region Implementations
 
 	protected override void SetSizeImplementation(Vector2Int size)
-		=> WinAPI.SetWindowPos(Handle, IntPtr.Zero, 0, 0, size.X, size.Y, SetWindowPosFlags.NoMove);
+		=> Win32.SetWindowPos(Handle, IntPtr.Zero, 0, 0, size.X, size.Y, Win32.SetWindowPosFlags.NOMOVE);
 
 	protected override void SetClientSizeImplementation(Vector2Int clientSize)
 	{
 		var newSize = new Win32.RECT(0, 0, clientSize.X, clientSize.Y);
 		Win32.AdjustWindowRectEx(ref newSize, getCurrentStyle(), false, getCurrentStyleEx());
-		WinAPI.SetWindowPos(Handle, IntPtr.Zero, 0, 0, newSize.Width, newSize.Height, SetWindowPosFlags.NoMove);
+		Win32.SetWindowPos(Handle, IntPtr.Zero, 0, 0, newSize.Width, newSize.Height, Win32.SetWindowPosFlags.NOMOVE);
 	}
 
 	protected override void SetPositionImplementation(Vector2Int position)
-		=> WinAPI.SetWindowPos(Handle, IntPtr.Zero, position.X, position.Y, 0, 0, SetWindowPosFlags.NoSize);
+		=> Win32.SetWindowPos(Handle, IntPtr.Zero, position.X, position.Y, 0, 0, Win32.SetWindowPosFlags.NOSIZE);
 
 	protected override void SetClientPositionImplementation(Vector2Int clientPosition)
 	{
 		var newPosition = new Win32.RECT(clientPosition.X, clientPosition.Y, 0, 0);
 		Win32.AdjustWindowRectEx(ref newPosition, getCurrentStyle(), false, getCurrentStyleEx());
-		WinAPI.SetWindowPos(Handle, IntPtr.Zero, newPosition.X, newPosition.Y, 0, 0, SetWindowPosFlags.NoSize);
+		Win32.SetWindowPos(Handle, IntPtr.Zero, newPosition.X, newPosition.Y, 0, 0, Win32.SetWindowPosFlags.NOSIZE);
 	}
 
 	protected override void MinimizeImplementation()
@@ -401,19 +401,19 @@ internal class Win32Window : PlatformWindow
 
 	protected override void FullscreenImplementation()
 	{
-		var monitor = getCurrentMonitorInfo().Monitor;
+		var monitor = getCurrentMonitorInfo().rcMonitor;
 		var newStyle = getCurrentStyle() & ~(Win32.WindowStyles.CAPTION | Win32.WindowStyles.SIZEBOX);
 		WinAPI.SetWindowStyle(Handle, newStyle);
-		WinAPI.SetWindowPos(Handle, IntPtr.Zero, monitor.X, monitor.Y, monitor.Width, monitor.Height,
-			SetWindowPosFlags.NoZOrder | SetWindowPosFlags.NoActivate | SetWindowPosFlags.FrameChanged);
+		Win32.SetWindowPos(Handle, IntPtr.Zero, monitor.X, monitor.Y, monitor.Width, monitor.Height,
+			Win32.SetWindowPosFlags.NOZORDER | Win32.SetWindowPosFlags.NOACTIVATE | Win32.SetWindowPosFlags.FRAMECHANGED);
 	}
 
 	protected override void RestoreFullscreenImplementation(Vector2Int lastPosition, Vector2Int lastSize)
 	{
 		var newStyle = getCurrentStyle() | Win32.WindowStyles.CAPTION | Win32.WindowStyles.SIZEBOX;
 		WinAPI.SetWindowStyle(Handle, newStyle);
-		WinAPI.SetWindowPos(Handle, IntPtr.Zero, lastPosition.X, lastPosition.Y, lastSize.X, lastSize.Y,
-			SetWindowPosFlags.NoZOrder | SetWindowPosFlags.NoActivate | SetWindowPosFlags.FrameChanged);
+		Win32.SetWindowPos(Handle, IntPtr.Zero, lastPosition.X, lastPosition.Y, lastSize.X, lastSize.Y,
+			Win32.SetWindowPosFlags.NOZORDER | Win32.SetWindowPosFlags.NOACTIVATE | Win32.SetWindowPosFlags.FRAMECHANGED);
 	}
 
 	protected override void SetTitleImplementation(string title)
@@ -447,37 +447,37 @@ internal class Win32Window : PlatformWindow
 		return changed;
 	}
 
-	protected override void SetCursorVisible(bool show) => WinAPI.ShowCursor(show);
+	protected override void SetCursorVisible(bool show) => Win32.ShowCursor(show);
 
 	public override void Center()
 	{
-		var workArea = getCurrentMonitorInfo().WorkArea;
+		var workArea = getCurrentMonitorInfo().rcWork;
 		Position = new Vector2Int(workArea.X, workArea.Y)
 			+ (new Vector2Int(workArea.Width, workArea.Height) / 2 - Size / 2);
 	}
 
 	public override void Focus()
 	{
-		WinAPI.BringWindowToTop(Handle);
-		WinAPI.SetForegroundWindow(Handle);
-		WinAPI.SetFocus(Handle);
+		Win32.BringWindowToTop(Handle);
+		Win32.SetForegroundWindow(Handle);
+		Win32.SetFocus(Handle);
 	}
 
 	public override void RequestAttention()
-		=> WinAPI.FlashWindow(Handle, true);
+		=> Win32.FlashWindow(Handle, true);
 
 	protected override void SetIconImplementation(Image? data)
 	{
 		IntPtr icon = IntPtr.Zero;
 
 		if (data is not null)
-			icon = WinAPI.CreateIconFromImage(DeviceContext, data);
+			icon = Win32.CreateIconFromPixelArray(DeviceContext, data.Width, data.Height, data.Data);
 
-		WinAPI.SendMessage(Handle, Win32.WindowMessage.SETICON, IntPtr.Zero, icon);
-		WinAPI.SendMessage(Handle, Win32.WindowMessage.SETICON, IntPtr.Zero + 1, icon);
+		Win32.SendMessageW(Handle, Win32.WindowMessage.SETICON, IntPtr.Zero, icon);
+		Win32.SendMessageW(Handle, Win32.WindowMessage.SETICON, IntPtr.Zero + 1, icon);
 
 		if (icon != IntPtr.Zero)
-			WinAPI.DeleteObject(icon);
+			Win32.DeleteObject(icon);
 	}
 
 	public override void SwapBuffers()
@@ -530,8 +530,13 @@ internal class Win32Window : PlatformWindow
 
 	private Win32.WindowStyles getCurrentStyle() => (Win32.WindowStyles)WinAPI.GetWindowLong(Handle, (int)WindowLongValue.Style);
 	private Win32.WindowStylesExtended getCurrentStyleEx() => (Win32.WindowStylesExtended)WinAPI.GetWindowLong(Handle, (int)WindowLongValue.ExStyle);
-	private IntPtr getCurrentMonitor() => WinAPI.MonitorFromWindow(Handle, MonitorFromFlags.DefaultToNearest);
-	private MonitorInfo getCurrentMonitorInfo() => WinAPI.GetMonitorInfo(getCurrentMonitor());
+	private IntPtr getCurrentMonitor() => Win32.MonitorFromWindow(Handle, Win32.MonitorFromWindowFlags.DEFAULTTONEAREST);
+	private Win32.MonitorInfo getCurrentMonitorInfo()
+	{
+		var info = new Win32.MonitorInfo();
+		Win32.GetMonitorInfoW(getCurrentMonitor(), ref info);
+		return info;
+	}
 
 	protected override void OnDispose()
 	{

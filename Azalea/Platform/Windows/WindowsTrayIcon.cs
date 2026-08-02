@@ -22,7 +22,7 @@ internal unsafe partial class WindowsTrayIcon : ITrayIcon
 		Handle = _nextID++;
 		_owningWindow = window;
 
-		IntPtr iconHandle = WinAPI.CreateIconFromImage(window.DeviceContext, icon);
+		IntPtr iconHandle = Win32.CreateIconFromPixelArray(window.DeviceContext, icon.Width, icon.Height, icon.Data);
 
 		const uint NIF_MESSAGE = 0x01, NIF_ICON = 0x02, NIF_TIP = 0x04;
 

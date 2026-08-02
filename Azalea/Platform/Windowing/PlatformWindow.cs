@@ -18,6 +18,7 @@ public abstract class PlatformWindow : ICommandHandler<WindowCommand>
 		ClientPosition = new(new Vector2Int(100, 100));
 		Size = new(clientSize);
 		ClientSize = new(clientSize);
+		CursorVisible = new(true);
 
 		Thread = new WindowThread(this);
 		Thread.Start();
@@ -38,7 +39,7 @@ public abstract class PlatformWindow : ICommandHandler<WindowCommand>
 	public ReadOnlyObservable<Vector2Int> ClientPosition { get; }
 	public ReadOnlyObservable<Vector2Int> Size { get; }
 	public ReadOnlyObservable<Vector2Int> ClientSize { get; }
-
+	public ReadOnlyObservable<bool> CursorVisible { get; }
 
 	public PlatformRenderer? SubscribedRenderer { get; private set; } = null;
 	internal void Subscribe(PlatformRenderer renderer)
