@@ -1,7 +1,6 @@
 ﻿using Azalea.Graphics;
 using Azalea.Inputs;
 using Azalea.Native.Windows;
-using Azalea.Platform.Windows.Structs;
 using System;
 using System.Runtime.InteropServices;
 
@@ -24,32 +23,29 @@ internal unsafe partial class WindowsTrayIcon : ITrayIcon
 
 		IntPtr iconHandle = Win32.CreateIconFromPixelArray(window.DeviceContext, icon.Width, icon.Height, icon.Data);
 
-		const uint NIF_MESSAGE = 0x01, NIF_ICON = 0x02, NIF_TIP = 0x04;
+		var nid = new Win32.NOTIFYICONDATAW
+		{
+			hWnd = window.Handle,
+			uID = Handle,
+			uFlags = Win32.NotifyIconFlag.MESSAGE | Win32.NotifyIconFlag.ICON | Win32.NotifyIconFlag.TIP,
+			uCallbackMessage = Win32.WindowMessage.AZ_TRAYICON,
+			hIcon = iconHandle,
+			szTip = iconName
+		};
 
-		var nid = new NOTIFYICONDATA();
-		nid.cbSize = Marshal.SizeOf(nid);
-		nid.hWnd = window.Handle;
-		nid.uID = Handle;
-		nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-		nid.uCallbackMessage = (uint)Win32.WindowMessage.AZ_TRAYICON;
-		nid.hIcon = iconHandle;
-		nid.szTip = iconName;
-
-		const uint NIM_ADD = 0x00;
-		Shell_NotifyIconW(NIM_ADD, ref nid);
+		Win32.Shell_NotifyIconW(Win32.NotifyIconMessage.ADD, ref nid);
 	}
 
 	public void Destroy()
 	{
 		_owningWindow.RemoveTrayIcon(this);
 
-		var nid = new NOTIFYICONDATA();
+		var nid = new Win32.NOTIFYICONDATAW();
 		nid.cbSize = Marshal.SizeOf(nid);
 		nid.hWnd = _owningWindow.Handle;
 		nid.uID = Handle;
 
-		const uint NIM_DELETE = 0x02;
-		Shell_NotifyIconW(NIM_DELETE, ref nid);
+		Win32.Shell_NotifyIconW(Win32.NotifyIconMessage.DELETE, ref nid);
 	}
 
 	internal void InvokeClick(MouseButton button)
@@ -57,8 +53,4 @@ internal unsafe partial class WindowsTrayIcon : ITrayIcon
 
 	internal void InvokeDoubleClick(MouseButton button)
 		=> OnDoubleClick?.Invoke(button);
-
-	[LibraryImport("shell32.dll")]
-	[return: MarshalAs(UnmanagedType.Bool)]
-	private static partial bool Shell_NotifyIconW(uint dwMessage, ref NOTIFYICONDATA data);
 }

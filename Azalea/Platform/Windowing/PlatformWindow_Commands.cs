@@ -16,6 +16,30 @@ public abstract class WindowCommand : ThreadCommand
 [ThreadCommand]
 internal partial class CenterCommand : WindowCommand { }
 
+[ThreadCommand(generateHandler: false)]
+internal partial class CreateTrayIconCommand : WindowCommand
+{
+	public TrayIcon TrayIcon;
+	public string Title;
+	public Image Icon;
+}
+
+internal static class CreateTrayIconCommand_Handler
+{
+	internal static TrayIcon CreateTrayIcon(this ICommandHandler<WindowCommand> handler, string title, Image icon)
+	{
+		var trayIcon = new TrayIcon();
+		handler.Enqueue(CreateTrayIconCommand.Borrow(trayIcon, title, icon));
+		return trayIcon;
+	}
+}
+
+[ThreadCommand()]
+internal partial class DeleteTrayIconCommand : WindowCommand
+{
+	public TrayIcon TrayIcon;
+}
+
 [ThreadCommand]
 internal partial class FocusCommand : WindowCommand { }
 

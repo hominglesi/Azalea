@@ -1,7 +1,9 @@
-﻿using Azalea.Native.Windows;
+﻿using Azalea.Inputs;
+using Azalea.Native.Windows;
 using Azalea.Platform.Windows;
 using Azalea.Utils;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -83,6 +85,8 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 
 	private Win32.WINDOWPLACEMENT _preFullscreenPlacement = new();
 	private bool _fullscreen = false;
+	private static uint _nextTrayIconId = 1;
+	private static Dictionary<uint, TrayIcon>? _trayIcons;
 
 	protected override void HandleCommandLogic(WindowCommand command)
 	{
@@ -97,6 +101,44 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 				var centerPosition = new Vector2Int(workArea.X, workArea.Y)
 					+ (new Vector2Int(workArea.Width, workArea.Height) / 2 - Size.Value / 2);
 				Win32.SetWindowPos(Handle, IntPtr.Zero, centerPosition.X, centerPosition.Y, 0, 0, Win32.SetWindowPosFlags.NOSIZE);
+				break;
+			case CreateTrayIconCommand(var trayIcon, var title, var icon):
+				nint iconHandle = Win32.CreateIconFromPixelArray(Win32.GetDC(Handle), icon.Width, icon.Height, icon.Data);
+
+				var notifyIconData = new Win32.NOTIFYICONDATAW
+				{
+					hWnd = Handle,
+					uID = _nextTrayIconId,
+					uFlags = Win32.NotifyIconFlag.MESSAGE | Win32.NotifyIconFlag.ICON | Win32.NotifyIconFlag.TIP,
+					uCallbackMessage = Win32.WindowMessage.AZ_TRAYICON,
+					hIcon = iconHandle,
+					szTip = title
+				};
+
+				Win32.Shell_NotifyIconW(Win32.NotifyIconMessage.ADD, ref notifyIconData);
+
+				trayIcon.Initialize(_nextTrayIconId);
+
+				_trayIcons ??= [];
+				_trayIcons.Add(_nextTrayIconId, trayIcon);
+				_nextTrayIconId++;
+				break;
+			case DeleteTrayIconCommand(var trayIcon):
+				if (_trayIcons is null || trayIcon.Handle.HasValue == false
+					|| _trayIcons.ContainsKey(trayIcon.Handle.Value) == false)
+					throw new Exception("Could not delete icon!");
+
+
+				_trayIcons.Remove(trayIcon.Handle.Value);
+
+				var nid = new Win32.NOTIFYICONDATAW
+				{
+					hWnd = Handle,
+					uID = trayIcon.Handle.Value
+				};
+
+				Win32.Shell_NotifyIconW(Win32.NotifyIconMessage.DELETE, ref nid);
+
 				break;
 			case FocusCommand:
 				Win32.BringWindowToTop(Handle);
@@ -167,17 +209,17 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 				CursorVisible.Value = isVisible;
 				break;
 			case SetIconCommand(var image):
-				IntPtr icon = IntPtr.Zero;
+				iconHandle = IntPtr.Zero;
 				var deviceContext = Win32.GetDC(Handle);
 
 				if (image is not null)
-					icon = Win32.CreateIconFromPixelArray(deviceContext, image.Width, image.Height, image.Data);
+					iconHandle = Win32.CreateIconFromPixelArray(deviceContext, image.Width, image.Height, image.Data);
 
-				Win32.SendMessageW(Handle, Win32.WindowMessage.SETICON, nint.Zero, icon);
-				Win32.SendMessageW(Handle, Win32.WindowMessage.SETICON, 1, icon);
+				Win32.SendMessageW(Handle, Win32.WindowMessage.SETICON, nint.Zero, iconHandle);
+				Win32.SendMessageW(Handle, Win32.WindowMessage.SETICON, 1, iconHandle);
 
-				if (icon != nint.Zero)
-					Win32.DeleteObject(icon);
+				if (iconHandle != nint.Zero)
+					Win32.DeleteObject(iconHandle);
 
 				break;
 			case SetPositionCommand(var position):
@@ -250,6 +292,35 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 				return nint.Zero;
 			case Win32.WindowMessage.ERASEBKGND:
 				return 1;
+			case Win32.WindowMessage.AZ_TRAYICON:
+				var iconId = (uint)wParam;
+				var iconEvent = BitwiseUtils.GetLowOrderValue(lParam);
+
+				if (_trayIcons is not null && _trayIcons.TryGetValue(iconId, out var icon))
+				{
+					switch ((Win32.WindowMessage)iconEvent)
+					{
+						case Win32.WindowMessage.MOUSEMOVE:
+						case Win32.WindowMessage.LBUTTONDOWN:
+						case Win32.WindowMessage.RBUTTONDOWN:
+						case Win32.WindowMessage.MBUTTONDOWN:
+							break;
+						case Win32.WindowMessage.LBUTTONUP:
+							icon.OnClick?.Invoke(MouseButton.Left);
+							break;
+						case Win32.WindowMessage.RBUTTONUP:
+							icon.OnClick?.Invoke(MouseButton.Right);
+							break;
+						case Win32.WindowMessage.MBUTTONUP:
+							icon.OnClick?.Invoke(MouseButton.Middle);
+							break;
+						case Win32.WindowMessage.LBUTTONDBLCLK:
+							icon.OnDoubleClick?.Invoke();
+							break;
+					}
+				}
+
+				return 0;
 		}
 
 		return Win32.DefWindowProcW(hWnd, uMsg, wParam, lParam);

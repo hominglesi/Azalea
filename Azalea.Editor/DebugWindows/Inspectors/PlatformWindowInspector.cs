@@ -2,6 +2,7 @@
 using Azalea.IO.Resources;
 using Azalea.Platform.Windowing;
 using Azalea.Platform.Windowing.Windows;
+using System;
 using System.Diagnostics;
 using System.Numerics;
 
@@ -48,6 +49,12 @@ internal class PlatformWindowInspector
 		guiWindow.AddButton("Request Attention", window.RequestAttention);
 		guiWindow.AddButton("Set Azalea icon", () => window.SetIcon(Assets.MainStore.GetImage("Textures/azalea-icon.png")));
 		guiWindow.AddButton("Set null icon", () => window.SetIcon(null));
+		guiWindow.AddButton("Create tray icon", () =>
+		{
+			var trayIcon = window.CreateTrayIcon("Azalea Window", Assets.MainStore.GetImage("Textures/azalea-icon.png")!);
+			trayIcon.OnClick += button => Console.WriteLine($"Tray icon recieved {button} click!");
+			trayIcon.OnDoubleClick += () => Console.WriteLine($"Tray icon revieved double click!");
+		});
 
 		// For now using a window without these doesn't make sense
 		// so we'll just assume that they are created
