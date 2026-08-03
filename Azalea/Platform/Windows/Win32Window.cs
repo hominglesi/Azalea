@@ -508,7 +508,6 @@ internal class Win32Window : PlatformWindow
 	public override void Hide()
 		=> Win32.ShowWindow(Handle, Win32.ShowWindowCommand.HIDE);
 
-	private Vector2Int _mousePosition;
 	public override void ProcessEvents()
 	{
 		while (Win32.PeekMessageW(out Win32.MSG message, Handle, 0, 0, 0x0001) != 0)
@@ -518,9 +517,9 @@ internal class Win32Window : PlatformWindow
 		}
 
 		// Update mouse position
-		WinAPI.GetCursorPos(out _mousePosition);
-		WinAPI.ScreenToClient(Handle, ref _mousePosition);
-		Input.ExecuteMousePositionChange(_mousePosition);
+		WinAPI.GetCursorPos(out var mousePosition);
+		WinAPI.ScreenToClient(Handle, ref mousePosition);
+		Input.ExecuteMousePositionChange(mousePosition);
 
 		// Update (gamepads)
 		_xInputManager.Update();

@@ -70,23 +70,7 @@ public static partial class Win32
 	public static partial nint CreateIconIndirect(ref ICONINFO piconinfo);
 
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw">Official Documentation</see></summary>
-	[DllImport(User32Path, CharSet = CharSet.Unicode, EntryPoint = "CreateWindowExW", SetLastError = true)]
-	public static extern nint CreateWindowExWDLL(
-		WindowStylesExtended dwExStyle,
-		ushort lpClassName,
-		string lpWindowName,
-		WindowStyles dwStyle,
-		int X,
-		int Y,
-		int nWidth,
-		int nHeight,
-		nint hWndParent,
-		nint hMenu,
-		nint hInstance,
-		nint lpParam);
-
-	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexw">Official Documentation</see></summary>
-	[LibraryImport(User32Path, StringMarshalling = StringMarshalling.Utf16)]
+	[LibraryImport(User32Path, StringMarshalling = StringMarshalling.Utf16, SetLastError = true)]
 	public static partial nint CreateWindowExW(
 		WindowStylesExtended dwExStyle,
 		ushort lpClassName,

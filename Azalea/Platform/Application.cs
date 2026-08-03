@@ -21,7 +21,7 @@ public sealed class Application
 
 	public Application()
 	{
-		Window = Windowing.PlatformWindow.Create(new(800, 600));
+		Window = Windowing.PlatformWindow.Create("Azalea App", new(800, 600));
 		Renderer = PlatformRenderer.AttachRenderer(Window);
 		Scheduler = PlatformScheduler.AttachScheduler(Window);
 

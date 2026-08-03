@@ -92,6 +92,12 @@ internal partial class SetPositionCommand : WindowCommand
 }
 
 [ThreadCommand]
+internal partial class SetResizableCommand : WindowCommand
+{
+	public bool Resizable;
+}
+
+[ThreadCommand]
 internal partial class SetSizeCommand : WindowCommand
 {
 	public Vector2Int Size;

@@ -8,8 +8,8 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Azalea.Platform.Windowing.Windows;
-internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
-	: PlatformWindow(clientSize, initiallyVisible)
+internal class WindowsWindow(string title, Vector2Int clientSize, bool initiallyVisible)
+	: PlatformWindow(title, clientSize, initiallyVisible)
 {
 	private static int _nextClassId = 0;
 	private Win32.WNDPROC? _windowProcedure;
@@ -24,22 +24,20 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 
 	protected override void InitializationLogic()
 	{
-		var processHandle = Process.GetCurrentProcess().Handle;
 		_windowProcedure = windowProcedure;
-
 		var classNamePtr = Marshal.StringToHGlobalUni("Azalea Window " + _nextClassId++);
-		var winProcPtr = Marshal.GetFunctionPointerForDelegate(_windowProcedure);
 
 		var wndClass = new Win32.WNDCLASSEXW
 		{
 			lpszClassName = classNamePtr,
-			hInstance = processHandle,
-			lpfnWndProc = winProcPtr,
+			hInstance = Process.GetCurrentProcess().Handle,
+			lpfnWndProc = Marshal.GetFunctionPointerForDelegate(_windowProcedure),
 			style = Win32.WNDCLASSEXW.ClassStyles.OWNDC,
 			hCursor = WinAPI.LoadCursor(nint.Zero, 32512)
 		};
 
 		ClassAtom = Win32.RegisterClassExW(ref wndClass);
+		Marshal.FreeHGlobal(classNamePtr);
 
 		_windowStyles = Win32.WindowStyles.OVERLAPPEDWINDOW;
 		if (Shown) _windowStyles |= Win32.WindowStyles.VISIBLE;
@@ -49,7 +47,7 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 		Win32.RECT windowRect = new(ClientPosition.Value.X, ClientPosition.Value.Y, ClientSize.Value.X, ClientSize.Value.Y);
 		Win32.AdjustWindowRectEx(ref windowRect, _windowStyles, false, _windowExtendedStyles);
 
-		Handle = Win32.CreateWindowExWDLL(
+		Handle = Win32.CreateWindowExW(
 			_windowExtendedStyles,
 			ClassAtom,
 			Title,
@@ -58,15 +56,13 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 			windowRect.top,
 			windowRect.Width,
 			windowRect.Height,
-			IntPtr.Zero,
-			IntPtr.Zero,
-			processHandle,
-			IntPtr.Zero);
+			nint.Zero,
+			nint.Zero,
+			Process.GetCurrentProcess().Handle,
+			nint.Zero);
 
-		if (Handle == IntPtr.Zero)
+		if (Handle == nint.Zero)
 			throw new Exception($"Could not create Window. (Error {Marshal.GetLastWin32Error()})");
-
-		Marshal.FreeHGlobal(classNamePtr);
 
 		// Set actual window position
 		Win32.GetWindowRect(Handle, out windowRect);
@@ -225,6 +221,18 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 			case SetPositionCommand(var position):
 				Win32.SetWindowPos(Handle, IntPtr.Zero, position.X, position.Y, 0, 0, Win32.SetWindowPosFlags.NOSIZE);
 				break;
+			case SetResizableCommand(var resizable):
+				if (Resizable == resizable)
+					break;
+
+				if (resizable)
+					_windowStyles |= Win32.WindowStyles.SIZEBOX | Win32.WindowStyles.MAXIMIZEBOX;
+				else
+					_windowStyles &= ~(Win32.WindowStyles.SIZEBOX | Win32.WindowStyles.MAXIMIZEBOX);
+
+				Win32.SetWindowLongPtrW(Handle, Win32.WindowLongValue.Style, (nint)_windowStyles);
+				Resizable.Value = resizable;
+				break;
 			case SetSizeCommand(var size):
 				Win32.SetWindowPos(Handle, IntPtr.Zero, 0, 0, size.X, size.Y, Win32.SetWindowPosFlags.NOMOVE);
 				break;
@@ -289,7 +297,7 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible)
 				break;
 			case Win32.WindowMessage.CLOSE:
 				Close();
-				return nint.Zero;
+				return 0;
 			case Win32.WindowMessage.ERASEBKGND:
 				return 1;
 			case Win32.WindowMessage.AZ_TRAYICON:

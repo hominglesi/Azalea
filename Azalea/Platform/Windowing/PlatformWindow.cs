@@ -10,14 +10,15 @@ using System.Threading;
 namespace Azalea.Platform.Windowing;
 public abstract class PlatformWindow : ICommandHandler<WindowCommand>
 {
-	protected PlatformWindow(Vector2Int clientSize, bool initiallyVisible)
+	protected PlatformWindow(string title, Vector2Int clientSize, bool initiallyVisible)
 	{
-		Title = new("Azalea Window");
+		Title = new(title);
 		Shown = new(initiallyVisible);
 		Position = new(new Vector2Int(100, 100));
 		ClientPosition = new(new Vector2Int(100, 100));
 		Size = new(clientSize);
 		ClientSize = new(clientSize);
+		Resizable = new(true);
 		CursorVisible = new(true);
 
 		Thread = new WindowThread(this);
@@ -39,6 +40,7 @@ public abstract class PlatformWindow : ICommandHandler<WindowCommand>
 	public ReadOnlyObservable<Vector2Int> ClientPosition { get; }
 	public ReadOnlyObservable<Vector2Int> Size { get; }
 	public ReadOnlyObservable<Vector2Int> ClientSize { get; }
+	public ReadOnlyObservable<bool> Resizable { get; }
 	public ReadOnlyObservable<bool> CursorVisible { get; }
 
 	public PlatformRenderer? SubscribedRenderer { get; private set; } = null;
@@ -118,11 +120,11 @@ public abstract class PlatformWindow : ICommandHandler<WindowCommand>
 
 	#endregion
 
-	public static PlatformWindow Create(Vector2Int size, bool initiallyVisible = true)
+	public static PlatformWindow Create(string title, Vector2Int size, bool initiallyVisible = true)
 	{
 		var newWindow = RuntimeInformation.ProcessArchitecture switch
 		{
-			Architecture.X64 or Architecture.X86 => new WindowsWindow(size, initiallyVisible),
+			Architecture.X64 or Architecture.X86 => new WindowsWindow(title, size, initiallyVisible),
 			_ => throw new NotSupportedException(
 				$"Platform '{RuntimeInformation.ProcessArchitecture}' is not supported")
 		};

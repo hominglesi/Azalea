@@ -20,7 +20,7 @@ internal partial class GLRenderer
 			if (LoadingContext is not null)
 				return;
 
-			var dummyWindow = Windowing.PlatformWindow.Create(Vector2Int.Zero, initiallyVisible: false);
+			var dummyWindow = Windowing.PlatformWindow.Create("", Vector2Int.Zero, initiallyVisible: false);
 			var dummyDeviceContext = dummyWindow.BorrowDeviceContext();
 
 			var dummyThread = new InitializationThread(dummyDeviceContext);

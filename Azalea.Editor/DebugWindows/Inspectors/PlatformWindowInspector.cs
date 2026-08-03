@@ -39,6 +39,8 @@ internal class PlatformWindowInspector
 		guiWindow.AddButton("Set Client Size to {800, 600}", () => window.SetClientSize(new(800, 600)));
 		guiWindow.AddObservingLabel("Cursor Visible", window.CursorVisible);
 		guiWindow.AddButton("Toggle Cursor Visible", () => window.SetCursorVisible(!window.CursorVisible.Value));
+		guiWindow.AddObservingLabel("Resizable", window.Resizable);
+		guiWindow.AddButton("Toggle Resizable", () => window.SetResizable(!window.Resizable));
 
 		guiWindow.AddButton("Focus", window.Focus);
 		guiWindow.AddButton("Restore", window.Restore);
