@@ -1,5 +1,4 @@
-﻿using Azalea.Sounds.OpenAL;
-using Azalea.Utils;
+﻿using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Threading.Channels;
@@ -82,7 +81,7 @@ internal abstract class AudioManager : Disposable, IAudioManager
 	public abstract IAudioInstance Play(Sound sound, float gain = 1, bool looping = false);
 	public abstract IAudioInstance PlayByte(SoundByte soundByte, float gain = 1, bool looping = false);
 	public abstract IAudioInstance PlayByteInternal(SoundByte soundByte, float gain = 1, bool looping = false);
-	public abstract SoundByte CreateSoundByte(byte[] data, int dataLength, ALFormat format, int frequency);
+	public abstract SoundByte CreateSoundByte(byte[] data, int dataLength, int format, int frequency);
 
 	public virtual void Update() { }
 }

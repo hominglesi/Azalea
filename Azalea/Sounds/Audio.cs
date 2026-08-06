@@ -1,5 +1,4 @@
 ﻿using Azalea.Platform;
-using Azalea.Sounds.OpenAL;
 
 namespace Azalea.Sounds;
 public static class Audio
@@ -22,6 +21,6 @@ public static class Audio
 	internal static IAudioInstance PlayByteInternal(SoundByte soundByte, float gain = 1, bool looping = false)
 		=> Instance.PlayByteInternal(soundByte, gain, looping);
 
-	internal static SoundByte CreateSound(byte[] data, int dataLength, ALFormat format, int frequency)
+	internal static SoundByte CreateSound(byte[] data, int dataLength, int format, int frequency)
 		=> Instance.CreateSoundByte(data, dataLength, format, frequency);
 }

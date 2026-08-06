@@ -1,4 +1,4 @@
-﻿using Azalea.Sounds.OpenAL.Enums;
+﻿using Azalea.Native.OpenAL;
 using Azalea.Threading;
 using System;
 using System.Buffers;
@@ -11,48 +11,12 @@ internal unsafe partial class ALAudioManager
 {
 	public const string OpenALPath = "soft_oal.dll";
 
-	[LibraryImport(OpenALPath)]
-	private static partial void alcGetIntegerv(IntPtr device, int param, int size, int* value);
-
-	[LibraryImport(OpenALPath, StringMarshalling = StringMarshalling.Utf8)]
-	private static partial IntPtr alcGetProcAddress(IntPtr device, string functionName);
-
-	[LibraryImport(OpenALPath)]
-	private static partial IntPtr alcGetString(IntPtr device, int param);
-
-	[LibraryImport(OpenALPath)]
-	private static partial void alGetSourcef(uint source, int param, float* value);
-
-	[LibraryImport(OpenALPath)]
-	private static partial void alGetSourcei(uint source, int param, int* value);
-
-	[LibraryImport(OpenALPath)]
-	private static partial IntPtr alGetString(int param);
-
-	[LibraryImport(OpenALPath)]
-	private static partial void alListener3f(int param, float value1, float value2, float value3);
-
-	[LibraryImport(OpenALPath)]
-	private static partial void alListenerf(int param, float value);
-
-	[LibraryImport(OpenALPath)]
-	private static partial void alSource3f(uint source, int param, float value1, float value2, float value3);
-
-	[LibraryImport(OpenALPath)]
-	private static partial void alSourcef(uint source, int param, float value);
-
-	[LibraryImport(OpenALPath)]
-	private static partial void alSourcei(uint source, int param, int value);
-
 	#region BindSourceBuffer
 
 	internal record BindSourceBufferCommand(uint source, ValuePromise<uint> buffer) : AudioCommand;
 
 	private static void bindSourceBuffer(uint source, uint buffer)
-	{
-		const int AL_BUFFER = 0x1009;
-		alSourcei(source, AL_BUFFER, (int)buffer);
-	}
+		=> AL.Sourcei(source, AL.BUFFER, (int)buffer);
 
 	public void BindSourceBuffer(uint source, ValuePromise<uint> buffer)
 	{
@@ -65,15 +29,15 @@ internal unsafe partial class ALAudioManager
 	#endregion
 	#region BufferAndFreeData
 
-	internal record BufferAndFreeDataCommand(ValuePromise<uint> buffer, byte[] data, int dataLength, ALFormat format, int frequency) : AudioCommand;
+	internal record BufferAndFreeDataCommand(ValuePromise<uint> buffer, byte[] data, int dataLength, int format, int frequency) : AudioCommand;
 
-	private static void bufferAndFreeData(uint buffer, byte[] data, int dataLength, ALFormat format, int frequency)
+	private static void bufferAndFreeData(uint buffer, byte[] data, int dataLength, int format, int frequency)
 	{
 		bufferData(buffer, data, dataLength, format, frequency);
 		ArrayPool<byte>.Shared.Return(data);
 	}
 
-	public void BufferAndFreeData(ValuePromise<uint> buffer, byte[] data, int dataLength, ALFormat format, int frequency)
+	public void BufferAndFreeData(ValuePromise<uint> buffer, byte[] data, int dataLength, int format, int frequency)
 	{
 		if (IsAudioThread() && buffer.IsResolved)
 			bufferAndFreeData(buffer.Value, data, dataLength, format, frequency);
@@ -84,18 +48,12 @@ internal unsafe partial class ALAudioManager
 	#endregion
 	#region BufferData
 
-	internal record BufferDataCommand(ValuePromise<uint> buffer, byte[] data, int dataLength, ALFormat format, int frequency) : AudioCommand;
+	internal record BufferDataCommand(ValuePromise<uint> buffer, byte[] data, int dataLength, int format, int frequency) : AudioCommand;
 
-	[LibraryImport(OpenALPath)]
-	private static partial void alBufferData(uint buffer, ALFormat format, void* data, int size, int frequency);
+	private static void bufferData(uint buffer, byte[] data, int dataLength, int format, int frequency)
+		=> AL.BufferData(buffer, format, ref data[0], dataLength, frequency);
 
-	private static void bufferData(uint buffer, byte[] data, int dataLength, ALFormat format, int frequency)
-	{
-		fixed (void* p = data)
-			alBufferData(buffer, format, p, dataLength, frequency);
-	}
-
-	public void BufferData(ValuePromise<uint> buffer, byte[] data, int dataLength, ALFormat format, int frequency)
+	public void BufferData(ValuePromise<uint> buffer, byte[] data, int dataLength, int format, int frequency)
 	{
 		if (IsAudioThread() && buffer.IsResolved)
 			bufferData(buffer.Value, data, dataLength, format, frequency);
@@ -108,11 +66,7 @@ internal unsafe partial class ALAudioManager
 
 	internal record CloseDeviceCommand(IntPtr device) : AudioCommand;
 
-	[LibraryImport(OpenALPath)]
-	[return: MarshalAs(UnmanagedType.U1)]
-	private static partial bool alcCloseDevice(IntPtr device);
-
-	private void closeDevice(IntPtr device) => alcCloseDevice(device);
+	private void closeDevice(IntPtr device) => ALC.CloseDevice(device);
 
 	public void CloseDevice(IntPtr device)
 	{
@@ -125,14 +79,8 @@ internal unsafe partial class ALAudioManager
 	#endregion
 	#region CreateContext
 
-	[LibraryImport(OpenALPath)]
-	private static partial IntPtr alcCreateContext(IntPtr device, int* attributeList);
-
 	private static IntPtr createContext(IntPtr device, int[] attributeList)
-	{
-		fixed (int* ptr = attributeList)
-			return alcCreateContext(device, ptr);
-	}
+		=> ALC.CreateContext(device, ref attributeList[0]);
 
 	public IntPtr CreateContext(IntPtr device, int[] attributeList)
 	{
@@ -162,13 +110,7 @@ internal unsafe partial class ALAudioManager
 
 	internal record DeleteBufferCommand(ValuePromise<uint> buffer) : AudioCommand;
 
-	[LibraryImport(OpenALPath)]
-	private static partial void alDeleteBuffers(int count, uint* buffers);
-
-	private static void deleteBuffer(uint buffer)
-	{
-		alDeleteBuffers(1, &buffer);
-	}
+	private static void deleteBuffer(uint buffer) => AL.DeleteBuffers(1, ref buffer);
 
 	public void DeleteBuffer(ValuePromise<uint> buffer)
 	{
@@ -183,13 +125,7 @@ internal unsafe partial class ALAudioManager
 
 	internal record DeleteSourceCommand(uint source) : AudioCommand;
 
-	[LibraryImport(OpenALPath)]
-	private static partial void alDeleteSources(int count, uint* sources);
-
-	public static void deleteSource(uint source)
-	{
-		alDeleteSources(1, &source);
-	}
+	public static void deleteSource(uint source) => AL.DeleteSources(1, ref source);
 
 	public void DeleteSource(uint source)
 	{
@@ -204,8 +140,7 @@ internal unsafe partial class ALAudioManager
 
 	private static IEnumerable<string> enumerateOutputDevices()
 	{
-		const int ALC_ALL_DEVICES_SPECIFIER = 0x1013;
-		var deviceList = alcGetString(IntPtr.Zero, ALC_ALL_DEVICES_SPECIFIER);
+		var deviceList = ALC.GetString(nint.Zero, ALC.ALL_DEVICES_SPECIFIER);
 
 		string? deviceName;
 		while (string.IsNullOrEmpty(deviceName = Marshal.PtrToStringAnsi(deviceList)) == false)
@@ -227,13 +162,10 @@ internal unsafe partial class ALAudioManager
 
 	internal record GenerateBufferCommand(Promise<uint> result) : AudioCommand;
 
-	[LibraryImport(OpenALPath)]
-	private static partial void alGenBuffers(int count, uint* buffers);
-
 	private uint generateBuffer()
 	{
-		uint buffer;
-		alGenBuffers(1, &buffer);
+		uint buffer = 0;
+		AL.GenBuffers(1, ref buffer);
 		return buffer;
 	}
 
@@ -250,13 +182,12 @@ internal unsafe partial class ALAudioManager
 	#endregion
 	#region GenerateSource
 
-	[LibraryImport(OpenALPath)]
-	private static partial void alGenSources(int count, uint* sources);
+
 
 	private uint generateSource()
 	{
-		uint source;
-		alGenSources(1, &source);
+		uint source = 0;
+		AL.GenSources(1, ref source);
 		return source;
 	}
 
@@ -272,8 +203,7 @@ internal unsafe partial class ALAudioManager
 
 	private static string getALRenderer()
 	{
-		const int AL_RENDERER = 0xB007;
-		var ptr = alGetString(AL_RENDERER);
+		var ptr = AL.GetString(AL.RENDERER);
 		return Marshal.PtrToStringAnsi(ptr)!;
 	}
 
@@ -289,8 +219,7 @@ internal unsafe partial class ALAudioManager
 
 	private static string getALVersion()
 	{
-		const int AL_VERSION = 0xB002;
-		var ptr = alGetString(AL_VERSION);
+		var ptr = AL.GetString(AL.VERSION);
 		return Marshal.PtrToStringAnsi(ptr)!;
 	}
 
@@ -306,8 +235,7 @@ internal unsafe partial class ALAudioManager
 
 	public string getDefaultDeviceName()
 	{
-		const int ALC_DEFAULT_ALL_DEVICES_SPECIFIER = 0x1012;
-		var str = alcGetString(IntPtr.Zero, ALC_DEFAULT_ALL_DEVICES_SPECIFIER);
+		var str = ALC.GetString(IntPtr.Zero, ALC.DEFAULT_ALL_DEVICES_SPECIFIER);
 		return Marshal.PtrToStringAnsi(str)!;
 	}
 
@@ -323,9 +251,8 @@ internal unsafe partial class ALAudioManager
 
 	public bool getDeviceConnected(IntPtr device)
 	{
-		const int ALC_CONNECTED = 0x313;
-		int connected;
-		alcGetIntegerv(device, ALC_CONNECTED, 1, &connected);
+		int connected = 0;
+		ALC.GetIntegerv(device, ALC.CONNECTED, 1, ref connected);
 		return connected != 0;
 	}
 
@@ -341,9 +268,8 @@ internal unsafe partial class ALAudioManager
 
 	public int getDeviceFrequency(IntPtr device)
 	{
-		const int ALC_FREQUENCY = 0x1007;
-		int frequency;
-		alcGetIntegerv(device, ALC_FREQUENCY, 1, &frequency);
+		int frequency = 0;
+		ALC.GetIntegerv(device, ALC.FREQUENCY, 1, ref frequency);
 		return frequency;
 	}
 
@@ -359,9 +285,8 @@ internal unsafe partial class ALAudioManager
 
 	public bool getDeviceHRTF(IntPtr device)
 	{
-		const int ALC_HRTF_SOFT = 0x1992;
-		int hrtf;
-		alcGetIntegerv(device, ALC_HRTF_SOFT, 1, &hrtf);
+		int hrtf = 0;
+		ALC.GetIntegerv(device, ALC.HRTF_SOFT, 1, ref hrtf);
 		return hrtf != 0;
 	}
 
@@ -377,8 +302,7 @@ internal unsafe partial class ALAudioManager
 
 	public string getDeviceName(IntPtr device)
 	{
-		const int ALC_ALL_DEVICES_SPECIFIER = 0x1013;
-		var str = alcGetString(device, ALC_ALL_DEVICES_SPECIFIER);
+		var str = ALC.GetString(device, ALC.ALL_DEVICES_SPECIFIER);
 		return Marshal.PtrToStringAnsi(str)!;
 	}
 
@@ -394,9 +318,8 @@ internal unsafe partial class ALAudioManager
 
 	private int getSourceBuffersProcessed(uint source)
 	{
-		const int AL_BUFFERS_PROCESSED = 0x1016;
-		int buffersProcessed;
-		alGetSourcei(source, AL_BUFFERS_PROCESSED, &buffersProcessed);
+		int buffersProcessed = 0;
+		AL.GetSourcei(source, AL.BUFFERS_PROCESSED, ref buffersProcessed);
 		return buffersProcessed;
 	}
 
@@ -412,9 +335,8 @@ internal unsafe partial class ALAudioManager
 
 	private int getSourceBuffersQueued(uint source)
 	{
-		const int AL_BUFFERS_QUEUED = 0x1015;
-		int buffersQueued;
-		alGetSourcei(source, AL_BUFFERS_QUEUED, &buffersQueued);
+		int buffersQueued = 0;
+		AL.GetSourcei(source, AL.BUFFERS_QUEUED, ref buffersQueued);
 		return buffersQueued;
 	}
 
@@ -430,9 +352,8 @@ internal unsafe partial class ALAudioManager
 
 	public static float getSourceSecOffset(uint source)
 	{
-		const int AL_SEC_OFFSET = 0x1024;
-		float secOffset;
-		alGetSourcef(source, AL_SEC_OFFSET, &secOffset);
+		float secOffset = 0;
+		AL.GetSourcef(source, AL.SEC_OFFSET, ref secOffset);
 		return secOffset;
 	}
 
@@ -446,15 +367,14 @@ internal unsafe partial class ALAudioManager
 	#endregion
 	#region GetSourceState
 
-	public static ALSourceState getSourceState(uint source)
+	public static int getSourceState(uint source)
 	{
-		const int AL_SOURCE_STATE = 0x1010;
-		int sourceState;
-		alGetSourcei(source, AL_SOURCE_STATE, &sourceState);
-		return (ALSourceState)sourceState;
+		int sourceState = 0;
+		AL.GetSourcei(source, AL.SOURCE_STATE, ref sourceState);
+		return sourceState;
 	}
 
-	public ALSourceState GetSourceState(uint source)
+	public int GetSourceState(uint source)
 	{
 		AssertAudioThread();
 
@@ -464,13 +384,11 @@ internal unsafe partial class ALAudioManager
 	#endregion
 	#region MakeContextCurrent
 
-	[LibraryImport(OpenALPath)]
-	[return: MarshalAs(UnmanagedType.U1)]
-	private static partial bool alcMakeContextCurrent(IntPtr context);
+
 
 	private static bool makeContextCurrent(IntPtr context)
 	{
-		return alcMakeContextCurrent(context);
+		return ALC.MakeContextCurrent(context);
 	}
 
 	public bool MakeContextCurrent(IntPtr context)
@@ -483,11 +401,10 @@ internal unsafe partial class ALAudioManager
 	#endregion
 	#region OpenDevice
 
-	[LibraryImport(OpenALPath, StringMarshalling = StringMarshalling.Utf8)]
-	private static partial IntPtr alcOpenDevice(string? deviceName);
+
 
 	private static IntPtr openDevice(string? deviceName)
-		=> alcOpenDevice(deviceName);
+		=> ALC.OpenDevice(deviceName);
 
 	public IntPtr OpenDevice(string? deviceName)
 	{
@@ -501,10 +418,9 @@ internal unsafe partial class ALAudioManager
 
 	internal record PauseSourceCommand(uint source) : AudioCommand;
 
-	[LibraryImport(OpenALPath)]
-	private static partial void alSourcePause(uint source);
 
-	private static void pauseSource(uint source) => alSourcePause(source);
+
+	private static void pauseSource(uint source) => AL.SourcePause(source);
 
 	public void PauseSource(uint source)
 	{
@@ -519,10 +435,9 @@ internal unsafe partial class ALAudioManager
 
 	internal record PlaySourceCommand(uint source) : AudioCommand;
 
-	[LibraryImport(OpenALPath)]
-	private static partial void alSourcePlay(uint source);
 
-	private static void playSource(uint source) => alSourcePlay(source);
+
+	private static void playSource(uint source) => AL.SourcePlay(source);
 
 	public void PlaySource(uint source)
 	{
@@ -537,16 +452,15 @@ internal unsafe partial class ALAudioManager
 
 	internal record PrintErrorsCommand() : AudioCommand;
 
-	[LibraryImport(OpenALPath, EntryPoint = "alGetError")]
-	private static partial ALError alGetError();
+
 
 	private static void printErrors()
 	{
-		var error = alGetError();
-		while (error != ALError.NoError)
+		var error = AL.GetError();
+		while (error != AL.NO_ERROR)
 		{
 			Console.WriteLine("OpenAL Error: " + error);
-			error = alGetError();
+			error = AL.GetError();
 		}
 	}
 
@@ -563,13 +477,10 @@ internal unsafe partial class ALAudioManager
 
 	internal record QueueSourceBufferCommand(uint source, ValuePromise<uint> buffer) : AudioCommand;
 
-	[LibraryImport(OpenALPath)]
-	private static partial void alSourceQueueBuffers(uint source, int size, uint* buffers);
+
 
 	private static void queueSourceBuffer(uint source, uint buffer)
-	{
-		alSourceQueueBuffers(source, 1, &buffer);
-	}
+		=> AL.SourceQueueBuffers(source, 1, ref buffer);
 
 	public void QueueSourceBuffer(uint source, ValuePromise<uint> buffer)
 	{
@@ -591,7 +502,7 @@ internal unsafe partial class ALAudioManager
 	{
 		_alcReopenDeviceSOFT ??=
 			Marshal.GetDelegateForFunctionPointer<ReopenDeviceDelegate>(
-				alcGetProcAddress(device, "alcReopenDeviceSOFT"));
+				ALC.GetProcAddress(device, "alcReopenDeviceSOFT"));
 
 		_alcReopenDeviceSOFT(device, deviceName, attributes);
 	}
@@ -609,11 +520,8 @@ internal unsafe partial class ALAudioManager
 
 	internal record SetDistanceModelCommand(int distanceModel) : AudioCommand;
 
-	[LibraryImport(OpenALPath)]
-	public static partial void alDistanceModel(int distanceModel);
-
 	private static void setDistanceModel(int distanceModel)
-		=> alDistanceModel(distanceModel);
+		=> AL.DistanceModel(distanceModel);
 
 	public void SetDistanceModel(int distanceModel)
 	{
@@ -628,11 +536,7 @@ internal unsafe partial class ALAudioManager
 
 	internal record SetListenerGainCommand(float gain) : AudioCommand;
 
-	private static void setListenerGain(float gain)
-	{
-		const int AL_GAIN = 0x100A;
-		alListenerf(AL_GAIN, gain);
-	}
+	private static void setListenerGain(float gain) => AL.Listenerf(AL.GAIN, gain);
 
 	public void SetListenerGain(float gain)
 	{
@@ -648,10 +552,7 @@ internal unsafe partial class ALAudioManager
 	internal record SetListenerPositionCommand(Vector3 position) : AudioCommand;
 
 	private static void setListenerPosition(Vector3 position)
-	{
-		const int AL_POSITION = 0x1004;
-		alListener3f(AL_POSITION, position.X, position.Y, position.Z);
-	}
+		=> AL.Listener3f(AL.POSITION, position.X, position.Y, position.Z);
 
 	public void SetListenerPosition(Vector3 position)
 	{
@@ -667,10 +568,7 @@ internal unsafe partial class ALAudioManager
 	internal record SetListenerVelocityCommand(Vector3 velocity) : AudioCommand;
 
 	private static void setListenerVelocity(Vector3 velocity)
-	{
-		const int AL_VELOCITY = 0x1006;
-		alListener3f(AL_VELOCITY, velocity.X, velocity.Y, velocity.Z);
-	}
+		=> AL.Listener3f(AL.VELOCITY, velocity.X, velocity.Y, velocity.Z);
 
 	public void SetListenerVelocity(Vector3 velocity)
 	{
@@ -686,10 +584,7 @@ internal unsafe partial class ALAudioManager
 	internal record SetSourceGainCommand(uint source, float gain) : AudioCommand;
 
 	private static void setSourceGain(uint source, float gain)
-	{
-		const int AL_GAIN = 0x100A;
-		alSourcef(source, AL_GAIN, gain);
-	}
+		=> AL.Sourcef(source, AL.GAIN, gain);
 
 	public void SetSourceGain(uint source, float gain)
 	{
@@ -705,10 +600,7 @@ internal unsafe partial class ALAudioManager
 	internal record SetSourceLoopingCommand(uint source, bool looping) : AudioCommand;
 
 	private static void setSourceLooping(uint source, bool looping)
-	{
-		const int AL_LOOPING = 0x1007;
-		alSourcei(source, AL_LOOPING, looping ? 1 : 0);
-	}
+		=> AL.Sourcei(source, AL.LOOPING, looping ? 1 : 0);
 
 	public void SetSourceLooping(uint source, bool looping)
 	{
@@ -724,10 +616,7 @@ internal unsafe partial class ALAudioManager
 	internal record SetSourcePitchCommand(uint source, float pitch) : AudioCommand;
 
 	private static void setSourcePitch(uint source, float pitch)
-	{
-		const int AL_PITCH = 0x1003;
-		alSourcef(source, AL_PITCH, pitch);
-	}
+		=> AL.Sourcef(source, AL.PITCH, pitch);
 
 	public void SetSourcePitch(uint source, float pitch)
 	{
@@ -743,10 +632,7 @@ internal unsafe partial class ALAudioManager
 	internal record SetSourcePositionCommand(uint source, Vector3 position) : AudioCommand;
 
 	private static void setSourcePosition(uint source, Vector3 position)
-	{
-		const int AL_POSITION = 0x1004;
-		alSource3f(source, AL_POSITION, position.X, position.Y, position.Z);
-	}
+		=> AL.Source3f(source, AL.POSITION, position.X, position.Y, position.Z);
 
 	public void SetSourcePosition(uint source, Vector3 position)
 	{
@@ -762,10 +648,7 @@ internal unsafe partial class ALAudioManager
 	internal record SetSourceRelativeCommand(uint source, bool relative) : AudioCommand;
 
 	private static void setSourceRelative(uint source, bool relative)
-	{
-		const int AL_SOURCE_RELATIVE = 0x202;
-		alSourcei(source, AL_SOURCE_RELATIVE, relative ? 1 : 0);
-	}
+		=> AL.Sourcei(source, AL.SOURCE_RELATIVE, relative ? 1 : 0);
 
 	public void SetSourceRelative(uint source, bool relative)
 	{
@@ -781,10 +664,7 @@ internal unsafe partial class ALAudioManager
 	internal record SetSourceSecOffsetCommand(uint source, float secOffset) : AudioCommand;
 
 	private static void setSourceSecOffset(uint source, float offset)
-	{
-		const int AL_SEC_OFFSET = 0x1024;
-		alSourcef(source, AL_SEC_OFFSET, offset);
-	}
+		=> AL.Sourcef(source, AL.SEC_OFFSET, offset);
 
 	public void SetSourceSecOffset(uint source, float offset)
 	{
@@ -800,10 +680,7 @@ internal unsafe partial class ALAudioManager
 	internal record SetSourceVelocityCommand(uint source, Vector3 velocity) : AudioCommand;
 
 	private static void setSourceVelocity(uint source, Vector3 velocity)
-	{
-		const int AL_VELOCITY = 0x1006;
-		alSource3f(source, AL_VELOCITY, velocity.X, velocity.Y, velocity.Z);
-	}
+		=> AL.Source3f(source, AL.VELOCITY, velocity.X, velocity.Y, velocity.Z);
 
 	public void SetSourceVelocity(uint source, Vector3 velocity)
 	{
@@ -818,10 +695,7 @@ internal unsafe partial class ALAudioManager
 
 	internal record StopSourceCommand(uint source) : AudioCommand;
 
-	[LibraryImport(OpenALPath)]
-	private static partial void alSourceStop(uint source);
-
-	private static void stopSource(uint source) => alSourceStop(source);
+	private static void stopSource(uint source) => AL.SourceStop(source);
 
 	public void StopSource(uint source)
 	{
@@ -856,13 +730,10 @@ internal unsafe partial class ALAudioManager
 
 	internal record UnqueueSourceBufferCommand(uint source, Promise<uint> result) : AudioCommand;
 
-	[LibraryImport(OpenALPath)]
-	private static partial void alSourceUnqueueBuffers(uint source, int size, uint* buffers);
-
 	private static uint unqueueSourceBuffer(uint source)
 	{
-		uint buffer;
-		alSourceUnqueueBuffers(source, 1, &buffer);
+		uint buffer = 0;
+		AL.SourceUnqueueBuffers(source, 1, ref buffer);
 		return buffer;
 	}
 

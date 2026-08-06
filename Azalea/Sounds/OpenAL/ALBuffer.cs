@@ -19,10 +19,10 @@ internal class ALBuffer : Disposable
 		Handle = _audioManager.GenerateBuffer();
 	}
 
-	public void BufferData(byte[] data, int dataLength, ALFormat format, int frequency)
+	public void BufferData(byte[] data, int dataLength, int format, int frequency)
 		=> _audioManager.BufferData(Handle, data, dataLength, format, frequency);
 
-	public void BufferAndFreeData(byte[] data, int dataLength, ALFormat format, int frequency)
+	public void BufferAndFreeData(byte[] data, int dataLength, int format, int frequency)
 		=> _audioManager.BufferAndFreeData(Handle, data, dataLength, format, frequency);
 
 	protected override void OnDispose()

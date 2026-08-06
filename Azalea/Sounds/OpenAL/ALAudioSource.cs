@@ -1,5 +1,5 @@
-﻿using Azalea.Sounds.FFmpeg;
-using Azalea.Sounds.OpenAL.Enums;
+﻿using Azalea.Native.OpenAL;
+using Azalea.Sounds.FFmpeg;
 using Azalea.Threading;
 using System;
 using System.Diagnostics;
@@ -75,7 +75,7 @@ internal class ALAudioSource : IAudioSource
 		{
 			if (_currentReader.ReadChunk(out var pcm, out var pcmLength, out var sampleRate, out var startTime))
 			{
-				_buffers[i].BufferAndFreeData(pcm, pcmLength, ALFormat.Stereo16, sampleRate);
+				_buffers[i].BufferAndFreeData(pcm, pcmLength, AL.FORMAT_STEREO16, sampleRate);
 				_source.QueueBuffer(_buffers[i]);
 				_bufferStartTimes[_nextBufferStartTime] = startTime;
 				_nextBufferStartTime = (_nextBufferStartTime + 1) % __bufferCount;
@@ -164,7 +164,7 @@ internal class ALAudioSource : IAudioSource
 			{
 				if (_currentReader.ReadChunk(out var pcm, out var pcmLength, out var sampleRate, out var startTime))
 				{
-					_buffers[i].BufferAndFreeData(pcm, pcmLength, ALFormat.Stereo16, sampleRate);
+					_buffers[i].BufferAndFreeData(pcm, pcmLength, AL.FORMAT_STEREO16, sampleRate);
 					_source.QueueBuffer(_buffers[i]);
 					_bufferStartTimes[_nextBufferStartTime] = startTime;
 					_nextBufferStartTime = (_nextBufferStartTime + 1) % __bufferCount;
@@ -196,7 +196,7 @@ internal class ALAudioSource : IAudioSource
 
 				if (_currentReader.ReadChunk(out var pcm, out var pcmLength, out var sampleRate, out var startTime))
 				{
-					_audioManager.BufferAndFreeData(buffer, pcm, pcmLength, ALFormat.Stereo16, sampleRate);
+					_audioManager.BufferAndFreeData(buffer, pcm, pcmLength, AL.FORMAT_STEREO16, sampleRate);
 					_source.QueueBuffer(buffer);
 					_bufferStartTimes[_nextBufferStartTime] = startTime;
 				}
@@ -204,10 +204,10 @@ internal class ALAudioSource : IAudioSource
 				_nextBufferStartTime = (_nextBufferStartTime + 1) % __bufferCount;
 			}
 
-			if (_source.GetState() != ALSourceState.Playing)
+			if (_source.GetState() != AL.PLAYING)
 				_source.Play();
 
-			if (_seekCounter.IsActive == false && _source.GetState() == ALSourceState.Stopped)
+			if (_seekCounter.IsActive == false && _source.GetState() == AL.STOPPED)
 			{
 				if (Looping == false)
 					State = AudioSourceState.Paused;
@@ -218,7 +218,7 @@ internal class ALAudioSource : IAudioSource
 					{
 						if (_currentReader.ReadChunk(out var pcm, out var pcmLength, out var sampleRate, out var startTime))
 						{
-							_buffers[i].BufferAndFreeData(pcm, pcmLength, ALFormat.Stereo16, sampleRate);
+							_buffers[i].BufferAndFreeData(pcm, pcmLength, AL.FORMAT_STEREO16, sampleRate);
 							_source.QueueBuffer(_buffers[i]);
 							_bufferStartTimes[_nextBufferStartTime] = startTime;
 							_nextBufferStartTime = (_nextBufferStartTime + 1) % __bufferCount;

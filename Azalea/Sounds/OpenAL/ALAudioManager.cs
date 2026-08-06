@@ -71,7 +71,7 @@ internal partial class ALAudioManager : AudioManager
 		}
 	}
 
-	public override SoundByte CreateSoundByte(byte[] data, int dataLength, ALFormat format, int frequency)
+	public override SoundByte CreateSoundByte(byte[] data, int dataLength, int format, int frequency)
 		=> new ALSound(this, data, dataLength, format, frequency);
 
 	private int _currentAudioSource = 0;
@@ -116,11 +116,11 @@ internal partial class ALAudioManager : AudioManager
 				buffer.AssertResolved();
 				bindSourceBuffer(source, buffer.Value);
 				break;
-			case BufferAndFreeDataCommand(var buffer, byte[] data, int dataLength, ALFormat format, int frequency):
+			case BufferAndFreeDataCommand(var buffer, byte[] data, int dataLength, int format, int frequency):
 				buffer.AssertResolved();
 				bufferAndFreeData(buffer.Value, data, dataLength, format, frequency);
 				break;
-			case BufferDataCommand(var buffer, byte[] data, int dataLength, ALFormat format, int frequency):
+			case BufferDataCommand(var buffer, byte[] data, int dataLength, int format, int frequency):
 				buffer.AssertResolved();
 				bufferData(buffer.Value, data, dataLength, format, frequency);
 				return;

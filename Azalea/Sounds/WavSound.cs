@@ -1,5 +1,5 @@
 ﻿using Azalea.Extentions;
-using Azalea.Sounds.OpenAL;
+using Azalea.Native.OpenAL;
 using System;
 using System.Buffers.Binary;
 using System.Diagnostics;
@@ -13,7 +13,7 @@ internal class WavSound
 	private readonly byte[] _wavBytes;
 
 	public Span<byte> Data => _wavBytes.AsSpan().Slice(_dataOffset, _dataLength);
-	public ALFormat Format { get; private set; }
+	public int Format { get; private set; }
 	public int Frequency { get; private set; }
 
 	public WavSound(Stream stream)
@@ -111,9 +111,9 @@ internal class WavSound
 			if (_numChannels == 1)
 			{
 				if (_bitsPerSample == 8)
-					Format = ALFormat.Mono8;
+					Format = AL.FORMAT_MONO8;
 				else if (_bitsPerSample == 16)
-					Format = ALFormat.Mono16;
+					Format = AL.FORMAT_MONO16;
 				else
 				{
 					Console.WriteLine($"Can't Play mono {_bitsPerSample} sound.");
@@ -122,9 +122,9 @@ internal class WavSound
 			else if (_numChannels == 2)
 			{
 				if (_bitsPerSample == 8)
-					Format = ALFormat.Stereo8;
+					Format = AL.FORMAT_STEREO8;
 				else if (_bitsPerSample == 16)
-					Format = ALFormat.Stereo16;
+					Format = AL.FORMAT_STEREO16;
 				else
 				{
 					Console.WriteLine($"Can't Play stereo {_bitsPerSample} sound.");

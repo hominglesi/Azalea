@@ -1,4 +1,4 @@
-﻿using Azalea.Sounds.OpenAL.Enums;
+﻿using Azalea.Native.OpenAL;
 using System;
 
 namespace Azalea.Sounds.OpenAL;
@@ -120,7 +120,7 @@ internal class ALAudioByteSource : IAudioSource
 
 		var state = _source.GetState();
 
-		if (State == AudioSourceState.Playing && state == ALSourceState.Stopped)
+		if (State == AudioSourceState.Playing && state == AL.STOPPED)
 			State = AudioSourceState.Paused;
 
 		if (State == AudioSourceState.Playing)

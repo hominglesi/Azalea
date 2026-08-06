@@ -23,6 +23,7 @@ public abstract class PlatformAudio : ICommandHandler<AudioCommand>
 
 	public ReadOnlyObservable<float> MasterVolume { get; }
 
+	protected abstract void HandleCommandLogic(AudioCommand command);
 	public ICommandAwaitable? Enqueue(AudioCommand command) => Thread.Enqueue(command);
 
 	#region AudioThread

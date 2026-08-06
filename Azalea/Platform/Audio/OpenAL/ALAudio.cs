@@ -1,4 +1,5 @@
-﻿using Azalea.Sounds.OpenAL;
+﻿using Azalea.Sounds;
+using Azalea.Sounds.OpenAL;
 
 namespace Azalea.Platform.Audio.OpenAL;
 internal class ALAudio : PlatformAudio
@@ -12,11 +13,12 @@ internal class ALAudio : PlatformAudio
 
 	}
 
+	internal override IAudioSource[] AudioChannels => _audioSources;
+	internal override IAudioSource[] AudioByteChannels => _audioByteSources;
+	internal override IAudioSource[] AudioByteInternalChannels => _audioByteSourcesInternal;
+
 	protected override void HandleCommandLogic(AudioCommand command)
 	{
-		switch (command)
-		{
-			case CreateSoundByteCommand()
-		}
+
 	}
 }

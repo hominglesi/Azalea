@@ -1,5 +1,4 @@
 ﻿using Azalea.Sounds;
-using Azalea.Sounds.OpenAL;
 using Azalea.Threading;
 
 namespace Azalea.Platform.Audio;
@@ -19,13 +18,13 @@ internal partial class CreateSoundByteCommand : AudioCommand
 	public SoundByte SoundByte;
 	public byte[] Data;
 	public int DataLength;
-	public ALFormat Format;
+	public int Format;
 	public int Frequency;
 }
 
 internal static class CreateSoundByteCommand_Handler
 {
-	internal static SoundByte CreateSoundByte(this ICommandHandler<AudioCommand> handler, byte[] data, int dataLength, ALFormat format, int frequency)
+	internal static SoundByte CreateSoundByte(this ICommandHandler<AudioCommand> handler, byte[] data, int dataLength, int format, int frequency)
 	{
 		var soundByte = new SoundByte();
 		handler.Enqueue(CreateSoundByteCommand.Borrow(soundByte, data, dataLength, format, frequency));
