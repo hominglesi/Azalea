@@ -116,8 +116,10 @@ public static partial class GL
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetUniformLocation.xhtml")]
 	private delegate int GetUniformLocationDelegate(uint program, byte[] name);
 
+	/* Method could not be found on my laptop, disabled for now; Might work with LibraryImport since it's OpenGL 1.1
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glIsTexture.xhtml")]
 	private delegate bool IsTextureDelegate(uint texture);
+	*/
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glLinkProgram.xhtml")]
 	private delegate void LinkProgramDelegate(uint program);
