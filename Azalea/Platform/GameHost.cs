@@ -7,6 +7,7 @@ using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
 using Azalea.IO.Configs;
 using Azalea.Lists;
+using Azalea.Platform.Audio;
 using Azalea.Simulations;
 using Azalea.Sounds;
 using Azalea.Threading;
@@ -37,6 +38,7 @@ public abstract class GameHost
 	internal EditorContainer? EditorContainer { get; private set; }
 
 	private AudioThread _audioThread;
+	public PlatformAudio Audio;
 
 	internal GameHost(HostPreferences prefs)
 	{
@@ -50,6 +52,8 @@ public abstract class GameHost
 		Clipboard = CreateClipboard();
 		Physics = new PhysicsGenerator();
 		SceneManager = new SceneContainer();
+
+		Audio = PlatformAudio.Create();
 
 		_root = new Composition();
 	}

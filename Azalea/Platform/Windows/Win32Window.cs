@@ -2,7 +2,6 @@
 using Azalea.Graphics.OpenGL;
 using Azalea.Inputs;
 using Azalea.Native.Windows;
-using Azalea.Platform.Windows.Com;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
@@ -306,19 +305,19 @@ internal class Win32Window : PlatformWindow
 		return Win32.DefWindowProcW(window, message, wParam, lParam);
 	}
 
-	private class DropTarget(Win32Window window) : IDropTarget
+	private class DropTarget(Win32Window window) : Win32.IDropTarget
 	{
-		public int DragEnter(nint dataObject, uint keyState, Vector2Int point, ref uint effect) => 0;
+		public int DragEnter(IDataObject dataObject, uint keyState, Win32.POINT point, ref uint effect) => 0;
 		public int DragLeave() => 0;
 
-		public int DragOver(uint keyState, Vector2Int point, ref uint effect)
+		public int DragOver(uint keyState, Win32.POINT point, ref uint effect)
 		{
 			effect = Input.OverDroppableFile ? 1u : 0u;
 
 			return 0;
 		}
 
-		public int Drop(IDataObject dataObject, uint keyState, Vector2Int point, ref uint effect)
+		public int Drop(IDataObject dataObject, uint keyState, Win32.POINT point, ref uint effect)
 		{
 			var format = new FORMATETC()
 			{

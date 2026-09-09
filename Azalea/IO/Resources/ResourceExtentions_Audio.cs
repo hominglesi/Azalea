@@ -1,4 +1,6 @@
-﻿using Azalea.Sounds;
+﻿using Azalea.Platform;
+using Azalea.Platform.Audio;
+using Azalea.Sounds;
 using System;
 
 namespace Azalea.IO.Resources;
@@ -16,9 +18,9 @@ public static partial class ResourceStoreExtentions
 		return sound;
 	}
 
-	private static ResourceCache<SoundByte> _soundByteCache = new();
+	private static ResourceCache<Sounds.SoundByte> _soundByteCache = new();
 
-	public static SoundByte GetSoundByte(this IResourceStore store, string path)
+	public static Sounds.SoundByte GetSoundByte(this IResourceStore store, string path)
 	{
 		if (_soundByteCache.TryGetValue(store, path, out var cached))
 			return cached;
@@ -34,6 +36,27 @@ public static partial class ResourceStoreExtentions
 		var sound = Audio.CreateSound(data, data.Length, wav.Format, wav.Frequency);
 
 		_soundByteCache.AddValue(store, path, sound);
+
+		return sound;
+	}
+
+	private static ResourceCache<Platform.Audio.SoundByte> _soundByteCacheNew = new();
+	public static Platform.Audio.SoundByte GetSoundByteNew(this IResourceStore store, string path)
+	{
+		if (_soundByteCacheNew.TryGetValue(store, path, out var cached))
+			return cached;
+
+		using var stream = store.GetStream(path)
+			?? throw new Exception("Sound could not be found.");
+
+		WavSound wav;
+		try { wav = new WavSound(stream); }
+		catch (ArgumentException) { throw new ArgumentException("Sound Bytes only support .wav files"); }
+
+		var data = wav.Data.ToArray();
+		var sound = GameHost.Main.Audio.CreateSoundByte(data, data.Length, wav.Format, wav.Frequency);
+
+		_soundByteCacheNew.AddValue(store, path, sound);
 
 		return sound;
 	}

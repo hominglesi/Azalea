@@ -1,25 +1,21 @@
-﻿using Azalea.Sounds;
+﻿using Azalea.Platform.Audio.OpenAL;
+using Azalea.Platform.Audio.Windows;
 using Azalea.Threading;
 using Azalea.Utils;
+using System;
+using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace Azalea.Platform.Audio;
 public abstract class PlatformAudio : ICommandHandler<AudioCommand>
 {
-	public PlatformAudio()
+	protected PlatformAudio()
 	{
 		MasterVolume = new(1.0f);
 
-		Thread = new AudioThread();
+		Thread = new AudioThread(this);
 		Thread.Start();
 	}
-
-	// All audio channels should total up to 32
-	internal abstract IAudioSource[] AudioChannels { get; }
-	protected const int AudioChannelCount = 4;
-	internal abstract IAudioSource[] AudioByteChannels { get; }
-	protected const int AudioByteChannelCount = 24;
-	internal abstract IAudioSource[] AudioByteInternalChannels { get; }
-	protected const int AudioByteChannelInternalCount = 4;
 
 	public ReadOnlyObservable<float> MasterVolume { get; }
 
@@ -30,20 +26,38 @@ public abstract class PlatformAudio : ICommandHandler<AudioCommand>
 
 	internal readonly AudioThread Thread;
 
-	internal class AudioThread() : GameThread<AudioCommand>(1)
+	internal class AudioThread(PlatformAudio audio) : GameThread<AudioCommand>(1)
 	{
+		private readonly PlatformAudio _audio = audio;
+
 		public override string DisplayName => "Audio Thread";
 
+		public ManualResetEvent InitializedEvent = new(false);
 		protected override void Initialize()
 		{
-			throw new System.NotImplementedException();
+
 		}
 
 		protected override void Update()
 		{
-			throw new System.NotImplementedException();
+
 		}
+
+		protected override void HandleCommand(AudioCommand command)
+			 => _audio.HandleCommandLogic(command);
 	}
 
 	#endregion
+
+	public static PlatformAudio Create()
+	{
+		var newAudio = RuntimeInformation.ProcessArchitecture switch
+		{
+			Architecture.X64 or Architecture.X86 => new ALAudio(new WindowsAudioDeviceNotificationClient()),
+			_ => throw new NotSupportedException(
+				$"Platform '{RuntimeInformation.ProcessArchitecture}' is not supported")
+		};
+
+		return newAudio;
+	}
 }

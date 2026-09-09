@@ -1,15 +1,15 @@
-﻿using Azalea.Platform.Windows.Com;
+﻿using Azalea.Native.Windows;
 using System;
 using System.Runtime.InteropServices;
 
-namespace Azalea.Platform.Windows;
-internal class WindowsAudioDeviceNotificationClient : IMMNotificationClient, IAudioDeviceNotificationClient
+namespace Azalea.Platform.Audio.Windows;
+internal class WindowsAudioDeviceNotificationClient : Win32.IMMNotificationClient, IAudioDeviceNotificationClient
 {
-	private readonly IMMDeviceEnumerator _deviceEnumerator;
+	private readonly Win32.IMMDeviceEnumerator _deviceEnumerator;
 
 	public WindowsAudioDeviceNotificationClient()
 	{
-		_deviceEnumerator = (IMMDeviceEnumerator)new MMDeviceEnumeratorObject();
+		_deviceEnumerator = (Win32.IMMDeviceEnumerator)new Win32.MMDeviceEnumerator();
 		_deviceEnumerator.RegisterEndpointNotificationCallback(this);
 	}
 
@@ -27,5 +27,5 @@ internal class WindowsAudioDeviceNotificationClient : IMMNotificationClient, IAu
 	public void OnDeviceStateChanged([In, MarshalAs(UnmanagedType.LPWStr)] string deviceId, int newState) { }
 	public void OnDeviceAdded([In, MarshalAs(UnmanagedType.LPWStr)] string deviceId) { }
 	public void OnDeviceRemoved([In, MarshalAs(UnmanagedType.LPWStr)] string deviceId) { }
-	public void OnPropertyValueChanged([In, MarshalAs(UnmanagedType.LPWStr)] string deviceId, PropertyKey key) { }
+	public void OnPropertyValueChanged([In, MarshalAs(UnmanagedType.LPWStr)] string deviceId, Win32.PROPERTYKEY key) { }
 }

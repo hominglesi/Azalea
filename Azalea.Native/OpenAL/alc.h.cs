@@ -5,6 +5,7 @@ public static partial class ALC
 {
 	private const string SoftOalPath = "soft_oal.dll";
 
+	public const int FALSE = 0;
 	public const int FREQUENCY = 0x1007;
 	public const int CONNECTED = 0x313;
 	public const int MONO_SOURCES = 0x1010;
@@ -47,4 +48,17 @@ public static partial class ALC
 	/// <summary><see href="https://github.com/kcat/openal-soft/wiki/Programmer's-Guide#alcOpenDevice">Official Documentation</see></summary>
 	[LibraryImport(SoftOalPath, EntryPoint = "alcOpenDevice", StringMarshalling = StringMarshalling.Utf8)]
 	public static partial nint OpenDevice(string? deviceName);
+
+	private delegate bool ReopenDeviceSOFTDelegate(nint device, [MarshalAs(UnmanagedType.LPStr)] string? deviceName, ref int attribs);
+	private static ReopenDeviceSOFTDelegate? __ReopenDeviceSOFTDelegate;
+	/// <summary><see href="https://registry.khronos.org/OpenGL/extensions/EXT/WGL_EXT_swap_control.txt">Official Documentation</see></summary>
+	public static bool ReopenDeviceSOFT(nint device, string? deviceName, ref int attribs) => __ReopenDeviceSOFTDelegate!(device, deviceName, ref attribs);
+
+	public static bool DynamicFunctionsLoaded { get; private set; } = false;
+	/// <summary> A valid OpenGL context must be current before calling this method </summary>
+	public static void LoadDynamicFunctions(Func<nint, string, nint> getProcAddressMethod, nint device)
+	{
+		__ReopenDeviceSOFTDelegate = Marshal.GetDelegateForFunctionPointer<ReopenDeviceSOFTDelegate>(getProcAddressMethod(device, "alcReopenDeviceSOFT"));
+		DynamicFunctionsLoaded = true;
+	}
 }

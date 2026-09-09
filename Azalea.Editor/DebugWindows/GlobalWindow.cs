@@ -30,6 +30,8 @@ internal static class GlobalWindow
 			_window = GUIWindow.Create("Global", new(100), new(400, 400));
 
 			_window.AddGroup("Host");
+			_window.AddButton("Inspect PlatformAudio",
+					() => PlatformAudioInspector.Create(GameHost.Main.Audio, _window));
 			_window.AddButton("Create Application", () => GameHost.Main.CreateApplication());
 			var applicationsGroup = _window.AddGroup("Applications");
 			var applicationGroups = new Dictionary<Application, GUIGroup>();

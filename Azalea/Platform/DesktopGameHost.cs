@@ -4,6 +4,7 @@ using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.Rendering;
 using Azalea.IO.Configs;
 using Azalea.IO.Resources;
+using Azalea.Platform.Audio.Windows;
 using Azalea.Platform.Windows;
 using Azalea.Sounds;
 using Azalea.Sounds.FFmpeg;

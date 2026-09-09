@@ -75,7 +75,7 @@ internal partial class BufferDataCommand : RenderCommand
 
 	protected override void Cleanup()
 	{
-		if (FreeData && Data is not null)
+		if (FreeData)
 			ArrayPool<byte>.Shared.Return(Data);
 	}
 }
@@ -99,7 +99,7 @@ internal partial class BufferDataFloatCommand : RenderCommand
 
 	protected override void Cleanup()
 	{
-		if (FreeData && Data is not null)
+		if (FreeData)
 			DefaultQuadBatch.ArrayPool.Return(Data);
 	}
 }
@@ -115,7 +115,7 @@ internal partial class BufferDataUIntCommand : RenderCommand
 
 	protected override void Cleanup()
 	{
-		if (FreeData && Data is not null)
+		if (FreeData)
 			ArrayPool<uint>.Shared.Return(Data);
 	}
 }

@@ -1,6 +1,5 @@
 ﻿using Azalea.Native.Windows;
 using Azalea.Numerics;
-using Azalea.Platform.Windows.Com;
 using Azalea.Platform.Windows.Enums;
 using Azalea.Platform.Windows.Enums.RawInput;
 using Microsoft.Win32.SafeHandles;
@@ -113,7 +112,7 @@ internal static partial class WinAPI
 	public static extern bool RedrawWindow(IntPtr window, Win32.RECT? rectangle, IntPtr region, uint flags);
 
 	[DllImport(Ole32Path, EntryPoint = "RegisterDragDrop")]
-	public static extern uint RegisterDragDrop(IntPtr window, IDropTarget dropTarget);
+	public static extern uint RegisterDragDrop(IntPtr window, Win32.IDropTarget dropTarget);
 
 	[DllImport(User32Path, EntryPoint = "RegisterRawInputDevices", SetLastError = true)]
 	[return: MarshalAs(UnmanagedType.Bool)]
