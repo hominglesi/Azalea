@@ -1,6 +1,4 @@
 ﻿using Azalea.Native.OpenAL;
-using Azalea.Sounds;
-using System;
 using System.Diagnostics;
 
 namespace Azalea.Platform.Audio.OpenAL;
@@ -10,15 +8,14 @@ internal class ALAudio : PlatformAudio
 	private static readonly int[] _contextAttributes = [ALC.HRTF_SOFT, ALC.FALSE, 0];
 
 	private const int _audioChannelCount = 4;
-	private const int _audioByteChannelCount = 24;
 	private const int _audioByteChannelInternalCount = 4;
 
 	private nint _device;
 	private nint _context;
 
-	private ALAudioSource[] _audioSources = new ALAudioSource[_audioChannelCount];
-	private ALAudioByteSource[] _audioByteSources = new ALAudioByteSource[_audioByteChannelCount];
-	private ALAudioByteSource[] _audioByteSourcesInternal = new ALAudioByteSource[_audioByteChannelInternalCount];
+	private uint[] _audioSources = new uint[_audioChannelCount];
+
+	private uint[] _audioByteSourcesInternal = new uint[_audioByteChannelInternalCount];
 
 	internal ALAudio(IAudioDeviceNotificationClient deviceNotificationClient)
 	{
@@ -32,7 +29,26 @@ internal class ALAudio : PlatformAudio
 	}
 
 	private int _currentAudioSource = 0;
-	private int _currentAudioByteSource = 0;
+
+	protected override void UpdateLogic()
+	{
+		for (int i = 0; i < ActiveInstances.Count; i++)
+		{
+			var audioInstance = ActiveInstances[i];
+			if (audioInstance is AudioByteInstance byteInstance)
+			{
+				int sourceState = 0;
+				Debug.Assert(byteInstance.Source is not null);
+				AL.GetSourcei(byteInstance.Source.Handle, AL.SOURCE_STATE, ref sourceState);
+
+				if (sourceState == AL.STOPPED)
+				{
+					markInstanceStopped(audioInstance);
+					i--;
+				}
+			}
+		}
+	}
 
 	protected override void HandleCommandLogic(AudioCommand command)
 	{
@@ -55,79 +71,73 @@ internal class ALAudio : PlatformAudio
 				var deviceFrequency = 0;
 				ALC.GetIntegerv(_device, ALC.FREQUENCY, 1, ref deviceFrequency);
 
-				for (int i = 0; i < _audioSources.Length; i++)
-					_audioSources[i] = new ALAudioSource();
-				for (int i = 0; i < _audioByteSources.Length; i++)
-					_audioByteSources[i] = new ALAudioByteSource();
-				for (int i = 0; i < _audioByteSourcesInternal.Length; i++)
-					_audioByteSourcesInternal[i] = new ALAudioByteSource();
-				break;
+				AL.GenSources(_audioSources.Length, ref _audioSources[0]);
 
-			case BindSourceBufferCommand(var source, var buffer):
-				AL.Sourcei(source, AL.BUFFER, (int)buffer);
-				break;
-			case BufferDataCommand(var buffer, byte[] data, int dataLength, int format, int frequency, bool freeData):
-				AL.BufferData(buffer, format, ref data[0], dataLength, frequency);
-				break;
-			case CloseDeviceCommand(var device):
-				ALC.CloseDevice(device);
+				var byteSourceHandles = new uint[AudioByteSources.Length];
+				AL.GenSources(AudioByteSources.Length, ref byteSourceHandles[0]);
+				for (int i = 0; i < AudioByteSources.Length; i++)
+					AudioByteSources[i] = new ALByteSource(byteSourceHandles[i]);
+
+				AL.GenSources(_audioByteSourcesInternal.Length, ref _audioByteSourcesInternal[0]);
+
 				break;
 			case CreateSoundByteCommand(var soundByte, byte[] data, int dataLength, int format, int frequency):
 				uint bufferHandle = 0;
 				AL.GenBuffers(1, ref bufferHandle);
 				AL.BufferData(bufferHandle, format, ref data[0], dataLength, frequency);
 
-				var channels = format switch
-				{
-					AL.FORMAT_MONO8 => 1,
-					AL.FORMAT_MONO16 => 1,
-					AL.FORMAT_STEREO8 => 2,
-					AL.FORMAT_STEREO16 => 2,
-					_ => throw new NotImplementedException()
-				};
-
-				var bits = format switch
-				{
-					AL.FORMAT_MONO8 => 8,
-					AL.FORMAT_MONO16 => 16,
-					AL.FORMAT_STEREO8 => 8,
-					AL.FORMAT_STEREO16 => 16,
-					_ => throw new NotImplementedException()
-				};
-
-				var duration = dataLength / (channels * (bits / 8) * frequency);
-
-				soundByte.Initialize(bufferHandle, duration);
+				soundByte.Initialize(bufferHandle);
 				break;
-			case PlayCommand(var sound, var gain, var looping):
-				var audioSource = _audioSources[_currentAudioSource];
-				_currentAudioSource = (_currentAudioSource + 1) % _audioSources.Length;
-
-				if (audioSource.State == AudioSourceState.Playing || audioSource.State == AudioSourceState.Paused)
-					audioSource.Stop();
-
-				audioSource.Play(sound, gain, looping);
-
-				break;
-			case PlayByteCommand(var sound, var gain, var looping):
-				var audioByteSource = _audioByteSources[_currentAudioSource];
-				_currentAudioByteSource = (_currentAudioByteSource + 1) % _audioByteSources.Length;
-
+			case PlayByteCommand(var instance, var sound, var gain, var looping):
 				Debug.Assert(sound.Handle is not null);
-				AL.Sourcei(audioByteSource.Handle, AL.BUFFER, (int)sound.Handle);
 
+				var audioByteSource = getNextByteSource();
+
+				if (audioByteSource.CurrentInstance.Value is not null)
+				{
+					AL.SourceStop(audioByteSource.Handle);
+					markInstanceStopped(audioByteSource.CurrentInstance.Value);
+				}
+
+				AL.Sourcei(audioByteSource.Handle, AL.BUFFER, (int)sound.Handle);
 				AL.Sourcef(audioByteSource.Handle, AL.GAIN, gain);
 				AL.Sourcei(audioByteSource.Handle, AL.LOOPING, looping ? 1 : 0);
 
 				AL.SourcePlay(audioByteSource.Handle);
 
-				break;
-			case SetMasterVolumeCommand(var volume):
-				AL.Listenerf(AL.GAIN, volume);
-				MasterVolume.Value = volume;
+				audioByteSource.CurrentInstance.Value = instance;
+
+				instance.Source = audioByteSource;
+				instance.State = AudioInstanceState.Playing;
+
+				ActiveInstances.Add(instance);
+				InstanceStarted?.Invoke(instance);
 				break;
 		}
 
 		command.Return();
+	}
+
+	private const int _audioByteChannelCount = 24;
+	internal ALByteSource[] AudioByteSources = new ALByteSource[_audioByteChannelCount];
+	private int _nextAudioByteSource = 0;
+	private ALByteSource getNextByteSource()
+	{
+		var next = AudioByteSources[_nextAudioByteSource];
+		_nextAudioByteSource = (_nextAudioByteSource + 1) % AudioByteSources.Length;
+		return next;
+	}
+
+	private void markInstanceStopped(IAudioInstance instance)
+	{
+		if (instance is AudioByteInstance byteInstance)
+		{
+			Debug.Assert(byteInstance.Source is not null);
+			byteInstance.Source.CurrentInstance.Value = null;
+
+			byteInstance.InvokeStopped();
+		}
+
+		ActiveInstances.Remove(instance);
 	}
 }

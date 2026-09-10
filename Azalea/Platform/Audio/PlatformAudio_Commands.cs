@@ -1,6 +1,5 @@
-﻿using Azalea.Sounds;
-using Azalea.Threading;
-using System.Buffers;
+﻿using Azalea.Threading;
+using System.Diagnostics;
 
 namespace Azalea.Platform.Audio;
 public abstract class AudioCommand : ThreadCommand
@@ -11,36 +10,6 @@ public abstract class AudioCommand : ThreadCommand
 	{
 		TotalCreated++;
 	}
-}
-
-[ThreadCommand]
-internal partial class BindSourceBufferCommand : AudioCommand
-{
-	public uint Source;
-	public uint Buffer;
-}
-
-[ThreadCommand]
-internal partial class BufferDataCommand : AudioCommand
-{
-	public uint Buffer;
-	public byte[] Data;
-	public int DataLength;
-	public int Format;
-	public int Frequency;
-	public bool FreeData;
-
-	protected override void Cleanup()
-	{
-		if (FreeData)
-			ArrayPool<byte>.Shared.Return(Data);
-	}
-}
-
-[ThreadCommand]
-internal partial class CloseDeviceCommand : AudioCommand
-{
-	public nint Device;
 }
 
 [ThreadCommand(generateHandler: false)]
@@ -57,7 +26,9 @@ internal static class CreateSoundByteCommand_Handler
 {
 	internal static SoundByte CreateSoundByte(this ICommandHandler<AudioCommand> handler, byte[] data, int dataLength, int format, int frequency)
 	{
-		var soundByte = new SoundByte();
+		var duration = AudioUtils.CalculateDuration(data, dataLength, format, frequency);
+
+		var soundByte = new SoundByte(duration);
 		handler.Enqueue(CreateSoundByteCommand.Borrow(soundByte, data, dataLength, format, frequency));
 		return soundByte;
 	}
@@ -66,32 +37,23 @@ internal static class CreateSoundByteCommand_Handler
 [ThreadCommand(awaitable: true)]
 internal partial class InitializeCommand : AudioCommand, ICommandAwaitable { }
 
-[ThreadCommand]
-internal partial class PlayCommand : AudioCommand
-{
-	public Sound Sound;
-	public float Gain;
-	public bool Looping;
-}
-
-[ThreadCommand]
+[ThreadCommand(generateHandler: false)]
 internal partial class PlayByteCommand : AudioCommand
 {
+	public AudioByteInstance Instance;
 	public SoundByte SoundByte;
 	public float Gain;
 	public bool Looping;
 }
 
-[ThreadCommand]
-internal partial class PlayByteInternalCommand : AudioCommand
+internal static class PlayByteCommand_Handler
 {
-	public SoundByte SoundByte;
-	public float Gain;
-	public bool Looping;
-}
+	internal static IAudioInstance PlayByte(this ICommandHandler<AudioCommand> handler, SoundByte soundByte, float gain, bool looping)
+	{
+		Debug.Assert(handler is PlatformAudio);
 
-[ThreadCommand]
-internal partial class SetMasterVolumeCommand : AudioCommand
-{
-	public float Volume;
+		var instance = new AudioByteInstance((PlatformAudio)handler, soundByte.Duration);
+		handler.Enqueue(PlayByteCommand.Borrow(instance, soundByte, gain, looping));
+		return instance;
+	}
 }

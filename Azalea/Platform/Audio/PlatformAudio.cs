@@ -3,12 +3,16 @@ using Azalea.Platform.Audio.Windows;
 using Azalea.Threading;
 using Azalea.Utils;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Azalea.Platform.Audio;
 public abstract class PlatformAudio : ICommandHandler<AudioCommand>
 {
+	internal Action<IAudioInstance>? InstanceStarted;
+	protected List<IAudioInstance> ActiveInstances = [];
+
 	protected PlatformAudio()
 	{
 		MasterVolume = new(1.0f);
@@ -20,6 +24,7 @@ public abstract class PlatformAudio : ICommandHandler<AudioCommand>
 	public ReadOnlyObservable<float> MasterVolume { get; }
 
 	protected abstract void HandleCommandLogic(AudioCommand command);
+	protected abstract void UpdateLogic();
 	public ICommandAwaitable? Enqueue(AudioCommand command) => Thread.Enqueue(command);
 
 	#region AudioThread
@@ -39,9 +44,7 @@ public abstract class PlatformAudio : ICommandHandler<AudioCommand>
 		}
 
 		protected override void Update()
-		{
-
-		}
+			=> _audio.UpdateLogic();
 
 		protected override void HandleCommand(AudioCommand command)
 			 => _audio.HandleCommandLogic(command);

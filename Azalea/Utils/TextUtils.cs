@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Azalea.Utils;
 public static class TextUtils
@@ -27,5 +28,13 @@ public static class TextUtils
 		}
 
 		return builder.ToString();
+	}
+
+	public static string FormatTimeCodeFromSeconds(double secondDuration)
+	{
+		var minutes = (int)Math.Round(secondDuration) / 60;
+		var seconds = (int)Math.Round(secondDuration % 60);
+
+		return $"{minutes}:{seconds}";
 	}
 }

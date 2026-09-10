@@ -184,6 +184,7 @@ public class GUIWindow : BasicWindowContainer
 		}
 
 		private readonly DropDownArrow _dropDownArrow;
+		internal readonly SpriteText Label;
 
 		public TitleBar(string title, float height, Color color, bool expanded)
 		{
@@ -198,7 +199,7 @@ public class GUIWindow : BasicWindowContainer
 
 			AddRange([
 				_dropDownArrow = new DropDownArrow(expanded),
-				new SpriteText(){
+				Label = new SpriteText(){
 					Text = title,
 					Font = GUIConstants.Font
 				}

@@ -6,6 +6,7 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.IO.Resources;
 using Azalea.Sounds;
+using Azalea.Utils;
 using System;
 
 namespace Azalea.VisualTests;
@@ -237,10 +238,8 @@ internal class AudioTest : TestScene
 
 				if (_audioSource.CurrentInstance is not null)
 				{
-					var duration = _audioSource.CurrentInstance.TotalDuration;
-					var minutes = (int)Math.Round(duration) / 60;
-					var seconds = (int)Math.Round(duration % 60);
-					_durationDisplay.Text = $"Duration: {minutes}:{seconds}";
+					var durationText = TextUtils.FormatTimeCodeFromSeconds(_audioSource.CurrentInstance.TotalDuration);
+					_durationDisplay.Text = $"Duration: {durationText}";
 					_loopingCheckbox.SetChecked(_audioSource.Looping);
 				}
 				else
