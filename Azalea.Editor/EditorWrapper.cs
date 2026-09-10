@@ -98,6 +98,8 @@ public class EditorWrapper : AzaleaGame
 			GlobalWindow.Toggle();
 		if (Input.GetKey(Keys.F3).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
 			RenderWindow.Toggle();
+		if (Input.GetKey(Keys.F4).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
+			ClassWindow.Toggle();
 	}
 
 	private class MissingGameDisplay : Composition
