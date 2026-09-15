@@ -132,6 +132,8 @@ public abstract class Slider : Composition
 
 		OnHeld();
 		_heldOffset = 0;
+
+		updateValue();
 		return true;
 	}
 
@@ -165,12 +167,15 @@ public abstract class Slider : Composition
 		}
 
 		if (IsHeld)
-		{
-			var newPosition = getLocalMousePosition() + _heldOffset;
-			newPosition = Math.Clamp(newPosition, SliderRange.X, SliderRange.Y);
+			updateValue();
+	}
 
-			Value = MathUtils.Map(newPosition, SliderRange.X, SliderRange.Y, 0, 1);
-		}
+	private void updateValue()
+	{
+		var newPosition = getLocalMousePosition() + _heldOffset;
+		newPosition = Math.Clamp(newPosition, SliderRange.X, SliderRange.Y);
+
+		Value = MathUtils.Map(newPosition, SliderRange.X, SliderRange.Y, 0, 1);
 	}
 }
 

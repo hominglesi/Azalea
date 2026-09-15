@@ -8,7 +8,7 @@ using System;
 namespace Azalea.Editor.Design.Gui;
 public class GUIButton : Composition
 {
-	private readonly SpriteText _text;
+	public readonly SpriteText Label;
 	private readonly Sprite _background;
 
 	internal GUIButton(string text, Action clickAction)
@@ -23,7 +23,7 @@ public class GUIButton : Composition
 				RelativeSizeAxes = Axes.Both,
 				Color = GUIConstants.Colors.AccentColor,
 			},
-			_text = new SpriteText(){
+			Label = new SpriteText(){
 				Font = GUIConstants.Font,
 				Origin = Anchor.Center,
 				Anchor = Anchor.Center,

@@ -1,12 +1,22 @@
-﻿using System;
+﻿using Azalea.Utils;
+using System;
 
 namespace Azalea.Platform.Audio;
-public interface IAudioInstance
+public partial interface IAudioInstance
 {
 	internal PlatformAudio Owner { get; }
+	public bool Looping { get; }
 	public double Duration { get; }
+	public ReadOnlyObservable<AudioInstanceState> State { get; }
 
-	public event Action Stopped;
+	[ObservableProperty] public float Gain { get; }
+	[ObservableProperty] public float Timestamp { get; }
+
+	public void Pause() => Owner.PauseInstance(this);
+	public void SetGain(float gain) => Owner.SetInstanceGain(this, gain);
+	public void SetTimestamp(float timestamp) => Owner.SetInstanceTimestamp(this, timestamp);
+	public void Stop() => Owner.StopInstance(this);
+	public void Unpause() => Owner.UnpauseInstance(this);
 }
 
 public enum AudioInstanceState

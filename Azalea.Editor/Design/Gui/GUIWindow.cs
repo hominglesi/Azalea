@@ -6,6 +6,7 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
+using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -90,7 +91,7 @@ public class GUIWindow : BasicWindowContainer
 
 	public void RemoveElement(GameObject obj) => obj.Parent!.Remove(obj);
 
-	private readonly Stack<GUIGroup> _groupStack = [];
+	private readonly Stack<Composition> _groupStack = [];
 
 	public GUIGroup AddGroup(string name)
 	{
@@ -100,7 +101,7 @@ public class GUIWindow : BasicWindowContainer
 		return group;
 	}
 
-	public void SelectGroup(GUIGroup group) => _groupStack.Push(group);
+	public void SelectGroup(Composition group) => _groupStack.Push(group);
 	public void FinishGroup() => _groupStack.Pop();
 
 	public GUILabel AddLabel(string text)
@@ -151,6 +152,16 @@ public class GUIWindow : BasicWindowContainer
 	{
 		var sliderFloat = new GUISliderFloat(
 			name, minValue, maxValue, initialValue, stringFormat, continuous);
+		Add(sliderFloat);
+		return sliderFloat;
+	}
+
+	public GUIObservingSliderFloat AddObservingSliderFloat(string name,
+		ObservableProxy<float> observable, float minValue = 0, float maxValue = 1,
+		string stringFormat = "0.000")
+	{
+		var sliderFloat = new GUIObservingSliderFloat(
+			name, observable, minValue, maxValue, stringFormat);
 		Add(sliderFloat);
 		return sliderFloat;
 	}

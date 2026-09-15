@@ -37,13 +37,17 @@ internal static class CreateSoundByteCommand_Handler
 [ThreadCommand(awaitable: true)]
 internal partial class InitializeCommand : AudioCommand, ICommandAwaitable { }
 
+[ThreadCommand]
+internal partial class PauseInstanceCommand : AudioCommand
+{
+	public IAudioInstance Instance;
+}
+
 [ThreadCommand(generateHandler: false)]
 internal partial class PlayByteCommand : AudioCommand
 {
 	public AudioByteInstance Instance;
 	public SoundByte SoundByte;
-	public float Gain;
-	public bool Looping;
 }
 
 internal static class PlayByteCommand_Handler
@@ -52,8 +56,34 @@ internal static class PlayByteCommand_Handler
 	{
 		Debug.Assert(handler is PlatformAudio);
 
-		var instance = new AudioByteInstance((PlatformAudio)handler, soundByte.Duration);
-		handler.Enqueue(PlayByteCommand.Borrow(instance, soundByte, gain, looping));
+		var instance = new AudioByteInstance((PlatformAudio)handler, looping, gain, soundByte.Duration);
+		handler.Enqueue(PlayByteCommand.Borrow(instance, soundByte));
 		return instance;
 	}
+}
+
+[ThreadCommand]
+internal partial class SetInstanceGainCommand : AudioCommand
+{
+	public IAudioInstance Instance;
+	public float Gain;
+}
+
+[ThreadCommand]
+internal partial class SetInstanceTimestampCommand : AudioCommand
+{
+	public IAudioInstance Instance;
+	public float Timestamp;
+}
+
+[ThreadCommand]
+internal partial class StopInstanceCommand : AudioCommand
+{
+	public IAudioInstance Instance;
+}
+
+[ThreadCommand]
+internal partial class UnpauseInstanceCommand : AudioCommand
+{
+	public IAudioInstance Instance;
 }

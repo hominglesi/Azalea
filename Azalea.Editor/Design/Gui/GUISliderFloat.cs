@@ -13,7 +13,7 @@ public class GUISliderFloat : Composition
 	private readonly float _maxValue;
 	private readonly string _stringFormat;
 
-	private readonly Slider _slider;
+	public Slider Slider { get; }
 	private readonly SpriteText _valueText;
 
 	internal GUISliderFloat(string name, float minValue, float maxValue,
@@ -27,7 +27,7 @@ public class GUISliderFloat : Composition
 		AutoSizeAxes = Axes.Y;
 
 		AddRange([
-			_slider = new GUISlider(){
+			Slider = new GUISlider(){
 				Width = 220,
 				Height = GUIConstants.ElementHeight
 			},
@@ -45,20 +45,25 @@ public class GUISliderFloat : Composition
 			}
 		]);
 
+		Slider.OnValueChanged += value =>
+		{
+			var boundValue = _minValue + (value * (_maxValue - _minValue));
+
+			_valueText.Text = boundValue.ToString(_stringFormat);
+		};
+
 		if (continuous)
-			_slider.OnValueChanged = onValueChanged;
+			Slider.OnValueChanged += onValueChanged;
 		else
-			_slider.OnValueSet = onValueChanged;
+			Slider.OnValueSet += onValueChanged;
 
 		initialValue = Math.Clamp(initialValue, _minValue, _maxValue);
-		_slider.Value = MathUtils.Map(initialValue, _minValue, _maxValue, 0, 1);
+		Slider.Value = MathUtils.Map(initialValue, _minValue, _maxValue, 0, 1);
 	}
 
 	private void onValueChanged(float value)
 	{
 		var boundValue = _minValue + (value * (_maxValue - _minValue));
-
-		_valueText.Text = boundValue.ToString(_stringFormat);
 		_valueChanged?.Invoke(boundValue);
 	}
 
@@ -66,7 +71,7 @@ public class GUISliderFloat : Composition
 	public void OnValueChanged(Action<float> valueChanged)
 		=> _valueChanged = valueChanged;
 
-	class GUISlider : Slider
+	internal class GUISlider : Slider
 	{
 		protected override GameObject CreateBody()
 		{

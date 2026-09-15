@@ -41,6 +41,10 @@ internal class ALAudio : PlatformAudio
 				Debug.Assert(byteInstance.Source is not null);
 				AL.GetSourcei(byteInstance.Source.Handle, AL.SOURCE_STATE, ref sourceState);
 
+				float sourceOffset = 0;
+				AL.GetSourcef(byteInstance.Source.Handle, AL.SEC_OFFSET, ref sourceOffset);
+				byteInstance.Timestamp = sourceOffset;
+
 				if (sourceState == AL.STOPPED)
 				{
 					markInstanceStopped(audioInstance);
@@ -88,7 +92,18 @@ internal class ALAudio : PlatformAudio
 
 				soundByte.Initialize(bufferHandle);
 				break;
-			case PlayByteCommand(var instance, var sound, var gain, var looping):
+			case PauseInstanceCommand(var instance):
+				switch (instance)
+				{
+					case AudioByteInstance byteInstance:
+						Debug.Assert(byteInstance.Source is not null);
+						AL.SourcePause(byteInstance.Source.Handle);
+						break;
+				}
+
+				instance.State.Value = AudioInstanceState.Paused;
+				break;
+			case PlayByteCommand(var instance, var sound):
 				Debug.Assert(sound.Handle is not null);
 
 				var audioByteSource = getNextByteSource();
@@ -100,18 +115,64 @@ internal class ALAudio : PlatformAudio
 				}
 
 				AL.Sourcei(audioByteSource.Handle, AL.BUFFER, (int)sound.Handle);
-				AL.Sourcef(audioByteSource.Handle, AL.GAIN, gain);
-				AL.Sourcei(audioByteSource.Handle, AL.LOOPING, looping ? 1 : 0);
+				AL.Sourcef(audioByteSource.Handle, AL.GAIN, instance.Gain);
+				AL.Sourcei(audioByteSource.Handle, AL.LOOPING, instance.Looping ? 1 : 0);
 
 				AL.SourcePlay(audioByteSource.Handle);
 
 				audioByteSource.CurrentInstance.Value = instance;
 
 				instance.Source = audioByteSource;
-				instance.State = AudioInstanceState.Playing;
+				instance.State.Value = AudioInstanceState.Playing;
 
 				ActiveInstances.Add(instance);
 				InstanceStarted?.Invoke(instance);
+				break;
+			case SetInstanceGainCommand(var instance, var gain):
+				switch (instance)
+				{
+					case AudioByteInstance byteInstance:
+						Debug.Assert(byteInstance.Source is not null);
+						AL.Sourcef(byteInstance.Source.Handle, AL.GAIN, gain);
+						byteInstance.Gain = gain;
+						break;
+				}
+
+				break;
+			case SetInstanceTimestampCommand(var instance, var timestamp):
+				switch (instance)
+				{
+					case AudioByteInstance byteInstance:
+						Debug.Assert(byteInstance.Source is not null);
+						AL.Sourcef(byteInstance.Source.Handle, AL.SEC_OFFSET, timestamp);
+						break;
+				}
+
+				break;
+			case StopInstanceCommand(var instance):
+				switch (instance)
+				{
+					case AudioByteInstance byteInstance:
+						Debug.Assert(byteInstance.Source is not null);
+						AL.SourceStop(byteInstance.Source.Handle);
+						break;
+				}
+
+				markInstanceStopped(instance);
+				break;
+			case UnpauseInstanceCommand(var instance):
+				if (instance.State != AudioInstanceState.Paused)
+					break;
+
+				switch (instance)
+				{
+					case AudioByteInstance byteInstance:
+						Debug.Assert(byteInstance.Source is not null);
+						AL.SourcePlay(byteInstance.Source.Handle);
+						break;
+				}
+
+				instance.State.Value = AudioInstanceState.Playing;
 				break;
 		}
 
@@ -130,6 +191,8 @@ internal class ALAudio : PlatformAudio
 
 	private void markInstanceStopped(IAudioInstance instance)
 	{
+		Debug.Assert(instance.State != AudioInstanceState.Stopped);
+
 		if (instance is AudioByteInstance byteInstance)
 		{
 			Debug.Assert(byteInstance.Source is not null);
@@ -138,6 +201,7 @@ internal class ALAudio : PlatformAudio
 			byteInstance.InvokeStopped();
 		}
 
+		instance.State.Value = AudioInstanceState.Stopped;
 		ActiveInstances.Remove(instance);
 	}
 }
