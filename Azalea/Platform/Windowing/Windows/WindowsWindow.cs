@@ -336,7 +336,10 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 
 	protected override IPlatformDeviceContext GetDeviceContext()
 	{
-		var deviceContext = Win32.GetDC(Handle);
-		return new WindowsDeviceContext(deviceContext, ClientSize);
+		var contextHandle = Win32.GetDC(Handle);
+		var deviceContext = new WindowsDeviceContext(contextHandle, ClientSize);
+		OnClientSizeChanged += deviceContext.UpdateClientSize;
+
+		return deviceContext;
 	}
 }
