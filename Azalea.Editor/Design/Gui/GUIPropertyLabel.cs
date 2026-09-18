@@ -2,19 +2,20 @@
 using Azalea.Design.Containers;
 using Azalea.Graphics;
 using Azalea.Utils;
+using Azalea.Utils.Proxies;
 
 namespace Azalea.Editor.Design.Gui;
-public class GUIObservingLabel<T> : TextContainer
+public class GUIPropertyLabel<T> : TextContainer
 {
 	private readonly string _label;
-	private readonly ObservableProxy<T> _observable;
+	private readonly IProxy<T> _proxy;
 	private readonly string? _displayString;
 
-	internal GUIObservingLabel(string label, ObservableProxy<T> observable, string? displayString = null)
+	internal GUIPropertyLabel(string label, IProxy<T> proxy, string? displayString = null)
 		: base(spriteText => spriteText.Font = GUIConstants.Font)
 	{
 		_label = label;
-		_observable = observable;
+		_proxy = proxy;
 		_displayString = displayString;
 
 		RelativeSizeAxes = Axes.X;
@@ -23,7 +24,7 @@ public class GUIObservingLabel<T> : TextContainer
 
 	protected override void Update()
 	{
-		if (_observable.TryGetInvalid(out T newValue))
+		if (_proxy.HasNewValue(out T newValue))
 			Text = $"{_label}: {format(newValue)}";
 	}
 

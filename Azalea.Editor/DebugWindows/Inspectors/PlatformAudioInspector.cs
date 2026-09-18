@@ -1,12 +1,13 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Editor.Design.Gui;
-using Azalea.Extentions.ObjectExtentions;
+using Azalea.Extentions;
 using Azalea.Graphics;
 using Azalea.IO.Resources;
 using Azalea.Platform.Audio;
 using Azalea.Platform.Audio.OpenAL;
 using Azalea.Threading;
 using Azalea.Utils;
+using Azalea.Utils.Proxies;
 using System;
 using System.Numerics;
 
@@ -79,11 +80,11 @@ internal class PlatformAudioInspector
 
 	class AudioInstanceInspector : FlexContainer
 	{
-		private readonly ObservableProxy<AudioInstanceState> _instanceState;
+		private readonly IProxy<AudioInstanceState> _stateProxy;
 
 		public AudioInstanceInspector(GUIWindow window, IAudioInstance instance)
 		{
-			_instanceState = instance.CreateProxy<AudioInstanceState>("State");
+			_stateProxy = instance.CreateProxy<AudioInstanceState>("State");
 
 			RelativeSizeAxes = Axes.X;
 			AutoSizeAxes = Axes.Y;
@@ -98,12 +99,12 @@ internal class PlatformAudioInspector
 
 				window.AddLabel($"Looping: {instance.Looping}");
 				window.AddLabel($"Duration: {durationText}");
-				window.AddObservingLabel("State", instance.CreateProxy<AudioInstanceState>("State"));
+				window.AddPropertyLabel("State", instance.CreateProxy<AudioInstanceState>("State"));
 
 				var gainSlider = window.AddSliderFloat("Gain", 0, 1, instance.Gain, "0.00");
 				gainSlider.OnValueChanged(instance.SetGain);
 
-				var timestampSlider = window.AddObservingSliderFloat("Timestamp",
+				var timestampSlider = window.AddPropertySliderFloat("Timestamp",
 					instance.CreateProxy<float>("Timestamp", instance.SetTimestamp),
 					0, (float)instance.Duration, "0.00");
 
@@ -128,7 +129,7 @@ internal class PlatformAudioInspector
 
 		protected override void Update()
 		{
-			if (_instanceState.TryGetInvalid(out AudioInstanceState newState))
+			if (_stateProxy.HasNewValue(out AudioInstanceState newState))
 				if (newState == AudioInstanceState.Stopped)
 					Parent!.Remove(this);
 		}

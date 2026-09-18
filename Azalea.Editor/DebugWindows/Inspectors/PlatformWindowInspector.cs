@@ -1,5 +1,5 @@
 ﻿using Azalea.Editor.Design.Gui;
-using Azalea.Extentions.ObjectExtentions;
+using Azalea.Extentions;
 using Azalea.IO.Resources;
 using Azalea.Platform.Windowing;
 using Azalea.Platform.Windowing.Windows;
@@ -26,22 +26,22 @@ internal class PlatformWindowInspector
 			guiWindow.FinishGroup();
 		}
 
-		guiWindow.AddObservingLabel("Title", window.CreateProxy<string>("Title"));
+		guiWindow.AddPropertyLabel("Title", window.CreateProxy<string>("Title"));
 		guiWindow.AddButton("Set Random Title", () => window.SetTitle("Random Title"));
-		guiWindow.AddObservingLabel("Shown", window.CreateProxy<bool>("Shown"));
+		guiWindow.AddPropertyLabel("Shown", window.CreateProxy<bool>("Shown"));
 		guiWindow.AddButton("Show", window.Show);
 		guiWindow.AddButton("Hide", window.Hide);
-		guiWindow.AddObservingLabel("Position", window.CreateProxy<Vector2Int>("Position"));
+		guiWindow.AddPropertyLabel("Position", window.CreateProxy<Vector2Int>("Position"));
 		guiWindow.AddButton("Set Position to {100, 100}", () => window.SetPosition(new(100)));
-		guiWindow.AddObservingLabel("Client Position", window.CreateProxy<Vector2Int>("ClientPosition"));
+		guiWindow.AddPropertyLabel("Client Position", window.CreateProxy<Vector2Int>("ClientPosition"));
 		guiWindow.AddButton("Set Client Position to {100, 100}", () => window.SetClientPosition(new(100)));
-		guiWindow.AddObservingLabel("Size", window.CreateProxy<Vector2Int>("Size"));
+		guiWindow.AddPropertyLabel("Size", window.CreateProxy<Vector2Int>("Size"));
 		guiWindow.AddButton("Set Size to {800, 600}", () => window.SetSize(new(800, 600)));
-		guiWindow.AddObservingLabel("Client Size", window.CreateProxy<Vector2Int>("ClientSize"));
+		guiWindow.AddPropertyLabel("Client Size", window.CreateProxy<Vector2Int>("ClientSize"));
 		guiWindow.AddButton("Set Client Size to {800, 600}", () => window.SetClientSize(new(800, 600)));
-		guiWindow.AddObservingLabel("Cursor Visible", window.CreateProxy<bool>("CursorVisible"));
+		guiWindow.AddPropertyLabel("Cursor Visible", window.CreateProxy<bool>("CursorVisible"));
 		guiWindow.AddButton("Toggle Cursor Visible", () => window.SetCursorVisible(!window.CursorVisible));
-		guiWindow.AddObservingLabel("Resizable", window.CreateProxy<bool>("Resizable"));
+		guiWindow.AddPropertyLabel("Resizable", window.CreateProxy<bool>("Resizable"));
 		guiWindow.AddButton("Toggle Resizable", () => window.SetResizable(!window.Resizable));
 
 		guiWindow.AddButton("Focus", window.Focus);
@@ -72,7 +72,7 @@ internal class PlatformWindowInspector
 
 		guiWindow.AddLabel("Device Context Borrowed: " + window.DeviceContextBorrowed);
 
-		guiWindow.AddObservingLabel("Closed", window.CreateProxy<bool>("Closed"));
+		guiWindow.AddPropertyLabel("Closed", window.CreateProxy<bool>("Closed"));
 		guiWindow.AddButton("Close", window.Close);
 
 		var thread = window.Thread;

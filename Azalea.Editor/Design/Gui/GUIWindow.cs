@@ -7,6 +7,7 @@ using Azalea.Graphics.Sprites;
 using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
 using Azalea.Utils;
+using Azalea.Utils.Proxies;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -125,12 +126,12 @@ public class GUIWindow : BasicWindowContainer
 		return counter;
 	}
 
-	public GUIObservingLabel<T> AddObservingLabel<T>(string label, ObservableProxy<T> observable,
+	public GUIPropertyLabel<T> AddPropertyLabel<T>(string label, IProxy<T> proxy,
 		string? displayString = null)
 	{
-		var observingLabel = new GUIObservingLabel<T>(label, observable, displayString);
-		Add(observingLabel);
-		return observingLabel;
+		var propertyLabel = new GUIPropertyLabel<T>(label, proxy, displayString);
+		Add(propertyLabel);
+		return propertyLabel;
 	}
 
 	public GUIButton AddButton(string text, Action clickAction)
@@ -157,12 +158,11 @@ public class GUIWindow : BasicWindowContainer
 		return sliderFloat;
 	}
 
-	public GUIObservingSliderFloat AddObservingSliderFloat(string name,
-		ObservableProxy<float> observable, float minValue = 0, float maxValue = 1,
-		string stringFormat = "0.000")
+	public GUIPropertySliderFloat AddPropertySliderFloat(string name, IProxy<float> proxy,
+		float minValue = 0, float maxValue = 1, string stringFormat = "0.000")
 	{
-		var sliderFloat = new GUIObservingSliderFloat(
-			name, observable, minValue, maxValue, stringFormat);
+		var sliderFloat = new GUIPropertySliderFloat(
+			name, proxy, minValue, maxValue, stringFormat);
 		Add(sliderFloat);
 		return sliderFloat;
 	}

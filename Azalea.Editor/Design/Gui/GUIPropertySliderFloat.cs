@@ -3,11 +3,12 @@ using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
 using Azalea.Utils;
+using Azalea.Utils.Proxies;
 
 namespace Azalea.Editor.Design.Gui;
-public class GUIObservingSliderFloat : Composition
+public class GUIPropertySliderFloat : Composition
 {
-	private readonly ObservableProxy<float> _observable;
+	private readonly IProxy<float> _proxy;
 	private readonly float _minValue;
 	private readonly float _maxValue;
 	private readonly string _stringFormat;
@@ -15,10 +16,10 @@ public class GUIObservingSliderFloat : Composition
 	public Slider Slider { get; }
 	private readonly SpriteText _valueText;
 
-	internal GUIObservingSliderFloat(string name, ObservableProxy<float> observable,
+	internal GUIPropertySliderFloat(string name, IProxy<float> proxy,
 		float minValue, float maxValue, string stringFormat)
 	{
-		_observable = observable;
+		_proxy = proxy;
 		_minValue = minValue;
 		_maxValue = maxValue;
 		_stringFormat = stringFormat;
@@ -46,12 +47,12 @@ public class GUIObservingSliderFloat : Composition
 		]);
 
 		Slider.OnValueChanged += value => _valueText.Text = toValueRange(value).ToString(_stringFormat);
-		Slider.OnValueSet += value => _observable.SetValue(toValueRange(value));
+		Slider.OnValueSet += value => _proxy.SetValue(toValueRange(value));
 	}
 
 	protected override void Update()
 	{
-		if(_observable.TryGetInvalid(out float newValue))
+		if(_proxy.HasNewValue(out float newValue))
 			Slider.Value = toSliderRange(newValue);
 	}
 
