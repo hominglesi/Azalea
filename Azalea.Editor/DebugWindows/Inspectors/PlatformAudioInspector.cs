@@ -1,5 +1,6 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Editor.Design.Gui;
+using Azalea.Extentions.ObjectExtentions;
 using Azalea.Graphics;
 using Azalea.IO.Resources;
 using Azalea.Platform.Audio;
@@ -35,7 +36,7 @@ internal class PlatformAudioInspector
 
 				window.FinishGroup();
 
-				alAudio.AudioByteSources[i].CurrentInstance.OnValueChanged +=
+				alAudio.AudioByteSources[i].OnCurrentInstanceChanged +=
 					instance => Scheduler.Schedule(() =>
 					{
 						if (instance is not null)
@@ -70,12 +71,6 @@ internal class PlatformAudioInspector
 			var instanceInspector = new AudioInstanceInspector(window, instance);
 			window.Add(instanceInspector);
 
-			instance.State.OnValueChanged += state => Scheduler.Schedule(() =>
-			{
-				if (state == AudioInstanceState.Stopped)
-					instanceInspector.Parent!.Remove(instanceInspector);
-			});
-
 			window.FinishGroup();
 		});
 
@@ -84,8 +79,12 @@ internal class PlatformAudioInspector
 
 	class AudioInstanceInspector : FlexContainer
 	{
+		private readonly ObservableProxy<AudioInstanceState> _instanceState;
+
 		public AudioInstanceInspector(GUIWindow window, IAudioInstance instance)
 		{
+			_instanceState = instance.CreateProxy<AudioInstanceState>("State");
+
 			RelativeSizeAxes = Axes.X;
 			AutoSizeAxes = Axes.Y;
 			Direction = FlexDirection.Vertical;
@@ -99,13 +98,13 @@ internal class PlatformAudioInspector
 
 				window.AddLabel($"Looping: {instance.Looping}");
 				window.AddLabel($"Duration: {durationText}");
-				window.AddObservingLabel("State", instance.State);
+				window.AddObservingLabel("State", instance.CreateProxy<AudioInstanceState>("State"));
 
 				var gainSlider = window.AddSliderFloat("Gain", 0, 1, instance.Gain, "0.00");
 				gainSlider.OnValueChanged(instance.SetGain);
 
 				var timestampSlider = window.AddObservingSliderFloat("Timestamp",
-					new ObservableProxy<float>(instance, "Timestamp", instance.SetTimestamp),
+					instance.CreateProxy<float>("Timestamp", instance.SetTimestamp),
 					0, (float)instance.Duration, "0.00");
 
 				var buttonGroup = new FlexContainer()
@@ -125,6 +124,13 @@ internal class PlatformAudioInspector
 			}
 
 			window.FinishGroup();
+		}
+
+		protected override void Update()
+		{
+			if (_instanceState.TryGetInvalid(out AudioInstanceState newState))
+				if (newState == AudioInstanceState.Stopped)
+					Parent!.Remove(this);
 		}
 	}
 }

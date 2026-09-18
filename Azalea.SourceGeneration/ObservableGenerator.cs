@@ -9,9 +9,9 @@ using System.Text;
 namespace Azalea.SourceGeneration;
 
 [Generator]
-internal class ObservablePropertyGenerator : IIncrementalGenerator
+internal class ObservableGenerator : IIncrementalGenerator
 {
-	readonly struct ObservablePropertyData(Details details, Accessibility setAccessibility)
+	readonly struct ObservableData(Details details, Accessibility setAccessibility)
 	{
 		public Details Details { get; } = details;
 		public Accessibility SetAccessibility { get; } = setAccessibility;
@@ -20,25 +20,25 @@ internal class ObservablePropertyGenerator : IIncrementalGenerator
 	public void Initialize(IncrementalGeneratorInitializationContext context)
 	{
 		context.ForAllWithAttribute(
-			"Azalea.Utils.ObservablePropertyAttribute",
+			"Azalea.Utils.ObservableAttribute",
 			node => node is PropertyDeclarationSyntax,
-			"ObservableProperties.g.cs",
+			"Observable.g.cs",
 			serializeData,
 			generateSource);
 	}
 
-	private ObservablePropertyData serializeData(AttributeData attribute, ISymbol symbol)
+	private ObservableData serializeData(AttributeData attribute, ISymbol symbol)
 	{
 		var propertySymbol = (IPropertySymbol)symbol;
 
-		return new ObservablePropertyData(
+		return new ObservableData(
 			GenerationExtentions.GetDetails(symbol),
 			propertySymbol.SetMethod is null ?
 				Accessibility.NotApplicable :
 				propertySymbol.SetMethod.DeclaredAccessibility);
 	}
 
-	private string generateSource(ImmutableArray<ObservablePropertyData> data)
+	private string generateSource(ImmutableArray<ObservableData> data)
 	{
 		var builder = new SourceBuilder();
 
@@ -52,6 +52,8 @@ internal class ObservablePropertyGenerator : IIncrementalGenerator
 				#region Property Implementation
 
 				builder.AppendAccessibility(item.Details.AccessModifier);
+				if (item.Details.IsStatic)
+					builder.Append("static ");
 				builder.Append($"partial {item.Details.ReturnType} {item.Details.Name}");
 				builder.BeginScope();
 				builder.AppendLine("get;");
@@ -77,8 +79,10 @@ internal class ObservablePropertyGenerator : IIncrementalGenerator
 
 			#region Changed Event
 
-			builder.Append($"public event System.Action<{item.Details.ReturnType}>? On{item.Details.Name}Changed;");
-
+			builder.Append("public ");
+			if(item.Details.IsStatic)
+				builder.Append("static ");
+			builder.Append($"event System.Action<{item.Details.ReturnType}>? On{item.Details.Name}Changed;");
 			#endregion
 
 			builder.EndClass(item.Details.ContainingDetails);

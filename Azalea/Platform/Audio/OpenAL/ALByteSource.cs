@@ -1,8 +1,9 @@
 ﻿using Azalea.Utils;
 
 namespace Azalea.Platform.Audio.OpenAL;
-internal class ALByteSource(uint handle)
+internal partial class ALByteSource(uint handle)
 {
 	public readonly uint Handle = handle;
-	public ReadOnlyObservable<AudioByteInstance?> CurrentInstance = new(null);
+
+	[Observable] public partial AudioByteInstance? CurrentInstance { get; internal set; }
 }

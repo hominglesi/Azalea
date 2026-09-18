@@ -33,10 +33,12 @@ internal class SourceBuilder
 			Accessibility.Private => "private ",
 			Accessibility.Public => "public ",
 			Accessibility.Internal => "internal ",
+			Accessibility.Protected => "protected ",
 			_ => "public "
 		});
 	}
 
+	public void Append(char value) => _builder.Append(value);
 	public void Append(string value) => _builder.Append(value);
 	public void AppendLine(string value)
 	{
@@ -72,6 +74,9 @@ internal class SourceBuilder
 			BeginClass(details.ContainingDetails[i]);
 
 		AppendAccessibility(details.AccessModifier);
+		if (details.IsAbstract && details.Kind != TypeKind.Interface)
+			Append("abstract ");
+
 		Append("partial ");
 
 		switch (details.Kind)
@@ -87,6 +92,17 @@ internal class SourceBuilder
 		}
 
 		Append(details.Name);
+		if(details.TypeParameters.Length > 0)
+		{
+			Append('<');
+			for (int i = 0; i < details.TypeParameters.Length; i++)
+			{
+				Append(details.TypeParameters[i]);
+				if (i + 1 < details.TypeParameters.Length)
+					Append(", ");
+			}
+			Append('>');
+		}
 		BeginScope();
 	}
 

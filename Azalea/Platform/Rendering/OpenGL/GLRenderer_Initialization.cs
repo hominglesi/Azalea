@@ -10,7 +10,7 @@ namespace Azalea.Platform.Rendering.OpenGL;
 internal partial class GLRenderer
 {
 	internal static GLLoadingContext? LoadingContext;
-	internal static ReadOnlyObservable<bool> LoadingContextCreated = new(false);
+	[Observable] internal static partial bool LoadingContextCreated { get; private set; }
 	private static object _initializationLock = new();
 	[MemberNotNull(nameof(LoadingContext))]
 	private static void assureGLInitialized()
@@ -33,7 +33,7 @@ internal partial class GLRenderer
 			dummyThread.Stop();
 
 			LoadingContext = new GLLoadingContext();
-			LoadingContextCreated.Value = true;
+			LoadingContextCreated = true;
 		}
 	}
 

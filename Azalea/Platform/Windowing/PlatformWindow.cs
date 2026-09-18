@@ -8,18 +8,18 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Azalea.Platform.Windowing;
-public abstract class PlatformWindow : ICommandHandler<WindowCommand>
+public abstract partial class PlatformWindow : ICommandHandler<WindowCommand>
 {
 	protected PlatformWindow(string title, Vector2Int clientSize, bool initiallyVisible)
 	{
-		Title = new(title);
-		Shown = new(initiallyVisible);
-		Position = new(new Vector2Int(100, 100));
-		ClientPosition = new(new Vector2Int(100, 100));
-		Size = new(clientSize);
-		ClientSize = new(clientSize);
-		Resizable = new(true);
-		CursorVisible = new(true);
+		Title = title;
+		Shown = initiallyVisible;
+		Position = new Vector2Int(100, 100);
+		ClientPosition = new Vector2Int(100, 100);
+		Size = clientSize;
+		ClientSize = clientSize;
+		Resizable = true;
+		CursorVisible = true;
 
 		Thread = new WindowThread(this);
 		Thread.Start();
@@ -34,14 +34,15 @@ public abstract class PlatformWindow : ICommandHandler<WindowCommand>
 
 	public virtual string PlatformType => "Abstract Window";
 
-	public ReadOnlyObservable<string> Title { get; }
-	public ReadOnlyObservable<bool> Shown { get; }
-	public ReadOnlyObservable<Vector2Int> Position { get; }
-	public ReadOnlyObservable<Vector2Int> ClientPosition { get; }
-	public ReadOnlyObservable<Vector2Int> Size { get; }
-	public ReadOnlyObservable<Vector2Int> ClientSize { get; }
-	public ReadOnlyObservable<bool> Resizable { get; }
-	public ReadOnlyObservable<bool> CursorVisible { get; }
+	[Observable] public partial string Title { get; protected set; }
+	[Observable] public partial bool Shown { get; protected set; }
+	[Observable] public partial Vector2Int Position { get; protected set; }
+	[Observable] public partial Vector2Int ClientPosition { get; protected set; }
+	[Observable] public partial Vector2Int Size { get; protected set; }
+	[Observable] public partial Vector2Int ClientSize { get; protected set; }
+	[Observable] public partial bool Resizable { get; protected set; }
+	[Observable] public partial bool CursorVisible { get; protected set; }
+	[Observable] public partial bool Closed { get; private set; }
 
 	public PlatformRenderer? SubscribedRenderer { get; private set; } = null;
 	internal void Subscribe(PlatformRenderer renderer)
@@ -77,7 +78,6 @@ public abstract class PlatformWindow : ICommandHandler<WindowCommand>
 		}
 	}
 
-	public readonly ReadOnlyObservable<bool> Closed = new(false);
 	public void Close()
 	{
 		if (Closed) return;
@@ -86,7 +86,7 @@ public abstract class PlatformWindow : ICommandHandler<WindowCommand>
 		SubscribedRenderer?.Stop();
 		SubscribedScheduler?.Stop();
 
-		Closed.Value = true;
+		Closed = true;
 	}
 
 	public ICommandAwaitable? Enqueue(WindowCommand command) => Thread.Enqueue(command);

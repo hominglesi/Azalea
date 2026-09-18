@@ -56,7 +56,7 @@ internal partial class GLRenderer : PlatformRenderer
 			_screenFramebuffers[i] = new(framebuffer, colorbuffer, Vector2Int.Zero);
 		}
 
-		deviceContext.ClientSize.OnValueChanged += newClientSize =>
+		deviceContext.OnClientSizeChanged += newClientSize =>
 		{
 			// This code is gonna be run on the window thread
 			// since that's the thread that changes the client size

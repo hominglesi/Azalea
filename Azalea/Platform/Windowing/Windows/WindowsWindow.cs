@@ -44,7 +44,7 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 
 		_windowExtendedStyles = Win32.WindowStylesExtended.APPWINDOW;
 
-		Win32.RECT windowRect = new(ClientPosition.Value.X, ClientPosition.Value.Y, ClientSize.Value.X, ClientSize.Value.Y);
+		Win32.RECT windowRect = new(ClientPosition.X, ClientPosition.Y, ClientSize.X, ClientSize.Y);
 		Win32.AdjustWindowRectEx(ref windowRect, _windowStyles, false, _windowExtendedStyles);
 
 		Handle = Win32.CreateWindowExW(
@@ -66,8 +66,8 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 
 		// Set actual window position
 		Win32.GetWindowRect(Handle, out windowRect);
-		Position.Value = new Vector2Int(windowRect.X, windowRect.Y);
-		Size.Value = new Vector2Int(windowRect.Width, windowRect.Height);
+		Position = new Vector2Int(windowRect.X, windowRect.Y);
+		Size = new Vector2Int(windowRect.Width, windowRect.Height);
 	}
 
 	protected override void UpdateLogic()
@@ -95,7 +95,7 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 
 				var workArea = monitorInfo.rcWork;
 				var centerPosition = new Vector2Int(workArea.X, workArea.Y)
-					+ (new Vector2Int(workArea.Width, workArea.Height) / 2 - Size.Value / 2);
+					+ (new Vector2Int(workArea.Width, workArea.Height) / 2 - Size / 2);
 				Win32.SetWindowPos(Handle, IntPtr.Zero, centerPosition.X, centerPosition.Y, 0, 0, Win32.SetWindowPosFlags.NOSIZE);
 				break;
 			case CreateTrayIconCommand(var trayIcon, var title, var icon):
@@ -202,7 +202,7 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 				break;
 			case SetCursorVisibleCommand(var isVisible):
 				Win32.ShowCursor(isVisible);
-				CursorVisible.Value = isVisible;
+				CursorVisible = isVisible;
 				break;
 			case SetIconCommand(var image):
 				iconHandle = IntPtr.Zero;
@@ -231,14 +231,14 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 					_windowStyles &= ~(Win32.WindowStyles.SIZEBOX | Win32.WindowStyles.MAXIMIZEBOX);
 
 				Win32.SetWindowLongPtrW(Handle, Win32.WindowLongValue.Style, (nint)_windowStyles);
-				Resizable.Value = resizable;
+				Resizable = resizable;
 				break;
 			case SetSizeCommand(var size):
 				Win32.SetWindowPos(Handle, IntPtr.Zero, 0, 0, size.X, size.Y, Win32.SetWindowPosFlags.NOMOVE);
 				break;
 			case SetTitleCommand(var title):
 				Win32.SetWindowTextW(Handle, title);
-				Title.Value = title;
+				Title = title;
 				break;
 			case ShowCommand:
 				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOW);
@@ -273,27 +273,27 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 				Win32.GetClientRect(Handle, out var rect);
 				Win32.ClientToScreen(Handle, ref clientPosition);
 
-				Size.Value = new Vector2Int(windosPos.cx, windosPos.cy);
-				ClientSize.Value = new Vector2Int(rect.Width, rect.Height);
+				Size = new Vector2Int(windosPos.cx, windosPos.cy);
+				ClientSize = new Vector2Int(rect.Width, rect.Height);
 
-				Position.Value = new Vector2Int(windosPos.x, windosPos.y);
-				ClientPosition.Value = new Vector2Int(clientPosition.x, clientPosition.y);
+				Position = new Vector2Int(windosPos.x, windosPos.y);
+				ClientPosition = new Vector2Int(clientPosition.x, clientPosition.y);
 
 				return 0;
 			case Win32.WindowMessage.MOVE:
 				// WM_WINDOWPOSCHANGED handles position changes but
 				// it can miss when client position is changed.
 
-				ClientPosition.Value = BitwiseUtils.SplitValue(lParam);
+				ClientPosition = BitwiseUtils.SplitValue(lParam);
 				return 0;
 			case Win32.WindowMessage.SIZE:
 				// WM_WINDOWPOSCHANGED handles size changes but
 				// it can miss when client size is changed.
 
-				ClientSize.Value = BitwiseUtils.SplitValue(lParam);
+				ClientSize = BitwiseUtils.SplitValue(lParam);
 				return 0;
 			case Win32.WindowMessage.SHOWWINDOW:
-				Shown.Value = wParam != nint.Zero;
+				Shown = wParam != nint.Zero;
 				break;
 			case Win32.WindowMessage.CLOSE:
 				Close();

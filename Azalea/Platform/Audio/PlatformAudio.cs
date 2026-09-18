@@ -8,20 +8,18 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Azalea.Platform.Audio;
-public abstract class PlatformAudio : ICommandHandler<AudioCommand>
+public abstract partial class PlatformAudio : ICommandHandler<AudioCommand>
 {
 	internal Action<IAudioInstance>? InstanceStarted;
 	protected List<IAudioInstance> ActiveInstances = [];
 
 	protected PlatformAudio()
 	{
-		MasterVolume = new(1.0f);
-
 		Thread = new AudioThread(this);
 		Thread.Start();
 	}
 
-	public ReadOnlyObservable<float> MasterVolume { get; }
+	[Observable] public partial float MasterVolume { get; internal set; } = 1.0f;
 
 	protected abstract void HandleCommandLogic(AudioCommand command);
 	protected abstract void UpdateLogic();

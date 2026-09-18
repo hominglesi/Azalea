@@ -9,7 +9,7 @@ namespace Azalea.Utils;
 
 public class ObservableProxy<T>
 {
-	private bool _invalidated = false;
+	private bool _invalidated = true;
 	public bool Invalidated => _invalidated;
 
 	private T _value;
@@ -24,7 +24,8 @@ public class ObservableProxy<T>
 
 		changedEvent.AddEventHandler(obj, Delegate.CreateDelegate(changedEvent.EventHandlerType!, this, changedHandler));
 
-		var property = obj.GetType().GetProperty(propertyName)!;
+		var bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
+		var property = obj.GetType().GetProperty(propertyName, bindingFlags)!;
 		Debug.Assert(property is not null);
 
 		var currentValue = property.GetValue(obj)!;

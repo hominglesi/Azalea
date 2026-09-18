@@ -24,13 +24,13 @@ public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 
 	public Vector2Int FramebufferSize { get; set; } = Vector2Int.Zero;
 
-	public readonly ReadOnlyObservable<bool> Stopped = new(false);
+	[Observable] public partial bool Stopped { get; private set; }
 	internal void Stop()
 	{
 		if (Stopped) return;
 
 		Thread.Stop();
-		Stopped.Value = true;
+		Stopped = true;
 	}
 
 	#region Commands
@@ -50,7 +50,7 @@ public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 	private RenderCommandGroup? _stagedQueue = null;
 	private readonly object _stagedQueueLock = new();
 
-	internal readonly ReadOnlyObservable<int> StagedQueueOverrides = new(0);
+	[Observable] internal partial int StagedQueueOverrides { get; private set; }
 
 	internal void StageQueue(RenderCommandGroup queue)
 	{
@@ -59,7 +59,7 @@ public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 			if (_stagedQueue is not null)
 			{
 				ObjectPool<RenderCommandGroup>.Return(_stagedQueue);
-				StagedQueueOverrides.Value++;
+				StagedQueueOverrides++;
 			}
 
 			_stagedQueue = queue;
@@ -82,11 +82,9 @@ public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 
 	internal readonly RenderThread Thread;
 
-	internal class RenderThread(PlatformRenderer renderer) : GameThread<RenderCommand>(1)
+	internal partial class RenderThread(PlatformRenderer renderer) : GameThread<RenderCommand>(1)
 	{
 		private readonly PlatformRenderer _renderer = renderer;
-
-		internal readonly ReadOnlyObservable<int> NoStagedQueueFrames = new(0);
 
 		internal bool SnapshotNextFrame = false;
 		internal event Action<List<string>>? CommandSnapshotCreated;
@@ -108,13 +106,15 @@ public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 		protected override void HandleCommand(RenderCommand command)
 			=> _renderer.HandleCommandLogic(command);
 
+		[Observable] internal partial int NoStagedQueueFrames { get; private set; }
+
 		private void processStagedQueue()
 		{
 			var stagedQueue = _renderer.RequestQueue();
 
 			if (stagedQueue is null)
 			{
-				NoStagedQueueFrames.Value++;
+				NoStagedQueueFrames++;
 				return;
 			}
 

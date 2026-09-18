@@ -7,10 +7,10 @@ public partial interface IAudioInstance
 	internal PlatformAudio Owner { get; }
 	public bool Looping { get; }
 	public double Duration { get; }
-	public ReadOnlyObservable<AudioInstanceState> State { get; }
-
-	[ObservableProperty] public float Gain { get; }
-	[ObservableProperty] public float Timestamp { get; }
+	
+	[Observable] public AudioInstanceState State { get; }
+	[Observable] public float Gain { get; }
+	[Observable] public float Timestamp { get; }
 
 	public void Pause() => Owner.PauseInstance(this);
 	public void SetGain(float gain) => Owner.SetInstanceGain(this, gain);

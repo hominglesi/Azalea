@@ -1,6 +1,8 @@
 ﻿using Azalea.Editor.Design.Gui;
+using Azalea.Extentions.ObjectExtentions;
 using Azalea.Platform.Rendering;
 using Azalea.Threading;
+using Azalea.Utils;
 using System.Numerics;
 
 namespace Azalea.Editor.DebugWindows.Inspectors;
@@ -11,8 +13,8 @@ internal class PlatformRendererInspector
 		var position = origin is null ? new(100, 100) : origin.Position + new Vector2(20, 20);
 		var window = GUIWindow.Create("PlatformRenderer", position, new(400, 400));
 
-		window.AddObservingLabel("Staged Queue Overrides", renderer.StagedQueueOverrides);
-		window.AddObservingLabel("No Staged Queue Frames", renderer.Thread.NoStagedQueueFrames);
+		window.AddObservingLabel("Staged Queue Overrides", renderer.CreateProxy<int>("StagedQueueOverrides"));
+		window.AddObservingLabel("No Staged Queue Frames", renderer.Thread.CreateProxy<int>("NoStagedQueueFrames"));
 
 		GUIGroup? commandsGroup = null;
 		window.AddButton("Snapshot Frame Commands", () =>
@@ -33,7 +35,7 @@ internal class PlatformRendererInspector
 		window.AddLabel("Take first snapshot to see commands!");
 		window.FinishGroup();
 
-		window.AddObservingLabel("Stopped", renderer.Stopped);
+		window.AddObservingLabel("Stopped", renderer.CreateProxy<bool>("Stopped"));
 		window.AddButton("Stop", renderer.Stop);
 
 		var thread = renderer.Thread;

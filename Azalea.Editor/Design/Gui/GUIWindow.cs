@@ -125,9 +125,10 @@ public class GUIWindow : BasicWindowContainer
 		return counter;
 	}
 
-	public GUIObservingLabel<T> AddObservingLabel<T>(string label, Utils.IObservable<T> observable)
+	public GUIObservingLabel<T> AddObservingLabel<T>(string label, ObservableProxy<T> observable,
+		string? displayString = null)
 	{
-		var observingLabel = new GUIObservingLabel<T>(label, observable);
+		var observingLabel = new GUIObservingLabel<T>(label, observable, displayString);
 		Add(observingLabel);
 		return observingLabel;
 	}

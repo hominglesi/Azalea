@@ -129,7 +129,7 @@ internal static class GlobalWindow
 			if (GLRenderer.LoadingContext is not null)
 				GLLoadingContextInspector.Inject(_window, GLRenderer.LoadingContext);
 			else
-				GLRenderer.LoadingContextCreated.OnValueChanged += _ => Scheduler.Schedule(
+				GLRenderer.OnLoadingContextCreatedChanged += _ => Scheduler.Schedule(
 					() => GLLoadingContextInspector.Inject(_window, GLRenderer.LoadingContext!));
 		}
 

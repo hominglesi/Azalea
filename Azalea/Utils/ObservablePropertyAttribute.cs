@@ -3,7 +3,4 @@
 namespace Azalea.Utils;
 
 [AttributeUsage(AttributeTargets.Property)]
-public sealed class ObservablePropertyAttribute : Attribute
-{
-
-}
+public sealed class ObservableAttribute : Attribute { }

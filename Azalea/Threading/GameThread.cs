@@ -7,17 +7,17 @@ using System.Threading.Channels;
 
 namespace Azalea.Threading;
 
-internal abstract class GameThread(int targetInterval)
+internal abstract partial class GameThread(int targetInterval)
 	: GameThread<ThreadCommand>(targetInterval)
 { }
 
-internal abstract class GameThread<T> : ICommandHandler<T>
+internal abstract partial class GameThread<T> : ICommandHandler<T>
 	where T : ThreadCommand
 {
 	public readonly Thread NativeThread;
 
 	private volatile bool _running;
-	public readonly ReadOnlyObservable<bool> Running = new(false);
+	[Observable] public partial bool Running { get; private set; }
 
 	private WindowsWaitableTimer? _timer;
 
@@ -43,7 +43,7 @@ internal abstract class GameThread<T> : ICommandHandler<T>
 
 		_running = true;
 		NativeThread.Start();
-		Running.Value = true;
+		Running = true;
 	}
 
 	public void Stop()
@@ -58,7 +58,7 @@ internal abstract class GameThread<T> : ICommandHandler<T>
 		else
 			Console.WriteLine($"{DisplayName} closed itself!");
 
-		Running.Value = false;
+		Running = false;
 	}
 
 	private void threadLoop()
@@ -146,9 +146,9 @@ internal abstract class GameThread<T> : ICommandHandler<T>
 	private double[] _workDurationList = new double[100];
 	private DateTime _workBeginTime;
 
-	public readonly ReadOnlyObservable<double> AverageInterval = new(0);
-	public readonly ReadOnlyObservable<double> AverageFrequency = new(0);
-	public readonly ReadOnlyObservable<double> AverageWorkDuration = new(0);
+	[Observable] public partial double AverageInterval { get; private set; }
+	[Observable] public partial double AverageFrequency { get; private set; }
+	[Observable] public partial double AverageWorkDuration { get; private set; }
 
 	private void updateActualInterval()
 	{
@@ -170,10 +170,10 @@ internal abstract class GameThread<T> : ICommandHandler<T>
 
 		if (_tickIndex % 20 == 0)
 		{
-			AverageInterval.Value = _tickSum / _tickList.Length;
-			AverageFrequency.Value = 1000 / AverageInterval;
+			AverageInterval = _tickSum / _tickList.Length;
+			AverageFrequency = 1000 / AverageInterval;
 
-			AverageWorkDuration.Value = _workSum / _tickList.Length;
+			AverageWorkDuration = _workSum / _tickList.Length;
 		}
 	}
 

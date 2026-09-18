@@ -37,11 +37,25 @@ internal static class GenerationExtentions
 
 		while(current is not null)
 		{
+			var typeParameters = ImmutableArray<string>.Empty;
+
+			if(current.TypeParameters.Length > 0)
+			{
+				var parametersBuilder = ImmutableArray.CreateBuilder<string>();
+				foreach (var typeParam in current.TypeParameters)
+					parametersBuilder.Add(typeParam.Name);
+
+				typeParameters = parametersBuilder.ToImmutable();
+			}
+
 			builder.Add(new Details(
 				containingDetails: ImmutableArray<Details>.Empty,
 				@namespace: @namespace,
 				name: current.Name,
 				accessModifier: current.DeclaredAccessibility,
+				isAbstract: current.IsAbstract,
+				isStatic: current.IsStatic,
+				typeParameters: typeParameters,
 				kind: current.TypeKind,
 				returnType: null));
 
@@ -59,19 +73,26 @@ internal static class GenerationExtentions
 					@namespace: @namespace,
 					name: symbol.Name,
 					accessModifier: symbol.DeclaredAccessibility,
+					isAbstract: symbol.IsAbstract,
+					isStatic: symbol.IsStatic,
+					typeParameters: ImmutableArray<string>.Empty,
 					kind: TypeKind.Unknown,
 					returnType: returnType);
 	}
 }
 
 public readonly struct Details(ImmutableArray<Details> containingDetails, string @namespace, string name,
-	Accessibility accessModifier, TypeKind kind, ITypeSymbol? returnType)
+	Accessibility accessModifier, bool isAbstract, bool isStatic, ImmutableArray<string> typeParameters,
+	TypeKind kind, ITypeSymbol? returnType)
 {
 	public ImmutableArray<Details> ContainingDetails { get; } = containingDetails;
 
 	public string Namespace { get; } = @namespace;
 	public string Name { get; } = name;
 	public Accessibility AccessModifier { get; } = accessModifier;
+	public bool IsAbstract { get; } = isAbstract;
+	public bool IsStatic { get; } = isStatic;
+	public ImmutableArray<string> TypeParameters { get; } = typeParameters;
 	public TypeKind Kind { get; } = kind;
 	public ITypeSymbol? ReturnType { get; } = returnType;
 }

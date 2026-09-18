@@ -1,7 +1,7 @@
 ﻿using Azalea.Utils;
 
 namespace Azalea.Platform.Windowing;
-public interface IPlatformDeviceContext
+public partial interface IPlatformDeviceContext
 {
-	public ReadOnlyObservable<Vector2Int> ClientSize { get; }
+	public Vector2Int ClientSize { get; }
 }

@@ -98,20 +98,20 @@ internal class ALAudio : PlatformAudio
 					case AudioByteInstance byteInstance:
 						Debug.Assert(byteInstance.Source is not null);
 						AL.SourcePause(byteInstance.Source.Handle);
+						byteInstance.State = AudioInstanceState.Paused;
 						break;
 				}
 
-				instance.State.Value = AudioInstanceState.Paused;
 				break;
 			case PlayByteCommand(var instance, var sound):
 				Debug.Assert(sound.Handle is not null);
 
 				var audioByteSource = getNextByteSource();
 
-				if (audioByteSource.CurrentInstance.Value is not null)
+				if (audioByteSource.CurrentInstance is not null)
 				{
 					AL.SourceStop(audioByteSource.Handle);
-					markInstanceStopped(audioByteSource.CurrentInstance.Value);
+					markInstanceStopped(audioByteSource.CurrentInstance);
 				}
 
 				AL.Sourcei(audioByteSource.Handle, AL.BUFFER, (int)sound.Handle);
@@ -120,10 +120,10 @@ internal class ALAudio : PlatformAudio
 
 				AL.SourcePlay(audioByteSource.Handle);
 
-				audioByteSource.CurrentInstance.Value = instance;
+				audioByteSource.CurrentInstance = instance;
 
 				instance.Source = audioByteSource;
-				instance.State.Value = AudioInstanceState.Playing;
+				instance.State = AudioInstanceState.Playing;
 
 				ActiveInstances.Add(instance);
 				InstanceStarted?.Invoke(instance);
@@ -169,10 +169,10 @@ internal class ALAudio : PlatformAudio
 					case AudioByteInstance byteInstance:
 						Debug.Assert(byteInstance.Source is not null);
 						AL.SourcePlay(byteInstance.Source.Handle);
+						byteInstance.State = AudioInstanceState.Playing;
 						break;
 				}
-
-				instance.State.Value = AudioInstanceState.Playing;
+				
 				break;
 		}
 
@@ -196,12 +196,13 @@ internal class ALAudio : PlatformAudio
 		if (instance is AudioByteInstance byteInstance)
 		{
 			Debug.Assert(byteInstance.Source is not null);
-			byteInstance.Source.CurrentInstance.Value = null;
+			byteInstance.Source.CurrentInstance = null;
 
 			byteInstance.InvokeStopped();
+
+			byteInstance.State = AudioInstanceState.Stopped;
 		}
 
-		instance.State.Value = AudioInstanceState.Stopped;
 		ActiveInstances.Remove(instance);
 	}
 }

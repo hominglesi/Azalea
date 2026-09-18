@@ -25,7 +25,7 @@ public sealed class Application
 		Renderer = PlatformRenderer.AttachRenderer(Window);
 		Scheduler = PlatformScheduler.AttachScheduler(Window);
 
-		Window.Closed.OnValueChanged += _ => OnClosed?.Invoke();
+		Window.OnClosedChanged += _ => OnClosed?.Invoke();
 
 		var commandGroup = ObjectPool<RenderCommandGroup>.Borrow();
 
@@ -96,7 +96,7 @@ public sealed class Application
 			}
 			else
 			{
-				debugContainer.Size = Window.ClientSize.Value;
+				debugContainer.Size = Window.ClientSize;
 				debugContainer.UpdateSubTree();
 				debugContainer.Draw(null, Renderer.Coordinator);
 			}
