@@ -17,7 +17,7 @@ internal abstract partial class GameThread<T> : ICommandHandler<T>
 	public readonly Thread NativeThread;
 
 	private volatile bool _running;
-	[Observable] public partial bool Running { get; private set; }
+	public bool Running { get; private set; }
 
 	private WindowsWaitableTimer? _timer;
 
@@ -146,9 +146,9 @@ internal abstract partial class GameThread<T> : ICommandHandler<T>
 	private double[] _workDurationList = new double[100];
 	private DateTime _workBeginTime;
 
-	[Observable] public partial double AverageInterval { get; private set; }
-	[Observable] public partial double AverageFrequency { get; private set; }
-	[Observable] public partial double AverageWorkDuration { get; private set; }
+	public double AverageInterval { get; private set; }
+	public double AverageFrequency { get; private set; }
+	public double AverageWorkDuration { get; private set; }
 
 	private void updateActualInterval()
 	{

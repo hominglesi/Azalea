@@ -34,15 +34,26 @@ public abstract partial class PlatformWindow : ICommandHandler<WindowCommand>
 
 	public virtual string PlatformType => "Abstract Window";
 
-	[Observable] public partial string Title { get; protected set; }
-	[Observable] public partial bool Shown { get; protected set; }
-	[Observable] public partial Vector2Int Position { get; protected set; }
-	[Observable] public partial Vector2Int ClientPosition { get; protected set; }
-	[Observable] public partial Vector2Int Size { get; protected set; }
-	[Observable] public partial Vector2Int ClientSize { get; protected set; }
-	[Observable] public partial bool Resizable { get; protected set; }
-	[Observable] public partial bool CursorVisible { get; protected set; }
-	[Observable] public partial bool Closed { get; private set; }
+	public string Title { get; protected set; }
+	public bool Shown { get; protected set; }
+	public Vector2Int Position { get; protected set; }
+	public Vector2Int ClientPosition { get; protected set; }
+	public Vector2Int Size { get; protected set; }
+	public Vector2Int ClientSize
+	{
+		get;
+		protected set { if (field == value) return; field = value; OnResized?.Invoke(value); }
+	}
+	internal event Action<Vector2Int> OnResized;
+	public bool Resizable { get; protected set; }
+	public bool CursorVisible { get; protected set; }
+	public bool Closed
+	{
+		get;
+		set { if (field == value) return; field = value; OnClosed?.Invoke(); }
+	}
+
+	public event Action? OnClosed;
 
 	public PlatformRenderer? SubscribedRenderer { get; private set; } = null;
 	internal void Subscribe(PlatformRenderer renderer)

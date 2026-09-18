@@ -24,7 +24,7 @@ public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 
 	public Vector2Int FramebufferSize { get; set; } = Vector2Int.Zero;
 
-	[Observable] public partial bool Stopped { get; private set; }
+	public bool Stopped { get; private set; }
 	internal void Stop()
 	{
 		if (Stopped) return;
@@ -50,7 +50,7 @@ public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 	private RenderCommandGroup? _stagedQueue = null;
 	private readonly object _stagedQueueLock = new();
 
-	[Observable] internal partial int StagedQueueOverrides { get; private set; }
+	internal int StagedQueueOverrides { get; private set; }
 
 	internal void StageQueue(RenderCommandGroup queue)
 	{
@@ -106,7 +106,7 @@ public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 		protected override void HandleCommand(RenderCommand command)
 			=> _renderer.HandleCommandLogic(command);
 
-		[Observable] internal partial int NoStagedQueueFrames { get; private set; }
+		internal int NoStagedQueueFrames { get; private set; }
 
 		private void processStagedQueue()
 		{

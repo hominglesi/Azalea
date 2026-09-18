@@ -10,9 +10,9 @@ internal partial class AudioByteInstance(PlatformAudio owner, bool looping, floa
 	public PlatformAudio Owner { get; } = owner;
 	public bool Looping { get; } = looping;
 	public double Duration { get; } = duration;
-	[Observable] public partial AudioInstanceState State { get; internal set; } = AudioInstanceState.Stopped;
-	[Observable] public partial float Gain { get; internal set; } = gain;
-	[Observable] public partial float Timestamp { get; internal set; }
+	public AudioInstanceState State { get; internal set; } = AudioInstanceState.Stopped;
+	public float Gain { get; internal set; } = gain;
+	public float Timestamp { get; internal set; }
 
 	private bool _stopped = false;
 	public event Action? Stopped;

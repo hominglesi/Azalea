@@ -19,7 +19,7 @@ public abstract partial class PlatformAudio : ICommandHandler<AudioCommand>
 		Thread.Start();
 	}
 
-	[Observable] public partial float MasterVolume { get; internal set; } = 1.0f;
+	public float MasterVolume { get; internal set; } = 1.0f;
 
 	protected abstract void HandleCommandLogic(AudioCommand command);
 	protected abstract void UpdateLogic();

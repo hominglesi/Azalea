@@ -17,13 +17,17 @@ internal static class GenerationExtentions
 			transform: (ctx, _) =>
 			{
 				var attribute = ctx.Attributes.First(
-					a => a.AttributeClass?.ToString() == attributeName);
+					a => a.AttributeClass?.ToString() == attributeName.Replace('+', '.'));
 
 				return dataCreation(attribute, ctx.TargetSymbol);
 			});
 
 		context.RegisterSourceOutput(provider.Collect(),
-			(ctx, commands) => ctx.AddSource(resultingClass, classCreation(commands)));
+			(ctx, commands) =>
+			{
+				if (commands.Length > 0)
+					ctx.AddSource(resultingClass, classCreation(commands));
+			});
 	}
 
 	public static Details GetDetails(ISymbol symbol)
@@ -64,9 +68,10 @@ internal static class GenerationExtentions
 
 		ITypeSymbol? returnType = null;
 
-		if(symbol is IPropertySymbol propertySymbol)
+		if (symbol is IPropertySymbol propertySymbol)
 			returnType = propertySymbol.Type;
-
+		else if (symbol is INamedTypeSymbol namedSymbol && namedSymbol.DelegateInvokeMethod is not null)
+			returnType = namedSymbol.DelegateInvokeMethod.ReturnType;
 
 		return new Details(
 					containingDetails: builder.ToImmutable(),
@@ -82,8 +87,8 @@ internal static class GenerationExtentions
 }
 
 public readonly struct Details(ImmutableArray<Details> containingDetails, string @namespace, string name,
-	Accessibility accessModifier, bool isAbstract, bool isStatic, ImmutableArray<string> typeParameters,
-	TypeKind kind, ITypeSymbol? returnType)
+	Accessibility accessModifier, bool isAbstract, bool isStatic,
+	ImmutableArray<string> typeParameters, TypeKind kind, ITypeSymbol? returnType)
 {
 	public ImmutableArray<Details> ContainingDetails { get; } = containingDetails;
 

@@ -3,6 +3,7 @@ using Azalea.Platform.Rendering.OpenGL.LoadingContext;
 using Azalea.Platform.Windowing;
 using Azalea.Threading;
 using Azalea.Utils;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
@@ -10,7 +11,7 @@ namespace Azalea.Platform.Rendering.OpenGL;
 internal partial class GLRenderer
 {
 	internal static GLLoadingContext? LoadingContext;
-	[Observable] internal static partial bool LoadingContextCreated { get; private set; }
+	internal static Action<GLLoadingContext>? LoadingContextCreated;
 	private static object _initializationLock = new();
 	[MemberNotNull(nameof(LoadingContext))]
 	private static void assureGLInitialized()
@@ -33,7 +34,7 @@ internal partial class GLRenderer
 			dummyThread.Stop();
 
 			LoadingContext = new GLLoadingContext();
-			LoadingContextCreated = true;
+			LoadingContextCreated?.Invoke(LoadingContext);
 		}
 	}
 

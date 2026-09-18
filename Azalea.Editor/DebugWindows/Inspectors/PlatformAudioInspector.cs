@@ -37,7 +37,7 @@ internal class PlatformAudioInspector
 
 				window.FinishGroup();
 
-				alAudio.AudioByteSources[i].OnCurrentInstanceChanged +=
+				alAudio.AudioByteSources[i].OnInstanceChanged +=
 					instance => Scheduler.Schedule(() =>
 					{
 						if (instance is not null)

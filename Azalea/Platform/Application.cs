@@ -25,7 +25,7 @@ public sealed class Application
 		Renderer = PlatformRenderer.AttachRenderer(Window);
 		Scheduler = PlatformScheduler.AttachScheduler(Window);
 
-		Window.OnClosedChanged += _ => OnClosed?.Invoke();
+		Window.OnClosed += () => OnClosed?.Invoke();
 
 		var commandGroup = ObjectPool<RenderCommandGroup>.Borrow();
 

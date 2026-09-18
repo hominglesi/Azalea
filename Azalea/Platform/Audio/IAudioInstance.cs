@@ -8,9 +8,9 @@ public partial interface IAudioInstance
 	public bool Looping { get; }
 	public double Duration { get; }
 	
-	[Observable] public AudioInstanceState State { get; }
-	[Observable] public float Gain { get; }
-	[Observable] public float Timestamp { get; }
+	public AudioInstanceState State { get; }
+	public float Gain { get; }
+	public float Timestamp { get; }
 
 	public void Pause() => Owner.PauseInstance(this);
 	public void SetGain(float gain) => Owner.SetInstanceGain(this, gain);

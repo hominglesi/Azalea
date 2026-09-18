@@ -338,7 +338,7 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 	{
 		var contextHandle = Win32.GetDC(Handle);
 		var deviceContext = new WindowsDeviceContext(contextHandle, ClientSize);
-		OnClientSizeChanged += deviceContext.UpdateClientSize;
+		OnResized += deviceContext.UpdateClientSize;
 
 		return deviceContext;
 	}
