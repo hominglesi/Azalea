@@ -71,8 +71,19 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 		Size = new Vector2Int(windowRect.Width, windowRect.Height);
 	}
 
+	private Vector2Int _lastMousePosition;
+
 	protected override void UpdateLogic()
 	{
+		WinAPI.GetCursorPos(out var mousePosition);
+		WinAPI.ScreenToClient(Handle, ref mousePosition);
+
+		if(_lastMousePosition != mousePosition)
+		{
+			EnqueueInputEvent(new MouseMoveEvent(mousePosition));
+			_lastMousePosition = mousePosition;
+		}
+
 		while (Win32.PeekMessageW(out Win32.MSG message, Handle, 0, 0, 0x0001) != 0)
 		{
 			Win32.TranslateMessage(in message);
@@ -317,6 +328,9 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 			case Win32.WindowMessage.KEYUP:
 				var upKey = WindowsExtentions.KeycodeToKey((int)wParam);
 				EnqueueInputEvent(new KeyUpEvent(upKey));
+				break;
+			case Win32.WindowMessage.CHAR:
+				EnqueueInputEvent(new CharInputEvent((char)wParam));
 				break;
 			case Win32.WindowMessage.AZ_TRAYICON:
 				var iconId = (uint)wParam;

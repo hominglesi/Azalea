@@ -22,7 +22,7 @@ internal class Program
 			.Create();
 
 		/*
-		host.CreateApplication(new VisualTestsTemp());
+		host.CreateApplication(new VisualTests());
 		Thread.Sleep(int.MaxValue);*/
 
 		/*

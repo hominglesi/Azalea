@@ -44,6 +44,9 @@ internal class AudioThread : GameThread
 		AudioManager.HandleCommands();
 		AudioManager.Update();
 
+		// Don't ask why the audio thread updates time
+		Time.UpdateDeltaTime();
+
 		((ALAudioManager)AudioManager).PrintErrors();
 	}
 }

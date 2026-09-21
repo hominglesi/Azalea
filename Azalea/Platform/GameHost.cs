@@ -56,6 +56,7 @@ public abstract class GameHost
 		Audio = PlatformAudio.Create();
 
 		_root = new Composition();
+		Time.Setup();
 	}
 
 	public virtual void Run(AzaleaGame game)
@@ -71,7 +72,6 @@ public abstract class GameHost
 		game.AddInternal(SceneManager);
 
 		Input.Initialize(_root);
-		Time.Setup();
 
 		RunGameLoop();
 	}
@@ -86,7 +86,7 @@ public abstract class GameHost
 	{
 		_frameStart = PerformanceTrace.StartEvent();
 
-		Time.UpdateDeltaTime();
+		
 		_accumulator += Time.DeltaTime;
 
 		Scheduler.InvokeScheduled();
