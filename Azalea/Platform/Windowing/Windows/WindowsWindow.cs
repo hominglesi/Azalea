@@ -1,4 +1,5 @@
 ﻿using Azalea.Inputs;
+using Azalea.Inputs.Events;
 using Azalea.Native.Windows;
 using Azalea.Platform.Windows;
 using Azalea.Utils;
@@ -300,6 +301,23 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 				return 0;
 			case Win32.WindowMessage.ERASEBKGND:
 				return 1;
+			case Win32.WindowMessage.LBUTTONDOWN:
+				EnqueueInputEvent(new MouseDownEvent(MouseButton.Left, BitwiseUtils.SplitValue(lParam)));
+				WinAPI.SetCapture(Handle);
+				break;
+			case Win32.WindowMessage.LBUTTONUP:
+				EnqueueInputEvent(new MouseUpEvent(MouseButton.Left, BitwiseUtils.SplitValue(lParam)));
+				WinAPI.ReleaseCapture();
+				break;
+			case Win32.WindowMessage.KEYDOWN:
+				var isRepeat = BitwiseUtils.GetSpecificBit(lParam, 31);
+				var downKey = WindowsExtentions.KeycodeToKey((int)wParam);
+				EnqueueInputEvent(new KeyDownEvent(downKey, isRepeat));
+				break;
+			case Win32.WindowMessage.KEYUP:
+				var upKey = WindowsExtentions.KeycodeToKey((int)wParam);
+				EnqueueInputEvent(new KeyUpEvent(upKey));
+				break;
 			case Win32.WindowMessage.AZ_TRAYICON:
 				var iconId = (uint)wParam;
 				var iconEvent = BitwiseUtils.GetLowOrderValue(lParam);

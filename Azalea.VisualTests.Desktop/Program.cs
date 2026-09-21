@@ -2,6 +2,7 @@
 using Azalea.Editor;
 using Azalea.VisualTests;
 using System;
+using System.Threading;
 
 internal class Program
 {
@@ -20,8 +21,16 @@ internal class Program
 			.SetupConfig()
 			.Create();
 
+		/*
+		host.CreateApplication(new VisualTestsTemp());
+		Thread.Sleep(int.MaxValue);*/
+
+		/*
 		AzaleaGame.RENDERED_GAME = EditorWrapper.Wrap(new VisualTests());
-		host.Run(AzaleaGame.RENDERED_GAME);
+		host.Run(AzaleaGame.RENDERED_GAME);*/
+
+		host.CreateApplication(new VisualTests());
+		Thread.Sleep(int.MaxValue);
 	}
 }
 

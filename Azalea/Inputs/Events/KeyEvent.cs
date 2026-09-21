@@ -1,11 +1,11 @@
 ﻿namespace Azalea.Inputs.Events;
 
-public abstract class KeyEvent : InputEvent
+public abstract class KeyEvent(Keys key) : InputEvent
 {
-	public readonly Keys Key;
+	public readonly Keys Key = key;
 
-	public KeyEvent(Keys key)
+	public void Deconstruct(out Keys key)
 	{
-		Key = key;
+		key = Key;
 	}
 }

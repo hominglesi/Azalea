@@ -1,10 +1,3 @@
 ﻿namespace Azalea.Inputs.Events;
 
-public class KeyUpEvent : KeyEvent
-{
-	public KeyUpEvent(Keys key)
-		: base(key)
-	{
-
-	}
-}
+public class KeyUpEvent(Keys key) : KeyEvent(key) { }

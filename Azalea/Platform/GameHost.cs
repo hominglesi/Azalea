@@ -140,9 +140,9 @@ public abstract class GameHost
 		Physics.Update();
 	}
 
-	public Application CreateApplication()
+	public Application CreateApplication(AzaleaGame game)
 	{
-		var application = new Application();
+		var application = new Application(game);
 		Applications.Add(application);
 
 		application.OnClosed += () => Applications.Remove(application);

@@ -1,4 +1,6 @@
-﻿using Azalea.Platform.Rendering;
+﻿using Azalea.Inputs;
+using Azalea.Inputs.Events;
+using Azalea.Platform.Rendering;
 using Azalea.Platform.Scheduling;
 using Azalea.Platform.Windowing.Windows;
 using Azalea.Threading;
@@ -6,6 +8,7 @@ using Azalea.Utils;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Channels;
 
 namespace Azalea.Platform.Windowing;
 public abstract partial class PlatformWindow : ICommandHandler<WindowCommand>
@@ -44,7 +47,7 @@ public abstract partial class PlatformWindow : ICommandHandler<WindowCommand>
 		get;
 		protected set { if (field == value) return; field = value; OnResized?.Invoke(value); }
 	}
-	internal event Action<Vector2Int> OnResized;
+	internal event Action<Vector2Int>? OnResized;
 	public bool Resizable { get; protected set; }
 	public bool CursorVisible { get; protected set; }
 	public bool Closed
@@ -87,6 +90,16 @@ public abstract partial class PlatformWindow : ICommandHandler<WindowCommand>
 
 			return GetDeviceContext();
 		}
+	}
+
+	internal readonly Channel<InputEvent> PendingInputEvents = Channel.CreateUnbounded<InputEvent>(
+		new() { SingleReader = true }
+	);
+
+	protected void EnqueueInputEvent(InputEvent e)
+	{
+		if (PendingInputEvents.Writer.TryWrite(e) == false)
+			throw new Exception("Could not write command!");
 	}
 
 	public void Close()

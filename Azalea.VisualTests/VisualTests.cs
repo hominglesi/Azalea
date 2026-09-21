@@ -33,9 +33,10 @@ public class VisualTests : AzaleaGame
 		Assets.MainStore.AddMsdfFont("TitanOne-Regular", "Fonts/TitanOne-Regular.csv", "Fonts/TitanOne-Regular.bmp");
 		_tests = ReflectionUtils.GetAllChildrenOf(typeof(TestScene)).Where(x => x.IsAbstract == false).Select(x => x.FullName).ToList()!;
 
-		_testSelectScene = new TestSelectScene(_tests);
+		_testSelectScene = new TestSelectScene(this, _tests);
 
 		BackgroundColor = new Color(40, 51, 60);
+		RelativeSizeAxes = Axes.Both;
 
 		var selectedTest = Config.Get(__currentSceneKey);
 		if (selectedTest is null || _tests.Contains(selectedTest) == false)
@@ -44,19 +45,29 @@ public class VisualTests : AzaleaGame
 			_testSelectScene.ChangeTest(selectedTest);
 	}
 
-	protected override void Update()
+	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		if (Input.GetKey(Keys.Escape).Down)
+		if(e.Key == Keys.Escape)
+		{
 			goToSceneSelect();
+			return true;
+		}
+
+		return false;
+	}
+
+	private GameObject? _currentScene;
+	private void setScene(GameObject scene)
+	{
+		_currentScene = scene;
+		Child = _currentScene;
 	}
 
 	private void goToSceneSelect()
 	{
-		var currentScene = SceneManager.CurrentScene;
-
-		if (currentScene == null || currentScene != _testSelectScene)
+		if (_currentScene == null || _currentScene != _testSelectScene)
 		{
-			SceneManager.ChangeScene(_testSelectScene);
+			setScene(_testSelectScene);
 			Window.ClientSize = new(1600, 900);
 			Window.Center();
 		}
@@ -64,10 +75,13 @@ public class VisualTests : AzaleaGame
 
 	private class TestSelectScene : Scene
 	{
+		private readonly VisualTests _parent;
 		private FlexContainer _testContainer;
 
-		public TestSelectScene(IEnumerable<string> tests)
+		public TestSelectScene(VisualTests parent, IEnumerable<string> tests)
 		{
+			_parent = parent;
+
 			Add(_testContainer = new FlexContainer()
 			{
 				RelativeSizeAxes = Axes.Both,
@@ -93,7 +107,7 @@ public class VisualTests : AzaleaGame
 			var test = Activator.CreateInstance(Assembly.GetAssembly(typeof(VisualTests))!.FullName!, testName)!.Unwrap()
 			as TestScene;
 
-			SceneManager.ChangeScene(test!);
+			_parent.setScene(test!);
 			Config.Set(__currentSceneKey, testName);
 		}
 	}

@@ -16,6 +16,9 @@ public class IWindowTest : TestScene
 			CreateFullscreenVerticalFlex(new GameObject[]
 			{
 				CreateActionButton(
+					"Create application window",
+					() => GameHost.Main.CreateApplication(new VisualTests())),
+				CreateActionButton(
 					"Set size to 700, 700",
 					() => Window.Size = new(700, 700)),
 				CreateActionButton(

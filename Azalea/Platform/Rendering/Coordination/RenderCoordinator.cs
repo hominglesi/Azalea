@@ -68,6 +68,12 @@ public class RenderCoordinator
 
 		var commandQueue = _commandQueue;
 		_commandQueue = null;
+
+		Debug.Assert(_scissorStack.Count == 0);
+		_boundProgram = null;
+		_boundTexture = null;
+		_activeRenderBatch = null;
+
 		return commandQueue;
 	}
 
