@@ -22,15 +22,17 @@ public sealed class Application
 	public readonly Windowing.PlatformWindow Window;
 	public readonly PlatformRenderer Renderer;
 	public readonly PlatformScheduler Scheduler;
-	private readonly InputProcessor InputProcessor;
+	public readonly InputProcessor Input;
 
 	internal Application(AzaleaGame game)
 	{
 		Game = game;
+		Game.App = this;
+
 		Window = Windowing.PlatformWindow.Create("Azalea App", new(800, 600));
 		Renderer = PlatformRenderer.AttachRenderer(Window);
 		Scheduler = PlatformScheduler.AttachScheduler(Window);
-		InputProcessor = new InputProcessor(Game);
+		Input = new InputProcessor(Game);
 
 		Window.OnClosed += () => OnClosed?.Invoke();
 
@@ -58,7 +60,7 @@ public sealed class Application
 			Game.Size = clientSize;
 			Game.UpdateSubTree();
 
-			InputProcessor.Process(win.PendingInputEvents);
+			Input.Process(win.PendingInputEvents);
 			
 			var renderQueue = coordinator.BeginCommandQueue();
 			renderQueue.PrepareRendering(clientSize);

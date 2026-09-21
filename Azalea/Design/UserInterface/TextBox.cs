@@ -7,13 +7,13 @@ using System;
 using System.Numerics;
 
 namespace Azalea.Design.UserInterface;
-public abstract class TextBox : TextContainer
+public abstract class TextBox(Action<SpriteText>? creationParameters = null) : TextContainer(creationParameters)
 {
 	private int _caratPosition = 0;
-	public TextBox(Action<SpriteText>? defaultCreationParameters = null)
-		: base(defaultCreationParameters)
+
+	protected override void Initialize()
 	{
-		Input.OnTextInput += onTextInput;
+		App.Input.OnCharInput += onTextInput;
 	}
 
 	private string _text = "";

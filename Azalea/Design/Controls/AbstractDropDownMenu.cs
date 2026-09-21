@@ -92,15 +92,12 @@ public abstract class AbstractDropDownMenu<T> : Composition
 		return true;
 	}
 
-	protected override void Update()
+	protected override void OnMouseUp(MouseUpEvent e)
 	{
-		if (Input.GetMouseButton(MouseButton.Left).Up)
-		{
-			foreach (var item in Input.GetHoveredObjects())
-				if (item == this || item == ExpandedSegment)
-					return;
+		foreach (var item in Input.GetHoveredObjects())
+			if (item == this || item == ExpandedSegment)
+				return;
 
-			Contract();
-		}
+		Contract();
 	}
 }

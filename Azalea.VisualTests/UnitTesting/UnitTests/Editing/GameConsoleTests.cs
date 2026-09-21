@@ -15,7 +15,7 @@ public class GameConsoleTests : UnitTestSuite
 			AddOperation("Input 'fullscreen' command", () =>
 			{
 				EditorOld.FocusConsole();
-				InputUtils.SimulateCharInput("fullscreen");
+				InputUtils.SimulateCharInput(App, "fullscreen");
 			});
 			AddOperation("Input enter", () => InputUtils.SimulateKeyInput(Keys.Enter));
 			AddResult("Check if window is Fullscreen", () => Window.State == WindowState.Fullscreen);
@@ -24,7 +24,7 @@ public class GameConsoleTests : UnitTestSuite
 			AddOperation("Execute 'restorewindow' command", () =>
 			{
 				EditorOld.FocusConsole();
-				InputUtils.SimulateCharInput("restorewindow");
+				InputUtils.SimulateCharInput(App, "restorewindow");
 			});
 			AddOperation("Input enter", () => InputUtils.SimulateKeyInput(Keys.Enter));
 			AddResult("Check if window is Restored", () => Window.State == WindowState.Normal);
@@ -34,7 +34,7 @@ public class GameConsoleTests : UnitTestSuite
 			AddOperation("Execute 'windowtitle Lorem Ipsum' command", () =>
 			{
 				EditorOld.FocusConsole();
-				InputUtils.SimulateCharInput("windowtitle Lorem Ipsum");
+				InputUtils.SimulateCharInput(App, "windowtitle Lorem Ipsum");
 			});
 			AddOperation("Input enter", () => InputUtils.SimulateKeyInput(Keys.Enter));
 			AddResult("Check if WindowTitle is 'Lorem Ipsum'", () => Window.Title == "Lorem Ipsum");

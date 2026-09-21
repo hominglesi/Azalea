@@ -1,10 +1,10 @@
 ﻿namespace Azalea.Inputs.Events;
-public class ScrollEvent : InputEvent
+public class ScrollEvent(float delta) : InputEvent
 {
-	public float ScrollDelta;
+	public float Delta = delta;
 
-	public ScrollEvent(float scrollDelta)
+	public void Deconstruct(out float delta)
 	{
-		ScrollDelta = scrollDelta;
+		delta = Delta;
 	}
 }

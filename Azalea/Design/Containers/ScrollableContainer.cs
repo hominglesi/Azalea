@@ -58,7 +58,7 @@ public class ScrollableContainer : ContentContainer
 	{
 		if (Hovered == false) return;
 
-		ScrollPosition += e.ScrollDelta * ScrollSpeed;
+		ScrollPosition += e.Delta * ScrollSpeed;
 
 		ScrollBar.Value = MathUtils.Map(ScrollPosition, _scrollRange.X, _scrollRange.Y, 0, 1);
 	}

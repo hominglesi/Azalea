@@ -96,7 +96,7 @@ public abstract partial class PlatformWindow : ICommandHandler<WindowCommand>
 		new() { SingleReader = true }
 	);
 
-	protected void EnqueueInputEvent(InputEvent e)
+	internal void EnqueueInputEvent(InputEvent e)
 	{
 		if (PendingInputEvents.Writer.TryWrite(e) == false)
 			throw new Exception("Could not write command!");

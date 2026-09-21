@@ -10,6 +10,7 @@ using Azalea.Graphics.Rendering;
 using Azalea.Inputs.Events;
 using Azalea.Layout;
 using Azalea.Numerics;
+using Azalea.Platform;
 using Azalea.Platform.Rendering.Coordination;
 using Azalea.Utils;
 using System;
@@ -144,10 +145,17 @@ public partial class GameObject : Amendable, IGameObject
 	#endregion
 
 	public bool Active { get; set; } = true;
+	private bool _initialized = false;
 
 	public virtual void UpdateSubTree()
 	{
 		if (Active == false) return;
+
+		if(_initialized == false)
+		{
+			Initialize();
+			_initialized = true;
+		}
 
 		UpdateAmends();
 		Update();
@@ -161,6 +169,8 @@ public partial class GameObject : Amendable, IGameObject
 
 		FixedUpdate();
 	}
+
+	protected virtual void Initialize() { }
 
 	protected virtual void Update() { }
 
@@ -535,6 +545,28 @@ public partial class GameObject : Amendable, IGameObject
 		}
 	}
 
+	private Application? _app;
+	public Application App
+	{
+		get
+		{
+			if (_app is not null)
+				return _app;
+
+			GameObject? parent = Parent;
+			while (parent is not null)
+			{
+				if (parent._app is not null)
+					return parent._app;
+
+				parent = parent.Parent;
+			}
+
+			throw new Exception("GameObject is not contained in any Application");
+		}
+		internal set { _app = value; }
+	}
+
 	private Composition? parent;
 
 	public Composition? Parent
@@ -897,8 +929,6 @@ public partial class GameObject : Amendable, IGameObject
 
 	public virtual bool TriggerEvent(InputEvent e)
 	{
-		e.Target = this;
-
 		switch (e)
 		{
 			case MouseDownEvent mouseDown:

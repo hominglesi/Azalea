@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azalea.Platform;
+using System;
 using System.Collections.Generic;
 
 namespace Azalea.VisualTests.UnitTesting;
@@ -7,6 +8,8 @@ public abstract class UnitTest : UnitTestBase
 	public UnitTestSuite? Suite { get; set; }
 	public UnitTestContainer? TestContainer { get; set; }
 	public List<TestStep> Steps { get; init; } = new();
+
+	public Application App => TestContainer!.App;
 
 	internal void AddOperation(string name, Action action)
 		=> Steps.Add(new TestStepOperation(name, action));

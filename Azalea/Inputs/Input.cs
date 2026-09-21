@@ -34,8 +34,6 @@ public static class Input
 
 	internal static void LateUpdate()
 	{
-		MouseWheelDelta = 0;
-
 		foreach (var key in _keyboardKeys)
 			key.Update();
 
@@ -100,11 +98,6 @@ public static class Input
 	public static Vector2 MousePosition { get; private set; } = Vector2.Zero;
 
 	/// <summary>
-	/// Scroll value change since last frame.
-	/// </summary>
-	public static float MouseWheelDelta { get; private set; } = 0;
-
-	/// <summary>
 	/// Returns the state of the specified mouse button.
 	/// </summary>
 	public static ButtonState GetMouseButton(MouseButton button) => _mouseButtons[(int)button];
@@ -167,77 +160,6 @@ public static class Input
 		}
 	}
 
-	/// <summary>
-	/// Executes a mouse move action.
-	/// </summary>
-	public static void ExecuteMousePositionChange(Vector2 newPosition)
-	{
-		if (_lastMousePosition == newPosition) return;
-
-		_lastMousePosition = MousePosition;
-
-		var worldPosition = MainCamera.Instance.ToWorldSpace(newPosition);
-
-		MousePosition = worldPosition;
-
-		PerformanceTrace.RunAndTrace(updateHoveredObjects, "Hover Update");
-	}
-
-	/// <summary>
-	/// Executes a scroll action.
-	/// </summary>
-	public static void ExecuteScroll(float delta)
-	{
-		if (delta == 0) return;
-
-		MouseWheelDelta += delta;
-
-		foreach (var obj in GetNonPositionalInputQueue())
-		{
-			obj.TriggerEvent(new ScrollEvent(delta));
-		}
-
-		PerformanceTrace.RunAndTrace(updateHoveredObjects, "Hover Update");
-	}
-
-	/// <summary>
-	/// Executes a pressed state change action on the specified button.
-	/// </summary>
-	public static void ExecuteMouseButtonStateChange(MouseButton button, bool pressed)
-	{
-		_mouseButtons[(int)button].SetState(pressed);
-
-		if (pressed)
-		{
-			_clickDownGameObjects.Clear();
-
-			foreach (var obj in GetPositionalInputQueue(MousePosition))
-			{
-				_clickDownGameObjects.Add(obj);
-				if (obj.TriggerEvent(new MouseDownEvent(button, MousePosition)) == true) return;
-
-				if (button == MouseButton.Left && obj.AcceptsFocus)
-					ChangeFocus(obj);
-			}
-
-			if (FocusedObject is not null && _clickDownGameObjects.Contains(FocusedObject) == false)
-				ChangeFocus(null);
-		}
-		else
-		{
-			propagateNonPositionalInputEvent(new MouseUpEvent(button, MousePosition));
-			var clickUpGameObjects = GetPositionalInputQueue(MousePosition);
-
-			foreach (var obj in clickUpGameObjects)
-			{
-				if (_clickDownGameObjects.Contains(obj))
-				{
-					if (obj.TriggerEvent(new ClickEvent(button, MousePosition))) break;
-				}
-			}
-		}
-	}
-
 	#endregion
 
 	#region Keyboard
@@ -285,14 +207,6 @@ public static class Input
 		propagateNonPositionalInputEvent(new KeyDownEvent(key, true));
 	}
 
-	/// <summary>
-	/// Executes a text input action with the specified character.
-	/// </summary>
-	public static void ExecuteTextInput(char input)
-	{
-		OnTextInput?.Invoke(input);
-	}
-
 	#endregion
 
 	#region Gamepad
@@ -317,7 +231,6 @@ public static class Input
 
 		foreach (var obj in _hoveredObjects)
 		{
-			e.Target = obj;
 			if (obj.TriggerEvent(e))
 				break;
 		}

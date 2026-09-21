@@ -218,36 +218,7 @@ internal class Win32Window : PlatformWindow
 				Close();
 				return IntPtr.Zero;
 
-			//Mouse Input
-			case Win32.WindowMessage.LBUTTONDOWN:
-				Input.ExecuteMouseButtonStateChange(MouseButton.Left, true);
-				WinAPI.SetCapture(Handle);
-				break;
-			case Win32.WindowMessage.LBUTTONUP:
-				Input.ExecuteMouseButtonStateChange(MouseButton.Left, false);
-				WinAPI.ReleaseCapture();
-				break;
-			case Win32.WindowMessage.RBUTTONDOWN:
-				Input.ExecuteMouseButtonStateChange(MouseButton.Right, true); break;
-			case Win32.WindowMessage.RBUTTONUP:
-				Input.ExecuteMouseButtonStateChange(MouseButton.Right, false); break;
-			case Win32.WindowMessage.MBUTTONDOWN:
-				Input.ExecuteMouseButtonStateChange(MouseButton.Middle, true); break;
-			case Win32.WindowMessage.MBUTTONUP:
-				Input.ExecuteMouseButtonStateChange(MouseButton.Middle, false); break;
-			case Win32.WindowMessage.XBUTTONDOWN:
-				var xButtonDown = MouseButton.Middle + BitwiseUtils.GetHighOrderValue(wParam);
-				Input.ExecuteMouseButtonStateChange(xButtonDown, true); break;
-			case Win32.WindowMessage.XBUTTONUP:
-				var xButtonUp = MouseButton.Middle + BitwiseUtils.GetHighOrderValue(wParam);
-				Input.ExecuteMouseButtonStateChange(xButtonUp, false); break;
-			case Win32.WindowMessage.MOUSEWHEEL:
-				var delta = BitwiseUtils.GetHighOrderValue(wParam) / 120;
-				Input.ExecuteScroll(delta); break;
-
 			//Keyboad Input
-			case Win32.WindowMessage.CHAR:
-				Input.ExecuteTextInput((char)wParam); break;
 			case Win32.WindowMessage.KEYDOWN:
 				var isRepeat = BitwiseUtils.GetSpecificBit(lParam, 31);
 				var downKey = WindowsExtentions.KeycodeToKey((int)wParam);
@@ -514,11 +485,6 @@ internal class Win32Window : PlatformWindow
 			Win32.TranslateMessage(in message);
 			Win32.DispatchMessageW(in message);
 		}
-
-		// Update mouse position
-		WinAPI.GetCursorPos(out var mousePosition);
-		WinAPI.ScreenToClient(Handle, ref mousePosition);
-		Input.ExecuteMousePositionChange(mousePosition);
 
 		// Update (gamepads)
 		_xInputManager.Update();

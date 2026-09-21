@@ -1,12 +1,14 @@
 ﻿using Azalea.Inputs;
+using Azalea.Inputs.Events;
+using Azalea.Platform;
 
 namespace Azalea.Utils;
 public static class InputUtils
 {
-	public static void SimulateCharInput(string charString)
+	public static void SimulateCharInput(Application app, string charString)
 	{
 		foreach (var chr in charString)
-			Input.ExecuteTextInput(chr);
+			app.Window.EnqueueInputEvent(new CharInputEvent(chr));
 	}
 
 	public static void SimulateKeyInput(Keys key)

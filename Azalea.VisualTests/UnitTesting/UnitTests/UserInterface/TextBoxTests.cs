@@ -19,7 +19,7 @@ public class TextBoxTests : UnitTestSuite
 			AddOperation("Input 'Lorem Ipsum'", () =>
 			{
 				Input.ChangeFocus(_textBox);
-				InputUtils.SimulateCharInput("Lorem Ipsum");
+				InputUtils.SimulateCharInput(App, "Lorem Ipsum");
 			});
 			AddResult("Check if Text is 'Lorem Ipsum'", () => _textBox.Text == "Lorem Ipsum");
 
@@ -38,7 +38,7 @@ public class TextBoxTests : UnitTestSuite
 			AddOperation("Input 'ch'", () =>
 			{
 				Input.ChangeFocus(_textBox);
-				InputUtils.SimulateCharInput("ch");
+				InputUtils.SimulateCharInput(App, "ch");
 			});
 			AddResult("Check if Text is 'Lorem chIps'", () => _textBox.Text == "Lorem chIps");
 

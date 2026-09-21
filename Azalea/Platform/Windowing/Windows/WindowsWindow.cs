@@ -320,6 +320,26 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 				EnqueueInputEvent(new MouseUpEvent(MouseButton.Left, BitwiseUtils.SplitValue(lParam)));
 				WinAPI.ReleaseCapture();
 				break;
+			case Win32.WindowMessage.RBUTTONDOWN:
+				EnqueueInputEvent(new MouseDownEvent(MouseButton.Right, BitwiseUtils.SplitValue(lParam)));
+				break;
+			case Win32.WindowMessage.RBUTTONUP:
+				EnqueueInputEvent(new MouseUpEvent(MouseButton.Right, BitwiseUtils.SplitValue(lParam)));
+				break;
+			case Win32.WindowMessage.MBUTTONDOWN:
+				EnqueueInputEvent(new MouseDownEvent(MouseButton.Middle, BitwiseUtils.SplitValue(lParam)));
+				break;
+			case Win32.WindowMessage.MBUTTONUP:
+				EnqueueInputEvent(new MouseUpEvent(MouseButton.Middle, BitwiseUtils.SplitValue(lParam)));
+				break;
+			case Win32.WindowMessage.XBUTTONDOWN:
+				var xButtonDown = MouseButton.Middle + BitwiseUtils.GetHighOrderValue(wParam);
+				EnqueueInputEvent(new MouseDownEvent(xButtonDown, BitwiseUtils.SplitValue(lParam)));
+				break;
+			case Win32.WindowMessage.XBUTTONUP:
+				var xButtonUp = MouseButton.Middle + BitwiseUtils.GetHighOrderValue(wParam);
+				EnqueueInputEvent(new MouseUpEvent(xButtonUp, BitwiseUtils.SplitValue(lParam)));
+				break;
 			case Win32.WindowMessage.KEYDOWN:
 				var isRepeat = BitwiseUtils.GetSpecificBit(lParam, 31);
 				var downKey = WindowsExtentions.KeycodeToKey((int)wParam);
@@ -331,6 +351,10 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 				break;
 			case Win32.WindowMessage.CHAR:
 				EnqueueInputEvent(new CharInputEvent((char)wParam));
+				break;
+			case Win32.WindowMessage.MOUSEWHEEL:
+				var delta = BitwiseUtils.GetHighOrderValue(wParam) / 120;
+				EnqueueInputEvent(new ScrollEvent(delta));
 				break;
 			case Win32.WindowMessage.AZ_TRAYICON:
 				var iconId = (uint)wParam;

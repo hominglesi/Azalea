@@ -24,13 +24,15 @@ public class InputTest : TestScene
 		});
 	}
 
-	protected override void Update()
+	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		if (Input.GetKey(Keys.P).Down)
-			Console.WriteLine("P recieved directly");
+		if (e.Key == Keys.P)
+		{
+			Console.WriteLine("P down");
+			return true;
+		}
 
-		//Console.WriteLine(Input.GetGamepad(1).GetLeftStick().GetVectorNormalized());
-		//Console.WriteLine(Input.GetGamepad(0).GetRightStick().GetVector());
+		return false;
 	}
 
 	private class InputLoggingObject : Box
