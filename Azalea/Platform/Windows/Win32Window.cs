@@ -219,24 +219,6 @@ internal class Win32Window : PlatformWindow
 				return IntPtr.Zero;
 
 			//Keyboad Input
-			case Win32.WindowMessage.KEYDOWN:
-				var isRepeat = BitwiseUtils.GetSpecificBit(lParam, 31);
-				var downKey = WindowsExtentions.KeycodeToKey((int)wParam);
-				handleKeyDown(downKey, isRepeat);
-				break;
-			case Win32.WindowMessage.KEYUP:
-				Input.ExecuteKeyboardKeyStateChange(WindowsExtentions.KeycodeToKey((int)wParam), false); break;
-			case Win32.WindowMessage.SYSKEYDOWN:
-				var downSysKey = WindowsExtentions.KeycodeToKey((int)wParam);
-
-				if (downSysKey == Keys.F10 || downSysKey == Keys.AltLeft)
-				{
-					var downSysKeyIsRepeat = BitwiseUtils.GetSpecificBit(lParam, 31);
-					handleKeyDown(downSysKey, downSysKeyIsRepeat);
-					return IntPtr.Zero;
-				}
-
-				break;
 			case Win32.WindowMessage.AZ_TRAYICON:
 				var iconId = (uint)wParam;
 				var iconEvent = (Win32.WindowMessage)BitwiseUtils.GetLowOrderValue(lParam);
@@ -329,14 +311,6 @@ internal class Win32Window : PlatformWindow
 
 	internal void RemoveTrayIcon(WindowsTrayIcon trayIcon)
 		=> _trayIcons.Remove(trayIcon.Handle);
-
-	private void handleKeyDown(Keys key, bool isRepeat)
-	{
-		if (isRepeat)
-			Input.ExecuteKeyboardKeyRepeat(key);
-		else
-			Input.ExecuteKeyboardKeyStateChange(key, true);
-	}
 
 	#region Implementations
 

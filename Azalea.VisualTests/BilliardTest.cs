@@ -4,6 +4,7 @@ using Azalea.Design.Shapes;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
+using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
 using Azalea.Platform;
 using Azalea.Simulations;
@@ -447,47 +448,9 @@ public class BilliardTest : TestScene
 	}
 	protected override void Update()
 	{
-		if (Input.GetKey(Keys.P).Down)
-		{
-			Console.WriteLine($"Circle1 Position:{whiteBall.Position}");
-		}
-
-		if (Input.GetKey(Keys.Tilde).Down)
-		{
-			infoContainer.Alpha = infoContainer.Alpha != 1f ? 1f : 0f;
-		}
-
-		/*
-		Console.WriteLine($"Box1 Position: {box1.Position}");
-		Console.WriteLine($"Circle1 Position: {circle1.Position}");
-		Console.WriteLine($"Circle2 Position: {circle2.Position}");
-		Console.WriteLine($"Circle3 Position: {circle3.Position}");
-	   */
-		if (Input.GetKey(Keys.W).Pressed)
-		{
-			whiteBall.Position += new Vector2(0, -2);
-		}
-		if (Input.GetKey(Keys.A).Pressed)
-		{
-			whiteBall.Position += new Vector2(-2, 0);
-		}
-		if (Input.GetKey(Keys.S).Pressed)
-		{
-			whiteBall.Position += new Vector2(0, 2);
-		}
-		if (Input.GetKey(Keys.D).Pressed)
-		{
-			whiteBall.Position += new Vector2(2, 0);
-		}
-
-		if (Input.GetKey(Keys.E).Pressed)
-		{
-			whiteBall.Rotation += 3f;
-		}
-		if (Input.GetKey(Keys.Q).Pressed)
-		{
-			whiteBall.Rotation -= 3f;
-		}
+		whiteBall.Position += App.Input.State.GetDirectionalMovement() * 2;
+		if (App.Input.State.KeyPressed(Keys.E)) whiteBall.Rotation += 3f;
+		if (App.Input.State.KeyPressed(Keys.Q)) whiteBall.Rotation -= 3f;
 
 		line.StartPoint = whiteBall.Position;
 		line.EndPoint = Input.MousePosition;
@@ -533,6 +496,18 @@ public class BilliardTest : TestScene
 		}
 		else
 			aimLine.Alpha = 0;
+	}
+
+	protected override bool OnKeyDown(KeyDownEvent e)
+	{
+		if (e.Key == Keys.P)
+			Console.WriteLine($"Circle1 Position:{whiteBall.Position}");
+		else if (e.Key == Keys.Tilde)
+			infoContainer.Alpha = infoContainer.Alpha != 1f ? 1f : 0f;
+		else
+			return false;
+
+		return true;
 	}
 	protected override void FixedUpdate()
 	{

@@ -112,101 +112,6 @@ public static class Input
 		return _hoveredObjects;
 	}
 
-	private static void updateHoveredObjects()
-	{
-		GameObject? lastHoverHandledObject = _hoverHandledObject;
-		_hoverHandledObject = null;
-
-		_lastHoveredObjects.Clear();
-		_lastHoveredObjects.AddRange(_hoveredObjects);
-
-		_hoveredObjects.Clear();
-		OverDroppableFile = false;
-
-		var positionalQueue = GetPositionalInputQueue(MousePosition);
-
-		foreach (var obj in positionalQueue)
-		{
-			_hoveredObjects.Add(obj);
-			_lastHoveredObjects.Remove(obj);
-
-			if (OverDroppableFile == false && obj.AcceptsFiles)
-				OverDroppableFile = true;
-
-			if (obj.Hovered)
-			{
-				if (obj == lastHoverHandledObject)
-				{
-					_hoverHandledObject = lastHoverHandledObject;
-					break;
-				}
-
-				continue;
-			}
-
-			obj.Hovered = true;
-
-			if (obj.TriggerEvent(new HoverEvent()))
-			{
-				_hoverHandledObject = obj;
-				break;
-			}
-		}
-
-		foreach (var obj in _lastHoveredObjects)
-		{
-			obj.Hovered = false;
-			obj.TriggerEvent(new HoverLostEvent());
-		}
-	}
-
-	#endregion
-
-	#region Keyboard
-
-	private static ButtonState[] _keyboardKeys = Array.Empty<ButtonState>();
-
-	/// <summary>
-	/// Returns the state of the specified key.
-	/// </summary>
-	public static ButtonState GetKey(Keys key) => GetKey((int)key);
-
-	/// <summary>
-	/// Event that get raised whenever a character is inputted on the keyboard.
-	/// </summary>
-	public static event Action<char>? OnTextInput;
-
-	internal static ButtonState GetKey(int keycode)
-	{
-		if (keycode < (int)Keys.Amount)
-			return _keyboardKeys[keycode];
-		else
-			return _keyboardKeys[(int)Keys.Unknown];
-	}
-
-	/// <summary>
-	/// Executes a pressed state change action on the specified key.
-	/// </summary>
-	public static void ExecuteKeyboardKeyStateChange(Keys key, bool pressed)
-	{
-		_keyboardKeys[(int)key].SetState(pressed);
-
-		if (pressed)
-			propagateNonPositionalInputEvent(new KeyDownEvent(key));
-		else
-			propagateNonPositionalInputEvent(new KeyUpEvent(key));
-	}
-
-	/// <summary>
-	/// Sets the repeat state of the specified key to true.
-	/// </summary>
-	public static void ExecuteKeyboardKeyRepeat(Keys key)
-	{
-		_keyboardKeys[(int)key].SetRepeat();
-
-		propagateNonPositionalInputEvent(new KeyDownEvent(key, true));
-	}
-
 	#endregion
 
 	#region Gamepad
@@ -222,8 +127,6 @@ public static class Input
 	#endregion
 
 	#region Files
-
-	public static bool OverDroppableFile { get; private set; } = false;
 
 	public static void ExecuteFileDropped(string[] filePaths)
 	{
@@ -266,35 +169,6 @@ public static class Input
 		}
 
 		return true;
-	}
-
-	/// <summary>
-	/// Returns the movement vector by getting the state of the WASD and Arrow keys.
-	/// </summary>
-	/// <returns></returns>
-
-	public static Vector2 GetDirectionalMovement()
-	{
-		var horizontal = 0;
-		var vertical = 0;
-
-		if (GetKey(Keys.W).Pressed || GetKey(Keys.Up).Pressed)
-			vertical -= 1;
-
-		if (GetKey(Keys.S).Pressed || GetKey(Keys.Down).Pressed)
-			vertical += 1;
-
-		if (GetKey(Keys.D).Pressed || GetKey(Keys.Right).Pressed)
-			horizontal += 1;
-
-		if (GetKey(Keys.A).Pressed || GetKey(Keys.Left).Pressed)
-			horizontal -= 1;
-
-		if (horizontal == 0 && vertical == 0)
-			return Vector2.Zero;
-
-		var direction = new Vector2(horizontal, vertical);
-		return Vector2.Normalize(direction);
 	}
 
 	#endregion

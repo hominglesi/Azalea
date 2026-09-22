@@ -3,6 +3,7 @@ using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
+using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
 using Azalea.Platform;
 using SampleGame.Elements;
@@ -42,8 +43,14 @@ public class MemoryGame : AzaleaGame
 		_logic = new MemoryLogic(_field);
 	}
 
-	protected override void Update()
+	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		if (Input.GetKey(Keys.P).Down) _logic?.Solve();
+		if(e.Key == Keys.P)
+		{
+			_logic?.Solve();
+			return true;
+		}
+
+		return false;
 	}
 }

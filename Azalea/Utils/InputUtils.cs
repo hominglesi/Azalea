@@ -11,10 +11,10 @@ public static class InputUtils
 			app.Window.EnqueueInputEvent(new CharInputEvent(chr));
 	}
 
-	public static void SimulateKeyInput(Keys key)
+	public static void SimulateKeyInput(Application app, Keys key)
 	{
-		Input.ExecuteKeyboardKeyStateChange(key, true);
-		Input.ExecuteKeyboardKeyStateChange(key, false);
+		app.Window.EnqueueInputEvent(new KeyDownEvent(key, false));
+		app.Window.EnqueueInputEvent(new KeyUpEvent(key));
 	}
 
 	public static void SimulateMultipleKeyInput(Keys key, int count)

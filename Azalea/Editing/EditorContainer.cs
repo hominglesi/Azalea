@@ -30,7 +30,7 @@ public class EditorContainer : Composition
 
 	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		if (e.Key == Keys.Q && Input.GetKey(Keys.ControlLeft).Pressed)
+		if (e.Key == Keys.Q && e.State.ControlPressed)
 		{
 			if (Expanded.Parent is null)
 			{

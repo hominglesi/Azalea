@@ -4,6 +4,7 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
+using Azalea.Inputs.Events;
 using Azalea.Platform.Rendering.Coordination;
 using Azalea.Simulations.Colliders;
 using System.Numerics;
@@ -14,12 +15,24 @@ public class LegacyColliderDebug : GameObject
 	public bool IsShown { get; set; }
 	private bool _isToggled = false;
 
-	protected override void Update()
+	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		if (Input.GetKey(Keys.W).Down && Input.GetKey(Keys.ControlLeft).Pressed && Input.GetKey(Keys.ShiftLeft).Pressed)
-			_isToggled = !_isToggled;
+		if(e.Key == Keys.W && e.State.ControlPressed && e.State.ShiftPressed)
+		{
+			if (e.State.ShiftPressed)
+				_isToggled = !_isToggled;
 
-		IsShown = _isToggled || Input.GetKey(Keys.W).Pressed && Input.GetKey(Keys.ControlLeft).Pressed;
+			IsShown = true;
+			return true;
+		}
+
+		return false;
+	}
+
+	protected override void OnKeyUp(KeyUpEvent e)
+	{
+		if (e.Key == Keys.W)
+			IsShown = _isToggled;
 	}
 
 	public override void Draw(IRenderer renderer, RenderCoordinator? coordinator)

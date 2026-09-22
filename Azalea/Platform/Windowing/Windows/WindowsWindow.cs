@@ -349,6 +349,16 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 				var upKey = WindowsExtentions.KeycodeToKey((int)wParam);
 				EnqueueInputEvent(new KeyUpEvent(upKey));
 				break;
+			case Win32.WindowMessage.SYSKEYDOWN:
+				var downSysKey = WindowsExtentions.KeycodeToKey((int)wParam);
+
+				if (downSysKey == Keys.F10 || downSysKey == Keys.AltLeft)
+				{
+					var downSysKeyIsRepeat = BitwiseUtils.GetSpecificBit(lParam, 31);
+					EnqueueInputEvent(new KeyDownEvent(downSysKey, downSysKeyIsRepeat));
+					return IntPtr.Zero;
+				}
+				break;
 			case Win32.WindowMessage.CHAR:
 				EnqueueInputEvent(new CharInputEvent((char)wParam));
 				break;

@@ -59,13 +59,16 @@ internal class LargeIconsExplorerView : ResourceExplorer
 		_contentContainer.Clear();
 	}
 
-	protected override void Update()
+	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		if (Input.GetKey(Keys.Left).Down)
+		if (e.Key == Keys.Left)
 			MoveBackward();
-
-		if (Input.GetKey(Keys.Right).Down)
+		else if (e.Key == Keys.Right)
 			MoveForward();
+		else
+			return false;
+
+		return true;
 	}
 
 	private class IconItem : Composition

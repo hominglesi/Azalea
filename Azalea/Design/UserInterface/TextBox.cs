@@ -58,7 +58,7 @@ public abstract class TextBox(Action<SpriteText>? creationParameters = null) : T
 		if (e.Key == Keys.Left) moveCarat(-1);
 		if (e.Key == Keys.Right) moveCarat(1);
 
-		if (e.Key == Keys.V && Input.GetKey(Keys.ControlLeft).Pressed)
+		if (e.Key == Keys.V && e.State.ControlPressed)
 		{
 			var clipboardText = Clipboard.GetText() ?? "";
 			var newText = _text.Insert(_caratPosition, clipboardText);
@@ -66,7 +66,7 @@ public abstract class TextBox(Action<SpriteText>? creationParameters = null) : T
 			Text = newText;
 		}
 
-		if (e.Key == Keys.C && Input.GetKey(Keys.ControlLeft).Pressed)
+		if (e.Key == Keys.C && e.State.ControlPressed)
 			Clipboard.SetText(_text);
 
 		return base.OnKeyDown(e);

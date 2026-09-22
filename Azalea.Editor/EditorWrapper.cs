@@ -9,6 +9,7 @@ using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
+using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
 using System;
 using System.Diagnostics;
@@ -91,15 +92,22 @@ public class EditorWrapper : AzaleaGame
 			_wrappedGame.AddInternal(sceneContainer);
 			_sceneContainerHandedOver = true;
 		}
+	}
 
-		if (Input.GetKey(Keys.F1).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
+	protected override bool OnKeyDown(KeyDownEvent e)
+	{
+		if (e.Key == Keys.F1 && e.State.ShiftPressed)
 			CameraWindow.Toggle();
-		if (Input.GetKey(Keys.F2).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
+		else if (e.Key == Keys.F2 && e.State.ShiftPressed)
 			GlobalWindow.Toggle();
-		if (Input.GetKey(Keys.F3).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
+		else if (e.Key == Keys.F3 && e.State.ShiftPressed)
 			RenderWindow.Toggle();
-		if (Input.GetKey(Keys.F4).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
+		else if (e.Key == Keys.F4 && e.State.ShiftPressed)
 			ClassWindow.Toggle();
+		else
+			return false;
+
+		return true;
 	}
 
 	private class MissingGameDisplay : Composition

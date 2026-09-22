@@ -323,29 +323,26 @@ public abstract class TextBoxOld : Composition
 
 	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		var controlPressed = Input.GetKey(Keys.ControlLeft).Pressed || Input.GetKey(Keys.ControlRight).Pressed;
-		var shiftPressed = Input.GetKey(Keys.ShiftLeft).Pressed || Input.GetKey(Keys.ShiftRight).Pressed;
-
 		switch (e.Key)
 		{
 			case Keys.A:
-				if (controlPressed) return onAction(PlatformAction.SelectAll);
+				if (e.State.ControlPressed) return onAction(PlatformAction.SelectAll);
 				return false;
 			case Keys.V:
-				if (controlPressed) return onAction(PlatformAction.Paste);
+				if (e.State.ControlPressed) return onAction(PlatformAction.Paste);
 				return false;
 			case Keys.C:
-				if (controlPressed) return onAction(PlatformAction.Copy);
+				if (e.State.ControlPressed) return onAction(PlatformAction.Copy);
 				return false;
 			case Keys.X:
-				if (controlPressed) return onAction(PlatformAction.Cut);
+				if (e.State.ControlPressed) return onAction(PlatformAction.Cut);
 				return false;
 			case Keys.Backspace: return onAction(PlatformAction.DeleteBackwardChar);
 			case Keys.Left:
-				if (shiftPressed) return onAction(PlatformAction.SelectBackwardChar);
+				if (e.State.ShiftPressed) return onAction(PlatformAction.SelectBackwardChar);
 				return onAction(PlatformAction.MoveBackwardChar);
 			case Keys.Right:
-				if (shiftPressed) return onAction(PlatformAction.SelectForwardChar);
+				if (e.State.ShiftPressed) return onAction(PlatformAction.SelectForwardChar);
 				return onAction(PlatformAction.MoveForwardChar);
 		}
 

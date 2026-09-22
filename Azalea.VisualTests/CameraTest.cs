@@ -60,7 +60,7 @@ internal class CameraTest : TestScene
 
 	protected override void Update()
 	{
-		var movement = Input.GetDirectionalMovement();
+		var movement = App.Input.State.GetDirectionalMovement();
 		if (movement != Vector2.Zero)
 		{
 			_player.Position += movement * 3 * Time.DeltaTime * 60;

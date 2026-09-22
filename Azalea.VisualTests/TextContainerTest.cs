@@ -2,6 +2,7 @@
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
+using Azalea.Inputs.Events;
 using Azalea.Platform;
 using Azalea.Utils;
 
@@ -59,11 +60,14 @@ public class TextContainerTest : TestScene
 
 	}
 
-	protected override void Update()
+	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		if (Input.GetKey(Keys.Space).Down)
+		if(e.Key == Keys.Space)
 		{
-			_scrollable.Size = _scrollable.ToLocalSpace(Input.MousePosition);
+			_scrollable.Size = _scrollable.ToLocalSpace(e.State.MousePosition);
+			return true;
 		}
+
+		return false;
 	}
 }

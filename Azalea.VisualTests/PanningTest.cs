@@ -1,6 +1,7 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Design.UserInterface;
 using Azalea.Inputs;
+using Azalea.Inputs.Events;
 using Azalea.Platform;
 using System.Numerics;
 
@@ -52,9 +53,18 @@ public class PanningTest : TestScene
 	protected override void Update()
 	{
 		var panSpeed = 0.5f * Time.DeltaTimeMs;
-		_container.Position += Input.GetDirectionalMovement() * panSpeed;
+		_container.Position += App.Input.State.GetDirectionalMovement() * panSpeed;
+	}
 
-		if (Input.GetKey(Keys.KeypadPlus).Down) _container.Scale += new Vector2(0.15f, 0.15f);
-		if (Input.GetKey(Keys.KeypadMinus).Down) _container.Scale += new Vector2(-0.15f, -0.15f);
+	protected override bool OnKeyDown(KeyDownEvent e)
+	{
+		if (e.Key == Keys.KeypadPlus)
+			_container.Scale += new Vector2(0.15f, 0.15f);
+		else if (e.Key == Keys.KeypadMinus)
+			_container.Scale += new Vector2(-0.15f, -0.15f);
+		else
+			return false;
+
+		return true;
 	}
 }

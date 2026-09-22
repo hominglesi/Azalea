@@ -288,7 +288,7 @@ public class TestingTestScene : TestScene
 	private float _elapsedTime = 0;
 	protected override void Update()
 	{
-		_sprite.Position += Input.GetDirectionalMovement() * Time.DeltaTime * 200;
+		_sprite.Position += App.Input.State.GetDirectionalMovement() * Time.DeltaTime * 200;
 
 		/*
 		_elapsedTime += Time.DeltaTime;

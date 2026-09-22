@@ -3,6 +3,7 @@ using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
+using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
 using Azalea.Simulations;
 using Azalea.Simulations.Colliders;
@@ -82,37 +83,11 @@ public class TriggerTest : TestScene
 
 	protected override void Update()
 	{
-		if (Input.GetKey(Keys.Space).Down)
-		{
-			Physics.UsesGravity = true;
-		}
+		box1.Position += App.Input.State.GetDirectionalMovement() * 2;
 
-		if (Input.GetKey(Keys.W).Pressed)
-		{
-			box1.Position += new Vector2(0, -2);
+		if (App.Input.State.KeyPressed(Keys.E)) box1.Rotation += 3f;
+		if (App.Input.State.KeyPressed(Keys.Q)) box1.Rotation -= 3f;
 
-		}
-		if (Input.GetKey(Keys.A).Pressed)
-		{
-			box1.Position += new Vector2(-2, 0);
-		}
-		if (Input.GetKey(Keys.S).Pressed)
-		{
-			box1.Position += new Vector2(0, 2);
-		}
-		if (Input.GetKey(Keys.D).Pressed)
-		{
-			box1.Position += new Vector2(2, 0);
-		}
-
-		if (Input.GetKey(Keys.E).Pressed)
-		{
-			box1.Rotation += 3f;
-		}
-		if (Input.GetKey(Keys.Q).Pressed)
-		{
-			box1.Rotation -= 3f;
-		}
 		/*
 		line.StartPoint = circle1.Position;
 		line.EndPoint = Input.MousePosition;
@@ -138,5 +113,16 @@ public class TriggerTest : TestScene
 			power *= 1 + distance / 10;
 			circle1.GetComponent<RigidBody>().ApplyForce(directionVector, power);
 		}*/
+	}
+
+	protected override bool OnKeyDown(KeyDownEvent e)
+	{
+		if (e.Key == Keys.Space)
+		{
+			Physics.UsesGravity = true;
+			return true;
+		}
+
+		return false;
 	}
 }

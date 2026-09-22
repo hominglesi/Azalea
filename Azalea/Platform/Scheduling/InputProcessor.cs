@@ -15,15 +15,18 @@ namespace Azalea.Platform.Scheduling;
 public class InputProcessor
 {
 	private readonly GameObject _root;
+	private readonly Action<bool>? _showDroppableCursorChanged;
+	public readonly InputState State;
 
-	public InputProcessor(GameObject root)
+	public InputProcessor(GameObject root, Action<bool>? showDroppableCursorChanged = null)
 	{
 		_root = root;
+		_showDroppableCursorChanged = showDroppableCursorChanged;
+		State = new InputState();
 	}
 
 	public event Action<char>? OnCharInput;
 
-	private Vector2 _mousePosition;
 	private readonly List<GameObject> _clickDownGameObjects = [];
 	private GameObject? _focusedObject;
 
@@ -34,8 +37,8 @@ public class InputProcessor
 			switch (command)
 			{
 				case MouseMoveEvent(var position):
-					_mousePosition = MainCamera.Instance.ToWorldSpace(position);
-					reprocessHoveredObjects(_mousePosition);
+					State.MousePosition = MainCamera.Instance.ToWorldSpace(position);
+					reprocessHoveredObjects(State.MousePosition);
 					break;
 				case MouseDownEvent(var button, var position):
 					_clickDownGameObjects.Clear();
@@ -74,7 +77,17 @@ public class InputProcessor
 					}
 
 					break;
-				case KeyDownEvent or KeyUpEvent:
+				case KeyDownEvent(var key, var isRepeat):
+					State.SetKeyPressed(key, true);
+					command.State = State;
+
+					foreach (var obj in getNonPositionalInputQueue())
+						if (obj.TriggerEvent(command) == true) return;
+					break;
+				case KeyUpEvent(var key):
+					State.SetKeyPressed(key, false);
+					command.State = State;
+
 					foreach (var obj in getNonPositionalInputQueue())
 						if (obj.TriggerEvent(command) == true) return;
 					break;
@@ -87,7 +100,7 @@ public class InputProcessor
 
 					// For now we recalculate hovered objects since a scroll
 					// often moves the objects. We should recalculate when objects are moved instead.
-					reprocessHoveredObjects(_mousePosition);
+					reprocessHoveredObjects(State.MousePosition);
 					break;
 			}
 		}
@@ -111,7 +124,6 @@ public class InputProcessor
 		return inputQueue;
 	}
 
-	
 	private readonly List<GameObject> _hoveredObjects = [];
 	private readonly List<GameObject> _lastHoveredObjects = [];
 	private GameObject? _hoverHandledObject;
@@ -126,12 +138,18 @@ public class InputProcessor
 
 		_hoveredObjects.Clear();
 
+		var showDroppableCursor = false;
+		_showDroppableCursorChanged?.Invoke(showDroppableCursor);
+
 		var positionalQueue = getPositionalInputQueue(newPosition);
 
 		foreach (var obj in positionalQueue)
 		{
 			_hoveredObjects.Add(obj);
 			_lastHoveredObjects.Remove(obj);
+
+			if (showDroppableCursor == false && obj.AcceptsFiles)
+				_showDroppableCursorChanged?.Invoke(true);
 
 			if (obj.Hovered)
 			{

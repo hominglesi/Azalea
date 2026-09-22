@@ -50,6 +50,7 @@ public abstract partial class PlatformWindow : ICommandHandler<WindowCommand>
 	internal event Action<Vector2Int>? OnResized;
 	public bool Resizable { get; protected set; }
 	public bool CursorVisible { get; protected set; }
+	internal bool ShowDroppableCursor { get; set; }
 	public bool Closed
 	{
 		get;

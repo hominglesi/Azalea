@@ -1,6 +1,7 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics.Colors;
 using Azalea.Inputs;
+using Azalea.Inputs.Events;
 using Azalea.Utils;
 using System.Numerics;
 
@@ -34,10 +35,18 @@ public class AutoSizeTest : TestScene
 
 	protected override void Update()
 	{
-		_flex.Position = Input.MousePosition - new Vector2(100);
+		_flex.Position = App.Input.State.MousePosition - new Vector2(100);
+	}
 
-		if (Input.GetKey(Keys.Space).DownOrRepeat)
+	protected override bool OnKeyDown(KeyDownEvent e)
+	{
+		if (e.Key == Keys.Space)
+		{
 			regenerateText();
+			return true;
+		}
+			
+		return false;
 	}
 
 	private void regenerateText()
