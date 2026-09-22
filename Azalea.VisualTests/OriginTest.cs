@@ -36,7 +36,7 @@ internal class OriginTest : TestScene
 
 	protected override void Update()
 	{
-		var angle = MathUtils.GetAngleTowards(_windowCenter, Input.MousePosition);
+		var angle = MathUtils.GetAngleTowards(_windowCenter, App.Input.State.MousePosition);
 		var direction = MathUtils.GetDirectionFromAngle(angle);
 		var rotation = MathUtils.RadiansToDegrees(angle) - 180;
 

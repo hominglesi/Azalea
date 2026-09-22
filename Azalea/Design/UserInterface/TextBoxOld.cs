@@ -406,7 +406,7 @@ public abstract class TextBoxOld : Composition
 
 	protected override void OnFocus(FocusEvent e)
 	{
-		App.Input.OnCharInput += handleTextInput;
+		App.Input.State.OnCharInput += handleTextInput;
 		updateCaretVisibility();
 
 		base.OnFocus(e);
@@ -414,18 +414,13 @@ public abstract class TextBoxOld : Composition
 
 	protected override void OnFocusLost(FocusLostEvent e)
 	{
-		App.Input.OnCharInput -= handleTextInput;
+		App.Input.State.OnCharInput -= handleTextInput;
 		updateCaretVisibility();
 
 		base.OnFocusLost(e);
 	}
 
-	protected virtual void KillFocus() => killFocus();
-
-	private void killFocus()
-	{
-		Input.ChangeFocus(null);
-	}
+	protected virtual void KillFocus() => App.Input.ChangeFocus(null);
 
 	private void handleTextInput(char text)
 	{

@@ -28,7 +28,7 @@ public class BoundingBoxTreeTest : TestScene
 	private SpriteText _checkCountDisplay;
 	protected override void Update()
 	{
-		var contained = Root.ContainsPoint(Input.MousePosition);
+		var contained = Root.ContainsPoint(App.Input.State.MousePosition);
 
 		if (contained is null)
 		{

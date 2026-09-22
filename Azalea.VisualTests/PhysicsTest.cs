@@ -306,13 +306,15 @@ public class PhysicsTest : TestScene
 		if (App.Input.State.KeyPressed(Keys.E)) circle1.Rotation += 3f;
 		if (App.Input.State.KeyPressed(Keys.Q)) circle1.Rotation -= 3f;
 
+		var mousePos = App.Input.State.MousePosition;
+
 		line.StartPoint = circle1.Position;
-		line.EndPoint = Input.MousePosition;
+		line.EndPoint = mousePos;
 		CircleCollider crCol = circle1.GetComponent<CircleCollider>();
-		if (Input.MousePosition.X < circle1.Position.X + crCol.Radius && Input.MousePosition.X > circle1.Position.X - crCol.Radius
-			&& Input.MousePosition.Y < circle1.Position.Y + crCol.Radius && Input.MousePosition.Y > circle1.Position.Y - crCol.Radius)
+		if (mousePos.X < circle1.Position.X + crCol.Radius && mousePos.X > circle1.Position.X - crCol.Radius
+			&& mousePos.Y < circle1.Position.Y + crCol.Radius && mousePos.Y > circle1.Position.Y - crCol.Radius)
 		{
-			if (Input.GetMouseButton(MouseButton.Left).Down)
+			if (App.Input.State.MouseButtonPressed(MouseButton.Left))
 			{
 				line.Alpha = 1;
 				charging = true;
@@ -377,10 +379,10 @@ public class PhysicsTest : TestScene
 
 		charging = false;
 		line.Alpha = 0;
-		Vector2 directionVector = Vector2.Normalize(circle1.Position - Input.MousePosition);
+		Vector2 directionVector = Vector2.Normalize(circle1.Position - e.State.MousePosition);
 
 		float power = 2f;
-		float distance = Vector2.Distance(Input.MousePosition, circle1.Position);
+		float distance = Vector2.Distance(e.State.MousePosition, circle1.Position);
 		power *= 1 + distance / 10;
 		circle1.GetComponent<RigidBody>().ApplyForce(directionVector, power);
 	}

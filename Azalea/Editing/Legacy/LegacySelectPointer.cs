@@ -28,7 +28,8 @@ public class LegacySelectPointer : Sprite
 
 	private void onSelectClicked()
 	{
-		var hoveredObjects = Input.GetHoveredObjects(recalculate: true);
+		// This is broken but it's legacy and should be removed anyway
+		var hoveredObjects = App.Input.State.HoveredObjects;
 
 		for (int i = 0; i < hoveredObjects.Count; i++)
 		{

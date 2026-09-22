@@ -28,7 +28,7 @@ public abstract class BasicWindowContainer : Composition
 
 	private void startDragging()
 	{
-		_previousDragPosition = Input.MousePosition;
+		_previousDragPosition = App.Input.State.MousePosition;
 		_isBeingDragged = true;
 	}
 
@@ -43,8 +43,8 @@ public abstract class BasicWindowContainer : Composition
 	{
 		if (_isBeingDragged)
 		{
-			Position += Input.MousePosition - _previousDragPosition;
-			_previousDragPosition = Input.MousePosition;
+			Position += App.Input.State.MousePosition - _previousDragPosition;
+			_previousDragPosition = App.Input.State.MousePosition;
 		}
 	}
 

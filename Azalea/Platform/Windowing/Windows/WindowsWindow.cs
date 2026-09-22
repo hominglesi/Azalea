@@ -7,6 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
+using System.Runtime.Serialization;
+using System.Text;
 
 namespace Azalea.Platform.Windowing.Windows;
 internal class WindowsWindow(string title, Vector2Int clientSize, bool initiallyVisible)
@@ -64,6 +67,11 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 
 		if (Handle == nint.Zero)
 			throw new Exception($"Could not create Window. (Error {Marshal.GetLastWin32Error()})");
+
+		if (WinAPI.OleInitialize(0) == 0)
+			_ = WinAPI.RegisterDragDrop(Handle, new DropTarget(this));
+		else
+			Console.WriteLine("The Main method has not been marked with an [STAThread] attribute. You may experience some strange behaviours.");
 
 		// Set actual window position
 		Win32.GetWindowRect(Handle, out windowRect);
@@ -398,6 +406,54 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 		}
 
 		return Win32.DefWindowProcW(hWnd, uMsg, wParam, lParam);
+	}
+
+	private class DropTarget(WindowsWindow window) : Win32.IDropTarget
+	{
+		public int DragEnter(IDataObject dataObject, uint keyState, Win32.POINT point, ref uint effect) => 0;
+		public int DragLeave() => 0;
+
+		public int DragOver(uint keyState, Win32.POINT point, ref uint effect)
+		{
+			effect = window.ShowDroppableCursor ? 1u : 0u;
+
+			return 0;
+		}
+
+		public int Drop(IDataObject dataObject, uint keyState, Win32.POINT point, ref uint effect)
+		{
+			var format = new FORMATETC()
+			{
+				cfFormat = 15, // CF_HDROP
+				dwAspect = DVASPECT.DVASPECT_CONTENT,
+				tymed = TYMED.TYMED_HGLOBAL
+			};
+
+			string[] files;
+			dataObject.GetData(ref format, out STGMEDIUM medium);
+
+			try
+			{
+				IntPtr dropHandle = medium.unionmember;
+				int fileCount = WinAPI.DragQueryFile(dropHandle, uint.MaxValue, null, 0);
+				files = new string[fileCount];
+				for (uint x = 0; x < fileCount; ++x)
+				{
+					int size = WinAPI.DragQueryFile(dropHandle, x, null, 0);
+					if (size > 0)
+					{
+						StringBuilder fileName = new StringBuilder(size + 1);
+						if (WinAPI.DragQueryFile(dropHandle, x, fileName, (uint)fileName.Capacity) > 0)
+							files[x] = fileName.ToString();
+					}
+				}
+			}
+			finally { WinAPI.ReleaseStgMedium(ref medium); }
+
+			window.EnqueueInputEvent(new FileDroppedEvent(files));
+
+			return 0;
+		}
 	}
 
 	protected override IPlatformDeviceContext GetDeviceContext()

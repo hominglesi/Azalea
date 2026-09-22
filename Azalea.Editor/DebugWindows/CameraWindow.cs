@@ -26,7 +26,7 @@ internal static class CameraWindow
 				.OnValueChanged(y => MainCamera.Instance.Position = new(MainCamera.Instance.Position.X, y));
 			_window.AddSliderFloat("Zoom", minValue: 0.5f, maxValue: 1.5f, initialValue: 1, continuous: false)
 				.OnValueChanged(zoom => MainCamera.Instance.Zoom = zoom);
-			_window.AddLabel(() => $"Mouse Position: {Input.MousePosition}");
+			_window.AddLabel(() => $"Mouse Position: {_window.App.Input.State.MousePosition}");
 		}
 
 		_window.Show();

@@ -1,6 +1,7 @@
 using Azalea.Graphics;
 using Azalea.IO.Resources;
 using Azalea.Platform;
+using Azalea.Platform.Windowing;
 using System;
 
 namespace Azalea.VisualTests;
@@ -20,37 +21,29 @@ public class IWindowTest : TestScene
 					() => GameHost.Main.CreateApplication(new VisualTests())),
 				CreateActionButton(
 					"Set size to 700, 700",
-					() => Window.Size = new(700, 700)),
+					() => App.Window.SetSize(new(700, 700))),
 				CreateActionButton(
 					"Set client size to 700, 700",
-					() => Window.ClientSize = new(700, 700)),
-				CreateActionButton(
-					"Set WindowState to 'Normal'",
-					() => Window.State = WindowState.Normal),
-				CreateActionButton(
-					"Set WindowState to 'Minimized'",
-					() => Window.State = WindowState.Minimized),
-				CreateActionButton(
-					"Set WindowState to 'Maximized'",
-					() => Window.State = WindowState.Maximized),
-				CreateActionButton(
-					"Set WindowState to 'Fullscreen'",
-					() => Window.State = WindowState.Fullscreen),
+					() => App.Window.SetClientSize(new(700, 700))),
+				CreateActionButton("Restore window", () => App.Window.Restore()),
+				CreateActionButton("Minimize window", () => App.Window.Minimize()),
+				CreateActionButton("Maximize window", () => App.Window.Maximize()),
+				CreateActionButton("Fullscreen window", () => App.Window.Fullscreen()),
 				CreateActionButton(
 					"Set Resizable to 'true'",
-					() => Window.Resizable = true),
+					() => App.Window.SetResizable(true)),
 				CreateActionButton(
 					"Set Resizable to 'false'",
-					() => Window.Resizable = false),
+					() => App.Window.SetResizable(false)),
 				CreateActionButton(
 					"Set Title to 'Azalea Game'",
-					() => Window.Title = "Azalea Game"),
+					() => App.Window.SetTitle("Azalea Game")),
 				CreateActionButton(
 					"Set Title to 'Ide Gas'",
-					() => Window.Title = "Ide Gas"),
+					() => App.Window.SetTitle(Window.Title = "Ide Gas")),
 				CreateActionButton(
 					"Set Title to ''",
-					() => Window.Title = ""),
+					() => App.Window.SetTitle(Window.Title = "")),
 				CreateActionButton(
 					"Set this test to prevent Closing",
 					() => _preventsClosure = true),
@@ -59,49 +52,45 @@ public class IWindowTest : TestScene
 					() => _preventsClosure = false),
 				CreateActionButton(
 					"Set icon to Azalea flower",
-					() => Window.SetIconFromStream(Assets.GetStream("Textures/azalea-icon.png")!)),
+					() => App.Window.SetIcon(Assets.MainStore.GetImage("Textures/azalea-icon.png"))),
 				CreateActionButton(
 					"Set icon to Missing texture",
-					() => Window.SetIconFromStream(Assets.GetStream("Textures/missing-texture.png")!)),
+					() => App.Window.SetIcon(Assets.MainStore.GetImage("Textures/missing-texture.png"))),
 				CreateActionButton(
 					"Set icon to null",
-					() => Window.SetIconFromStream(null)),
+					() => App.Window.SetIcon(null)),
 				CreateActionButton(
-					"Turn vsync on",
+					"Turn vsync on (BROKEN)",
 					() => Window.VSync = true),
 				CreateActionButton(
-					"Turn vsync off",
+					"Turn vsync off (BROKEN)",
 					() => Window.VSync = false),
 				CreateActionButton(
 					"Show cursor",
-					() => Window.CursorVisible = true),
+					() => App.Window.SetCursorVisible(true)),
 				CreateActionButton(
 					"Hide cursor",
-					() => Window.CursorVisible = false),
+					() => App.Window.SetCursorVisible(false)),
 				CreateActionButton(
 					"Set position to 0",
-					() => Window.Position = Vector2Int.Zero),
+					() => App.Window.SetPosition(Vector2Int.Zero)),
 				CreateActionButton(
 					"Set client position to 0",
-					() => Window.ClientPosition = Vector2Int.Zero),
+					() => App.Window.SetPosition(Vector2Int.Zero)),
 				CreateActionButton(
 					"Move window by (25, 25)",
-					() => Window.Position += new Vector2Int(25, 25)),
+					() => App.Window.SetPosition(App.Window.Position + new Vector2Int(25, 25))),
 				CreateActionButton(
 					"Enlarge window by (25, 25)",
-					() => Window.ClientSize += new Vector2Int(25, 25)),
-				CreateActionButton(
-					"Center window",
-					() => Window.Center()),
+					() => App.Window.SetClientSize(App.Window.ClientSize + new Vector2Int(25, 25))),
+				CreateActionButton("Center window", () => App.Window.Center()),
 				CreateActionButton(
 					"Request Attention in 1.5 seconds",
 					() => {_attentionTimer = 1.5f; }),
 				CreateActionButton(
 					"Focus in 1.5 seconds",
 					() => _focusTimer = 1.5f),
-				CreateActionButton(
-					"Close window",
-					() => Window.Close())
+				CreateActionButton("Close window", () => App.Window.Close())
 			}),
 
 			CreateObservedContainer(new GameObject[]
@@ -147,18 +136,14 @@ public class IWindowTest : TestScene
 		{
 			_focusTimer -= Time.DeltaTime;
 			if (_focusTimer <= 0)
-			{
-				Window.Focus();
-			}
+				App.Window.Focus();
 		}
 
 		if (_attentionTimer > 0)
 		{
 			_attentionTimer -= Time.DeltaTime;
 			if (_attentionTimer <= 0)
-			{
-				Window.RequestAttention();
-			}
+				App.Window.RequestAttention();
 		}
 	}
 

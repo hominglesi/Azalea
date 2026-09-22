@@ -13,7 +13,7 @@ public abstract class TextBox(Action<SpriteText>? creationParameters = null) : T
 
 	protected override void Initialize()
 	{
-		App.Input.OnCharInput += onTextInput;
+		App.Input.State.OnCharInput += onTextInput;
 	}
 
 	private string _text = "";

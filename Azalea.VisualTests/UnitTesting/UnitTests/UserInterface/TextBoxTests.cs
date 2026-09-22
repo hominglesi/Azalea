@@ -18,27 +18,27 @@ public class TextBoxTests : UnitTestSuite
 		{
 			AddOperation("Input 'Lorem Ipsum'", () =>
 			{
-				Input.ChangeFocus(_textBox);
-				InputUtils.SimulateCharInput(App, "Lorem Ipsum");
+				App.Input.ChangeFocus(_textBox);
+				App.Input.SimulateCharInput("Lorem Ipsum");
 			});
 			AddResult("Check if Text is 'Lorem Ipsum'", () => _textBox.Text == "Lorem Ipsum");
 
 			AddOperation("Press Backspace twice", () =>
 			{
-				Input.ChangeFocus(_textBox);
-				InputUtils.SimulateMultipleKeyInput(Keys.Backspace, 2);
+				App.Input.ChangeFocus(_textBox);
+				App.Input.SimulateKeyInput(Keys.Backspace, 2);
 			});
 			AddResult("Check if Text is 'Lorem Ips'", () => _textBox.Text == "Lorem Ips");
 
 			AddOperation("Press Left arrow 3 times", () =>
 			{
-				Input.ChangeFocus(_textBox);
-				InputUtils.SimulateMultipleKeyInput(Keys.Left, 3);
+				App.Input.ChangeFocus(_textBox);
+				App.Input.SimulateKeyInput(Keys.Left, 3);
 			});
 			AddOperation("Input 'ch'", () =>
 			{
-				Input.ChangeFocus(_textBox);
-				InputUtils.SimulateCharInput(App, "ch");
+				App.Input.ChangeFocus(_textBox);
+				App.Input.SimulateCharInput("ch");
 			});
 			AddResult("Check if Text is 'Lorem chIps'", () => _textBox.Text == "Lorem chIps");
 

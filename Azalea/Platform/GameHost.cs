@@ -71,8 +71,6 @@ public abstract class GameHost
 
 		game.AddInternal(SceneManager);
 
-		Input.Initialize(_root);
-
 		RunGameLoop();
 	}
 
@@ -129,8 +127,6 @@ public abstract class GameHost
 		_root.Size = Vector2Extentions.ComponentMax(Vector2.One, _root.Size);
 
 		_root.UpdateSubTree();
-
-		Input.LateUpdate();
 	}
 
 	public virtual void CallOnFixedUpdate()

@@ -25,84 +25,89 @@ public class InputProcessor
 		State = new InputState();
 	}
 
-	public event Action<char>? OnCharInput;
-
 	private readonly List<GameObject> _clickDownGameObjects = [];
-	private GameObject? _focusedObject;
 
 	public void Process(Channel<InputEvent> inputChannel)
 	{
 		while (inputChannel.Reader.TryRead(out var command))
+			handleEvent(command);
+	}
+
+	private void handleEvent(InputEvent e)
+	{
+		e.State = State;
+
+		switch (e)
 		{
-			switch (command)
-			{
-				case MouseMoveEvent(var position):
-					State.MousePosition = MainCamera.Instance.ToWorldSpace(position);
-					reprocessHoveredObjects(State.MousePosition);
-					break;
-				case MouseDownEvent(var button, var position):
-					_clickDownGameObjects.Clear();
+			case MouseMoveEvent(var position):
+				State.MousePosition = MainCamera.Instance.ToWorldSpace(position);
+				reprocessHoveredObjects(State.MousePosition);
+				break;
+			case MouseDownEvent(var button, var position):
+				State.SetMouseButtonPressed(button, true);
+				_clickDownGameObjects.Clear();
 
-					bool focusAccepted = false;
+				bool focusAccepted = false;
 
-					foreach (var obj in getPositionalInputQueue(position))
+				foreach (var obj in getPositionalInputQueue(position))
+				{
+					_clickDownGameObjects.Add(obj);
+
+					if (focusAccepted == false && button == MouseButton.Left && obj.AcceptsFocus)
 					{
-						_clickDownGameObjects.Add(obj);
-
-						if (focusAccepted == false && button == MouseButton.Left && obj.AcceptsFocus)
-						{
-							changeFocus(obj);
-							focusAccepted = true;
-						}
-
-						if (obj.TriggerEvent(new MouseDownEvent(button, position)) == true) break;
+						ChangeFocus(obj);
+						focusAccepted = true;
 					}
 
-					if (_focusedObject is not null && focusAccepted == false)
-						changeFocus(null);
+					if (obj.TriggerEvent(e) == true) break;
+				}
 
-					break;
-				case MouseUpEvent(var button, var position):
-					foreach (var obj in getNonPositionalInputQueue())
-						if (obj.TriggerEvent(command) == true) return;
+				if (State.FocusedObject is not null && focusAccepted == false)
+					ChangeFocus(null);
 
-					ClickEvent? clickEvent = null;
-					foreach (var obj in getPositionalInputQueue(position))
+				break;
+			case MouseUpEvent(var button, var position):
+				State.SetMouseButtonPressed(button, false);
+				foreach (var obj in getNonPositionalInputQueue())
+					if (obj.TriggerEvent(e) == true) break;
+
+				ClickEvent? clickEvent = null;
+				foreach (var obj in getPositionalInputQueue(position))
+				{
+					if (_clickDownGameObjects.Contains(obj))
 					{
-						if (_clickDownGameObjects.Contains(obj))
-						{
-							clickEvent ??= new ClickEvent(button, position);
-							if (obj.TriggerEvent(clickEvent)) break;
-						}
+						clickEvent ??= new ClickEvent(button, position);
+						clickEvent.State = State;
+						if (obj.TriggerEvent(clickEvent)) break;
 					}
+				}
 
-					break;
-				case KeyDownEvent(var key, var isRepeat):
-					State.SetKeyPressed(key, true);
-					command.State = State;
+				break;
+			case KeyDownEvent(var key, var isRepeat):
+				State.SetKeyPressed(key, true);
+				foreach (var obj in getNonPositionalInputQueue())
+					if (obj.TriggerEvent(e) == true) break;
+				break;
+			case KeyUpEvent(var key):
+				State.SetKeyPressed(key, false);
+				foreach (var obj in getNonPositionalInputQueue())
+					if (obj.TriggerEvent(e) == true) break;
+				break;
+			case CharInputEvent(var chr):
+				State.TriggerCharInput(chr);
+				break;
+			case ScrollEvent:
+				foreach (var obj in getNonPositionalInputQueue())
+					obj.TriggerEvent(e);
 
-					foreach (var obj in getNonPositionalInputQueue())
-						if (obj.TriggerEvent(command) == true) return;
-					break;
-				case KeyUpEvent(var key):
-					State.SetKeyPressed(key, false);
-					command.State = State;
-
-					foreach (var obj in getNonPositionalInputQueue())
-						if (obj.TriggerEvent(command) == true) return;
-					break;
-				case CharInputEvent(var chr):
-					OnCharInput?.Invoke(chr);
-					break;
-				case ScrollEvent(var delta):
-					foreach (var obj in getNonPositionalInputQueue())
-						obj.TriggerEvent(command);
-
-					// For now we recalculate hovered objects since a scroll
-					// often moves the objects. We should recalculate when objects are moved instead.
-					reprocessHoveredObjects(State.MousePosition);
-					break;
-			}
+				// For now we recalculate hovered objects since a scroll
+				// often moves the objects. We should recalculate when objects are moved instead.
+				reprocessHoveredObjects(State.MousePosition);
+				break;
+			case FileDroppedEvent:
+				foreach (var obj in getPositionalInputQueue(State.MousePosition))
+					if (obj.TriggerEvent(e)) break;
+				break;
 		}
 	}
 
@@ -124,19 +129,20 @@ public class InputProcessor
 		return inputQueue;
 	}
 
-	private readonly List<GameObject> _hoveredObjects = [];
 	private readonly List<GameObject> _lastHoveredObjects = [];
 	private GameObject? _hoverHandledObject;
 
 	private void reprocessHoveredObjects(Vector2 newPosition)
 	{
 		GameObject? lastHoverHandledObject = _hoverHandledObject;
+		var hoveredObjects = State.HoveredObjectsInternal;
+
 		_hoverHandledObject = null;
 
 		_lastHoveredObjects.Clear();
-		_lastHoveredObjects.AddRange(_hoveredObjects);
+		_lastHoveredObjects.AddRange(hoveredObjects);
 
-		_hoveredObjects.Clear();
+		hoveredObjects.Clear();
 
 		var showDroppableCursor = false;
 		_showDroppableCursorChanged?.Invoke(showDroppableCursor);
@@ -145,7 +151,7 @@ public class InputProcessor
 
 		foreach (var obj in positionalQueue)
 		{
-			_hoveredObjects.Add(obj);
+			hoveredObjects.Add(obj);
 			_lastHoveredObjects.Remove(obj);
 
 			if (showDroppableCursor == false && obj.AcceptsFiles)
@@ -178,13 +184,13 @@ public class InputProcessor
 		}
 	}
 
-	private bool changeFocus(GameObject? newFocus)
+	public bool ChangeFocus(GameObject? newFocus)
 	{
-		if (_focusedObject == newFocus)
+		if (State.FocusedObject == newFocus)
 			return true;
 
-		var previousFocus = _focusedObject;
-		_focusedObject = newFocus;
+		var previousFocus = State.FocusedObject;
+		State.FocusedObject = newFocus;
 
 		if (previousFocus is not null)
 		{
@@ -192,12 +198,31 @@ public class InputProcessor
 			previousFocus.TriggerEvent(new FocusLostEvent(newFocus));
 		}
 
-		if (_focusedObject is not null)
+		if (State.FocusedObject is not null)
 		{
-			_focusedObject.HasFocus = true;
-			_focusedObject.TriggerEvent(new FocusEvent(previousFocus));
+			State.FocusedObject.HasFocus = true;
+			State.FocusedObject.TriggerEvent(new FocusEvent(previousFocus));
 		}
 
 		return true;
 	}
+
+	#region Simulations
+
+	public void SimulateCharInput(string charString)
+	{
+		foreach (var chr in charString)
+			handleEvent(new CharInputEvent(chr));
+	}
+
+	public void SimulateKeyInput(Keys key, int count = 1)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			handleEvent(new KeyDownEvent(key, false));
+			handleEvent(new KeyUpEvent(key));
+		}
+	}
+
+	#endregion
 }

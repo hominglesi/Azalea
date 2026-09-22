@@ -47,14 +47,14 @@ public class EditorConsole : TextBox
 
 	internal void Activate()
 	{
-		Input.ChangeFocus(this);
+		App.Input.ChangeFocus(this);
 		Activated?.Invoke();
 	}
 
 	internal void Deactivate()
 	{
 		if (HasFocus)
-			Input.ChangeFocus(this);
+			App.Input.ChangeFocus(this);
 
 		Deactivated?.Invoke();
 	}
@@ -86,7 +86,7 @@ public class EditorConsole : TextBox
 		{
 			ExecuteQuery(Text);
 			Text = "";
-			InputUtils.SimulateKeyInput(Keys.F9);
+			App.Input.SimulateKeyInput(Keys.F9);
 			return true;
 		}
 

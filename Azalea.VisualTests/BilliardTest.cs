@@ -452,28 +452,30 @@ public class BilliardTest : TestScene
 		if (App.Input.State.KeyPressed(Keys.E)) whiteBall.Rotation += 3f;
 		if (App.Input.State.KeyPressed(Keys.Q)) whiteBall.Rotation -= 3f;
 
+		var mousePos = App.Input.State.MousePosition;
+
 		line.StartPoint = whiteBall.Position;
-		line.EndPoint = Input.MousePosition;
+		line.EndPoint = mousePos;
 		CircleCollider crCol = whiteBall.GetComponent<CircleCollider>();
-		if (Input.MousePosition.X < whiteBall.Position.X + crCol.Radius && Input.MousePosition.X > whiteBall.Position.X - crCol.Radius
-			&& Input.MousePosition.Y < whiteBall.Position.Y + crCol.Radius && Input.MousePosition.Y > whiteBall.Position.Y - crCol.Radius)
+		if (mousePos.X < whiteBall.Position.X + crCol.Radius && mousePos.X > whiteBall.Position.X - crCol.Radius
+			&& mousePos.Y < whiteBall.Position.Y + crCol.Radius && mousePos.Y > whiteBall.Position.Y - crCol.Radius)
 		{
-			if (Input.GetMouseButton(MouseButton.Left).Down && waitingForBalls == false)
+			if (App.Input.State.MouseButtonPressed(MouseButton.Left) && waitingForBalls == false)
 			{
 				line.Alpha = 1;
 				charging = true;
 			}
 		}
 
-		Vector2 directionVector = Vector2.Normalize(whiteBall.Position - Input.MousePosition);
-		if (charging && Input.GetMouseButton(MouseButton.Left).Released)
+		Vector2 directionVector = Vector2.Normalize(whiteBall.Position - mousePos);
+		if (charging && App.Input.State.MouseButtonPressed(MouseButton.Left) == false)
 		{
 			charging = false;
 			line.Alpha = 0;
 
 
 			float power = 4f;
-			float distance = Vector2.Distance(Input.MousePosition, whiteBall.Position);
+			float distance = Vector2.Distance(mousePos, whiteBall.Position);
 			power *= 1 + distance / 10;
 			whiteBall.GetComponent<RigidBody>().ApplyForce(directionVector, power);
 			waitingForBalls = true;

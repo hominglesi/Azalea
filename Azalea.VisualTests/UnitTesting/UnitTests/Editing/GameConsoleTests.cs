@@ -11,32 +11,32 @@ public class GameConsoleTests : UnitTestSuite
 	{
 		public FunctionalityTest()
 		{
-			AddOperation("Press F9 key", () => InputUtils.SimulateKeyInput(Keys.F9));
+			AddOperation("Press F9 key", () => App.Input.SimulateKeyInput(Keys.F9));
 			AddOperation("Input 'fullscreen' command", () =>
 			{
 				EditorOld.FocusConsole();
-				InputUtils.SimulateCharInput(App, "fullscreen");
+				App.Input.SimulateCharInput("fullscreen");
 			});
-			AddOperation("Input enter", () => InputUtils.SimulateKeyInput(Keys.Enter));
+			AddOperation("Input enter", () => App.Input.SimulateKeyInput(Keys.Enter));
 			AddResult("Check if window is Fullscreen", () => Window.State == WindowState.Fullscreen);
 
-			AddOperation("Press F9 key", () => InputUtils.SimulateKeyInput(Keys.F9));
+			AddOperation("Press F9 key", () => App.Input.SimulateKeyInput(Keys.F9));
 			AddOperation("Execute 'restorewindow' command", () =>
 			{
 				EditorOld.FocusConsole();
-				InputUtils.SimulateCharInput(App, "restorewindow");
+				App.Input.SimulateCharInput("restorewindow");
 			});
-			AddOperation("Input enter", () => InputUtils.SimulateKeyInput(Keys.Enter));
+			AddOperation("Input enter", () => App.Input.SimulateKeyInput(Keys.Enter));
 			AddResult("Check if window is Restored", () => Window.State == WindowState.Normal);
 
 			var lastTitle = Window.Title;
-			AddOperation("Press F9 key", () => InputUtils.SimulateKeyInput(Keys.F9));
+			AddOperation("Press F9 key", () => App.Input.SimulateKeyInput(Keys.F9));
 			AddOperation("Execute 'windowtitle Lorem Ipsum' command", () =>
 			{
 				EditorOld.FocusConsole();
-				InputUtils.SimulateCharInput(App, "windowtitle Lorem Ipsum");
+				App.Input.SimulateCharInput("windowtitle Lorem Ipsum");
 			});
-			AddOperation("Input enter", () => InputUtils.SimulateKeyInput(Keys.Enter));
+			AddOperation("Input enter", () => App.Input.SimulateKeyInput(Keys.Enter));
 			AddResult("Check if WindowTitle is 'Lorem Ipsum'", () => Window.Title == "Lorem Ipsum");
 			AddOperation("Restore title", () => Window.Title = lastTitle);
 		}

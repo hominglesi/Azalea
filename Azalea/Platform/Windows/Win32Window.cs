@@ -76,11 +76,6 @@ internal class Win32Window : PlatformWindow
 		_xInputManager = new XInputManager();
 		Input.SetGamepadManager(_xInputManager);
 
-		if (WinAPI.OleInitialize(0) == 0)
-			_ = WinAPI.RegisterDragDrop(Handle, new DropTarget(this));
-		else
-			Console.WriteLine("The Main method has not been marked with an [STAThread] attribute. You may experience some strange behaviours.");
-
 		//Setup OpenGL
 		DeviceContext = Win32.GetDC(Handle);
 
@@ -256,54 +251,6 @@ internal class Win32Window : PlatformWindow
 		}
 
 		return Win32.DefWindowProcW(window, message, wParam, lParam);
-	}
-
-	private class DropTarget(Win32Window window) : Win32.IDropTarget
-	{
-		public int DragEnter(IDataObject dataObject, uint keyState, Win32.POINT point, ref uint effect) => 0;
-		public int DragLeave() => 0;
-
-		public int DragOver(uint keyState, Win32.POINT point, ref uint effect)
-		{
-			effect = Input.OverDroppableFile ? 1u : 0u;
-
-			return 0;
-		}
-
-		public int Drop(IDataObject dataObject, uint keyState, Win32.POINT point, ref uint effect)
-		{
-			var format = new FORMATETC()
-			{
-				cfFormat = 15, // CF_HDROP
-				dwAspect = DVASPECT.DVASPECT_CONTENT,
-				tymed = TYMED.TYMED_HGLOBAL
-			};
-
-			string[] files;
-			dataObject.GetData(ref format, out STGMEDIUM medium);
-
-			try
-			{
-				IntPtr dropHandle = medium.unionmember;
-				int fileCount = WinAPI.DragQueryFile(dropHandle, uint.MaxValue, null, 0);
-				files = new string[fileCount];
-				for (uint x = 0; x < fileCount; ++x)
-				{
-					int size = WinAPI.DragQueryFile(dropHandle, x, null, 0);
-					if (size > 0)
-					{
-						StringBuilder fileName = new StringBuilder(size + 1);
-						if (WinAPI.DragQueryFile(dropHandle, x, fileName, (uint)fileName.Capacity) > 0)
-							files[x] = fileName.ToString();
-					}
-				}
-			}
-			finally { WinAPI.ReleaseStgMedium(ref medium); }
-
-			Input.ExecuteFileDropped(files);
-
-			return 0;
-		}
 	}
 
 	internal void AddTrayIcon(WindowsTrayIcon trayIcon)

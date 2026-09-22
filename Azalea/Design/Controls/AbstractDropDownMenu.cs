@@ -94,7 +94,7 @@ public abstract class AbstractDropDownMenu<T> : Composition
 
 	protected override void OnMouseUp(MouseUpEvent e)
 	{
-		foreach (var item in Input.GetHoveredObjects())
+		foreach (var item in e.State.HoveredObjects)
 			if (item == this || item == ExpandedSegment)
 				return;
 

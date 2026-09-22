@@ -72,7 +72,7 @@ public static class Editor
 	{
 		if (Instance is null) return;
 
-		Input.ChangeFocus(Instance.Console);
+		Instance.App.Input.ChangeFocus(Instance.Console);
 	}
 
 	public static void AddConsoleCommand(string keyword, EditorConsole.ConsoleCommandDelegate command)

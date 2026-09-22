@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azalea.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -8,9 +9,24 @@ namespace Azalea.Inputs;
 
 public class InputState
 {
-	#region Mouse
-
 	public Vector2 MousePosition { get; internal set; }
+	public GameObject? FocusedObject { get; internal set; }
+	internal List<GameObject> HoveredObjectsInternal { get; } = [];
+	public IReadOnlyList<GameObject> HoveredObjects => HoveredObjectsInternal;
+
+	#region MouseButtons
+
+	private readonly HashSet<MouseButton> _pressedMouseButton = [];
+
+	public bool MouseButtonPressed(MouseButton button) => _pressedMouseButton.Contains(button);
+
+	internal void SetMouseButtonPressed(MouseButton button, bool pressed)
+	{
+		if (pressed)
+			_pressedMouseButton.Add(button);
+		else
+			_pressedMouseButton.Remove(button);
+	}
 
 	#endregion
 
@@ -54,6 +70,10 @@ public class InputState
 		else
 			_pressedKeys.Remove(key);
 	}
+
+	public event Action<char>? OnCharInput;
+
+	internal void TriggerCharInput(char c) => OnCharInput?.Invoke(c);
 
 	#endregion
 }

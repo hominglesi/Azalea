@@ -109,7 +109,7 @@ public abstract class Slider : Composition
 
 	private float getLocalMousePosition()
 	{
-		var localPosition = ToLocalSpace(Input.MousePosition);
+		var localPosition = ToLocalSpace(App.Input.State.MousePosition);
 		return getDirectionalValue(localPosition);
 	}
 
