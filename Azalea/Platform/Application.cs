@@ -1,6 +1,7 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Design.Schemes;
 using Azalea.Design.Shapes;
+using Azalea.Extentions;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
@@ -35,14 +36,14 @@ public sealed class Application
 
 		Renderer = PlatformRenderer.AttachRenderer(Window);
 		Scheduler = PlatformScheduler.AttachScheduler(Window);
-		Input = new InputProcessor(Game, Window.GamepadInput, show => Window.ShowDroppableCursor = show);
+		Input = new InputProcessor(Game, Window.GamepadInput, Window.CreateProxy<bool>("ShowDroppableCursor"));
 
 		Window.OnClosed += () => OnClosed?.Invoke();
 
 		var commandGroup = ObjectPool<RenderCommandGroup>.Borrow();
 
 		commandGroup.Enable(GL.BLEND);
-		commandGroup.Enable(GL.CULL_FACE);
+		commandGroup.Disable(GL.CULL_FACE);
 		commandGroup.Disable(GL.DEPTH_TEST);
 		commandGroup.BlendFunction(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
 

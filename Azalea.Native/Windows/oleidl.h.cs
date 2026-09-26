@@ -13,10 +13,10 @@ public static partial class Win32
 		int DragEnter([In] IDataObject pDataObj, [In] uint grfKeyState, POINT pt, ref uint pdwEffect);
 
 		[PreserveSig]
-		int DragLeave();
+		int DragOver([In] uint grfKeyState, [In] POINT pt, ref uint pdwEffect);
 
 		[PreserveSig]
-		int DragOver([In] uint grfKeyState, [In] POINT pt, ref uint pdwEffect);
+		int DragLeave();
 
 		[PreserveSig]
 		int Drop([In] IDataObject pDataObj, [In] uint grfKeyState, [In] POINT pt, ref uint pdwEffect);

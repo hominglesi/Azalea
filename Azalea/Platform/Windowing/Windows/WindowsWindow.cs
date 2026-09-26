@@ -101,7 +101,7 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 
 		_xInputManager?.Update();
 
-		while (Win32.PeekMessageW(out Win32.MSG message, Handle, 0, 0, 0x0001) != 0)
+		while (Win32.PeekMessageW(out Win32.MSG message, 0, 0, 0, 0x0001) != 0)
 		{
 			Win32.TranslateMessage(in message);
 			Win32.DispatchMessageW(in message);

@@ -4,6 +4,7 @@ using Azalea.Graphics.Camera;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.Inputs.Gamepads;
+using Azalea.Utils.Proxies;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,16 +17,19 @@ namespace Azalea.Platform.Scheduling;
 public class InputProcessor
 {
 	private readonly GameObject _root;
-	private readonly Action<bool>? _showDroppableCursorChanged;
+	private readonly IProxy<bool> _droppableCursorProxy;
+	private bool _droppableCursor;
 	private readonly IGamepadManager _gamepadInput;
 	public readonly InputState State;
 
-	internal InputProcessor(GameObject root, IGamepadManager gamepadInput, Action<bool>? showDroppableCursorChanged = null)
+	internal InputProcessor(GameObject root, IGamepadManager gamepadInput, IProxy<bool> droppableCursorProxy)
 	{
 		_root = root;
-		_showDroppableCursorChanged = showDroppableCursorChanged;
+		_droppableCursorProxy = droppableCursorProxy;
 		_gamepadInput = gamepadInput;
 		State = new InputState();
+
+		_droppableCursorProxy.HasNewValue(out _droppableCursor);
 	}
 
 	private readonly List<GameObject> _clickDownGameObjects = [];
@@ -71,8 +75,6 @@ public class InputProcessor
 				break;
 			case MouseUpEvent(var button, var position):
 				State.SetMouseButtonPressed(button, false);
-				foreach (var obj in getNonPositionalInputQueue())
-					if (obj.TriggerEvent(e) == true) break;
 
 				ClickEvent? clickEvent = null;
 				foreach (var obj in getPositionalInputQueue(position))
@@ -84,6 +86,9 @@ public class InputProcessor
 						if (obj.TriggerEvent(clickEvent)) break;
 					}
 				}
+
+				foreach (var obj in getNonPositionalInputQueue())
+					obj.TriggerEvent(e);
 
 				break;
 			case KeyDownEvent(var key, var isRepeat):
@@ -148,7 +153,6 @@ public class InputProcessor
 		hoveredObjects.Clear();
 
 		var showDroppableCursor = false;
-		_showDroppableCursorChanged?.Invoke(showDroppableCursor);
 
 		var positionalQueue = getPositionalInputQueue(newPosition);
 
@@ -160,7 +164,6 @@ public class InputProcessor
 			if (showDroppableCursor == false && obj.AcceptsFiles)
 			{
 				showDroppableCursor = true;
-				_showDroppableCursorChanged?.Invoke(showDroppableCursor);
 			}
 
 			if (obj.Hovered)
@@ -187,6 +190,12 @@ public class InputProcessor
 		{
 			obj.Hovered = false;
 			obj.TriggerEvent(new HoverLostEvent());
+		}
+
+		if(_droppableCursor != showDroppableCursor)
+		{
+			_droppableCursor = showDroppableCursor;
+			_droppableCursorProxy.SetValue(_droppableCursor);
 		}
 	}
 
