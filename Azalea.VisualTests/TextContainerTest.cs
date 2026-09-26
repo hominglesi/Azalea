@@ -15,9 +15,6 @@ public class TextContainerTest : TestScene
 
 	public TextContainerTest()
 	{
-		App.Window.SetClientSize(new(1680, 960));
-		App.Window.Center();
-
 		Add(_scrollable = new ScrollableContainer()
 		{
 			BorderColor = Palette.Teal,
@@ -59,6 +56,12 @@ public class TextContainerTest : TestScene
 			_flex.Add(container);
 		}
 
+	}
+
+	protected override void Initialize()
+	{
+		App.Window.SetClientSize(new(1680, 960));
+		App.Window.Center();
 	}
 
 	protected override bool OnKeyDown(KeyDownEvent e)

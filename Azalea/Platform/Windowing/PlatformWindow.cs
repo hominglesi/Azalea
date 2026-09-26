@@ -1,6 +1,7 @@
 ﻿using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.Inputs.Gamepads;
+using Azalea.IO.Resources;
 using Azalea.Platform.Rendering;
 using Azalea.Platform.Scheduling;
 using Azalea.Platform.Windowing.Windows;
@@ -148,14 +149,16 @@ public abstract partial class PlatformWindow : ICommandHandler<WindowCommand>
 
 	#endregion
 
-	public static PlatformWindow Create(string title, Vector2Int size, bool initiallyVisible = true)
+	public static PlatformWindow Create(string title, Vector2Int size, bool initiallyVisible = true, bool initializeOle = true)
 	{
 		var newWindow = RuntimeInformation.ProcessArchitecture switch
 		{
-			Architecture.X64 or Architecture.X86 => new WindowsWindow(title, size, initiallyVisible),
+			Architecture.X64 or Architecture.X86 => new WindowsWindow(title, size, initiallyVisible, initializeOle),
 			_ => throw new NotSupportedException(
 				$"Platform '{RuntimeInformation.ProcessArchitecture}' is not supported")
 		};
+
+		newWindow.SetIcon(Assets.MainStore.GetImage("Textures/azalea-icon.png"));
 
 		return newWindow;
 	}

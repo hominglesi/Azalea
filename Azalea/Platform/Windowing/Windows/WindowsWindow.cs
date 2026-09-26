@@ -13,7 +13,7 @@ using System.Runtime.Serialization;
 using System.Text;
 
 namespace Azalea.Platform.Windowing.Windows;
-internal class WindowsWindow(string title, Vector2Int clientSize, bool initiallyVisible)
+internal class WindowsWindow(string title, Vector2Int clientSize, bool initiallyVisible, bool initializeOle)
 	: PlatformWindow(title, clientSize, initiallyVisible)
 {
 	private static int _nextClassId = 0;
@@ -71,10 +71,14 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 		if (Handle == nint.Zero)
 			throw new Exception($"Could not create Window. (Error {Marshal.GetLastWin32Error()})");
 
-		if (WinAPI.OleInitialize(0) == 0)
-			_ = WinAPI.RegisterDragDrop(Handle, new DropTarget(this));
-		else
-			Console.WriteLine("The Main method has not been marked with an [STAThread] attribute. You may experience some strange behaviours.");
+		if(initializeOle)
+		{
+			var oleStatus = WinAPI.OleInitialize(0);
+			if (oleStatus == 0)
+				_ = WinAPI.RegisterDragDrop(Handle, new DropTarget(this));
+			else
+				Console.WriteLine("The Main method has not been marked with an [STAThread] attribute. You may experience some strange behaviours.");
+		}
 
 		// Set actual window position
 		Win32.GetWindowRect(Handle, out windowRect);

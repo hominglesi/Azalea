@@ -100,6 +100,7 @@ internal class ThreadCommandGenerator : IIncrementalGenerator
 
 			foreach (var property in item.Properties)
 				builder.AppendLine($"command.{property.Item2} = __{property.Item2};");
+			if(item.IsAwaitable) builder.AppendLine("command._completedEvent.Reset();");
 
 			builder.Append("return command;");
 			builder.EndScope();
@@ -118,11 +119,7 @@ internal class ThreadCommandGenerator : IIncrementalGenerator
 			builder.Append("public override void Return()");
 			builder.BeginScope();
 			builder.AppendLine("Cleanup();");
-			if (item.IsAwaitable)
-			{
-				builder.AppendLine("_completedEvent.Set();");
-				builder.AppendLine("_completedEvent.Reset();");
-			}
+			if (item.IsAwaitable) builder.AppendLine("_completedEvent.Set();");
 			builder.Append("__commandPool.Add(this);");
 			builder.EndScope();
 			builder.NewLine();

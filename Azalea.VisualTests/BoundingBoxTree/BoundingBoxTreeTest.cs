@@ -4,6 +4,7 @@ using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Numerics;
 using Azalea.Platform;
+using Azalea.Platform.Windowing;
 using System.Numerics;
 
 namespace Azalea.VisualTests.BoundingBoxTree;
@@ -13,15 +14,18 @@ public class BoundingBoxTreeTest : TestScene
 
 	public BoundingBoxTreeTest()
 	{
-		Window.Resizable = false;
-
-		Root = new BoundingBoxBranch(new Rectangle(Vector2.Zero, App.Window.ClientSize), 9);
-
 		Add(_displayBox = new Box()
 		{
 			Color = Palette.Aqua
 		});
 		Add(_checkCountDisplay = new SpriteText());
+	}
+
+	protected override void Initialize()
+	{
+		App.Window.SetResizable(false);
+
+		Root = new BoundingBoxBranch(new Rectangle(Vector2.Zero, App.Window.ClientSize), 9);
 	}
 
 	private Box _displayBox;

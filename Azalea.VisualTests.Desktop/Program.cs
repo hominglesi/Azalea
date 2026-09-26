@@ -11,8 +11,6 @@ internal class Program
 	{
 		var host = new HostBuilder()
 			.EnableEditor()
-			.SetTitle("Azalea Visual Tests")
-			.SetGameSize(new Vector2Int(1600, 900))
 			.SetResizable(true)
 			.SetVSync(false)
 			.SetupPersistentDirectory("Azalea.VisualTests")
@@ -29,9 +27,9 @@ internal class Program
 		AzaleaGame.RENDERED_GAME = EditorWrapper.Wrap(new VisualTests());
 		host.Run(AzaleaGame.RENDERED_GAME);*/
 
-		host.CreateApplication(EditorWrapper.Wrap(new VisualTests()));
-		host.CreateApplication(EditorWrapper.Wrap(new VisualTests()));
-		Thread.Sleep(int.MaxValue);
+		host.CreateApplication(EditorWrapper.Wrap(new VisualTests()), "Azalea Visual Tests", new Vector2Int(1600, 900));
+
+		host.WaitUntilEmpty();
 	}
 }
 

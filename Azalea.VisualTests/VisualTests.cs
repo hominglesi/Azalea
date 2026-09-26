@@ -27,11 +27,14 @@ public class VisualTests : AzaleaGame
 	private List<string> _tests;
 	private TestSelectScene _testSelectScene;
 
-	public VisualTests()
+	static VisualTests()
 	{
 		Assets.AddToMainStore(new NamespacedResourceStore(new EmbeddedResourceStore(typeof(VisualTests).Assembly), "Resources"));
-
 		Assets.MainStore.AddMsdfFont("TitanOne-Regular", "Fonts/TitanOne-Regular.csv", "Fonts/TitanOne-Regular.bmp");
+	}
+
+	public VisualTests()
+	{
 		_tests = ReflectionUtils.GetAllChildrenOf(typeof(TestScene)).Where(x => x.IsAbstract == false).Select(x => x.FullName).ToList()!;
 
 		_testSelectScene = new TestSelectScene(this, _tests);

@@ -13,6 +13,7 @@ using Azalea.Sounds;
 using Azalea.Threading;
 using System;
 using System.Numerics;
+using System.Threading;
 
 namespace Azalea.Platform;
 
@@ -136,14 +137,36 @@ public abstract class GameHost
 		Physics.Update();
 	}
 
-	public Application CreateApplication(AzaleaGame game)
+	public Application CreateApplication(AzaleaGame game, string? title = null, Vector2Int? clientSize = null)
 	{
-		var application = new Application(game);
+		clientSize ??= new(800, 600);
+		title ??= "Azalea Application";
+
+		var application = new Application(game, title, clientSize.Value);
 		Applications.Add(application);
 
-		application.OnClosed += () => Applications.Remove(application);
+		application.OnClosed += () => onApplicationClosed(application);
 
 		return application;
+	}
+
+	private void onApplicationClosed(Application application)
+	{
+		Applications.Remove(application);
+
+		if (Applications.Count == 0)
+			_empty.Set();
+	}
+
+	private ManualResetEvent _empty = new(false);
+
+	public void WaitUntilEmpty()
+	{
+		if (Applications.Count == 0)
+			return;
+
+		_empty.WaitOne();
+		_empty.Reset();
 	}
 
 	internal abstract IWindow CreateWindow(HostPreferences preferences);

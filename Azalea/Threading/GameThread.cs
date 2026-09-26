@@ -2,6 +2,7 @@
 using Azalea.Platform.Windows;
 using Azalea.Utils;
 using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Channels;
 
@@ -32,8 +33,11 @@ internal abstract partial class GameThread<T> : ICommandHandler<T>
 		NativeThread = new Thread(threadLoop)
 		{
 			Name = DisplayName,
-			IsBackground = true,
+			IsBackground = true
 		};
+
+		if (OperatingSystem.IsWindows())
+			NativeThread.SetApartmentState(ApartmentState.STA);
 	}
 
 	public virtual void Start()

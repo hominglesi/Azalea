@@ -10,6 +10,7 @@ using Azalea.IO.Resources;
 using Azalea.Native.OpenGL;
 using Azalea.Platform.Rendering;
 using Azalea.Platform.Scheduling;
+using Azalea.Platform.Windowing;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
@@ -24,12 +25,14 @@ public sealed class Application
 	public readonly PlatformScheduler Scheduler;
 	public readonly InputProcessor Input;
 
-	internal Application(AzaleaGame game)
+	internal Application(AzaleaGame game, string title, Vector2Int clientSize)
 	{
 		Game = game;
 		Game.App = this;
 
-		Window = Windowing.PlatformWindow.Create("Azalea App", new(800, 600));
+		Window = Windowing.PlatformWindow.Create(title, clientSize);
+		Window.Center();
+
 		Renderer = PlatformRenderer.AttachRenderer(Window);
 		Scheduler = PlatformScheduler.AttachScheduler(Window);
 		Input = new InputProcessor(Game, Window.GamepadInput, show => Window.ShowDroppableCursor = show);

@@ -16,6 +16,5 @@ public abstract class AzaleaGame : Composition
 		Assets.MainStore.AddMsdfFont("Roboto-Regular", "Fonts/Roboto-Regular.csv", "Fonts/Roboto-Regular.bmp");
 
 		Window.SetIconFromStream(Assets.GetStream("Textures/azalea-icon.png")!);
-		Window.Center();
 	}
 }

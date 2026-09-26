@@ -7,7 +7,7 @@ internal partial class WindowsDeviceContext : IPlatformDeviceContext
 {
 	public nint Handle { get; private init; }
 	public Vector2Int ClientSize { get; private set; }
-	public event Action<Vector2Int> OnClientSizeChanged;
+	public event Action<Vector2Int>? OnClientSizeChanged;
 
 	internal WindowsDeviceContext(nint handle, Vector2Int clientSize)
 	{
@@ -18,7 +18,7 @@ internal partial class WindowsDeviceContext : IPlatformDeviceContext
 	public void UpdateClientSize(Vector2Int clientSize)
 	{
 		ClientSize = clientSize;
-		OnClientSizeChanged.Invoke(clientSize);
+		OnClientSizeChanged?.Invoke(clientSize);
 	}
 
 	public void SetDefaultPixelFormat()
