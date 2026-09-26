@@ -32,7 +32,7 @@ public sealed class Application
 		Window = Windowing.PlatformWindow.Create("Azalea App", new(800, 600));
 		Renderer = PlatformRenderer.AttachRenderer(Window);
 		Scheduler = PlatformScheduler.AttachScheduler(Window);
-		Input = new InputProcessor(Game);
+		Input = new InputProcessor(Game, Window.GamepadInput, show => Window.ShowDroppableCursor = show);
 
 		Window.OnClosed += () => OnClosed?.Invoke();
 
@@ -66,7 +66,7 @@ public sealed class Application
 			renderQueue.PrepareRendering(clientSize);
 			renderQueue.Clear(Palette.Flowers.Azalea);
 
-			Game.Draw(null, Renderer.Coordinator);
+			Game.Draw(Renderer.Coordinator);
 
 			quadBatch.Draw(renderQueue);
 

@@ -664,7 +664,7 @@ public partial class GameObject : Amendable, IGameObject
 		}
 	}
 
-	public virtual void Draw(IRenderer renderer, RenderCoordinator? coordinator)
+	public virtual void Draw(RenderCoordinator coordinator)
 	{
 
 	}

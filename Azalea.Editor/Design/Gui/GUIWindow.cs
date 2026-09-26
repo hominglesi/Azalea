@@ -6,6 +6,7 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
+using Azalea.Platform;
 using Azalea.Utils;
 using Azalea.Utils.Proxies;
 using System;
@@ -17,14 +18,16 @@ public class GUIWindow : BasicWindowContainer
 {
 	private const float __titleBarHeight = 20;
 
+	private readonly Application _app;
 	private readonly Vector2 _size;
 
 	private readonly GameObject _titleBar;
 	private readonly ScrollableContainer _scrollable;
 	private readonly FlexContainer _content;
 
-	internal GUIWindow(string title, Vector2 position, Vector2 size)
+	internal GUIWindow(Application app, string title, Vector2 position, Vector2 size)
 	{
+		_app = app;
 		Masking = true;
 		Position = position;
 		Size = _size = size;
@@ -71,14 +74,10 @@ public class GUIWindow : BasicWindowContainer
 		AddDragableSurface(_titleBar);
 	}
 
-	public static GUIWindow Create(string title, Vector2 position, Vector2 size)
+	public static GUIWindow Create(Application app, string title, Vector2 position, Vector2 size)
 	{
-		// EditorWrapper might have not been referenced yet 
-		// so the resources would not be loaded yet
-		_ = EditorWrapper.Instance;
-
-		var window = new GUIWindow(title, position, size);
-		EditorWrapper.Instance.Add(window);
+		var window = new GUIWindow(app, title, position, size);
+		app.Game.Add(window);
 		return window;
 	}
 
@@ -172,7 +171,7 @@ public class GUIWindow : BasicWindowContainer
 		if (Parent is null)
 			return;
 
-		EditorWrapper.Instance.Remove(this);
+		_app.Game.Remove(this);
 	}
 
 	public void Show()
@@ -180,7 +179,7 @@ public class GUIWindow : BasicWindowContainer
 		if (Parent is not null)
 			return;
 
-		EditorWrapper.Instance.Add(this);
+		_app.Game.Add(this);
 	}
 
 	protected override bool OnHover(HoverEvent e) => true;

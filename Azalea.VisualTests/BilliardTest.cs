@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Azalea.Platform.Windowing;
 
 namespace Azalea.VisualTests;
 public class BilliardTest : TestScene
@@ -121,8 +122,6 @@ public class BilliardTest : TestScene
 
 	public BilliardTest()
 	{
-		Window.ClientSize = new(panelWidth, panelHeight);
-		Window.Center();
 		this.BackgroundColor = new Graphics.Colors.Color(48, 23, 8);
 		Physics.UsesGravity = false;
 		Physics.IsTopDown = true;
@@ -164,6 +163,12 @@ public class BilliardTest : TestScene
 		GenerateUI();
 
 		GenerateInfo();
+	}
+
+	protected override void Initialize()
+	{
+		App.Window.SetClientSize(new(panelWidth, panelHeight));
+		App.Window.Center();
 	}
 
 	private void GenerateInfo()

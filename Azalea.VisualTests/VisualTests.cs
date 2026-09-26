@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Azalea.Platform.Windowing;
 
 namespace Azalea.VisualTests;
 
@@ -68,8 +69,8 @@ public class VisualTests : AzaleaGame
 		if (_currentScene == null || _currentScene != _testSelectScene)
 		{
 			setScene(_testSelectScene);
-			Window.ClientSize = new(1600, 900);
-			Window.Center();
+			App.Window.SetClientSize(new(1600, 900));
+			App.Window.Center();
 		}
 	}
 

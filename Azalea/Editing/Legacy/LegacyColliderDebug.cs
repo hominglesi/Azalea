@@ -5,6 +5,7 @@ using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
+using Azalea.Numerics;
 using Azalea.Platform.Rendering.Coordination;
 using Azalea.Simulations.Colliders;
 using System.Numerics;
@@ -35,26 +36,21 @@ public class LegacyColliderDebug : GameObject
 			IsShown = _isToggled;
 	}
 
-	public override void Draw(IRenderer renderer, RenderCoordinator? coordinator)
+	public override void Draw(RenderCoordinator coordinator)
 	{
 		if (IsShown)
 		{
-			if (coordinator is not null)
-			{
-
-				return;
-			}
-
 			var color = new DrawColorInfo(new Color(45, 75, 23, 80));
 			var color2 = new DrawColorInfo(new Color(84, 42, 86, 140));
 
 			foreach (var collider in ComponentStorage<RectCollider>.GetComponents())
 			{
-				renderer.DrawQuad(renderer.WhitePixel.GetNativeTexture(), collider.Quad, color);
+				coordinator.BindTexture(Platform.Rendering.OpenGL.GLRenderer.LoadingContext!.WhitePixel);
+				coordinator.BindProgram(coordinator.DefaultQuadProgram);
+				coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, collider.Quad, color.Color, Rectangle.One);
 
 				var centerQuad = new Quad(collider.Position - new Vector2(5), new(10));
-
-				renderer.DrawQuad(renderer.WhitePixel.GetNativeTexture(), centerQuad, color2);
+				coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, centerQuad, color2.Color, Rectangle.One);
 			}
 		}
 	}

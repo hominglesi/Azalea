@@ -15,7 +15,7 @@ public class BoundingBoxTreeTest : TestScene
 	{
 		Window.Resizable = false;
 
-		Root = new BoundingBoxBranch(new Rectangle(Vector2.Zero, Window.ClientSize), 9);
+		Root = new BoundingBoxBranch(new Rectangle(Vector2.Zero, App.Window.ClientSize), 9);
 
 		Add(_displayBox = new Box()
 		{

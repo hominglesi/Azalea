@@ -54,8 +54,12 @@ internal class CameraTest : TestScene
 		_worldContainer.Scale = new(2f);
 
 		_worldContainer.SetBoundaries(new(Vector2.Zero, tilemap.PixelSize));
-		_worldContainer.CenterOnObject(_player);
 		_worldContainer.SetFollowedObject(_player);
+	}
+
+	protected override void Initialize()
+	{
+		_worldContainer.CenterOnObject(_player);
 	}
 
 	protected override void Update()

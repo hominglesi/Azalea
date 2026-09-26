@@ -11,27 +11,28 @@ using System.Collections.Generic;
 using System.Reflection;
 
 namespace Azalea.Editor.DebugWindows;
-internal static class GlobalWindow
+internal class GlobalWindow(AzaleaGame game)
 {
-	private static GUIWindow? _window;
-	private static bool _shown = false;
+	private AzaleaGame _game = game;
+	private GUIWindow? _window;
+	private bool _shown = false;
 
-	public static void Toggle()
+	public void Toggle()
 	{
 		_shown = !_shown;
 		if (_shown) show();
 		else hide();
 	}
 
-	private static void show()
+	private void show()
 	{
 		if (_window is null)
 		{
-			_window = GUIWindow.Create("Global", new(100), new(400, 400));
+			_window = GUIWindow.Create(_game.App, "Global", new(100), new(400, 400));
 
 			_window.AddGroup("Host");
 			_window.AddButton("Inspect PlatformAudio",
-					() => PlatformAudioInspector.Create(GameHost.Main.Audio, _window));
+					() => PlatformAudioInspector.Create(_game.App, GameHost.Main.Audio, _window));
 			var applicationsGroup = _window.AddGroup("Applications");
 			var applicationGroups = new Dictionary<Application, GUIGroup>();
 
@@ -42,11 +43,11 @@ internal static class GlobalWindow
 				_window.AddButton("Close", () => application.Close());
 
 				_window.AddButton("Inspect PlatformWindow",
-					() => PlatformWindowInspector.Create(application.Window, _window));
+					() => PlatformWindowInspector.Create(_game.App, application.Window, _window));
 				_window.AddButton("Inspect PlatformRenderer",
-					() => PlatformRendererInspector.Create(application.Renderer, _window));
+					() => PlatformRendererInspector.Create(_game.App, application.Renderer, _window));
 				_window.AddButton("Inspect PlatformScheduler",
-					() => PlatformSchedulerInspector.Create(application.Scheduler, _window));
+					() => PlatformSchedulerInspector.Create(_game.App, application.Scheduler, _window));
 
 				_window.FinishGroup();
 				_window.FinishGroup();
@@ -135,7 +136,7 @@ internal static class GlobalWindow
 		_window.Show();
 	}
 
-	private static void hide()
+	private void hide()
 	{
 		if (_window is null)
 			return;

@@ -24,14 +24,8 @@ public class TiledLayer : GameObject
 	public TiledLayer(Tilemap tilemap, int layer)
 		: this(tilemap, tilemap.Layers[layer]) { }
 
-	public override void Draw(IRenderer renderer, RenderCoordinator? coordinator)
+	public override void Draw(RenderCoordinator coordinator)
 	{
-		if (coordinator is not null)
-		{
-
-			return;
-		}
-
 		var startPosition = ScreenSpaceDrawQuad.TopLeft;
 		var tileSize = ScreenSpaceDrawQuad.Size / new Vector2(Tilemap.Width, Tilemap.Height);
 
@@ -58,11 +52,12 @@ public class TiledLayer : GameObject
 				var sizeRatio = texture.Size / Tilemap.TileSize;
 				var quad = new Quad(startPosition + offset - allowedPadding, tileSize * sizeRatio + allowedPadding);
 
-				renderer.DrawQuad(
-					texture.GetNativeTexture(),
-					quad,
-					DrawColorInfo,
-					texture.GetUVCoordinates());
+				if (texture is null || texture.NewTexture is null)
+					continue;
+
+				coordinator.BindTexture(texture.NewTexture);
+				coordinator.BindProgram(coordinator.DefaultQuadProgram);
+				coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorInfo.Color, texture.GetUVCoordinates());
 			}
 		}
 	}

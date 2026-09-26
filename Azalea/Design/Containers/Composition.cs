@@ -285,9 +285,9 @@ public partial class Composition : GameObject
 			child.RemoveComponentTreeFromScene();
 	}
 
-	public override void Draw(IRenderer renderer, RenderCoordinator? coordinator)
+	public override void Draw(RenderCoordinator coordinator)
 	{
-		DrawBackground(renderer, coordinator);
+		DrawBackground(coordinator);
 
 		if (Masking)
 		{
@@ -300,24 +300,16 @@ public partial class Composition : GameObject
 				newScissor.Height += MathUtils.Ceiling(MaskingPadding.Vertical);
 			}
 
-			if (renderer is not null)
-				renderer.PushScissor(newScissor);
-			else
-				coordinator?.PushScissor(newScissor);
+			coordinator.PushScissor(newScissor);
 		}
 
 		foreach (var child in _internalChildren)
-			child.Draw(renderer, coordinator);
+			child.Draw(coordinator);
 
 		if (Masking)
-		{
-			if (renderer is not null)
-				renderer.PopScissor();
-			else
-				coordinator?.PopScissor();
-		}
+			coordinator.PopScissor();
 
-		DrawForeground(renderer, coordinator);
+		DrawForeground(coordinator);
 	}
 
 	private Boundary _padding;

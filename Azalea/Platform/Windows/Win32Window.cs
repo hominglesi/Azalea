@@ -18,7 +18,7 @@ internal class Win32Window : PlatformWindow
 	private readonly Win32.WNDPROC _windowProcedure;
 	private readonly WindowState _initialShowState;
 
-	private readonly XInputManager _xInputManager;
+	
 	private readonly Dictionary<uint, WindowsTrayIcon> _trayIcons = [];
 
 	public Win32Window(string title, Vector2Int clientSize, WindowState state, bool visible)
@@ -72,9 +72,6 @@ internal class Win32Window : PlatformWindow
 			Console.WriteLine($"Could not create Window. (Error {Marshal.GetLastWin32Error()})");
 			return;
 		}
-
-		_xInputManager = new XInputManager();
-		Input.SetGamepadManager(_xInputManager);
 
 		//Setup OpenGL
 		DeviceContext = Win32.GetDC(Handle);
@@ -406,9 +403,6 @@ internal class Win32Window : PlatformWindow
 			Win32.TranslateMessage(in message);
 			Win32.DispatchMessageW(in message);
 		}
-
-		// Update (gamepads)
-		_xInputManager.Update();
 	}
 
 	#endregion

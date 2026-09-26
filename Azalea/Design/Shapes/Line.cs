@@ -16,14 +16,8 @@ public class Line : GameObject
 
 	public float Thickness { get; set; } = 3;
 
-	public override void Draw(IRenderer renderer, RenderCoordinator? coordinator)
+	public override void Draw(RenderCoordinator coordinator)
 	{
-		if (coordinator is not null)
-		{
-
-			return;
-		}
-
 		var distance = MathUtils.DistanceBetween(StartPoint, EndPoint);
 		var rectangle = new Rectangle(Vector2.Zero, new(distance, Thickness));
 		rectangle.Y -= Thickness / 2;
@@ -33,9 +27,8 @@ public class Line : GameObject
 		MatrixExtentions.TranslateFromLeft(ref matrix, StartPoint);
 		MatrixExtentions.RotateFromLeft(ref matrix, rotation);
 
-		renderer.DrawQuad(
-		Renderer.WhitePixel.GetNativeTexture(),
-		Quad.FromRectangle(rectangle) * matrix, //  quad * Info.Matrix,
-		DrawColorInfo);
+		coordinator.BindTexture(Platform.Rendering.OpenGL.GLRenderer.LoadingContext!.WhitePixel);
+		coordinator.BindProgram(coordinator.DefaultQuadProgram);
+		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(rectangle) * matrix, DrawColorInfo.Color, Rectangle.One);
 	}
 }

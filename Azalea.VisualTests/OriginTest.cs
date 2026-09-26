@@ -10,7 +10,7 @@ internal class OriginTest : TestScene
 {
 	private Sprite _player;
 	private Sprite _arm;
-	private Vector2 _windowCenter => Window.ClientSize / 2;
+	private Vector2 _windowCenter => App.Window.ClientSize / 2;
 	private Vector2 _leftHandPosition => _windowCenter - new Vector2(22, 5);
 	private Vector2 _rightHandPosition => _windowCenter + new Vector2(22, -5);
 	public OriginTest()
@@ -19,7 +19,6 @@ internal class OriginTest : TestScene
 		{
 			Size = new(64, 96),
 			Texture = Assets.GetTexture("Textures/baseSprite.png"),
-			Position = _windowCenter,
 			Origin = Graphics.Anchor.Center,
 		});
 
@@ -28,10 +27,15 @@ internal class OriginTest : TestScene
 			Size = new(128, 64),
 			Origin = Graphics.Anchor.Custom,
 			OriginPosition = new(120, 40),
-			Position = _rightHandPosition,
 			Texture = Assets.GetTexture("Textures/Bolter.png"),
 
 		});
+	}
+
+	protected override void Initialize()
+	{
+		_player.Position = _windowCenter;
+		_arm.Position = _rightHandPosition;
 	}
 
 	protected override void Update()

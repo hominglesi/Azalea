@@ -3,6 +3,7 @@ using Azalea.Editor.Design.Gui;
 using Azalea.Extentions;
 using Azalea.Graphics;
 using Azalea.IO.Resources;
+using Azalea.Platform;
 using Azalea.Platform.Audio;
 using Azalea.Platform.Audio.OpenAL;
 using Azalea.Threading;
@@ -14,10 +15,10 @@ using System.Numerics;
 namespace Azalea.Editor.DebugWindows.Inspectors;
 internal class PlatformAudioInspector
 {
-	public static GUIWindow Create(PlatformAudio audio, GUIWindow? origin = null)
+	public static GUIWindow Create(Application app, PlatformAudio audio, GUIWindow? origin = null)
 	{
 		var position = origin is null ? new(100, 100) : origin.Position + new Vector2(20, 20);
-		var window = GUIWindow.Create("PlatformAudio", position, new(400, 400));
+		var window = GUIWindow.Create(app, "PlatformAudio", position, new(400, 400));
 
 		var loopingCheckbox = window.AddCheckbox("Looping", false);
 		var gainSlider = window.AddSliderFloat("Gain", 0, 1, 0.2f, "0.00");

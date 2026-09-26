@@ -6,6 +6,7 @@ using System.Numerics;
 namespace Azalea.Graphics.Sprites;
 public class SpritePattern : Sprite
 {
+	/*
 	protected override void DrawTexture(IRenderer renderer, ITexture texture)
 	{
 		var patternSize = DrawSize / texture.Size;
@@ -13,4 +14,5 @@ public class SpritePattern : Sprite
 
 		renderer.DrawQuad(texture.GetNativeTexture(), ScreenSpaceDrawQuad, DrawColorInfo, textureUV);
 	}
+	*/
 }

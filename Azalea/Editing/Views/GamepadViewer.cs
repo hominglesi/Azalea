@@ -30,7 +30,7 @@ internal class GamepadViewer : Composition
 		int currentIndex = 0;
 		IGamepad? currentGamepad;
 
-		while ((currentGamepad = Input.GetGamepad(currentIndex)) != null)
+		while ((currentGamepad = App.Input.GetGamepad(currentIndex)) != null)
 		{
 			if (_gamepadDisplays.Count <= currentIndex)
 			{

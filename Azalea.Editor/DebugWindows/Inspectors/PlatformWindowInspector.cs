@@ -11,10 +11,10 @@ using System.Numerics;
 namespace Azalea.Editor.DebugWindows.Inspectors;
 internal class PlatformWindowInspector
 {
-	public static GUIWindow Create(PlatformWindow window, GUIWindow? origin = null)
+	public static GUIWindow Create(Platform.Application app, PlatformWindow window, GUIWindow? origin = null)
 	{
 		var position = origin is null ? new(400, 400) : origin.Position + new Vector2(20, 20);
-		var guiWindow = GUIWindow.Create("PlatformWindow", position, new(400, 400));
+		var guiWindow = GUIWindow.Create(app, "PlatformWindow", position, new(400, 400));
 
 		guiWindow.AddLabel("Platform: " + window.PlatformType);
 
@@ -66,9 +66,9 @@ internal class PlatformWindowInspector
 		Debug.Assert(window.SubscribedScheduler is not null);
 
 		guiWindow.AddButton("Inspect Subscribed Renderer",
-			() => PlatformRendererInspector.Create(window.SubscribedRenderer, guiWindow));
+			() => PlatformRendererInspector.Create(app, window.SubscribedRenderer, guiWindow));
 		guiWindow.AddButton("Inspect Subscribed Scheduler",
-			() => PlatformSchedulerInspector.Create(window.SubscribedScheduler, guiWindow));
+			() => PlatformSchedulerInspector.Create(app, window.SubscribedScheduler, guiWindow));
 
 		guiWindow.AddLabel("Device Context Borrowed: " + window.DeviceContextBorrowed);
 

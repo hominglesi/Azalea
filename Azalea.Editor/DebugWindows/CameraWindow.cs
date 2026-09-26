@@ -1,25 +1,27 @@
 ﻿using Azalea.Editor.Design.Gui;
 using Azalea.Graphics.Camera;
 using Azalea.Inputs;
+using Azalea.Platform;
 
 namespace Azalea.Editor.DebugWindows;
-internal static class CameraWindow
+internal class CameraWindow(AzaleaGame game)
 {
-	private static GUIWindow? _window;
-	private static bool _shown = false;
+	private AzaleaGame _game = game;
+	private GUIWindow? _window;
+	private bool _shown = false;
 
-	public static void Toggle()
+	public void Toggle()
 	{
 		_shown = !_shown;
 		if (_shown) show();
 		else hide();
 	}
 
-	private static void show()
+	private void show()
 	{
 		if (_window is null)
 		{
-			_window = GUIWindow.Create("Camera", new(100), new(400, 400));
+			_window = GUIWindow.Create(_game.App, "Camera", new(100), new(400, 400));
 			_window.AddSliderFloat("X Position", minValue: -1000, maxValue: 1000, initialValue: 0, continuous: false)
 				.OnValueChanged(x => MainCamera.Instance.Position = new(x, MainCamera.Instance.Position.Y));
 			_window.AddSliderFloat("Y Position", minValue: -1000, maxValue: 1000, initialValue: 0, continuous: false)
@@ -32,7 +34,7 @@ internal static class CameraWindow
 		_window.Show();
 	}
 
-	private static void hide()
+	private void hide()
 	{
 		if (_window is null)
 			return;

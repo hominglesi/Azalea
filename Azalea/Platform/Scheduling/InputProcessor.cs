@@ -3,6 +3,7 @@ using Azalea.Graphics;
 using Azalea.Graphics.Camera;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
+using Azalea.Inputs.Gamepads;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,12 +17,14 @@ public class InputProcessor
 {
 	private readonly GameObject _root;
 	private readonly Action<bool>? _showDroppableCursorChanged;
+	private readonly IGamepadManager _gamepadInput;
 	public readonly InputState State;
 
-	public InputProcessor(GameObject root, Action<bool>? showDroppableCursorChanged = null)
+	internal InputProcessor(GameObject root, IGamepadManager gamepadInput, Action<bool>? showDroppableCursorChanged = null)
 	{
 		_root = root;
 		_showDroppableCursorChanged = showDroppableCursorChanged;
+		_gamepadInput = gamepadInput;
 		State = new InputState();
 	}
 
@@ -155,7 +158,10 @@ public class InputProcessor
 			_lastHoveredObjects.Remove(obj);
 
 			if (showDroppableCursor == false && obj.AcceptsFiles)
-				_showDroppableCursorChanged?.Invoke(true);
+			{
+				showDroppableCursor = true;
+				_showDroppableCursorChanged?.Invoke(showDroppableCursor);
+			}
 
 			if (obj.Hovered)
 			{
@@ -206,6 +212,8 @@ public class InputProcessor
 
 		return true;
 	}
+
+	public IGamepad? GetGamepad(int index) => _gamepadInput!.GetGamepad(index);
 
 	#region Simulations
 

@@ -1,5 +1,6 @@
 ﻿using Azalea.Editor.Design.Gui;
 using Azalea.Extentions;
+using Azalea.Platform;
 using Azalea.Platform.Rendering;
 using Azalea.Threading;
 using System.Numerics;
@@ -7,10 +8,10 @@ using System.Numerics;
 namespace Azalea.Editor.DebugWindows.Inspectors;
 internal class PlatformRendererInspector
 {
-	public static GUIWindow Create(PlatformRenderer renderer, GUIWindow? origin = null)
+	public static GUIWindow Create(Application app, PlatformRenderer renderer, GUIWindow? origin = null)
 	{
 		var position = origin is null ? new(100, 100) : origin.Position + new Vector2(20, 20);
-		var window = GUIWindow.Create("PlatformRenderer", position, new(400, 400));
+		var window = GUIWindow.Create(app, "PlatformRenderer", position, new(400, 400));
 
 		window.AddPropertyLabel("Staged Queue Overrides", renderer.CreateProxy<int>("StagedQueueOverrides"));
 		window.AddPropertyLabel("No Staged Queue Frames", renderer.Thread.CreateProxy<int>("NoStagedQueueFrames"));

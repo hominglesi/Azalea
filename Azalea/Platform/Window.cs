@@ -7,28 +7,10 @@ public static class Window
 	private static IWindow? _instance;
 	public static IWindow Instance => _instance ??= GameHost.Main.Window;
 
-	public static Vector2Int Size
-	{
-		get => Instance.Size;
-		set => Instance.Size = value;
-	}
-
 	public static Vector2Int ClientSize
 	{
 		get => Instance.ClientSize;
 		set => Instance.ClientSize = value;
-	}
-
-	public static Vector2Int Position
-	{
-		get => Instance.Position;
-		set => Instance.Position = value;
-	}
-
-	public static Vector2Int ClientPosition
-	{
-		get => Instance.ClientPosition;
-		set => Instance.ClientPosition = value;
 	}
 
 	public static WindowState State

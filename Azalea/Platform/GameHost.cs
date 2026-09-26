@@ -116,7 +116,7 @@ public abstract class GameHost
 		Renderer.BeginFrame();
 		if (Renderer.AutomaticallyClear) Renderer.Clear();
 
-		_root.Draw(Renderer, null);
+		_root.Draw(null);
 
 		Renderer.FinishFrame();
 	}

@@ -25,7 +25,9 @@ public class EditorContainer : Composition
 		AddInternal(DisplayValues = new DisplayValues());
 		Console = new EditorConsole();
 
-		DisplayValues.AddDisplayedValue("Fps", () => Time.FpsCount);
+		DisplayValues.AddDisplayedValue("Input", () => game.App.Window.Thread.AverageWorkDuration.ToString("0.00ms"));
+		DisplayValues.AddDisplayedValue("Scheduling", () => game.App.Scheduler.Thread.AverageWorkDuration.ToString("0.00ms"));
+		DisplayValues.AddDisplayedValue("Rendering", () => game.App.Renderer.Thread.AverageWorkDuration.ToString("0.00ms"));
 	}
 
 	protected override bool OnKeyDown(KeyDownEvent e)

@@ -1,5 +1,6 @@
 ﻿using Azalea.Inputs;
 using Azalea.Inputs.Events;
+using Azalea.Inputs.Gamepads;
 using Azalea.Platform.Rendering;
 using Azalea.Platform.Scheduling;
 using Azalea.Platform.Windowing.Windows;
@@ -58,6 +59,8 @@ public abstract partial class PlatformWindow : ICommandHandler<WindowCommand>
 	}
 
 	public event Action? OnClosed;
+
+	internal abstract IGamepadManager GamepadInput { get; }
 
 	public PlatformRenderer? SubscribedRenderer { get; private set; } = null;
 	internal void Subscribe(PlatformRenderer renderer)

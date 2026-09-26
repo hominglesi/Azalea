@@ -6,26 +6,27 @@ using Azalea.Graphics.Textures;
 using System.Collections.Generic;
 
 namespace Azalea.Editor.DebugWindows;
-internal static class RenderWindow
+internal class RenderWindow(AzaleaGame game)
 {
-	private static GUIWindow? _window;
-	private static bool _shown = false;
+	private AzaleaGame _game = game;
+	private GUIWindow? _window;
+	private bool _shown = false;
 
-	public static void Toggle()
+	public void Toggle()
 	{
 		_shown = !_shown;
 		if (_shown) show();
 		else hide();
 	}
 
-	private static readonly Dictionary<ITexture, Sprite> _loadedTextures = [];
-	private static Composition? _loadedTexturesContainer;
+	private readonly Dictionary<ITexture, Sprite> _loadedTextures = [];
+	private Composition? _loadedTexturesContainer;
 
-	private static void show()
+	private void show()
 	{
 		if (_window is null)
 		{
-			_window = GUIWindow.Create("Rendering", new(100), new(400, 400));
+			_window = GUIWindow.Create(_game.App, "Rendering", new(100), new(400, 400));
 			_window.AddGroup("Loaded Textures");
 			_window.Add(_loadedTexturesContainer = new FlexContainer()
 			{
@@ -53,7 +54,7 @@ internal static class RenderWindow
 		_window.Show();
 	}
 
-	private static void hide()
+	private void hide()
 	{
 		if (_window is null)
 			return;

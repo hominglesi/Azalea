@@ -3,23 +3,24 @@ using System;
 using System.Linq;
 
 namespace Azalea.Editor.DebugWindows;
-internal static class ClassWindow
+internal class ClassWindow(AzaleaGame game)
 {
-	private static GUIWindow? _window;
-	private static bool _shown = false;
+	private AzaleaGame _game = game;
+	private GUIWindow? _window;
+	private bool _shown = false;
 
-	public static void Toggle()
+	public void Toggle()
 	{
 		_shown = !_shown;
 		if (_shown) show();
 		else hide();
 	}
 
-	private static void show()
+	private void show()
 	{
 		if (_window is null)
 		{
-			_window = GUIWindow.Create("ClassTree", new(100), new(400, 400));
+			_window = GUIWindow.Create(_game.App, "ClassTree", new(100), new(400, 400));
 
 			foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
 			{
@@ -47,7 +48,7 @@ internal static class ClassWindow
 		_window.Show();
 	}
 
-	private static void hide()
+	private void hide()
 	{
 		if (_window is null)
 			return;

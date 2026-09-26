@@ -95,34 +95,27 @@ public class IWindowTest : TestScene
 
 			CreateObservedContainer(new GameObject[]
 			{
-				CreateObservedValue("WindowState",
-					() => Window.State,
-					(value) => $"Window state changed to {value}"),
 				CreateObservedValue("Title",
-					() => Window.Title,
+					() => App.Window.Title,
 					(value) => $"Window title changed to {value}"),
 				CreateObservedValue("Resizable",
-					() => Window.Resizable,
+					() => App.Window.Resizable,
 					(value) => $"Window resizable changed to {value}"),
 				CreateObservedValue("Prevents Closure",
 					() => _preventsClosure,
 					(value) => value ? $"Test now prevents closure attempts" : $"Test no longer prevents closure attempts"),
 				CreateObservedValue("Position",
-					() => Window.Position,
+					() => App.Window.Position,
 					(value) => $"Window moved to {value}"),
 				CreateObservedValue("ClientPosition",
-					() => Window.ClientPosition),
+					() => App.Window.ClientPosition),
 				CreateObservedValue("Size",
-					() => Window.Size),
+					() => App.Window.Size),
 				CreateObservedValue("ClientSize",
-					() => Window.ClientSize,
+					() => App.Window.ClientSize,
 					(value) => $"Window resized to {value}"),
-				CreateObservedValue("VSync",
-					() => Window.VSync),
-				CreateObservedValue("CanChangeVSync",
-					() => Window.CanChangeVSync),
 				CreateObservedValue("Cursor Visible",
-					() => Window.CursorVisible)
+					() => App.Window.CursorVisible)
 			})
 		});
 	}

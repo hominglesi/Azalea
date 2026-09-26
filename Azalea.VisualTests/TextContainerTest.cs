@@ -5,6 +5,7 @@ using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.Platform;
 using Azalea.Utils;
+using Azalea.Platform.Windowing;
 
 namespace Azalea.VisualTests;
 public class TextContainerTest : TestScene
@@ -14,8 +15,8 @@ public class TextContainerTest : TestScene
 
 	public TextContainerTest()
 	{
-		Window.ClientSize = new(1680, 960);
-		Window.Center();
+		App.Window.SetClientSize(new(1680, 960));
+		App.Window.Center();
 
 		Add(_scrollable = new ScrollableContainer()
 		{

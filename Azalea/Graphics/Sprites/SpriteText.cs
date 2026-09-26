@@ -69,28 +69,18 @@ public class SpriteText : GameObject
 		set => throw new InvalidOperationException($"Cannot set {nameof(Size)} of {nameof(SpriteText)}");
 	}
 
-	public override void Draw(IRenderer renderer, RenderCoordinator? coordinator)
+	public override void Draw(RenderCoordinator coordinator)
 	{
-		if (coordinator is not null)
-			coordinator.BindProgram(coordinator.DefaultTextProgram);
-		else
-			renderer?.BindShader(_textShader);
+		coordinator.BindProgram(coordinator.DefaultTextProgram);
 
 		foreach (var character in _layoutProvider.GetCharacters())
 		{
 			var quad = ToScreenSpace(character.DrawRectangle);
 
-			if (coordinator is not null)
-			{
-				if (character.Texture.NewTexture is not null)
-					coordinator.BindTexture(character.Texture.NewTexture!);
+			if (character.Texture.NewTexture is not null)
+				coordinator.BindTexture(character.Texture.NewTexture!);
 
-				coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorInfo.Color, character.Texture.GetUVCoordinates());
-			}
-			else
-				renderer?.DrawQuad(character.Texture.GetNativeTexture(), quad, DrawColorInfo, character.Texture.GetUVCoordinates());
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorInfo.Color, character.Texture.GetUVCoordinates());
 		}
-
-		renderer?.BindShader(renderer.DefaultQuadShader);
 	}
 }

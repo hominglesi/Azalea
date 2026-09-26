@@ -29,7 +29,8 @@ internal class Program
 		AzaleaGame.RENDERED_GAME = EditorWrapper.Wrap(new VisualTests());
 		host.Run(AzaleaGame.RENDERED_GAME);*/
 
-		host.CreateApplication(new VisualTests());
+		host.CreateApplication(EditorWrapper.Wrap(new VisualTests()));
+		host.CreateApplication(EditorWrapper.Wrap(new VisualTests()));
 		Thread.Sleep(int.MaxValue);
 	}
 }

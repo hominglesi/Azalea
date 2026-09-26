@@ -1,5 +1,6 @@
 ﻿using Azalea.Inputs;
 using Azalea.Inputs.Events;
+using Azalea.Inputs.Gamepads;
 using Azalea.Native.Windows;
 using Azalea.Platform.Windows;
 using Azalea.Utils;
@@ -20,6 +21,8 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 
 	private Win32.WindowStyles _windowStyles;
 	private Win32.WindowStylesExtended _windowExtendedStyles;
+	private XInputManager? _xInputManager = null;
+	internal override IGamepadManager GamepadInput => _xInputManager!;
 
 	public override string PlatformType => "Windows";
 
@@ -91,6 +94,8 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 			EnqueueInputEvent(new MouseMoveEvent(mousePosition));
 			_lastMousePosition = mousePosition;
 		}
+
+		_xInputManager?.Update();
 
 		while (Win32.PeekMessageW(out Win32.MSG message, Handle, 0, 0, 0x0001) != 0)
 		{

@@ -43,30 +43,11 @@ public class Sprite : GameObject
 
 	private static Shader? _loadingShader = null;
 
-	public override void Draw(IRenderer renderer, RenderCoordinator? coordinator)
+	public override void Draw(RenderCoordinator coordinator)
 	{
 		if (Alpha <= 0) return;
 
-		if (coordinator is not null)
-		{
-			if (Texture.NewTexture is not null)
-				coordinator.BindTexture(Texture.NewTexture!);
-			else
-				coordinator.BindTexture(GLRenderer.LoadingContext!.WhitePixel);
-
-			coordinator.BindProgram(coordinator.DefaultQuadProgram);
-
-			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorInfo.Color, Texture.GetUVCoordinates(Time));
-
-			return;
-		}
-
-		if (Texture is null)
-		{
-			Console.WriteLine("Couldn't draw sprite because texture was null");
-			return;
-		}
-
+		/*
 		if (Texture is PromisedTexture promised && promised.IsResolved == false)
 		{
 			if (_loadingShader is null)
@@ -83,17 +64,27 @@ public class Sprite : GameObject
 			_loadingShader.NativeShader.SetUniform("u_Time", Time);
 			_loadingShader.NativeShader.SetUniform("u_Offset", ScreenSpaceDrawQuad.TopLeft.X, ScreenSpaceDrawQuad.TopLeft.Y);
 			_loadingShader.NativeShader.SetUniform("u_Resolution", ScreenSpaceDrawQuad.Width, ScreenSpaceDrawQuad.Height);
-			_loadingShader.NativeShader.SetUniform("u_ScreenResolution", Window.ClientSize.X, Window.ClientSize.Y);
+			_loadingShader.NativeShader.SetUniform("u_ScreenResolution", App.Window.ClientSize.X, App.Window.ClientSize.Y);
 
 			renderer.DrawQuad(renderer.WhitePixel.GetNativeTexture(), ScreenSpaceDrawQuad, DrawColorInfo);
 
 			renderer.BindShader(renderer.DefaultQuadShader);
 			return;
 		}
+		 */
 
-		DrawTexture(renderer, Texture);
+		if (Texture is null)
+		{
+			Console.WriteLine("Couldn't draw sprite because texture was null");
+			return;
+		}
+
+		if (Texture.NewTexture is not null)
+			coordinator.BindTexture(Texture.NewTexture!);
+		else
+			coordinator.BindTexture(GLRenderer.LoadingContext!.WhitePixel);
+		coordinator.BindProgram(coordinator.DefaultQuadProgram);
+
+		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorInfo.Color, Texture.GetUVCoordinates(Time));
 	}
-
-	protected virtual void DrawTexture(IRenderer renderer, ITexture texture)
-		=> renderer.DrawQuad(texture.GetNativeTexture(Time), ScreenSpaceDrawQuad, DrawColorInfo, texture.GetUVCoordinates(Time));
 }
