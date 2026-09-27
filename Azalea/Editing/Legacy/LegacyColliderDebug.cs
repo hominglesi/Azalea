@@ -6,6 +6,8 @@ using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.Numerics;
+using Azalea.Platform;
+using Azalea.Platform.Loading.OpenGL;
 using Azalea.Platform.Rendering.Coordination;
 using Azalea.Simulations.Colliders;
 using System.Numerics;
@@ -45,7 +47,7 @@ public class LegacyColliderDebug : GameObject
 
 			foreach (var collider in ComponentStorage<RectCollider>.GetComponents())
 			{
-				coordinator.BindTexture(Platform.Rendering.OpenGL.GLRenderer.LoadingContext!.WhitePixel);
+				coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
 				coordinator.BindProgram(coordinator.DefaultQuadProgram);
 				coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, collider.Quad, color.Color, Rectangle.One);
 

@@ -1,7 +1,8 @@
 ﻿using Azalea.Native.OpenGL;
 using Azalea.Numerics;
+using Azalea.Platform.Loading;
+using Azalea.Platform.Loading.OpenGL;
 using Azalea.Platform.Rendering.OpenGL;
-using Azalea.Platform.Rendering.OpenGL.LoadingContext;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
@@ -25,11 +26,11 @@ public class RenderCoordinator
 		DefaultQuadBatch = new DefaultQuadBatch(this);
 
 		DefaultQuadProgram = new Program();
-		GLRenderer.LoadingContext.GenerateProgram(DefaultQuadProgram,
+		GameHost.Instance.Loader.GenerateProgram(DefaultQuadProgram,
 			_quadVertexShaderSource, _quadFragmentShaderSource);
 
 		DefaultTextProgram = new Program();
-		GLRenderer.LoadingContext.GenerateProgram(DefaultTextProgram,
+		GameHost.Instance.Loader.GenerateProgram(DefaultTextProgram,
 			_quadVertexShaderSource, _textFragmentShaderSource);
 
 		var shaderGroup = ObjectPool<RenderCommandGroup>.Borrow();

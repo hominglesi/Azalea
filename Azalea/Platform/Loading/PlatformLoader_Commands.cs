@@ -1,6 +1,11 @@
-﻿using Azalea.Threading;
+﻿using Azalea.Platform.Rendering;
+using Azalea.Threading;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace Azalea.Platform.Rendering.OpenGL.LoadingContext;
+namespace Azalea.Platform.Loading;
+
 public abstract class LoadingCommand : ThreadCommand
 {
 	internal static new int TotalCreated = 0;

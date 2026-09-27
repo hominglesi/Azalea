@@ -4,6 +4,7 @@ using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
 using Azalea.Numerics;
 using Azalea.Platform;
+using Azalea.Platform.Loading.OpenGL;
 using Azalea.Platform.Rendering.Coordination;
 using Azalea.Platform.Rendering.OpenGL;
 using System;
@@ -78,7 +79,7 @@ public class Sprite : GameObject
 		if (Texture is not null && Texture.NewTexture is not null)
 			coordinator.BindTexture(Texture.NewTexture!);
 		else
-			coordinator.BindTexture(GLRenderer.LoadingContext!.WhitePixel);
+			coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
 		coordinator.BindProgram(coordinator.DefaultQuadProgram);
 
 		if(Texture is null)

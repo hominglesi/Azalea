@@ -1,24 +1,25 @@
 ﻿using Azalea.Editor.Design.Gui;
-using Azalea.Platform.Rendering.OpenGL.LoadingContext;
+using Azalea.Platform.Loading;
+using Azalea.Platform.Loading.OpenGL;
 using Azalea.Threading;
 
 namespace Azalea.Editor.DebugWindows.Inspectors;
 internal class GLLoadingContextInspector
 {
-	public static void Inject(GUIWindow window, GLLoadingContext loadingContext)
+	public static void Inject(GUIWindow window, PlatformLoader loader)
 	{
 		window.AddGroup("GL Loading Context");
 
 		window.AddGroup("GL Loading Thread");
-		var thread = loadingContext.Thread;
+		var thread = loader.Thread;
 
-		var textureCount = window.AddCounter("LoadedTextures: ", thread.LoadedTextures.Count);
-		thread.LoadedTextures.OnChanged += () => Scheduler.Schedule(
-			() => textureCount.Value = thread.LoadedTextures.Count);
+		var textureCount = window.AddCounter("LoadedTextures: ", loader.LoadedTextures.Count);
+		loader.LoadedTextures.OnChanged += () => Scheduler.Schedule(
+			() => textureCount.Value = loader.LoadedTextures.Count);
 
-		var programCount = window.AddCounter("LoadedPrograms: ", thread.LoadedPrograms.Count);
-		thread.LoadedPrograms.OnChanged += () => Scheduler.Schedule(
-			() => programCount.Value = thread.LoadedPrograms.Count);
+		var programCount = window.AddCounter("LoadedPrograms: ", loader.LoadedPrograms.Count);
+		loader.LoadedPrograms.OnChanged += () => Scheduler.Schedule(
+			() => programCount.Value = loader.LoadedPrograms.Count);
 
 		GameThreadInspector.Inject(window, thread);
 

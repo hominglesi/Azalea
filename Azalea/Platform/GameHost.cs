@@ -8,6 +8,8 @@ using Azalea.Inputs;
 using Azalea.IO.Configs;
 using Azalea.Lists;
 using Azalea.Platform.Audio;
+using Azalea.Platform.Loading;
+using Azalea.Platform.Loading.OpenGL;
 using Azalea.Simulations;
 using Azalea.Sounds;
 using Azalea.Threading;
@@ -19,12 +21,14 @@ namespace Azalea.Platform;
 
 public abstract class GameHost
 {
-	#region Creation
+	#region SHIPPABLE
 
 	private static GameHost? _instance;
 
 	public static GameHost Instance => _instance
 		?? throw new InvalidOperationException("A GameHost has not yet been initialized!");
+
+	public PlatformLoader Loader { get; }
 
 	#endregion
 
@@ -46,10 +50,16 @@ public abstract class GameHost
 
 	internal GameHost(HostPreferences prefs)
 	{
+		#region SHIPPABLE
+
 		if (_instance is not null)
 			throw new InvalidOperationException("Only one instance of GameHost may be created!");
 
 		_instance = this;
+
+		Loader = new GLLoader();
+
+		#endregion
 
 		var window = CreateWindow(prefs);
 		Renderer = CreateRenderer(window);

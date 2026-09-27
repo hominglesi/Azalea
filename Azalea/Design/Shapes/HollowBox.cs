@@ -3,6 +3,8 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering;
 using Azalea.Numerics;
+using Azalea.Platform;
+using Azalea.Platform.Loading.OpenGL;
 using Azalea.Platform.Rendering.Coordination;
 
 namespace Azalea.Design.Shapes;
@@ -120,7 +122,7 @@ public partial class HollowBox : GameObject
 			color.Color.BottomLeft,
 			color.Color.TopLeft);
 
-		coordinator.BindTexture(Platform.Rendering.OpenGL.GLRenderer.LoadingContext!.WhitePixel);
+		coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
 		coordinator.BindProgram(coordinator.DefaultQuadProgram);
 
 		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(topRect) * DrawInfo.Matrix, topColor, Rectangle.One);

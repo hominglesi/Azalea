@@ -1,6 +1,7 @@
 ﻿using Azalea.Native.OpenGL;
 using Azalea.Native.Windows;
-using Azalea.Platform.Rendering.OpenGL.LoadingContext;
+using Azalea.Platform.Loading;
+using Azalea.Platform.Loading.OpenGL;
 using Azalea.Platform.Windowing;
 using Azalea.Platform.Windowing.Windows;
 using System;
@@ -35,7 +36,7 @@ internal class GLContext
 		throw new NotSupportedException("Device context is not supported");
 	}
 
-	public static GLContext Create(IPlatformDeviceContext deviceContext, GLLoadingContext? shareContext = null)
+	public static GLContext Create(IPlatformDeviceContext deviceContext, GLLoader? shareLoader = null)
 	{
 		if (deviceContext is WindowsDeviceContext winDeviceContext)
 		{
@@ -49,15 +50,15 @@ internal class GLContext
 				0, 0
 			};
 
-			shareContext?.ReleaseContext().Await();
+			shareLoader?.ReleaseContext().Await();
 
-			var shareContextHandle = shareContext is null ? nint.Zero : shareContext.Handle;
+			var shareContextHandle = shareLoader is null ? nint.Zero : shareLoader.Context!.Handle;
 
 			var context = GL.wglCreateContextAttribsARB(winDeviceContext.Handle, shareContextHandle, in openGLAttribs[0]);
 			if (context == nint.Zero)
 				throw new Exception($"Could not create context. (Error {Marshal.GetLastWin32Error()})");
 
-			shareContext?.RebindContext().Await();
+			shareLoader?.RebindContext().Await();
 
 			return new GLContext(context, deviceContext);
 		}

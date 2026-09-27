@@ -1,9 +1,9 @@
 ﻿using Azalea.Editor.DebugWindows.Inspectors;
 using Azalea.Editor.Design.Gui;
 using Azalea.Platform;
+using Azalea.Platform.Loading;
 using Azalea.Platform.Rendering;
 using Azalea.Platform.Rendering.OpenGL;
-using Azalea.Platform.Rendering.OpenGL.LoadingContext;
 using Azalea.Threading;
 using Azalea.Utils;
 using System;
@@ -126,11 +126,7 @@ internal class GlobalWindow(AzaleaGame game)
 				commandDisplays[command.GetType()].Value++;
 			};
 
-			if (GLRenderer.LoadingContext is not null)
-				GLLoadingContextInspector.Inject(_window, GLRenderer.LoadingContext);
-			else
-				GLRenderer.LoadingContextCreated += context => Scheduler.Schedule(
-					() => GLLoadingContextInspector.Inject(_window, context));
+			GLLoadingContextInspector.Inject(_window, GameHost.Instance.Loader);
 		}
 
 		_window.Show();

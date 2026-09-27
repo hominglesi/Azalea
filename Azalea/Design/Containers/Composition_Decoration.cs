@@ -4,6 +4,8 @@ using Azalea.Graphics.Primitives;
 using Azalea.Graphics.Rendering;
 using Azalea.Layout;
 using Azalea.Numerics;
+using Azalea.Platform;
+using Azalea.Platform.Loading.OpenGL;
 using Azalea.Platform.Rendering.Coordination;
 
 namespace Azalea.Design.Containers;
@@ -54,7 +56,7 @@ public partial class Composition
 			_backgroundColorBacking.Validate();
 		}
 
-		coordinator.BindTexture(Platform.Rendering.OpenGL.GLRenderer.LoadingContext!.WhitePixel);
+		coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
 		coordinator.BindProgram(coordinator.DefaultQuadProgram);
 		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, _backgroundDrawColorInfo.Color, Rectangle.One);
 	}
@@ -225,7 +227,7 @@ public partial class Composition
 			color.Color.BottomLeft,
 			color.Color.TopLeft);
 
-		coordinator.BindTexture(Platform.Rendering.OpenGL.GLRenderer.LoadingContext!.WhitePixel);
+		coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
 		coordinator.BindProgram(coordinator.DefaultQuadProgram);
 
 		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(topRect) * DrawInfo.Matrix, topColor, Rectangle.One);

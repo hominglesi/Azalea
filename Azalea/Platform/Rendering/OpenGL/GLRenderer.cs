@@ -2,7 +2,8 @@
 using Azalea.Graphics.Colors;
 using Azalea.Native.OpenGL;
 using Azalea.Numerics;
-using Azalea.Platform.Rendering.OpenGL.LoadingContext;
+using Azalea.Platform.Loading;
+using Azalea.Platform.Loading.OpenGL;
 using Azalea.Platform.Windowing;
 using System;
 using System.Diagnostics;
@@ -71,7 +72,7 @@ internal partial class GLRenderer : PlatformRenderer
 
 			if (_windowContext is null)
 			{
-				_windowContext = GLContext.Create(_deviceContext, LoadingContext);
+				_windowContext = GLContext.Create(_deviceContext, (GLLoader)GameHost.Instance.Loader);
 				_windowContext.MakeCurrent();
 
 				_windowFramebuffer = new Framebuffer();
@@ -128,9 +129,7 @@ internal partial class GLRenderer : PlatformRenderer
 
 	protected override void InitializationLogic()
 	{
-		assureGLInitialized();
-
-		_context = GLContext.Create(_deviceContext, LoadingContext);
+		_context = GLContext.Create(_deviceContext, (GLLoader)GameHost.Instance.Loader);
 		_context.MakeCurrent();
 
 		GL.Enable(GL.DEBUG_OUTPUT);
@@ -411,7 +410,7 @@ internal partial class GLRenderer : PlatformRenderer
 		switch (command)
 		{
 			case GenerateProgramCommand(var program, var vertexShaderCode, var fragmentShaderCode):
-				LoadingContext!.GenerateProgram(program, vertexShaderCode, fragmentShaderCode);
+				GameHost.Instance.Loader.GenerateProgram(program, vertexShaderCode, fragmentShaderCode);
 				return true;
 		}
 
