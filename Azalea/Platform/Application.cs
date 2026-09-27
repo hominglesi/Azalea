@@ -68,7 +68,6 @@ public sealed class Application
 			
 			var renderQueue = coordinator.BeginCommandQueue();
 			renderQueue.PrepareRendering(clientSize);
-			renderQueue.Clear(Palette.Flowers.Azalea);
 
 			Game.Draw(Renderer.Coordinator);
 

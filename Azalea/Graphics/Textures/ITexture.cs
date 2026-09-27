@@ -25,7 +25,6 @@ public interface ITexture
 	}
 
 	public void UploadImage(Image image);
-	public void SetFiltering(TextureFiltering minFilter, TextureFiltering magFilter);
 
 	static ITexture FromImage(Image image) => Renderer.CreateTexture(image);
 

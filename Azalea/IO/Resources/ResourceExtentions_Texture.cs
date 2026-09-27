@@ -21,7 +21,6 @@ public static partial class ResourceStoreExtentions
 			return Assets.MissingTexture ?? throw new Exception("Texture could not be found.");
 
 		var texture = Renderer.CreateTexture(data);
-		texture.SetFiltering(filtering, filtering);
 		_textureCache.AddValue(store, path, texture);
 
 		Platform.Rendering.OpenGL.GLRenderer.TempAssureGLInitialized();
@@ -61,7 +60,6 @@ public static partial class ResourceStoreExtentions
 			Scheduler.Schedule(() =>
 			{
 				var texture = Renderer.CreateTexture(image);
-				texture.SetFiltering(filtering, filtering);
 				_textureCache.AddValue(store, path, texture);
 				promise.Resolve(texture);
 			});

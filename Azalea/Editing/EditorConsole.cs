@@ -28,18 +28,6 @@ public class EditorConsole : TextBox
 			Alpha = 0,
 			Color = Palette.White
 		});
-
-		//Windowing Commands
-		AddCommand("fullscreen", args => Window.State = WindowState.Fullscreen);
-		AddCommand("minimize", args => Window.State = WindowState.Minimized);
-		AddCommand("maximize", args => Window.State = WindowState.Maximized);
-		AddCommand("restorewindow", args => Window.State = WindowState.Normal);
-		AddCommand("windowtitle", args => Window.Title = args.ArgumentQuery);
-		AddCommand("vsync", args =>
-		{
-			if (args.ArgumentQuery.ToLower() == "on") Window.VSync = true;
-			else if (args.ArgumentQuery.ToLower() == "off") Window.VSync = false;
-		});
 	}
 
 	public event Action? Activated;

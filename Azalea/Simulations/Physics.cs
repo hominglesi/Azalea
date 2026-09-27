@@ -7,7 +7,7 @@ namespace Azalea.Simulations;
 public static class Physics
 {
 	private static PhysicsGenerator? _instance;
-	public static PhysicsGenerator Instance => _instance ??= GameHost.Main.Physics;
+	public static PhysicsGenerator Instance => _instance ??= GameHost.Instance.Physics;
 
 	public static Vector2 GravityConstant
 	{

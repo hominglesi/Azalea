@@ -129,12 +129,6 @@ internal partial class BufferSubDataMatrix4x4Command : RenderCommand
 }
 
 [ThreadCommand]
-internal partial class ClearCommand : RenderCommand
-{
-	public Color Color;
-}
-
-[ThreadCommand]
 internal partial class DisableCommand : RenderCommand
 {
 	public int Capability;
@@ -311,6 +305,13 @@ internal partial class ScissorCommand : RenderCommand
 
 	public override string ToString()
 		=> Rectangle is null ? $"Scissor(0)" : $"Scissor({Rectangle})";
+}
+
+
+[ThreadCommand]
+internal partial class SetClearColorCommand : RenderCommand
+{
+	public Color Color;
 }
 
 [ThreadCommand]

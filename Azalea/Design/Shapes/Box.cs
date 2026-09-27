@@ -9,7 +9,7 @@ public class Box : Sprite
 {
 	public Box()
 	{
-		base.Texture = Renderer.WhitePixel;
+		base.Texture = null;
 	}
 
 	public override ITexture Texture

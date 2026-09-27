@@ -21,7 +21,7 @@ public class LegacySceneGraph : FlexContainer
 		Wrapping = FlexWrapping.NoWrapping;
 		AutoSizeAxes = Axes.Y;
 
-		ObjectSelected += obj => Editor.InspectObject(obj);
+		//ObjectSelected += obj => Editor.InspectObject(obj);
 
 		//if (_rootObject is Composition)
 		//{

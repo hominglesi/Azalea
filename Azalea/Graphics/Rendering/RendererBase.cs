@@ -19,9 +19,6 @@ internal abstract class RendererBase : IRenderer
 	private readonly INativeTexture[] lastBoundTexture = new INativeTexture[16];
 	private int lastActiveTextureUnit = -1;
 
-	internal Shader? _defaultQuadShader;
-	public Shader DefaultQuadShader => _defaultQuadShader
-		?? throw new Exception("Renderer has not been initialized yet!");
 	public INativeShader? ActiveShader { get; private set; }
 
 	private Color _clearColor;
@@ -51,13 +48,6 @@ internal abstract class RendererBase : IRenderer
 	{
 		defaultQuadBatch = CreateQuadBatch(10000);
 		currentActiveBatch = defaultQuadBatch;
-
-		_defaultQuadShader = ShaderBuilder.FromShaderCode(
-			Assets.GetText("Shaders/quad_vertex.glsl")!,
-			Assets.GetText("Shaders/quad_fragment.glsl")!);
-		ShaderLibrary.RegisterShader("QuadShader", _defaultQuadShader);
-
-		BindShader(_defaultQuadShader);
 	}
 
 	private ITexture? _whitePixel;

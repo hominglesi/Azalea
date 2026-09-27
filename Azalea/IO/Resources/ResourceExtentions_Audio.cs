@@ -54,7 +54,7 @@ public static partial class ResourceStoreExtentions
 		catch (ArgumentException) { throw new ArgumentException("Sound Bytes only support .wav files"); }
 
 		var data = wav.Data.ToArray();
-		var sound = GameHost.Main.Audio.CreateSoundByte(data, data.Length, wav.Format, wav.Frequency);
+		var sound = GameHost.Instance.Audio.CreateSoundByte(data, data.Length, wav.Format, wav.Frequency);
 
 		_soundByteCacheNew.AddValue(store, path, sound);
 

@@ -6,7 +6,7 @@ namespace Azalea.IO.Configs;
 public static class Config
 {
 	private static IConfigProvider? _instance;
-	public static IConfigProvider Instance => _instance ??= GameHost.Main.ConfigProvider
+	public static IConfigProvider Instance => _instance ??= GameHost.Instance.ConfigProvider
 		?? throw new Exception("Config must be set up to be able to use it.");
 
 	public static bool ContainsKey(string key) => Instance.ContainsKey(key);

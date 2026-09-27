@@ -8,7 +8,8 @@ using System;
 namespace Azalea.Editing;
 public static class Editor
 {
-	public static EditorContainer? Instance => GameHost.Main.EditorContainer;
+	/*
+	public static EditorContainer? Instance => GameHost.Instance.EditorContainer;
 
 	#region DisplayValues
 
@@ -94,5 +95,5 @@ public static class Editor
 		if (Instance is null) return;
 
 		Instance.Console.ExecuteQuery(query);
-	}
+	}*/
 }

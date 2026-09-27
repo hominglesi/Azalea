@@ -51,7 +51,7 @@ public class LegacyProperties : FlexContainer
 					RelativeSizeAxes = Axes.Both,
 					Size = new(0.65f, 1),
 					Text = "Highlight",
-					Action = () => { if (_observedObject is not null) Editor.HighlightObject(_observedObject); }
+					//Action = () => { if (_observedObject is not null) Editor.HighlightObject(_observedObject); }
 				}
 			},
 			_propertiesContainer = new FlexContainer()

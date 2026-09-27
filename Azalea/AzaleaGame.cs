@@ -2,6 +2,7 @@
 using Azalea.Graphics;
 using Azalea.IO.Resources;
 using Azalea.Platform;
+using Azalea.Platform.Windowing;
 
 namespace Azalea;
 
@@ -14,7 +15,11 @@ public abstract class AzaleaGame : Composition
 		RelativeSizeAxes = Axes.Both;
 
 		Assets.MainStore.AddMsdfFont("Roboto-Regular", "Fonts/Roboto-Regular.csv", "Fonts/Roboto-Regular.bmp");
+	}
 
-		Window.SetIconFromStream(Assets.GetStream("Textures/azalea-icon.png")!);
+	protected override void Initialize()
+	{
+		App.Window.SetIcon(Assets.MainStore.GetImage("Textures/azalea-icon.png"));
+		base.Initialize();
 	}
 }

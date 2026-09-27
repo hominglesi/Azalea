@@ -7,16 +7,12 @@ using System;
 namespace Azalea.VisualTests;
 public class IWindowTest : TestScene
 {
-	private bool _preventsClosure;
-
 	public IWindowTest()
 	{
-		Window.Closing += onWindowClosing;
-
 		Add(CreateFullscreenVerticalFlex([
 			CreateActionButton(
 				"Create application window",
-				() => GameHost.Main.CreateApplication(new VisualTests())),
+				() => GameHost.Instance.CreateApplication(new VisualTests())),
 			CreateActionButton(
 				"Set size to 700, 700",
 				() => App.Window.SetSize(new(700, 700))),
@@ -38,16 +34,10 @@ public class IWindowTest : TestScene
 				() => App.Window.SetTitle("Azalea Game")),
 			CreateActionButton(
 				"Set Title to 'Ide Gas'",
-				() => App.Window.SetTitle(Window.Title = "Ide Gas")),
+				() => App.Window.SetTitle("Ide Gas")),
 			CreateActionButton(
 				"Set Title to ''",
-				() => App.Window.SetTitle(Window.Title = "")),
-			CreateActionButton(
-				"Set this test to prevent Closing",
-				() => _preventsClosure = true),
-			CreateActionButton(
-				"Set this test to not prevent Closing",
-				() => _preventsClosure = false),
+				() => App.Window.SetTitle("")),
 			CreateActionButton(
 				"Set icon to Azalea flower",
 				() => App.Window.SetIcon(Assets.MainStore.GetImage("Textures/azalea-icon.png"))),
@@ -57,12 +47,6 @@ public class IWindowTest : TestScene
 			CreateActionButton(
 				"Set icon to null",
 				() => App.Window.SetIcon(null)),
-			CreateActionButton(
-				"Turn vsync on (BROKEN)",
-				() => Window.VSync = true),
-			CreateActionButton(
-				"Turn vsync off (BROKEN)",
-				() => Window.VSync = false),
 			CreateActionButton(
 				"Show cursor",
 				() => App.Window.SetCursorVisible(true)),
@@ -101,9 +85,6 @@ public class IWindowTest : TestScene
 			CreateObservedValue("Resizable",
 				() => App.Window.Resizable,
 				(value) => $"Window resizable changed to {value}"),
-			CreateObservedValue("Prevents Closure",
-				() => _preventsClosure,
-				(value) => value ? $"Test now prevents closure attempts" : $"Test no longer prevents closure attempts"),
 			CreateObservedValue("Position",
 				() => App.Window.Position,
 				(value) => $"Window moved to {value}"),
@@ -136,15 +117,6 @@ public class IWindowTest : TestScene
 			_attentionTimer -= Time.DeltaTime;
 			if (_attentionTimer <= 0)
 				App.Window.RequestAttention();
-		}
-	}
-
-	private void onWindowClosing()
-	{
-		if (_preventsClosure)
-		{
-			Console.WriteLine("The Window closure attempt was prevented by this Test");
-			Window.PreventClosure();
 		}
 	}
 }

@@ -80,9 +80,6 @@ public class Texture : Disposable, ITexture
 
 	public void UploadImage(Image upload) => _nativeTexture.SetData(upload);
 
-	public void SetFiltering(TextureFiltering minFilter, TextureFiltering magFilter)
-		=> _nativeTexture.SetFiltering(minFilter, magFilter);
-
 	protected override void OnDispose()
 	{
 		_nativeTexture.Dispose();

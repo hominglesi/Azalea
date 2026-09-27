@@ -39,14 +39,6 @@ public class FrameRateTest : TestScene
 		_deltaTimeText.Text = _deltaTimeCounter.ToString();
 	}
 
-	protected override bool OnKeyDown(KeyDownEvent e)
-	{
-		if (e.Key == Keys.Space)
-			Window.VSync = !Window.VSync;
-
-		return base.OnKeyDown(e);
-	}
-
 	private float _fixedDeltaTimeCounter;
 	protected override void FixedUpdate()
 	{

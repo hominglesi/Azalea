@@ -10,17 +10,6 @@ namespace Azalea.Graphics.Sprites;
 
 public class SpriteText : GameObject
 {
-	private static Shader _textShader;
-
-	static SpriteText()
-	{
-		_textShader = ShaderBuilder.FromShaderCode(
-			Assets.GetText("Shaders/quad_vertex.glsl")!,
-			Assets.GetText("Shaders/text_fragment.glsl")!);
-
-		ShaderLibrary.RegisterShader("TextShader", _textShader);
-	}
-
 	private TextLayoutProvider _layoutProvider = new();
 
 	public FontUsage Font

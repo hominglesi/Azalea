@@ -20,7 +20,7 @@ public class WebHost : GameHost
 
 		ConfigProvider = new WebConfigProvider();
 
-		Window.Closing += beforeClose;
+		//Window.Closing += beforeClose;
 	}
 
 	protected override void RunGameLoop()

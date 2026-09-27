@@ -4,7 +4,7 @@ namespace Azalea.Sounds;
 public static class Audio
 {
 	private static IAudioManager? _instance;
-	public static IAudioManager Instance => _instance ??= GameHost.Main.AudioManager;
+	public static IAudioManager Instance => _instance ??= GameHost.Instance.AudioManager;
 
 	public static float MasterVolume
 	{

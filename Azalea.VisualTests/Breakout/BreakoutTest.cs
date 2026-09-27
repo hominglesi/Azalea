@@ -8,6 +8,7 @@ using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Azalea.Platform.Rendering;
 
 namespace Azalea.VisualTests.Breakout;
 public class BreakoutTest : TestScene
@@ -27,8 +28,6 @@ public class BreakoutTest : TestScene
 
 	public BreakoutTest()
 	{
-		Renderer.ClearColor = Palette.Black;
-
 		_chunkRoot = new BreakoutChunk(new Rectangle(Vector2.Zero,
 									   new Vector2(GameWidth, BlocksHeight)));
 
@@ -74,6 +73,7 @@ public class BreakoutTest : TestScene
 
 	protected override void Initialize()
 	{
+		App.Renderer.SetClearColor(Palette.Black);
 		App.Window.SetClientSize(new(GameWidth, GameHeight));
 		App.Window.SetResizable(false);
 		App.Window.Center();

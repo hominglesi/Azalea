@@ -22,7 +22,7 @@ public class LegacySelectPointer : Sprite
 		{
 			ClickAction = (_) => onSelectClicked()
 		};
-		Editor.Instance.Expanded.AddInternal(overlay);
+		//Editor.Instance.Expanded.AddInternal(overlay);
 		return base.OnClick(e);
 	}
 
@@ -40,8 +40,8 @@ public class LegacySelectPointer : Sprite
 
 			if (hoveredObject.Parent is not null)
 			{
-				Editor.InspectObject(hoveredObject);
-				Editor.HighlightObject(hoveredObject);
+				//Editor.InspectObject(hoveredObject);
+				//Editor.HighlightObject(hoveredObject);
 				break;
 			}
 		}

@@ -48,21 +48,13 @@ internal class DesktopGameHost : GameHost
 
 	protected override void RunGameLoop()
 	{
-		var desktopWindow = (PlatformWindow)Window;
-		while (desktopWindow.ShouldClose == false)
-		{
-			ProcessGameLoop();
-		}
-
-		Window.Hide();
+		ProcessGameLoop();
 
 		if (PerformanceTrace.Enabled)
 		{
 			using var traceStream = Assets.PersistentStore.GetOrCreateStream("trace.txt");
 			PerformanceTrace.SaveEventsTo(traceStream);
 		}
-
-		Window.Dispose();
 	}
 
 	internal override IWindow CreateWindow(HostPreferences prefs)
@@ -94,10 +86,7 @@ internal class DesktopGameHost : GameHost
 	{
 		ArgumentNullException.ThrowIfNull(icon, nameof(icon));
 
-		var window = (Win32Window)Window;
-		var trayicon = new WindowsTrayIcon(window, iconName, icon);
-		window.AddTrayIcon(trayicon);
-		return trayicon;
+		return null;
 	}
 
 	private void setupNativeLibraries()

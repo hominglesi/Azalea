@@ -76,12 +76,6 @@ public class HostBuilder
 		return this;
 	}
 
-	public HostBuilder EnableEditor()
-	{
-		_preferences.EditorEnabled = true;
-		return this;
-	}
-
 	public HostBuilder EnableTracing()
 	{
 		if (_preferences.PersistentDirectory is null)
@@ -94,7 +88,6 @@ public class HostBuilder
 internal struct HostPreferences
 {
 	public string? ConfigName = null;
-	public bool EditorEnabled = false;
 	public Vector2Int? GameSize = null;
 	public string? PersistentDirectory = null;
 	public string? ReflectedDirectory = null;

@@ -105,8 +105,8 @@ internal class EditorExplorer : Composition
 					using var stream = _store.GetStream(path)!;
 					using var reader = new StreamReader(stream);
 
-					Editor.FocusTemplateEditor();
-					Editor.InspectTemplate(TemplateConverter.Parse(reader.ReadToEnd()));
+					//Editor.FocusTemplateEditor();
+					//Editor.InspectTemplate(TemplateConverter.Parse(reader.ReadToEnd()));
 					return;
 				}
 		}

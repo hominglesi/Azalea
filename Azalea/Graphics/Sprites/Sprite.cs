@@ -2,6 +2,7 @@
 using Azalea.Graphics.Shaders;
 using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
+using Azalea.Numerics;
 using Azalea.Platform;
 using Azalea.Platform.Rendering.Coordination;
 using Azalea.Platform.Rendering.OpenGL;
@@ -73,18 +74,16 @@ public class Sprite : GameObject
 		}
 		 */
 
-		if (Texture is null)
-		{
-			Console.WriteLine("Couldn't draw sprite because texture was null");
-			return;
-		}
 
-		if (Texture.NewTexture is not null)
+		if (Texture is not null && Texture.NewTexture is not null)
 			coordinator.BindTexture(Texture.NewTexture!);
 		else
 			coordinator.BindTexture(GLRenderer.LoadingContext!.WhitePixel);
 		coordinator.BindProgram(coordinator.DefaultQuadProgram);
 
-		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorInfo.Color, Texture.GetUVCoordinates(Time));
+		if(Texture is null)
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorInfo.Color, Rectangle.One);
+		else
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorInfo.Color, Texture.GetUVCoordinates(Time));
 	}
 }

@@ -10,7 +10,6 @@ internal class Program
 	private static void Main(string[] args)
 	{
 		var host = new HostBuilder()
-			.EnableEditor()
 			.SetResizable(true)
 			.SetVSync(false)
 			.SetupPersistentDirectory("Azalea.VisualTests")

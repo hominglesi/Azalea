@@ -32,7 +32,7 @@ internal class GlobalWindow(AzaleaGame game)
 
 			_window.AddGroup("Host");
 			_window.AddButton("Inspect PlatformAudio",
-					() => PlatformAudioInspector.Create(_game.App, GameHost.Main.Audio, _window));
+					() => PlatformAudioInspector.Create(_game.App, GameHost.Instance.Audio, _window));
 			var applicationsGroup = _window.AddGroup("Applications");
 			var applicationGroups = new Dictionary<Application, GUIGroup>();
 
@@ -61,14 +61,14 @@ internal class GlobalWindow(AzaleaGame game)
 				applicationsGroup.Remove(group);
 			}
 
-			foreach (var application in GameHost.Main.Applications)
+			foreach (var application in GameHost.Instance.Applications)
 				createApplicationGroup(application);
 
 			_window.FinishGroup();
 
-			GameHost.Main.Applications.OnItemAdded += applicaiton => Scheduler.Schedule(
+			GameHost.Instance.Applications.OnItemAdded += applicaiton => Scheduler.Schedule(
 				() => createApplicationGroup(applicaiton));
-			GameHost.Main.Applications.OnItemRemoved += application => Scheduler.Schedule(
+			GameHost.Instance.Applications.OnItemRemoved += application => Scheduler.Schedule(
 				() => removeApplicationGroup(application));
 
 			_window.FinishGroup();

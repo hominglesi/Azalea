@@ -105,8 +105,6 @@ internal partial class GLRenderer : PlatformRenderer
 
 			if (FramebufferSize == Vector2Int.Zero)
 			{
-				if (_clearColor.HasValue)
-					GL.ClearColor(_clearColor.Value.RNormalized, _clearColor.Value.GNormalized, _clearColor.Value.BNormalized, 1);
 				GL.Clear(GL.COLOR_BUFFER_BIT);
 
 				GL.BlitFramebuffer(0, colorbufferSize.Y - Math.Min(colorbufferSize.Y, newClientSize.Y), Math.Min(colorbufferSize.X, newClientSize.X), colorbufferSize.Y,
@@ -143,7 +141,6 @@ internal partial class GLRenderer : PlatformRenderer
 	}
 
 	private Vector2Int _intendedClientSize;
-	private Color? _clearColor = null;
 	private RectangleInt? _scissorRectangle = null;
 
 	protected unsafe override void HandleCommandLogic(RenderCommand command)
@@ -197,15 +194,6 @@ internal partial class GLRenderer : PlatformRenderer
 				break;
 			case BufferSubDataMatrix4x4Command(var type, var offset, var data):
 				GL.BufferSubData(type, offset, Marshal.SizeOf<Matrix4x4>(), (nint)(&data));
-				break;
-			case ClearCommand(var color):
-				if (_clearColor != color)
-				{
-					GL.ClearColor(color.RNormalized, color.GNormalized, color.BNormalized, color.ANormalized);
-					_clearColor = color;
-				}
-
-				GL.Clear(GL.COLOR_BUFFER_BIT);
 				break;
 			case DisableCommand(var capability):
 				GL.Disable(capability);
@@ -300,6 +288,7 @@ internal partial class GLRenderer : PlatformRenderer
 				Debug.Assert(screenFramebuffer.Framebuffer.Handle.HasValue);
 				GL.BindFramebuffer(GL.FRAMEBUFFER, screenFramebuffer.Framebuffer.Handle.Value);
 				GL.Viewport(0, 0, targetFramebufferSize.X, targetFramebufferSize.Y);
+				GL.Clear(GL.COLOR_BUFFER_BIT);
 				break;
 			case ScissorCommand(var rectangle):
 				if (_scissorRectangle == rectangle)
@@ -322,6 +311,9 @@ internal partial class GLRenderer : PlatformRenderer
 
 					GL.Scissor(screenRectangle.X, _screenFramebuffers[_activeScreenFramebuffer].Size.Y - screenRectangle.Y - screenRectangle.Height, screenRectangle.Width, screenRectangle.Height);
 				}
+				break;
+			case SetClearColorCommand(var color):
+				GL.ClearColor(color.RNormalized, color.GNormalized, color.BNormalized, color.ANormalized);
 				break;
 			case SwapBuffersCommand:
 				GL.Disable(GL.SCISSOR_TEST);

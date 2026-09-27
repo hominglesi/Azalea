@@ -19,14 +19,19 @@ namespace Azalea.Platform;
 
 public abstract class GameHost
 {
-	private const float __fixedUpdateFrametime = 1f / 60;
+	#region Creation
 
-	public static GameHost Main => _main ?? throw new Exception("GameHost hasn't been created yet.");
-	private static GameHost? _main;
+	private static GameHost? _instance;
+
+	public static GameHost Instance => _instance
+		?? throw new InvalidOperationException("A GameHost has not yet been initialized!");
+
+	#endregion
+
+	private const float __fixedUpdateFrametime = 1f / 60;
 
 	public readonly ObservableList<Application> Applications = [];
 
-	public IWindow Window { get; }
 	public IRenderer Renderer { get; }
 	public IAudioManager AudioManager => _audioThread.AudioManager;
 	public IConfigProvider? ConfigProvider { get; protected set; }
@@ -35,20 +40,19 @@ public abstract class GameHost
 	public IClipboard Clipboard { get; }
 
 	private readonly Composition _root;
-	private readonly bool _editorEnabled;
-	internal EditorContainer? EditorContainer { get; private set; }
 
 	private AudioThread _audioThread;
 	public PlatformAudio Audio;
 
 	internal GameHost(HostPreferences prefs)
 	{
-		_editorEnabled = prefs.EditorEnabled;
-		_main ??= this;
+		if (_instance is not null)
+			throw new InvalidOperationException("Only one instance of GameHost may be created!");
 
-		Window = CreateWindow(prefs);
-		Renderer = CreateRenderer(Window);
+		_instance = this;
 
+		var window = CreateWindow(prefs);
+		Renderer = CreateRenderer(window);
 		_audioThread = new AudioThread(this);
 		Clipboard = CreateClipboard();
 		Physics = new PhysicsGenerator();
@@ -63,10 +67,6 @@ public abstract class GameHost
 	public virtual void Run(AzaleaGame game)
 	{
 		GameObject rootObject = game;
-		Renderer.Initialize();
-
-		if (_editorEnabled)
-			rootObject = EditorContainer = new EditorContainer(game);
 
 		_root.Add(rootObject);
 
@@ -74,8 +74,6 @@ public abstract class GameHost
 
 		RunGameLoop();
 	}
-
-	private bool _firstWindowShown = false;
 
 	protected abstract void RunGameLoop();
 
@@ -90,8 +88,6 @@ public abstract class GameHost
 
 		Scheduler.InvokeScheduled();
 
-		Window.ProcessEvents();
-
 		while (_accumulator >= __fixedUpdateFrametime)
 		{
 			PerformanceTrace.RunAndTrace(CallOnFixedUpdate, "FixedUpdate");
@@ -100,31 +96,11 @@ public abstract class GameHost
 
 		PerformanceTrace.RunAndTrace(CallOnUpdate, "Update");
 
-		if (Window.State != WindowState.Minimized)
-			PerformanceTrace.RunAndTrace(CallOnRender, "Render");
-
-		if (_firstWindowShown == false)
-		{
-			Window.Show(true);
-			_firstWindowShown = true;
-		}
-
 		PerformanceTrace.AddEvent(_frameStart, "Frame");
-	}
-
-	public virtual void CallOnRender()
-	{
-		Renderer.BeginFrame();
-		if (Renderer.AutomaticallyClear) Renderer.Clear();
-
-		_root.Draw(null);
-
-		Renderer.FinishFrame();
 	}
 
 	public virtual void CallOnUpdate()
 	{
-		_root.Size = new Vector2(Window.ClientSize.X, Window.ClientSize.Y);
 		_root.Size = Vector2Extentions.ComponentMax(Vector2.One, _root.Size);
 
 		_root.UpdateSubTree();
