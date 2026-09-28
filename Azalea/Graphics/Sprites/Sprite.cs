@@ -76,8 +76,8 @@ public class Sprite : GameObject
 		 */
 
 
-		if (Texture is not null && Texture.NewTexture is not null)
-			coordinator.BindTexture(Texture.NewTexture!);
+		if (Texture is not null)
+			Texture.Bind(coordinator);
 		else
 			coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
 		coordinator.BindProgram(coordinator.DefaultQuadProgram);

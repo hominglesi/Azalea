@@ -52,10 +52,10 @@ public class TiledLayer : GameObject
 				var sizeRatio = texture.Size / Tilemap.TileSize;
 				var quad = new Quad(startPosition + offset - allowedPadding, tileSize * sizeRatio + allowedPadding);
 
-				if (texture is null || texture.NewTexture is null)
+				if (texture is null)
 					continue;
 
-				coordinator.BindTexture(texture.NewTexture);
+				texture.Bind(coordinator);
 				coordinator.BindProgram(coordinator.DefaultQuadProgram);
 				coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorInfo.Color, texture.GetUVCoordinates());
 			}

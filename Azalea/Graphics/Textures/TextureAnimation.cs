@@ -1,5 +1,6 @@
 ﻿using Azalea.IO.Resources;
 using Azalea.Numerics;
+using Azalea.Platform.Rendering.Coordination;
 using System;
 using System.Collections.Generic;
 
@@ -52,6 +53,31 @@ public class TextureAnimation : ITexture
 		}
 
 		return Assets.MissingTexture.GetUVCoordinates(time);
+	}
+
+	public void Bind(RenderCoordinator coordinator, float time)
+	{
+		if (_frames.Count == 0)
+		{
+			Assets.MissingTexture.Bind(coordinator, time);
+			return;
+		}
+
+		time %= _totalDuration;
+		float counter = 0;
+
+		foreach (var (frame, frameDuration) in _frames)
+		{
+			if (time < counter + frameDuration)
+			{
+				frame.Bind(coordinator, time);
+				return;
+			}
+
+			counter += frameDuration;
+		}
+
+		Assets.MissingTexture.Bind(coordinator, time);
 	}
 
 	public void SetFiltering(TextureFiltering minFilter, TextureFiltering magFilter)

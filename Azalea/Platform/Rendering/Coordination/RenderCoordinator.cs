@@ -1,4 +1,5 @@
-﻿using Azalea.Native.OpenGL;
+﻿using Azalea.Graphics.Textures;
+using Azalea.Native.OpenGL;
 using Azalea.Numerics;
 using Azalea.Platform.Loading;
 using Azalea.Platform.Loading.OpenGL;
@@ -115,6 +116,7 @@ public class RenderCoordinator
 	private Program? _boundProgram;
 	internal void BindProgram(Program program)
 	{
+		Debug.Assert(program is not null);
 		if (_boundProgram == program)
 			return;
 
@@ -129,6 +131,7 @@ public class RenderCoordinator
 	private NativeTexture? _boundTexture;
 	internal void BindTexture(NativeTexture texture)
 	{
+		Debug.Assert(texture is not null);
 		if (_boundTexture == texture)
 			return;
 

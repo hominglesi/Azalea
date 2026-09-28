@@ -1,5 +1,6 @@
 ﻿using Azalea.IO.Resources;
 using Azalea.Numerics;
+using Azalea.Platform.Rendering.Coordination;
 using Azalea.Threading;
 using System;
 
@@ -15,7 +16,7 @@ public class PromisedTexture : ITexture
 
 	public PromisedTexture(ValuePromise<ITexture> promise, ITexture? loadingTexture = null)
 	{
-		_loadingTexture = loadingTexture ?? Assets.MissingTexture;
+		_loadingTexture = loadingTexture ?? Assets.GetTexture("Textures/azalea-icon.png");
 		_promise = promise;
 	}
 
@@ -33,5 +34,13 @@ public class PromisedTexture : ITexture
 			return _loadingTexture.GetUVCoordinates(time);
 
 		return _promise.Value.GetUVCoordinates(time);
+	}
+
+	public void Bind(RenderCoordinator coordinator, float time)
+	{
+		if (IsResolved == false)
+			_loadingTexture.Bind(coordinator, time);
+		else
+			_promise.Value.Bind(coordinator, time);
 	}
 }

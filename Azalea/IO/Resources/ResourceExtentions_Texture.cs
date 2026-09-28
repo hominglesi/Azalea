@@ -22,11 +22,9 @@ public static partial class ResourceStoreExtentions
 		if (data is null)
 			return Assets.MissingTexture ?? throw new Exception("Texture could not be found.");
 
-		var texture = Renderer.CreateTexture(data);
-		_textureCache.AddValue(store, path, texture);
-
 		var newTexture = GameHost.Instance.Loader.CreateTexture(data.Width, data.Height, data.Data, false);
-		texture.NewTexture = newTexture;
+		var texture = Renderer.CreateTexture(data, newTexture);
+		_textureCache.AddValue(store, path, texture);
 
 		return texture;
 	}
@@ -56,12 +54,10 @@ public static partial class ResourceStoreExtentions
 				return;
 			}
 
-			Scheduler.Schedule(() =>
-			{
-				var texture = Renderer.CreateTexture(image);
-				_textureCache.AddValue(store, path, texture);
-				promise.Resolve(texture);
-			});
+			var newTexture = GameHost.Instance.Loader.CreateTexture(image.Width, image.Height, image.Data, false);
+			var texture = Renderer.CreateTexture(image, newTexture);
+			_textureCache.AddValue(store, path, texture);
+			promise.Resolve(texture);
 		});
 
 		return result;

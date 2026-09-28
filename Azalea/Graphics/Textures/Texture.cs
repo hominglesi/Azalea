@@ -1,4 +1,6 @@
 ﻿using Azalea.Numerics;
+using Azalea.Platform.Rendering;
+using Azalea.Platform.Rendering.Coordination;
 using Azalea.Utils;
 using System;
 using System.Numerics;
@@ -6,7 +8,7 @@ namespace Azalea.Graphics.Textures;
 
 public class Texture : ITexture
 {
-	public Platform.Rendering.NativeTexture? NewTexture { get; internal set; }
+	private readonly Platform.Rendering.NativeTexture _newTexture;
 
 	private readonly INativeTexture _nativeTexture;
 	private readonly int _nativeWidth;
@@ -65,20 +67,20 @@ public class Texture : ITexture
 	}
 
 	public Texture(ITexture other)
-		: this(other.GetNativeTexture())
-	{
-		NewTexture = other.NewTexture;
-	}
+		: this(other.GetNativeTexture(), ((Texture)other)._newTexture) { }
 
-	internal Texture(INativeTexture nativeTexture)
+	internal Texture(INativeTexture nativeTexture, NativeTexture newTexture)
 	{
 		ArgumentNullException.ThrowIfNull(nativeTexture);
 
 		_nativeWidth = nativeTexture.Width;
 		_nativeHeight = nativeTexture.Height;
 		_nativeTexture = nativeTexture;
+		_newTexture = newTexture;
 	}
 
 	public INativeTexture GetNativeTexture(float time) => _nativeTexture;
 	public Rectangle GetUVCoordinates(float time) => _uvCoordinates;
+
+	public void Bind(RenderCoordinator coordinator, float time = 0) => coordinator.BindTexture(_newTexture);
 }

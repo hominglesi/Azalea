@@ -1,9 +1,12 @@
 ﻿using Azalea.Graphics.Textures;
 using Azalea.Numerics;
+using Azalea.Platform;
+using Azalea.Platform.Loading;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Azalea.Text;
 public class MsdfFontData

@@ -6,6 +6,7 @@ using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
 using Azalea.Numerics;
 using Azalea.Platform;
+using Azalea.Platform.Rendering;
 using System;
 using System.Collections.Generic;
 
@@ -57,7 +58,7 @@ internal abstract class RendererBase : IRenderer
 		var whitePixel = new Image(1, 1,
 			new byte[4] { byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue });
 
-		return CreateTexture(whitePixel);
+		return CreateTexture(whitePixel, null);
 	}
 
 	public void SetViewport(Vector2Int size)
@@ -69,12 +70,12 @@ internal abstract class RendererBase : IRenderer
 
 	protected abstract IVertexBatch<TexturedVertex2D> CreateQuadBatch(int size);
 	protected abstract INativeTexture CreateNativeTexture(int width, int height);
-	public Texture CreateTexture(Image image)
+	public Texture CreateTexture(Image image, NativeTexture newTexture)
 	{
 		var nativeTexture = CreateNativeTexture(image.Width, image.Height);
 		nativeTexture.SetData(image);
-
-		var texture = new Texture(nativeTexture);
+		
+		var texture = new Texture(nativeTexture, newTexture);
 		return texture;
 	}
 

@@ -19,11 +19,12 @@ internal class GLTexture : Disposable, INativeTexture
 		_width = width;
 		_height = height;
 
-		Native.OpenGL.GL.GenTextures(1, ref _handle);
+		//Native.OpenGL.GL.GenTextures(1, ref _handle);
 	}
 
 	internal void SetData(Image image)
 	{
+		/*
 		if (image.Width != _width || image.Height != _height)
 		{
 			Console.WriteLine("Provided image was not the correct size");
@@ -39,22 +40,24 @@ internal class GLTexture : Disposable, INativeTexture
 		Native.OpenGL.GL.TexImage2D(Native.OpenGL.GL.TEXTURE_2D, 0, Native.OpenGL.GL.RGBA,
 			_width, _height, 0, Native.OpenGL.GL.RGBA, Native.OpenGL.GL.UNSIGNED_BYTE, in image.Data[0]);
 
-		GL.GenerateMipmap(GLTextureType.Texture2D);
+		GL.GenerateMipmap(GLTextureType.Texture2D);*/
 	}
 
 	public void SetFiltering(TextureFiltering minFilter, TextureFiltering magFilter)
 	{
+		/*
 		_renderer.BindTexture(this, 0);
 		Native.OpenGL.GL.TexParameteri(Native.OpenGL.GL.TEXTURE_2D, Native.OpenGL.GL.TEXTURE_MIN_FILTER,
 			minFilter == TextureFiltering.Nearest ? Native.OpenGL.GL.NEAREST : Native.OpenGL.GL.LINEAR);
 		Native.OpenGL.GL.TexParameteri(Native.OpenGL.GL.TEXTURE_2D, Native.OpenGL.GL.TEXTURE_MAG_FILTER,
 			magFilter == TextureFiltering.Nearest ? Native.OpenGL.GL.NEAREST : Native.OpenGL.GL.LINEAR);
+		*/
 	}
 
 	public void Bind(uint slot = 0)
 	{
-		GL.ActiveTexture(slot);
-		Native.OpenGL.GL.BindTexture(Native.OpenGL.GL.TEXTURE_2D, _handle);
+		//GL.ActiveTexture(slot);
+		//Native.OpenGL.GL.BindTexture(Native.OpenGL.GL.TEXTURE_2D, _handle);
 	}
 
 	public void Unbind() => Native.OpenGL.GL.BindTexture(Native.OpenGL.GL.TEXTURE_2D, 0);

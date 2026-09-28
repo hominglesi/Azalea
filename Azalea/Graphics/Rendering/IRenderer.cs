@@ -3,6 +3,7 @@ using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Graphics.Shaders;
 using Azalea.Graphics.Textures;
 using Azalea.Numerics;
+using Azalea.Platform.Rendering;
 
 namespace Azalea.Graphics.Rendering;
 
@@ -27,7 +28,7 @@ public interface IRenderer
 	internal void SetViewport(Vector2Int size);
 
 	internal IVertexBatch CreateQuadBatch(int size);
-	internal Texture CreateTexture(Image image);
+	internal Texture CreateTexture(Image image, NativeTexture newTexture);
 	internal bool BindTexture(INativeTexture texture, int unit = 0);
 
 	internal Shader CreateShader(string vertexCode, string fragmentCode);

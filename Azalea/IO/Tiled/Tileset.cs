@@ -4,9 +4,12 @@ using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
 using Azalea.Numerics;
+using Azalea.Platform;
+using Azalea.Platform.Loading;
 using Azalea.Utils;
 using System;
 using System.IO;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Azalea.IO.Tiled;
 public readonly struct Tileset
@@ -134,7 +137,8 @@ public readonly struct Tileset
 		}
 
 		// Create our Texture
-		var atlasTexture = Renderer.CreateTexture(atlas);
+		var newTexture = GameHost.Instance.Loader.CreateTexture(atlas.Width, atlas.Height, atlas.Data, false);
+		var atlasTexture = Renderer.CreateTexture(atlas, newTexture);
 
 		// Create all texture regions
 

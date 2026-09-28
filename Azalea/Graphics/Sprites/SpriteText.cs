@@ -66,8 +66,7 @@ public class SpriteText : GameObject
 		{
 			var quad = ToScreenSpace(character.DrawRectangle);
 
-			if (character.Texture.NewTexture is not null)
-				coordinator.BindTexture(character.Texture.NewTexture!);
+			character.Texture.Bind(coordinator);
 
 			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorInfo.Color, character.Texture.GetUVCoordinates());
 		}
