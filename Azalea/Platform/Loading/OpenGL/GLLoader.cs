@@ -25,15 +25,36 @@ internal class GLLoader : PlatformLoader
 		Context = GLContext.Create(dummyDeviceContext);
 		Context.MakeCurrent();
 
-		WhitePixel = new Texture();
-		this.GenerateTexture(WhitePixel);
-		this.TexImage2D(WhitePixel, 1, 1, [byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue], false);
+		WhitePixel = this.CreateTexture(1, 1, [byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue], false);
 	}
 
 	protected override void HandleCommandLogic(LoadingCommand command)
 	{
 		switch (command)
 		{
+			case CreateTextureCommand(var texture, var width, var height, var pixels, var generateMipmap):
+				uint textureHandle = 0;
+				GL.GenTextures(1, ref textureHandle);
+				GL.BindTexture(GL.TEXTURE_2D, textureHandle);
+				GL.TexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+				GL.TexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+
+				if (pixels is null)
+					GL.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, IntPtr.Zero);
+				else
+					GL.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, in pixels[0]);
+
+				if (generateMipmap)
+					GL.GenerateMipmap(GL.TEXTURE_2D);
+
+				GL.Flush();
+
+				((GLTexture)texture).Initialize(textureHandle);
+				texture.FinishLoadingOperation();
+
+				LoadedTextures.Add(texture);
+
+				break;
 			case GenerateProgramCommand(var program, var vertexShaderCode, var fragmentShaderCode):
 				var vertexShader = GL.CreateShader(GL.VERTEX_SHADER);
 				var fragmentShader = GL.CreateShader(GL.FRAGMENT_SHADER);
@@ -101,17 +122,6 @@ internal class GLLoader : PlatformLoader
 				LoadedPrograms.Add(program);
 
 				break;
-			case GenerateTextureCommand(var texture):
-				uint textureHandle = 0;
-				GL.GenTextures(1, ref textureHandle);
-				GL.BindTexture(GL.TEXTURE_2D, textureHandle);
-				GL.TexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-				GL.TexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-				GL.Flush();
-
-				texture.Initialize(new GLTexture(textureHandle));
-				LoadedTextures.Add(texture);
-				break;
 			case RebindContextCommand():
 				Debug.Assert(Context is not null);
 				Context.MakeCurrent();
@@ -120,25 +130,10 @@ internal class GLLoader : PlatformLoader
 				Debug.Assert(Context is not null);
 				Context.Release();
 				break;
-			case TexImage2DCommand(var texture, var width, var height, var pixels, var generateMipmap):
-				if (texture.NativeTexture is not GLTexture glTexture)
-					throw new Exception();
-
-				GL.BindTexture(glTexture.Target, glTexture.Handle);
-
-				if (pixels is null)
-					GL.TexImage2D(glTexture.Target, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, IntPtr.Zero);
-				else
-					GL.TexImage2D(glTexture.Target, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, in pixels[0]);
-
-				if (generateMipmap)
-					GL.GenerateMipmap(glTexture.Target);
-
-				GL.Flush();
-				texture.FinishLoadingOperation();
-				break;
 		}
 
 		command.Return();
 	}
+
+	internal override NativeTexture CreateEmptyTexture() => new GLTexture();
 }

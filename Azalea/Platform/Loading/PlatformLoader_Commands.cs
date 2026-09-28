@@ -1,4 +1,5 @@
-﻿using Azalea.Platform.Rendering;
+﻿using Azalea.Graphics;
+using Azalea.Platform.Rendering;
 using Azalea.Threading;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,28 @@ public abstract class LoadingCommand : ThreadCommand
 	}
 }
 
+[ThreadCommand(generateHandler: false)]
+internal partial class CreateTextureCommand : LoadingCommand
+{
+	public NativeTexture Texture;
+	public int Width;
+	public int Height;
+	public byte[]? Pixels;
+	public bool GenerateMipmap;
+}
+
+internal static class CreateTextureCommand_Handler
+{
+	internal static NativeTexture CreateTexture(this ICommandHandler<LoadingCommand> handler, int width, int height, byte[]? pixels, bool generateMipmap = false)
+	{
+		var texture = ((PlatformLoader)handler).CreateEmptyTexture();
+		texture.SetSize(width, height);
+		texture.BeginLoadingOperation();
+		handler.Enqueue(CreateTextureCommand.Borrow(texture, width, height, pixels, generateMipmap));
+		return texture;
+	}
+}
+
 [ThreadCommand]
 internal partial class GenerateProgramCommand : LoadingCommand
 {
@@ -27,7 +50,7 @@ internal partial class GenerateProgramCommand : LoadingCommand
 [ThreadCommand]
 internal partial class GenerateTextureCommand : LoadingCommand
 {
-	public Texture Texture;
+	public NativeTexture Texture;
 }
 
 [ThreadCommand(awaitable: true)]
@@ -35,22 +58,3 @@ internal partial class RebindContextCommand : LoadingCommand { }
 
 [ThreadCommand(awaitable: true)]
 internal partial class ReleaseContextCommand : LoadingCommand { }
-
-[ThreadCommand(generateHandler: false)]
-internal partial class TexImage2DCommand : LoadingCommand
-{
-	public Texture Texture;
-	public int Width;
-	public int Height;
-	public byte[]? Pixels;
-	public bool GenerateMipmap;
-}
-
-internal static class TexImage2DCommand_Handler
-{
-	internal static void TexImage2D(this ICommandHandler<LoadingCommand> handler, Texture texture, int width, int height, byte[]? pixels, bool generateMipmap)
-	{
-		texture.BeginLoadingOperation();
-		handler.Enqueue(TexImage2DCommand.Borrow(texture, width, height, pixels, generateMipmap));
-	}
-}

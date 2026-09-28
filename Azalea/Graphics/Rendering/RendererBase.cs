@@ -75,7 +75,6 @@ internal abstract class RendererBase : IRenderer
 		nativeTexture.SetData(image);
 
 		var texture = new Texture(nativeTexture);
-		ITexture.LoadedTextures.Add(texture);
 		return texture;
 	}
 

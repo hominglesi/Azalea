@@ -53,7 +53,6 @@ public class EditorWrapper : AzaleaGame
 
 		_cameraWindow = new(_wrappedGame);
 		_globalWindow = new(_wrappedGame);
-		_renderWindow = new(_wrappedGame);
 		_classWindow = new(_wrappedGame);
 	}
 
@@ -61,7 +60,6 @@ public class EditorWrapper : AzaleaGame
 
 	private readonly CameraWindow _cameraWindow;
 	private readonly GlobalWindow _globalWindow;
-	private readonly RenderWindow _renderWindow;
 	private readonly ClassWindow _classWindow;
 
 	protected override bool OnKeyDown(KeyDownEvent e)
@@ -71,8 +69,6 @@ public class EditorWrapper : AzaleaGame
 		else if (e.Key == Keys.F2 && e.State.ShiftPressed)
 			_globalWindow.Toggle();
 		else if (e.Key == Keys.F3 && e.State.ShiftPressed)
-			_renderWindow.Toggle();
-		else if (e.Key == Keys.F4 && e.State.ShiftPressed)
 			_classWindow.Toggle();
 		else
 			return false;

@@ -4,32 +4,29 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace Azalea.Platform.Rendering;
-public class Texture
+public abstract class NativeTexture
 {
-	internal INativeTexture? NativeTexture { get; private set; }
+	public int Width { get; private set; }
+	public int Height { get; private set; }
 
-	internal Texture() { }
-
-	internal void Initialize(INativeTexture nativeTexture)
+	internal void SetSize(int width, int heigth)
 	{
-		if (NativeTexture is not null)
-			throw new Exception("Texture cannot be initialized multiple times!");
-
-		NativeTexture = nativeTexture;
-		FinishLoadingOperation();
+		Width = width;
+		Height = heigth;
 	}
+
+	internal virtual bool IsReady() => true;
 
 	private readonly object _lock = new();
 	private volatile int _loadingOperations = 1;
 	private readonly ManualResetEvent _readyEvent = new(false);
-	[MemberNotNull(nameof(NativeTexture))]
 	internal void AssureReady()
 	{
 		lock (_lock)
 		{
 			if (_loadingOperations == 0)
 			{
-				Debug.Assert(NativeTexture is not null);
+				Debug.Assert(IsReady());
 				return;
 			}
 
@@ -38,7 +35,7 @@ public class Texture
 			Console.WriteLine($"Waited for texture {Time.GetPreciseMilisecondsSince(startTime)}ms");
 
 			Debug.Assert(_loadingOperations == 0);
-			Debug.Assert(NativeTexture is not null);
+			Debug.Assert(IsReady());
 		}
 	}
 
@@ -60,9 +57,4 @@ public class Texture
 		if (_loadingOperations == 0)
 			_readyEvent.Set();
 	}
-}
-
-internal interface INativeTexture
-{
-	public uint Handle { get; }
 }

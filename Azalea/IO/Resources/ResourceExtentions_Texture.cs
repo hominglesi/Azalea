@@ -25,9 +25,7 @@ public static partial class ResourceStoreExtentions
 		var texture = Renderer.CreateTexture(data);
 		_textureCache.AddValue(store, path, texture);
 
-		var newTexture = new Platform.Rendering.Texture();
-		GameHost.Instance.Loader.GenerateTexture(newTexture);
-		GameHost.Instance.Loader.TexImage2D(newTexture, data.Width, data.Height, data.Data, false);
+		var newTexture = GameHost.Instance.Loader.CreateTexture(data.Width, data.Height, data.Data, false);
 		texture.NewTexture = newTexture;
 
 		return texture;

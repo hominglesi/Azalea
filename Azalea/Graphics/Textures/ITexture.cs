@@ -6,9 +6,7 @@ using System.Numerics;
 namespace Azalea.Graphics.Textures;
 public interface ITexture
 {
-	public Platform.Rendering.Texture? NewTexture { get; }
-
-	public static readonly List<ITexture> LoadedTextures = [];
+	public Platform.Rendering.NativeTexture? NewTexture { get; }
 
 	public INativeTexture GetNativeTexture(float time = 0);
 	public Rectangle GetUVCoordinates(float time = 0);
@@ -23,11 +21,4 @@ public interface ITexture
 			return new Vector2(nativeTexture.Width, nativeTexture.Height);
 		}
 	}
-
-	public void UploadImage(Image image);
-
-	static ITexture FromImage(Image image) => Renderer.CreateTexture(image);
-
-	internal void SetupProcedure() { }
-	internal void CleanUpProcedure() { }
 }

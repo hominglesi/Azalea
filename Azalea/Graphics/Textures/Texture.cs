@@ -4,11 +4,13 @@ using System;
 using System.Numerics;
 namespace Azalea.Graphics.Textures;
 
-public class Texture : Disposable, ITexture
+public class Texture : ITexture
 {
-	public Platform.Rendering.Texture? NewTexture { get; internal set; }
+	public Platform.Rendering.NativeTexture? NewTexture { get; internal set; }
 
 	private readonly INativeTexture _nativeTexture;
+	private readonly int _nativeWidth;
+	private readonly int _nativeHeight;
 
 	private Rectangle _uvCoordinates = Rectangle.One;
 	private RectangleInt _region = new(-1, -1, -1, -1);
@@ -72,16 +74,11 @@ public class Texture : Disposable, ITexture
 	{
 		ArgumentNullException.ThrowIfNull(nativeTexture);
 
+		_nativeWidth = nativeTexture.Width;
+		_nativeHeight = nativeTexture.Height;
 		_nativeTexture = nativeTexture;
 	}
 
 	public INativeTexture GetNativeTexture(float time) => _nativeTexture;
 	public Rectangle GetUVCoordinates(float time) => _uvCoordinates;
-
-	public void UploadImage(Image upload) => _nativeTexture.SetData(upload);
-
-	protected override void OnDispose()
-	{
-		_nativeTexture.Dispose();
-	}
 }

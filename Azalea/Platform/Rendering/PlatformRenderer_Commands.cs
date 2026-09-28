@@ -45,7 +45,7 @@ internal partial class BindFramebufferCommand : RenderCommand
 internal partial class BindTextureCommand : RenderCommand
 {
 	public int Type;
-	public Texture Texture;
+	public NativeTexture Texture;
 }
 
 [ThreadCommand]
@@ -169,7 +169,7 @@ internal partial class EnableVertexAttribArrayCommand : RenderCommand
 internal partial class FramebufferTexture2DCommand : RenderCommand
 {
 	public Framebuffer Framebuffer;
-	public Texture Texture;
+	public NativeTexture Texture;
 	public int Target;
 	public int Attachment;
 	public int Textarget;
@@ -235,14 +235,14 @@ internal static class GenerateProgramCommand_Handler
 [ThreadCommand(generateHandler: false)]
 internal partial class GenerateTextureCommand : RenderCommand
 {
-	public Texture Texture;
+	public NativeTexture Texture;
 }
 
 internal static class GenerateTextureCommand_Handler
 {
-	public static Texture GenerateTexture(this ICommandHandler<RenderCommand> consumer)
+	public static NativeTexture GenerateTexture(this ICommandHandler<RenderCommand> consumer)
 	{
-		var texture = new Texture();
+		var texture = GameHost.Instance.Loader.CreateEmptyTexture();
 		consumer.Enqueue(GenerateTextureCommand.Borrow(texture));
 		return texture;
 	}
@@ -320,7 +320,7 @@ internal partial class SwapBuffersCommand : RenderCommand { }
 [ThreadCommand]
 internal partial class TexImage2DCommand : RenderCommand
 {
-	public Texture Texture;
+	public NativeTexture Texture;
 	public int Width;
 	public int Height;
 	public byte[]? Pixels;
@@ -330,7 +330,7 @@ internal partial class TexImage2DCommand : RenderCommand
 [ThreadCommand]
 internal partial class TexParameteriCommand : RenderCommand
 {
-	public Texture Texture;
+	public NativeTexture Texture;
 	public int Target;
 	public int Parameter;
 	public int Value;

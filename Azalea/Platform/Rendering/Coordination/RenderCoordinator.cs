@@ -126,8 +126,8 @@ public class RenderCoordinator
 	}
 	#endregion
 	#region Texture
-	private Texture? _boundTexture;
-	internal void BindTexture(Texture texture)
+	private NativeTexture? _boundTexture;
+	internal void BindTexture(NativeTexture texture)
 	{
 		if (_boundTexture == texture)
 			return;

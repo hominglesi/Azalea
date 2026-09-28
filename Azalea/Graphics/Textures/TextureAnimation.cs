@@ -9,7 +9,7 @@ public class TextureAnimation : ITexture
 	private readonly List<(ITexture, float)> _frames = [];
 	private float _totalDuration;
 
-	public Platform.Rendering.Texture? NewTexture => null;
+	public Platform.Rendering.NativeTexture? NewTexture => null;
 
 	public TextureAnimation() { }
 
@@ -19,7 +19,7 @@ public class TextureAnimation : ITexture
 	public INativeTexture GetNativeTexture(float time)
 	{
 		if (_frames.Count == 0)
-			return Assets.MissingTexture.GetNativeTexture();
+			return null;
 
 		time %= _totalDuration;
 		float counter = 0;
@@ -27,12 +27,12 @@ public class TextureAnimation : ITexture
 		foreach (var (frame, frameDuration) in _frames)
 		{
 			if (time < counter + frameDuration)
-				return frame.GetNativeTexture(time - counter);
+				return null; //frame.GetNativeTexture(time - counter);
 
 			counter += frameDuration;
 		}
 
-		return Assets.MissingTexture.GetNativeTexture();
+		return null;
 	}
 
 	public Rectangle GetUVCoordinates(float time)
@@ -52,12 +52,6 @@ public class TextureAnimation : ITexture
 		}
 
 		return Assets.MissingTexture.GetUVCoordinates(time);
-	}
-
-	public void UploadImage(Image image)
-	{
-		throw new Exception("Cannot upload Image to TextureAnimation! " +
-			"Upload images to the individual Textures instead.");
 	}
 
 	public void SetFiltering(TextureFiltering minFilter, TextureFiltering magFilter)

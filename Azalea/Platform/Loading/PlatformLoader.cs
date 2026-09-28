@@ -22,9 +22,10 @@ public abstract partial class PlatformLoader : ICommandHandler<LoadingCommand>
 	protected abstract void InitializationLogic();
 	protected abstract void HandleCommandLogic(LoadingCommand command);
 
-	public Texture WhitePixel { get; protected set; }
+	internal NativeTexture WhitePixel { get; set; }
+	internal abstract NativeTexture CreateEmptyTexture();
 
-	internal ObservableList<Texture> LoadedTextures { get; } = [];
+	internal ObservableList<NativeTexture> LoadedTextures { get; } = [];
 	internal ObservableList<Program> LoadedPrograms { get; } = [];
 
 	public ICommandAwaitable? Enqueue(LoadingCommand command) => Thread.Enqueue(command);

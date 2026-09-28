@@ -54,7 +54,7 @@ internal partial class GLRenderer : PlatformRenderer
 			var framebuffer = Thread.GenerateFramebuffer();
 			Thread.FramebufferTexture2D(framebuffer, colorbuffer, GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, 0);
 
-			_screenFramebuffers[i] = new(framebuffer, colorbuffer, Vector2Int.Zero);
+			_screenFramebuffers[i] = new(framebuffer, (GLTexture)colorbuffer, Vector2Int.Zero);
 		}
 
 		deviceContext.OnClientSizeChanged += newClientSize =>
@@ -95,7 +95,7 @@ internal partial class GLRenderer : PlatformRenderer
 			Debug.Assert(_windowFramebuffer.Handle.HasValue);
 			GL.BindFramebuffer(GL.FRAMEBUFFER, _windowFramebuffer.Handle.Value);
 			GL.FramebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0,
-				GL.TEXTURE_2D, lastActiveFramebuffer.Texture.NativeTexture.Handle, 0);
+				GL.TEXTURE_2D, lastActiveFramebuffer.Texture.Handle, 0);
 
 			GL.BindFramebuffer(GL.READ_FRAMEBUFFER, _windowFramebuffer.Handle.Value);
 			GL.BindFramebuffer(GL.DRAW_FRAMEBUFFER, 0);
@@ -165,7 +165,7 @@ internal partial class GLRenderer : PlatformRenderer
 				break;
 			case BindTextureCommand(var type, var texture):
 				texture.AssureReady();
-				GL.BindTexture(type, texture.NativeTexture.Handle);
+				GL.BindTexture(type, ((GLTexture)texture).Handle);
 				break;
 			case BindVertexArrayCommand(var vertexArray):
 				if (vertexArray is null)
@@ -213,7 +213,7 @@ internal partial class GLRenderer : PlatformRenderer
 				Debug.Assert(framebuffer.Handle is not null);
 				texture.AssureReady();
 				GL.BindFramebuffer(target, framebuffer.Handle.Value);
-				GL.FramebufferTexture2D(target, attachment, textarget, texture.NativeTexture.Handle, level);
+				GL.FramebufferTexture2D(target, attachment, textarget, ((GLTexture)texture).Handle, level);
 				GL.BindFramebuffer(target, 0);
 				break;
 			case GenerateBufferCommand(var buffer):
@@ -237,7 +237,7 @@ internal partial class GLRenderer : PlatformRenderer
 				GL.TexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
 				GL.BindTexture(GL.TEXTURE_2D, 0);
 
-				texture.Initialize(new GLTexture(textureHandle));
+				((GLTexture)texture).Initialize(textureHandle);
 				break;
 			case GenerateVertexArrayCommand(var vertexArray):
 				uint vertexArrayHandle = 0;
@@ -277,7 +277,7 @@ internal partial class GLRenderer : PlatformRenderer
 					GL.BufferSubData(GL.UNIFORM_BUFFER, 0, Marshal.SizeOf<Matrix4x4>(), (nint)(&projectionMatrix));
 					GL.BindBuffer(GL.UNIFORM_BUFFER, 0);
 
-					GL.BindTexture(GL.TEXTURE_2D, screenFramebuffer.Texture.NativeTexture.Handle);
+					GL.BindTexture(GL.TEXTURE_2D, screenFramebuffer.Texture.Handle);
 					GL.TexImage2D(GL.TEXTURE_2D, 0, GL.RGB, targetFramebufferSize.X, targetFramebufferSize.Y, 0, GL.RGB, GL.UNSIGNED_BYTE, nint.Zero);
 					GL.BindTexture(GL.TEXTURE_2D, 0);
 
@@ -360,22 +360,19 @@ internal partial class GLRenderer : PlatformRenderer
 				Monitor.Exit(screenFramebuffer.TextureLock);
 				break;
 			case TexImage2DCommand(var texture, var width, var height, var pixels, var generateMipmap):
-				if (texture.NativeTexture is not GLTexture glTexture)
-					throw new Exception();
-
-				GL.BindTexture(GL.TEXTURE_2D, texture.NativeTexture.Handle);
+				GL.BindTexture(GL.TEXTURE_2D, ((GLTexture)texture).Handle);
 
 				if (pixels is null)
-					GL.TexImage2D(glTexture.Target, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, IntPtr.Zero);
+					GL.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, IntPtr.Zero);
 				else
-					GL.TexImage2D(glTexture.Target, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, in pixels[0]);
+					GL.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, in pixels[0]);
 
 				GL.BindTexture(GL.TEXTURE_2D, 0);
 
 				break;
 			case TexParameteriCommand(var texture, var target, var parameter, var value):
 				texture.AssureReady();
-				GL.BindTexture(target, texture.NativeTexture.Handle);
+				GL.BindTexture(target, ((GLTexture)texture).Handle);
 				GL.TexParameteri(target, parameter, value);
 				GL.BindTexture(target, 0);
 				break;
@@ -428,11 +425,11 @@ internal partial class GLRenderer : PlatformRenderer
 	private struct ScreenFramebuffer
 	{
 		public readonly Framebuffer Framebuffer;
-		public readonly Texture Texture;
+		public readonly GLTexture Texture;
 		public object TextureLock = new();
 		public Vector2Int Size;
 
-		public ScreenFramebuffer(Framebuffer framebuffer, Texture texture, Vector2Int size)
+		public ScreenFramebuffer(Framebuffer framebuffer, GLTexture texture, Vector2Int size)
 		{
 			Framebuffer = framebuffer;
 			Texture = texture;
