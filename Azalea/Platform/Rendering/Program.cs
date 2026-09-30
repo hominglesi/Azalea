@@ -4,11 +4,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace Azalea.Platform.Rendering;
-public class Program
+public class Program : IShader
 {
 	internal uint? Handle { get; private set; }
 
-	internal Program() { }
+	public Program() { }
 
 	private readonly ManualResetEvent _initializedEvent = new(false);
 	internal void Initialize(uint handle)
@@ -32,3 +32,5 @@ public class Program
 		Debug.Assert(Handle is not null);
 	}
 }
+
+public interface IShader;

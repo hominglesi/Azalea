@@ -407,7 +407,7 @@ internal partial class GLRenderer : PlatformRenderer
 		switch (command)
 		{
 			case GenerateProgramCommand(var program, var vertexShaderCode, var fragmentShaderCode):
-				GameHost.Instance.Loader.GenerateProgram(program, vertexShaderCode, fragmentShaderCode);
+				Console.WriteLine("AAA");
 				return true;
 		}
 

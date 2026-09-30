@@ -16,9 +16,9 @@ public class RenderCoordinator
 	public PlatformRenderer Renderer { get; }
 
 	public DefaultQuadBatch DefaultQuadBatch { get; }
-	public Program DefaultQuadProgram { get; }
+	public IShader DefaultQuadShader { get; }
 
-	public Program DefaultTextProgram { get; }
+	public IShader DefaultTextShader { get; }
 
 	public RenderCoordinator(PlatformRenderer renderer)
 	{
@@ -26,22 +26,13 @@ public class RenderCoordinator
 
 		DefaultQuadBatch = new DefaultQuadBatch(this);
 
-		DefaultQuadProgram = new Program();
-		GameHost.Instance.Loader.GenerateProgram(DefaultQuadProgram,
-			_quadVertexShaderSource, _quadFragmentShaderSource);
-
-		DefaultTextProgram = new Program();
-		GameHost.Instance.Loader.GenerateProgram(DefaultTextProgram,
-			_quadVertexShaderSource, _textFragmentShaderSource);
+		DefaultQuadShader = GameHost.Instance.Loader.LoadShader(_quadVertexShaderSource, _quadFragmentShaderSource);
+		DefaultTextShader = GameHost.Instance.Loader.LoadShader(_quadVertexShaderSource, _textFragmentShaderSource);
 
 		var shaderGroup = ObjectPool<RenderCommandGroup>.Borrow();
 
-		shaderGroup.UseProgram(DefaultQuadProgram);
-
 		Renderer.Thread.SubmitCommandGroup(shaderGroup);
 		ObjectPool<RenderCommandGroup>.Return(shaderGroup);
-
-		_boundProgram = DefaultQuadProgram;
 	}
 
 	#region CommandQueue
@@ -72,7 +63,7 @@ public class RenderCoordinator
 		_commandQueue = null;
 
 		Debug.Assert(_scissorStack.Count == 0);
-		_boundProgram = null;
+		_boundShader = null;
 		_boundTexture = null;
 		_activeRenderBatch = null;
 
@@ -112,19 +103,19 @@ public class RenderCoordinator
 	}
 
 	#endregion
-	#region Program
-	private Program? _boundProgram;
-	internal void BindProgram(Program program)
+	#region Shader
+	private IShader? _boundShader;
+	public void BindShader(IShader shader)
 	{
-		Debug.Assert(program is not null);
-		if (_boundProgram == program)
+		Debug.Assert(shader is not null);
+		if (_boundShader == shader)
 			return;
 
 		assertQueueExists();
 		FlushRenderBatch();
 
-		_commandQueue.UseProgram(program);
-		_boundProgram = program;
+		_commandQueue.UseProgram((Program)shader);
+		_boundShader = shader;
 	}
 	#endregion
 	#region Texture

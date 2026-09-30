@@ -21,5 +21,5 @@ public interface ITexture
 		}
 	}
 
-	internal void Bind(RenderCoordinator coordinator, float time = 0);
+	public void Bind(RenderCoordinator coordinator, float time = 0);
 }

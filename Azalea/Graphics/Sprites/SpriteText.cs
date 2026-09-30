@@ -1,5 +1,4 @@
 ﻿using Azalea.Graphics.Rendering;
-using Azalea.Graphics.Shaders;
 using Azalea.IO.Resources;
 using Azalea.Platform.Rendering.Coordination;
 using Azalea.Text;
@@ -60,7 +59,7 @@ public class SpriteText : GameObject
 
 	public override void Draw(RenderCoordinator coordinator)
 	{
-		coordinator.BindProgram(coordinator.DefaultTextProgram);
+		coordinator.BindShader(coordinator.DefaultTextShader);
 
 		foreach (var character in _layoutProvider.GetCharacters())
 		{

@@ -2,6 +2,8 @@
 using Azalea.Lists;
 using Azalea.Platform.Rendering;
 using Azalea.Threading;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
@@ -26,7 +28,6 @@ public abstract partial class PlatformLoader : ICommandHandler<LoadingCommand>
 	internal abstract NativeTexture CreateEmptyTexture();
 
 	internal ObservableList<NativeTexture> LoadedTextures { get; } = [];
-	internal ObservableList<Program> LoadedPrograms { get; } = [];
 
 	public ICommandAwaitable? Enqueue(LoadingCommand command) => Thread.Enqueue(command);
 	internal readonly InitializationThread Thread;
@@ -49,4 +50,24 @@ public abstract partial class PlatformLoader : ICommandHandler<LoadingCommand>
 		protected override void HandleCommand(LoadingCommand command)
 			=> _loader.HandleCommandLogic(command);
 	}
+
+	#region Shaders
+
+	internal Dictionary<(string, string), IShader> LoadedShaders = [];
+	internal event Action<IShader>? OnShaderLoaded;
+
+	public IShader LoadShader(string vertexCode, string fragmentCode)
+	{
+		if (LoadedShaders.TryGetValue((vertexCode, fragmentCode), out var existing))
+			return existing;
+
+		var program = new Program();
+		Enqueue(CreateProgramCommand.Borrow(program, vertexCode, fragmentCode));
+
+		LoadedShaders.Add((vertexCode, fragmentCode), program);
+		OnShaderLoaded?.Invoke(program);
+		return program;
+	}
+
+	#endregion
 }

@@ -55,7 +55,7 @@ internal class GLLoader : PlatformLoader
 				LoadedTextures.Add(texture);
 
 				break;
-			case GenerateProgramCommand(var program, var vertexShaderCode, var fragmentShaderCode):
+			case CreateProgramCommand(var program, var vertexShaderCode, var fragmentShaderCode):
 				var vertexShader = GL.CreateShader(GL.VERTEX_SHADER);
 				var fragmentShader = GL.CreateShader(GL.FRAGMENT_SHADER);
 				unsafe
@@ -119,8 +119,6 @@ internal class GLLoader : PlatformLoader
 				GL.Flush();
 
 				program.Initialize(programHandle);
-				LoadedPrograms.Add(program);
-
 				break;
 			case RebindContextCommand():
 				Debug.Assert(Context is not null);

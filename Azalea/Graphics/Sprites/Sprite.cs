@@ -1,5 +1,4 @@
 ﻿using Azalea.Graphics.Rendering;
-using Azalea.Graphics.Shaders;
 using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
 using Azalea.Numerics;
@@ -43,8 +42,6 @@ public class Sprite : GameObject
 		_time += Platform.Time.DeltaTime;
 	}
 
-	private static Shader? _loadingShader = null;
-
 	public override void Draw(RenderCoordinator coordinator)
 	{
 		if (Alpha <= 0) return;
@@ -80,7 +77,7 @@ public class Sprite : GameObject
 			Texture.Bind(coordinator);
 		else
 			coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
-		coordinator.BindProgram(coordinator.DefaultQuadProgram);
+		coordinator.BindShader(coordinator.DefaultQuadShader);
 
 		if(Texture is null)
 			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorInfo.Color, Rectangle.One);

@@ -18,6 +18,14 @@ public abstract class LoadingCommand : ThreadCommand
 }
 
 [ThreadCommand(generateHandler: false)]
+internal partial class CreateProgramCommand : LoadingCommand
+{
+	public Program Program;
+	public string VertexShaderCode;
+	public string FragmentShaderCode;
+}
+
+[ThreadCommand(generateHandler: false)]
 internal partial class CreateTextureCommand : LoadingCommand
 {
 	public NativeTexture Texture;
@@ -37,14 +45,6 @@ internal static class CreateTextureCommand_Handler
 		handler.Enqueue(CreateTextureCommand.Borrow(texture, width, height, pixels, generateMipmap));
 		return texture;
 	}
-}
-
-[ThreadCommand]
-internal partial class GenerateProgramCommand : LoadingCommand
-{
-	public Program Program;
-	public string VertexShaderCode;
-	public string FragmentShaderCode;
 }
 
 [ThreadCommand]

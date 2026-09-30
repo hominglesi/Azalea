@@ -1,6 +1,4 @@
-﻿using Azalea.Graphics.Camera;
-using Azalea.Graphics.OpenGL.Enums;
-using Azalea.Graphics.OpenGL.Shaders;
+﻿using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Platform;
@@ -65,13 +63,6 @@ internal class GLVertexBatch<TVertex> : Disposable, IVertexBatch<TVertex>
 		_indexBuffer.Bind();
 
 		_vertexBuffer.SetData(_vertices, _vertexCount * _stride, GLUsageHint.DynamicDraw);
-
-		var projectionMatrix = MainCamera.Instance.CreateProjectionMatrix(_window.ClientSize);
-		if (_renderer.ActiveShader is GLShader glShader)
-		{
-			glShader.SetUniform("u_Projection", projectionMatrix);
-			glShader.SetUniform("u_Texture", 0);
-		}
 
 		var drawnVertices = (_vertexCount / 4) * 6;
 		GL.DrawElements(GLBeginMode.Triangles, drawnVertices, GLDataType.UnsignedInt, 0);
