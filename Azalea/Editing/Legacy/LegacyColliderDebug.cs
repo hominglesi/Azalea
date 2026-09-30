@@ -48,7 +48,7 @@ public class LegacyColliderDebug : GameObject
 			foreach (var collider in ComponentStorage<RectCollider>.GetComponents())
 			{
 				coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
-				coordinator.BindShader(coordinator.DefaultQuadShader);
+				coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);
 				coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, collider.Quad, color.Color, Rectangle.One);
 
 				var centerQuad = new Quad(collider.Position - new Vector2(5), new(10));

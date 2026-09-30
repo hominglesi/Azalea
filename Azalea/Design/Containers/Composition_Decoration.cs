@@ -57,7 +57,7 @@ public partial class Composition
 		}
 
 		coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
-		coordinator.BindShader(coordinator.DefaultQuadShader);
+		coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);
 		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, _backgroundDrawColorInfo.Color, Rectangle.One);
 	}
 
@@ -228,7 +228,7 @@ public partial class Composition
 			color.Color.TopLeft);
 
 		coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
-		coordinator.BindShader(coordinator.DefaultQuadShader);
+		coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);
 
 		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(topRect) * DrawInfo.Matrix, topColor, Rectangle.One);
 		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(rightRect) * DrawInfo.Matrix, rightColor, Rectangle.One);

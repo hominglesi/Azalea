@@ -30,7 +30,7 @@ public class Line : GameObject
 		MatrixExtentions.RotateFromLeft(ref matrix, rotation);
 
 		coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
-		coordinator.BindShader(coordinator.DefaultQuadShader);
+		coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);
 		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(rectangle) * matrix, DrawColorInfo.Color, Rectangle.One);
 	}
 }

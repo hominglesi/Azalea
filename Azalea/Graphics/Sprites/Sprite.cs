@@ -4,6 +4,7 @@ using Azalea.IO.Resources;
 using Azalea.Numerics;
 using Azalea.Platform;
 using Azalea.Platform.Loading.OpenGL;
+using Azalea.Platform.Rendering;
 using Azalea.Platform.Rendering.Coordination;
 using Azalea.Platform.Rendering.OpenGL;
 using System;
@@ -31,6 +32,8 @@ public class Sprite : GameObject
 				Size = new Vector2(_texture?.Width ?? 0, _texture?.Height ?? 0);
 		}
 	}
+
+	public IShader? Shader { get; set; }
 
 	private float _time = 0;
 	internal float Time => _time;
@@ -77,7 +80,8 @@ public class Sprite : GameObject
 			Texture.Bind(coordinator);
 		else
 			coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
-		coordinator.BindShader(coordinator.DefaultQuadShader);
+
+		coordinator.BindShader(Shader ?? GameHost.Instance.Loader.DefaultQuadShader);
 
 		if(Texture is null)
 			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorInfo.Color, Rectangle.One);

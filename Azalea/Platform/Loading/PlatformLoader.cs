@@ -25,6 +25,8 @@ public abstract partial class PlatformLoader : ICommandHandler<LoadingCommand>
 	protected abstract void HandleCommandLogic(LoadingCommand command);
 
 	internal NativeTexture WhitePixel { get; set; }
+	public IShader DefaultQuadShader { get; internal set; }
+	public IShader DefaultTextShader { get; internal set; }
 	internal abstract NativeTexture CreateEmptyTexture();
 
 	internal ObservableList<NativeTexture> LoadedTextures { get; } = [];

@@ -1,4 +1,5 @@
 ﻿// SHIPPABLE
+using Azalea.IO.Resources;
 using Azalea.Native.OpenGL;
 using Azalea.Platform.Rendering;
 using Azalea.Platform.Rendering.OpenGL;
@@ -26,6 +27,13 @@ internal class GLLoader : PlatformLoader
 		Context.MakeCurrent();
 
 		WhitePixel = this.CreateTexture(1, 1, [byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue], false);
+
+		var quadVertex = Assets.GetText("Shaders/DefaultQuadVertex.glsl")!;
+		var quadFragment = Assets.GetText("Shaders/DefaultQuadFragment.glsl")!;
+		DefaultQuadShader = LoadShader(quadVertex, quadFragment);
+
+		var textFragment = Assets.GetText("Shaders/DefaultTextFragment.glsl")!;
+		DefaultTextShader = LoadShader(quadVertex, textFragment);
 	}
 
 	protected override void HandleCommandLogic(LoadingCommand command)
