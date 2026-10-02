@@ -36,7 +36,6 @@ public abstract class GameHost
 
 	public readonly ObservableList<Application> Applications = [];
 
-	public IRenderer Renderer { get; }
 	public IAudioManager AudioManager => _audioThread.AudioManager;
 	public IConfigProvider? ConfigProvider { get; protected set; }
 	public SceneContainer SceneManager { get; }
@@ -61,8 +60,6 @@ public abstract class GameHost
 
 		#endregion
 
-		var window = CreateWindow(prefs);
-		Renderer = CreateRenderer(window);
 		_audioThread = new AudioThread(this);
 		Clipboard = CreateClipboard();
 		Physics = new PhysicsGenerator();
@@ -156,7 +153,6 @@ public abstract class GameHost
 	}
 
 	internal abstract IWindow CreateWindow(HostPreferences preferences);
-	internal abstract IRenderer CreateRenderer(IWindow window);
 	internal abstract IAudioManager CreateAudioManager();
 	internal abstract IClipboard CreateClipboard();
 	public abstract ITrayIcon CreateTrayIcon(string iconName, Image icon);

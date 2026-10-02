@@ -10,7 +10,7 @@ namespace Azalea.Design.Containers;
 
 public abstract class FlowContainer : Composition
 {
-	private Dictionary<GameObject, float> _childOrder = new();
+	private Dictionary<GameObject, float> _childOrder = [];
 
 	public FlowContainer()
 	{
@@ -117,7 +117,7 @@ public abstract class FlowContainer : Composition
 		}
 	}
 
-	public void PerformLayout()
+	public virtual void PerformLayout()
 	{
 		performLayout();
 		_layout.Validate();

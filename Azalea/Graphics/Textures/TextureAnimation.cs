@@ -3,6 +3,7 @@ using Azalea.Numerics;
 using Azalea.Platform.Rendering.Coordination;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace Azalea.Graphics.Textures;
 public class TextureAnimation : ITexture
@@ -12,11 +13,18 @@ public class TextureAnimation : ITexture
 
 	public Platform.Rendering.NativeTexture? NewTexture => null;
 
+	public int Width => throw new NotImplementedException();
+
+	public int Height => throw new NotImplementedException();
+
+	public Vector2 Size => throw new NotImplementedException();
+
 	public TextureAnimation() { }
 
 	public TextureAnimation(IEnumerable<ITexture> frames, float duration)
 		=> AddFrames(frames, duration);
 
+	/*
 	public INativeTexture GetNativeTexture(float time)
 	{
 		if (_frames.Count == 0)
@@ -34,7 +42,7 @@ public class TextureAnimation : ITexture
 		}
 
 		return null;
-	}
+	}*/
 
 	public Rectangle GetUVCoordinates(float time)
 	{

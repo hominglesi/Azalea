@@ -1,6 +1,5 @@
 ﻿using Azalea.Editing;
 using Azalea.Graphics;
-using Azalea.Graphics.OpenGL;
 using Azalea.Graphics.Rendering;
 using Azalea.IO.Configs;
 using Azalea.IO.Resources;
@@ -72,8 +71,6 @@ internal class DesktopGameHost : GameHost
 		};
 	}
 
-	internal override IRenderer CreateRenderer(IWindow window)
-		=> new GLRenderer(window);
 	internal override IAudioManager CreateAudioManager()
 	{
 		var deviceNotificationClient = new WindowsAudioDeviceNotificationClient();

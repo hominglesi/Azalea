@@ -1,5 +1,4 @@
 ﻿using Azalea.Graphics;
-using Azalea.Graphics.OpenGL;
 using Azalea.Inputs;
 using Azalea.Native.Windows;
 using Azalea.Utils;
@@ -93,8 +92,7 @@ internal class Win32Window : PlatformWindow
 
 		int pixelFormat = 0;
 		uint formatCount = 0;
-		GL.ChoosePixelFormatARB(DeviceContext, ref pixelFormatAttribs[0], IntPtr.Zero, 1, ref pixelFormat, ref formatCount);
-
+		
 		Win32.PIXELFORMATDESCRIPTOR pixelFormatDescriptor = new();
 		_ = Win32.DescribePixelFormat(DeviceContext, pixelFormat, pixelFormatDescriptor.nSize, ref pixelFormatDescriptor);
 		Win32.SetPixelFormat(DeviceContext, pixelFormat, in pixelFormatDescriptor);
@@ -107,7 +105,7 @@ internal class Win32Window : PlatformWindow
 			0
 		};
 
-		var glContext = GL.CreateContextAttribsARB(DeviceContext, false, ref openGLAttribs[0]);
+		var glContext = 0;
 		Win32.wglMakeCurrent(DeviceContext, glContext);
 
 		//Sync values with PlatformWindow
@@ -163,13 +161,7 @@ internal class Win32Window : PlatformWindow
 
 		Win32.SetPixelFormat(dummyDC, pixelFormat, in pfDescriptor);
 
-		var dummyContext = Win32.wglCreateContext(dummyDC);
-		Win32.wglMakeCurrent(dummyDC, dummyContext);
-
-		GL.ImportFunctions();
-
 		Win32.wglMakeCurrent(dummyDC, IntPtr.Zero);
-		GL.DeleteContext(dummyContext);
 		WinAPI.ReleaseDC(dummyWindow, dummyDC);
 		WinAPI.DestroyWindow(dummyWindow);
 	}
@@ -319,10 +311,10 @@ internal class Win32Window : PlatformWindow
 	}
 
 	protected override void SetVSyncImplementation(bool enabled)
-		=> GL.SwapInterval(enabled ? 1 : 0);
+		=> throw new NotImplementedException();
 
 	protected override bool GetVSyncImplementation()
-		=> GL.GetSwapInterval() == 1;
+		=> throw new NotImplementedException();
 
 	protected override bool GetCanChangeVSyncImplementation()
 	{

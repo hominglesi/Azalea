@@ -3,6 +3,7 @@ using Azalea.Numerics;
 using Azalea.Platform.Rendering.Coordination;
 using Azalea.Threading;
 using System;
+using System.Numerics;
 
 namespace Azalea.Graphics.Textures;
 public class PromisedTexture : ITexture
@@ -14,18 +15,16 @@ public class PromisedTexture : ITexture
 
 	public Platform.Rendering.NativeTexture? NewTexture => null;
 
+	public int Width => throw new NotImplementedException();
+
+	public int Height => throw new NotImplementedException();
+
+	public Vector2 Size => throw new NotImplementedException();
+
 	public PromisedTexture(ValuePromise<ITexture> promise, ITexture? loadingTexture = null)
 	{
 		_loadingTexture = loadingTexture ?? Assets.GetTexture("Textures/azalea-icon.png");
 		_promise = promise;
-	}
-
-	public INativeTexture GetNativeTexture(float time)
-	{
-		if (IsResolved == false)
-			return null; //_loadingTexture.GetNativeTexture(time);
-
-		return null; //_promise.Value.GetNativeTexture(time);
 	}
 
 	public Rectangle GetUVCoordinates(float time)

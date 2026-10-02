@@ -23,7 +23,7 @@ public static partial class ResourceStoreExtentions
 			return Assets.MissingTexture ?? throw new Exception("Texture could not be found.");
 
 		var newTexture = GameHost.Instance.Loader.CreateTexture(data.Width, data.Height, data.Data, false);
-		var texture = Renderer.CreateTexture(data, newTexture);
+		var texture = new Texture(newTexture);
 		_textureCache.AddValue(store, path, texture);
 
 		return texture;
@@ -55,7 +55,7 @@ public static partial class ResourceStoreExtentions
 			}
 
 			var newTexture = GameHost.Instance.Loader.CreateTexture(image.Width, image.Height, image.Data, false);
-			var texture = Renderer.CreateTexture(image, newTexture);
+			var texture = new Texture(newTexture);
 			_textureCache.AddValue(store, path, texture);
 			promise.Resolve(texture);
 		});
