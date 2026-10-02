@@ -68,7 +68,7 @@ public class SpriteText : GameObject
 
 			character.Texture.Bind(coordinator);
 
-			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorInfo.Color, character.Texture.GetUVCoordinates());
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorQuad, character.Texture.GetUVCoordinates());
 		}
 	}
 }

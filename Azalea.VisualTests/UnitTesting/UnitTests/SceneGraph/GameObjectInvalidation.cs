@@ -40,7 +40,7 @@ public class GameObjectInvalidation : UnitTestSuite
 
 			AddResult("Check if DrawColorInfo is correct", () =>
 			{
-				var colorInfo = _childBox.DrawColorInfo.Color;
+				var colorInfo = _childBox.DrawColorQuad;
 
 				if (colorInfo.TryGetSingleColor(out var color))
 				{
@@ -59,7 +59,7 @@ public class GameObjectInvalidation : UnitTestSuite
 
 			AddResult("Check if DrawColorInfo is correct", () =>
 			{
-				var colorInfo = _childBox.DrawColorInfo.Color;
+				var colorInfo = _childBox.DrawColorQuad;
 
 				if (colorInfo.TryGetSingleColor(out var color))
 				{
@@ -87,7 +87,7 @@ public class GameObjectInvalidation : UnitTestSuite
 
 			AddResult("Check if DrawColorInfo is correct", () =>
 			{
-				var colorInfo = _childBox.DrawColorInfo.Color;
+				var colorInfo = _childBox.DrawColorQuad;
 
 				if (colorInfo.TryGetSingleColor(out var color))
 				{
@@ -157,7 +157,7 @@ public class GameObjectInvalidation : UnitTestSuite
 
 			AddResult("Check if DrawColorInfo is correct", () =>
 			{
-				var colorInfo = _childBox.DrawColorInfo.Color;
+				var colorInfo = _childBox.DrawColorQuad;
 
 				if (colorInfo.TryGetSingleColor(out var color))
 				{
@@ -175,7 +175,7 @@ public class GameObjectInvalidation : UnitTestSuite
 
 			AddResult("Check if DrawColorInfo is correct", () =>
 			{
-				var colorInfo = _childBox.DrawColorInfo.Color;
+				var colorInfo = _childBox.DrawColorQuad;
 
 				if (colorInfo.TryGetSingleColor(out var color))
 				{
@@ -201,7 +201,7 @@ public class GameObjectInvalidation : UnitTestSuite
 
 			AddResult("Check if DrawColorInfo is correct", () =>
 			{
-				var colorInfo = _childBox.DrawColorInfo.Color;
+				var colorInfo = _childBox.DrawColorQuad;
 
 				if (colorInfo.TryGetSingleColor(out var color))
 				{

@@ -11,7 +11,7 @@ using Azalea.Platform.Rendering.Coordination;
 namespace Azalea.Design.Containers;
 public partial class Composition
 {
-	private DrawColorInfo _backgroundDrawColorInfo;
+	private ColorQuad _backgroundColorQuad;
 	private readonly LayoutValue _backgroundColorBacking = new(Invalidation.Color);
 
 	private ColorQuad? _backgroundColor;
@@ -45,23 +45,23 @@ public partial class Composition
 
 		if (_backgroundColorBacking.IsValid == false)
 		{
-			_backgroundDrawColorInfo = Parent?.DrawColorInfo ?? new DrawColorInfo(null);
+			_backgroundColorQuad = Parent?.DrawColorQuad ?? ColorQuad.SolidColor(Palette.White);
 
 			var colorInfo = BackgroundColor.Value;
 
 			if (Alpha != 1) colorInfo = colorInfo.MultiplyAlpha(Alpha);
 			if (BackgroundAlpha != 1) colorInfo = colorInfo.MultiplyAlpha(BackgroundAlpha);
 
-			_backgroundDrawColorInfo.Color.ApplyChild(colorInfo);
+			_backgroundColorQuad.ApplyChild(colorInfo);
 			_backgroundColorBacking.Validate();
 		}
 
 		coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
 		coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);
-		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, _backgroundDrawColorInfo.Color, Rectangle.One);
+		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, _backgroundColorQuad, Rectangle.One);
 	}
 
-	private DrawColorInfo _borderDrawColorInfo;
+	private ColorQuad _borderColorQuad;
 	private readonly LayoutValue _borderColorBacking = new(Invalidation.Color);
 
 	private ColorQuad? _borderColor;
@@ -105,7 +105,7 @@ public partial class Composition
 
 		if (_borderColorBacking.IsValid == false)
 		{
-			_borderDrawColorInfo = Parent?.DrawColorInfo ?? new DrawColorInfo(null);
+			_borderColorQuad = Parent?.DrawColorQuad ?? ColorQuad.SolidColor(Palette.White);
 
 			var colorInfo = BorderColor is not null
 				? BorderColor.Value
@@ -114,13 +114,13 @@ public partial class Composition
 			if (Alpha != 1) colorInfo = colorInfo.MultiplyAlpha(Alpha);
 			if (BorderAlpha != 1) colorInfo = colorInfo.MultiplyAlpha(BorderAlpha);
 
-			_borderDrawColorInfo.Color.ApplyChild(colorInfo);
+			_borderColorQuad.ApplyChild(colorInfo);
 			_borderColorBacking.Validate();
 		}
 
 		var rect = DrawRectangle;
 		var thickness = BorderThickness;
-		var color = _borderDrawColorInfo;
+		var color = _borderColorQuad;
 		var alignment = BorderAlignment;
 
 		var topRect = alignment switch
@@ -144,10 +144,10 @@ public partial class Composition
 		};
 
 		var topColor = new ColorQuad(
-			color.Color.TopLeft,
-			color.Color.TopLeft,
-			color.Color.TopRight,
-			color.Color.TopRight);
+			color.TopLeft,
+			color.TopLeft,
+			color.TopRight,
+			color.TopRight);
 
 		var rightRect = alignment switch
 		{
@@ -170,10 +170,10 @@ public partial class Composition
 		};
 
 		var rightColor = new ColorQuad(
-			color.Color.TopRight,
-			color.Color.BottomRight,
-			color.Color.BottomRight,
-			color.Color.TopRight);
+			color.TopRight,
+			color.BottomRight,
+			color.BottomRight,
+			color.TopRight);
 
 		var bottomRect = alignment switch
 		{
@@ -196,10 +196,10 @@ public partial class Composition
 		};
 
 		var bottomColor = new ColorQuad(
-			color.Color.BottomLeft,
-			color.Color.BottomLeft,
-			color.Color.BottomRight,
-			color.Color.BottomRight);
+			color.BottomLeft,
+			color.BottomLeft,
+			color.BottomRight,
+			color.BottomRight);
 
 		var leftRect = alignment switch
 		{
@@ -222,10 +222,10 @@ public partial class Composition
 		};
 
 		var leftColor = new ColorQuad(
-			color.Color.TopLeft,
-			color.Color.BottomLeft,
-			color.Color.BottomLeft,
-			color.Color.TopLeft);
+			color.TopLeft,
+			color.BottomLeft,
+			color.BottomLeft,
+			color.TopLeft);
 
 		coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
 		coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);

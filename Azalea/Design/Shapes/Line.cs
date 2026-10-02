@@ -31,6 +31,6 @@ public class Line : GameObject
 
 		coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
 		coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);
-		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(rectangle) * matrix, DrawColorInfo.Color, Rectangle.One);
+		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(rectangle) * matrix, DrawColorQuad, Rectangle.One);
 	}
 }

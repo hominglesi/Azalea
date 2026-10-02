@@ -84,8 +84,8 @@ public class Sprite : GameObject
 		coordinator.BindShader(Shader ?? GameHost.Instance.Loader.DefaultQuadShader);
 
 		if(Texture is null)
-			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorInfo.Color, Rectangle.One);
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, Rectangle.One);
 		else
-			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorInfo.Color, Texture.GetUVCoordinates(Time));
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, Texture.GetUVCoordinates(Time));
 	}
 }

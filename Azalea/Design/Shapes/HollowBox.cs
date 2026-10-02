@@ -16,7 +16,7 @@ public partial class HollowBox : GameObject
 	public override void Draw(RenderCoordinator coordinator)
 	{
 		var rect = DrawRectangle;
-		var color = DrawColorInfo;
+		var color = DrawColorQuad;
 
 		var topRect = Alignment switch
 		{
@@ -39,10 +39,10 @@ public partial class HollowBox : GameObject
 		};
 
 		var topColor = new ColorQuad(
-			color.Color.TopLeft,
-			color.Color.TopLeft,
-			color.Color.TopRight,
-			color.Color.TopRight);
+			color.TopLeft,
+			color.TopLeft,
+			color.TopRight,
+			color.TopRight);
 
 		var rightRect = Alignment switch
 		{
@@ -65,10 +65,10 @@ public partial class HollowBox : GameObject
 		};
 
 		var rightColor = new ColorQuad(
-			color.Color.TopRight,
-			color.Color.BottomRight,
-			color.Color.BottomRight,
-			color.Color.TopRight);
+			color.TopRight,
+			color.BottomRight,
+			color.BottomRight,
+			color.TopRight);
 
 		var bottomRect = Alignment switch
 		{
@@ -91,10 +91,10 @@ public partial class HollowBox : GameObject
 		};
 
 		var bottomColor = new ColorQuad(
-			color.Color.BottomLeft,
-			color.Color.BottomLeft,
-			color.Color.BottomRight,
-			color.Color.BottomRight);
+			color.BottomLeft,
+			color.BottomLeft,
+			color.BottomRight,
+			color.BottomRight);
 
 		var leftRect = Alignment switch
 		{
@@ -117,10 +117,10 @@ public partial class HollowBox : GameObject
 		};
 
 		var leftColor = new ColorQuad(
-			color.Color.TopLeft,
-			color.Color.BottomLeft,
-			color.Color.BottomLeft,
-			color.Color.TopLeft);
+			color.TopLeft,
+			color.BottomLeft,
+			color.BottomLeft,
+			color.TopLeft);
 
 		coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
 		coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);

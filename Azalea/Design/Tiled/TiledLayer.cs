@@ -58,7 +58,7 @@ public class TiledLayer : GameObject
 
 				texture.Bind(coordinator);
 				coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);
-				coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorInfo.Color, texture.GetUVCoordinates());
+				coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorQuad, texture.GetUVCoordinates());
 			}
 		}
 	}

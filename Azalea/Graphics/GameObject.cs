@@ -23,7 +23,7 @@ public partial class GameObject : Amendable, IGameObject
 	public GameObject()
 	{
 		AddLayout(_drawInfoBacking);
-		AddLayout(_drawColorInfoBacking);
+		AddLayout(_drawColorQuadBacking);
 	}
 
 	public event Action<GameObject>? OnUpdate;
@@ -996,26 +996,26 @@ public partial class GameObject : Amendable, IGameObject
 
 	public virtual Quad ScreenSpaceDrawQuad => ToScreenSpace(DrawRectangle);
 
-	private DrawColorInfo _drawColorInfo;
-	private readonly LayoutValue _drawColorInfoBacking = new(Invalidation.Color);
-	public DrawColorInfo DrawColorInfo
+	private ColorQuad _drawColorQuad;
+	private readonly LayoutValue _drawColorQuadBacking = new(Invalidation.Color);
+	public ColorQuad DrawColorQuad
 	{
 		get
 		{
-			if (_drawColorInfoBacking.IsValid)
-				return _drawColorInfo;
+			if (_drawColorQuadBacking.IsValid)
+				return _drawColorQuad;
 
-			_drawColorInfo = Parent?.DrawColorInfo ?? new DrawColorInfo(null);
+			_drawColorQuad = Parent?.DrawColorQuad ?? ColorQuad.SolidColor(Palette.White);
 
 			var colorInfo = _color;
 
 			if (Alpha != 1) colorInfo = colorInfo.MultiplyAlpha(Alpha);
 
-			_drawColorInfo.Color.ApplyChild(colorInfo);
+			_drawColorQuad.ApplyChild(colorInfo);
 
-			_drawColorInfoBacking.Validate();
+			_drawColorQuadBacking.Validate();
 
-			return _drawColorInfo;
+			return _drawColorQuad;
 		}
 	}
 }
