@@ -1,9 +1,14 @@
 ﻿using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Azalea.Native.Windows;
 public static partial class Win32
 {
 	private const string Shell32Path = "shell32.dll";
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-dragqueryfilew">Official Documentation</see></summary>
+	[LibraryImport(Shell32Path, StringMarshalling = StringMarshalling.Utf16)]
+	public static partial int DragQueryFileW(nint hDrop, uint iFile, Span<char> lpszFile, uint cch);
 
 	[StructLayout(LayoutKind.Sequential)]
 	public unsafe struct NOTIFYICONDATAW

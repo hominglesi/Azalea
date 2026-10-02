@@ -1,4 +1,5 @@
 ﻿using Azalea.Inputs;
+using Azalea.Native.Windows;
 using Azalea.Utils;
 
 namespace Azalea.Platform.Windows.XInput;
@@ -17,7 +18,7 @@ internal class XInputGamepad : IGamepad
 			_buttons[i] = new ButtonState();
 	}
 
-	public void Update(XInputGamepadData data)
+	public void Update(Win32.XINPUT_GAMEPAD data)
 	{
 		IsConnected = true;
 
@@ -26,30 +27,30 @@ internal class XInputGamepad : IGamepad
 
 		_dPad.Update();
 
-		_buttons[0].SetState(BitwiseUtils.GetSpecificBit(data.Buttons, 13));
-		_buttons[1].SetState(BitwiseUtils.GetSpecificBit(data.Buttons, 14));
-		_buttons[2].SetState(BitwiseUtils.GetSpecificBit(data.Buttons, 15));
-		_buttons[3].SetState(BitwiseUtils.GetSpecificBit(data.Buttons, 16));
-		_buttons[4].SetState(BitwiseUtils.GetSpecificBit(data.Buttons, 7));
-		_buttons[5].SetState(BitwiseUtils.GetSpecificBit(data.Buttons, 8));
-		_buttons[6].SetState(BitwiseUtils.GetSpecificBit(data.Buttons, 6));
-		_buttons[7].SetState(BitwiseUtils.GetSpecificBit(data.Buttons, 5));
-		_buttons[8].SetState(BitwiseUtils.GetSpecificBit(data.Buttons, 9));
-		_buttons[9].SetState(BitwiseUtils.GetSpecificBit(data.Buttons, 10));
-		_buttons[10].SetState(data.LeftTrigger > 0);
-		_buttons[11].SetState(data.RightTrigger > 0);
+		_buttons[0].SetState(BitwiseUtils.GetSpecificBit(data.wButtons, 13));
+		_buttons[1].SetState(BitwiseUtils.GetSpecificBit(data.wButtons, 14));
+		_buttons[2].SetState(BitwiseUtils.GetSpecificBit(data.wButtons, 15));
+		_buttons[3].SetState(BitwiseUtils.GetSpecificBit(data.wButtons, 16));
+		_buttons[4].SetState(BitwiseUtils.GetSpecificBit(data.wButtons, 7));
+		_buttons[5].SetState(BitwiseUtils.GetSpecificBit(data.wButtons, 8));
+		_buttons[6].SetState(BitwiseUtils.GetSpecificBit(data.wButtons, 6));
+		_buttons[7].SetState(BitwiseUtils.GetSpecificBit(data.wButtons, 5));
+		_buttons[8].SetState(BitwiseUtils.GetSpecificBit(data.wButtons, 9));
+		_buttons[9].SetState(BitwiseUtils.GetSpecificBit(data.wButtons, 10));
+		_buttons[10].SetState(data.bLeftTrigger > 0);
+		_buttons[11].SetState(data.bRightTrigger > 0);
 
-		var dPadUp = BitwiseUtils.GetSpecificBit(data.Buttons, 1);
-		var dPadDown = BitwiseUtils.GetSpecificBit(data.Buttons, 2);
-		var dPadLeft = BitwiseUtils.GetSpecificBit(data.Buttons, 3);
-		var dPadRight = BitwiseUtils.GetSpecificBit(data.Buttons, 4);
+		var dPadUp = BitwiseUtils.GetSpecificBit(data.wButtons, 1);
+		var dPadDown = BitwiseUtils.GetSpecificBit(data.wButtons, 2);
+		var dPadLeft = BitwiseUtils.GetSpecificBit(data.wButtons, 3);
+		var dPadRight = BitwiseUtils.GetSpecificBit(data.wButtons, 4);
 
 		_dPad.SetIndividual(dPadUp, dPadDown, dPadLeft, dPadRight);
 
-		_leftStick.Horizontal = data.ThumbLX / (float)short.MaxValue;
-		_leftStick.Vertical = data.ThumbLY / (float)short.MaxValue * -1;
-		_rightStick.Horizontal = data.ThumbRX / (float)short.MaxValue;
-		_rightStick.Vertical = data.ThumbRY / (float)short.MaxValue * -1;
+		_leftStick.Horizontal = data.sThumbLX / (float)short.MaxValue;
+		_leftStick.Vertical = data.sThumbLY / (float)short.MaxValue * -1;
+		_rightStick.Horizontal = data.sThumbRX / (float)short.MaxValue;
+		_rightStick.Vertical = data.sThumbRY / (float)short.MaxValue * -1;
 	}
 
 	public ButtonState GetButton(GamepadButton button) => _buttons[(int)button];

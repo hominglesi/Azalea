@@ -1,5 +1,6 @@
 ﻿using Azalea.Inputs;
 using Azalea.Inputs.Gamepads;
+using Azalea.Native.Windows;
 using Azalea.Platform.Windows.XInput;
 
 namespace Azalea.Platform.Windows;
@@ -23,15 +24,15 @@ internal class XInputManager : IGamepadManager
 	{
 		for (int i = 0; i < _gamepadMaxCount; i++)
 		{
-			XInputState gamepadState = new();
-			if (WinAPI.XInputGetState(i, ref gamepadState) != 0)
+			Win32.XINPUT_STATE gamepadState = new();
+			if (Win32.XInputGetState(i, ref gamepadState) != 0)
 			{
 				_gamepads[i].IsConnected = false;
 				continue;
 			}
 
 			//Skip gamepads that havent changed
-			if (gamepadState.PacketNumber == _packetNumbers[i])
+			if (gamepadState.dwPacketNumber == _packetNumbers[i])
 				continue;
 
 			_gamepads[i].Update(gamepadState.Gamepad);

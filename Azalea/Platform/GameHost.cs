@@ -152,7 +152,6 @@ public abstract class GameHost
 		_empty.Reset();
 	}
 
-	internal abstract IWindow CreateWindow(HostPreferences preferences);
 	internal abstract IAudioManager CreateAudioManager();
 	internal abstract IClipboard CreateClipboard();
 	public abstract ITrayIcon CreateTrayIcon(string iconName, Image icon);

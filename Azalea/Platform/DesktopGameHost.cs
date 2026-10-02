@@ -56,21 +56,6 @@ internal class DesktopGameHost : GameHost
 		}
 	}
 
-	internal override IWindow CreateWindow(HostPreferences prefs)
-	{
-		var windowSize = prefs.GameSize ?? _defaultWindowSize;
-		var resizable = prefs.Resizable ?? false;
-		var startingState = prefs.StartingState ?? WindowState.Normal;
-		var title = prefs.Title ?? "Azalea Game";
-		var vSync = prefs.VSync ?? true;
-
-		return new Win32Window(title, windowSize, startingState, false)
-		{
-			VSync = vSync,
-			Resizable = resizable
-		};
-	}
-
 	internal override IAudioManager CreateAudioManager()
 	{
 		var deviceNotificationClient = new WindowsAudioDeviceNotificationClient();

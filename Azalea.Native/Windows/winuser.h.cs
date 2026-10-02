@@ -24,6 +24,11 @@ public static partial class Win32
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static partial bool ClientToScreen(nint hWnd, ref POINT lpPoint);
 
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-closeclipboard">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool CloseClipboard();
+
 	/// <summary> Helper method to simplify creating icons. </summary>
 	public static IntPtr CreateIconFromPixelArray(IntPtr deviceContext, int width, int height, byte[] data)
 	{
@@ -93,6 +98,11 @@ public static partial class Win32
 	[LibraryImport(User32Path)]
 	public static partial nint DispatchMessageW(in MSG message);
 
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-emptyclipboard">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool EmptyClipboard();
+
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-flashwindow">Official Documentation</see></summary>
 	[LibraryImport(User32Path)]
 	[return: MarshalAs(UnmanagedType.Bool)]
@@ -102,6 +112,15 @@ public static partial class Win32
 	[LibraryImport(User32Path)]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static partial bool GetClientRect(nint window, out RECT rect);
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getclipboarddata">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	public static partial nint GetClipboardData(uint format);
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getcursorpos">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool GetCursorPos(out POINT point);
 
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdc">Official Documentation</see></summary>
 	[LibraryImport(User32Path)]
@@ -144,6 +163,10 @@ public static partial class Win32
 	[return: MarshalAs(UnmanagedType.Bool)]
 	public static partial bool IsIconic(nint hwnd);
 
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadcursorw">Official Documentation</see></summary>
+	[LibraryImport(User32Path, StringMarshalling = StringMarshalling.Utf16)]
+	public static partial nint LoadCursorW(nint hInstance, uint lpCursorName);
+
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-monitorfromwindow">Official Documentation</see></summary>
 	[LibraryImport(User32Path)]
 	public static partial nint MonitorFromWindow(nint hwnd, MonitorFromWindowFlags dwFlags);
@@ -184,6 +207,11 @@ public static partial class Win32
 		public POINT Point;
 	}
 
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-openclipboard">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool OpenClipboard(nint hWndNewOwner);
+
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-peekmessagew">Official Documentation</see></summary>
 	[LibraryImport(User32Path, EntryPoint = "PeekMessageW")]
 	public static partial sbyte PeekMessageW(out MSG lpMsg, nint hWnd, uint wMsgFilterMin, uint wMsgFilterMax, uint wRemoveMsg);
@@ -192,9 +220,27 @@ public static partial class Win32
 	[LibraryImport(User32Path)]
 	public static partial ushort RegisterClassExW(ref WNDCLASSEXW windowClass);
 
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-releasecapture">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool ReleaseCapture();
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-screentoclient">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	public static partial bool ScreenToClient(IntPtr window, ref POINT point);
+
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-sendmessage">Official Documentation</see></summary>
 	[LibraryImport(User32Path, StringMarshalling = StringMarshalling.Utf16)]
 	public static partial nint SendMessageW(nint window, WindowMessage message, nint wParam, nint lParam);
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setcapture">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	public static partial nint SetCapture(nint window);
+
+	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setclipboarddata">Official Documentation</see></summary>
+	[LibraryImport(User32Path)]
+	public static partial nint SetClipboardData(uint uFormat, nint hMem);
 
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setfocus">Official Documentation</see></summary>
 	[LibraryImport(User32Path)]

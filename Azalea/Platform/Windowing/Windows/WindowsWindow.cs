@@ -7,6 +7,8 @@ using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.Serialization;
@@ -40,7 +42,7 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 			hInstance = Process.GetCurrentProcess().Handle,
 			lpfnWndProc = Marshal.GetFunctionPointerForDelegate(_windowProcedure),
 			style = Win32.WNDCLASSEXW.ClassStyles.OWNDC,
-			hCursor = WinAPI.LoadCursor(nint.Zero, 32512)
+			hCursor = Win32.LoadCursorW(nint.Zero, 32512)
 		};
 
 		ClassAtom = Win32.RegisterClassExW(ref wndClass);
@@ -73,9 +75,9 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 
 		if(initializeOle)
 		{
-			var oleStatus = WinAPI.OleInitialize(0);
+			var oleStatus = Win32.OleInitialize(0);
 			if (oleStatus == 0)
-				_ = WinAPI.RegisterDragDrop(Handle, new DropTarget(this));
+				_ = Win32.RegisterDragDrop(Handle, new DropTarget(this));
 			else
 				Console.WriteLine("The Main method has not been marked with an [STAThread] attribute. You may experience some strange behaviours.");
 		}
@@ -86,17 +88,17 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 		Size = new Vector2Int(windowRect.Width, windowRect.Height);
 	}
 
-	private Vector2Int _lastMousePosition;
+	private Win32.POINT _lastMousePoint;
 
 	protected override void UpdateLogic()
 	{
-		WinAPI.GetCursorPos(out var mousePosition);
-		WinAPI.ScreenToClient(Handle, ref mousePosition);
+		Win32.GetCursorPos(out var mousePoint);
+		Win32.ScreenToClient(Handle, ref mousePoint);
 
-		if(_lastMousePosition != mousePosition)
+		if(_lastMousePoint != mousePoint)
 		{
-			EnqueueInputEvent(new MouseMoveEvent(mousePosition));
-			_lastMousePosition = mousePosition;
+			EnqueueInputEvent(new MouseMoveEvent(new Vector2(mousePoint.x, mousePoint.y)));
+			_lastMousePoint = mousePoint;
 		}
 
 		_xInputManager?.Update();
@@ -331,11 +333,11 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 				return 1;
 			case Win32.WindowMessage.LBUTTONDOWN:
 				EnqueueInputEvent(new MouseDownEvent(MouseButton.Left, BitwiseUtils.SplitValue(lParam)));
-				WinAPI.SetCapture(Handle);
+				Win32.SetCapture(Handle);
 				break;
 			case Win32.WindowMessage.LBUTTONUP:
 				EnqueueInputEvent(new MouseUpEvent(MouseButton.Left, BitwiseUtils.SplitValue(lParam)));
-				WinAPI.ReleaseCapture();
+				Win32.ReleaseCapture();
 				break;
 			case Win32.WindowMessage.RBUTTONDOWN:
 				EnqueueInputEvent(new MouseDownEvent(MouseButton.Right, BitwiseUtils.SplitValue(lParam)));
@@ -444,20 +446,29 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 			try
 			{
 				IntPtr dropHandle = medium.unionmember;
-				int fileCount = WinAPI.DragQueryFile(dropHandle, uint.MaxValue, null, 0);
+				int fileCount = Win32.DragQueryFileW(dropHandle, uint.MaxValue, [], 0);
 				files = new string[fileCount];
 				for (uint x = 0; x < fileCount; ++x)
 				{
-					int size = WinAPI.DragQueryFile(dropHandle, x, null, 0);
+					int size = Win32.DragQueryFileW(dropHandle, x, [], 0);
 					if (size > 0)
 					{
-						StringBuilder fileName = new StringBuilder(size + 1);
-						if (WinAPI.DragQueryFile(dropHandle, x, fileName, (uint)fileName.Capacity) > 0)
-							files[x] = fileName.ToString();
+						unsafe
+						{
+							char* p = (char*)NativeMemory.Alloc((uint)size + 1, sizeof(char));
+
+							try
+							{
+								var buffer = new Span<char>(p, size + 1);
+								if (Win32.DragQueryFileW(dropHandle, x, buffer, (uint)buffer.Length) > 0)
+									files[x] = buffer.ToString();
+							}
+							finally { NativeMemory.Free(p); }
+						}
 					}
 				}
 			}
-			finally { WinAPI.ReleaseStgMedium(ref medium); }
+			finally { Win32.ReleaseStgMedium(ref medium); }
 
 			window.EnqueueInputEvent(new FileDroppedEvent(files));
 
