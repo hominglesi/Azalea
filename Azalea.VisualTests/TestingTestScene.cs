@@ -22,7 +22,6 @@ public class TestingTestScene : TestScene
 	private Composition _wrapper;
 	private Composition _comp;
 	private TextContainer _composition;
-	private BasicTextBoxOld _text;
 	private Box _cursor;
 	private Box _igrac;
 	private Sprite _sprite;
@@ -184,28 +183,6 @@ public class TestingTestScene : TestScene
 
 		_composition.AddText("Text3 ", t => { t.Color = Palette.Black; });
 		_composition.AddText("Text4 ");
-
-		Add(_text = new BasicTextBoxOld()
-		{
-			Width = 500,
-			Height = 30,
-			Position = new Vector2(500, 500),
-			Text = "Ide Gas",
-			Alpha = 0
-		}
-		.RepositionBy(new(-100, 0), 0)
-		.RepositionBy(new(100, 0), 1.5f)
-		.ChangeAlphaTo(1, 1.5f)
-		.Then()
-		.Loop(x => x.RepositionBy(new(0, -100), 1)
-				.Then().RepositionBy(new(0, 100), 1), 2));
-
-		Add(new BasicTextBoxOld()
-		{
-			Width = 500,
-			Height = 30,
-			Position = new Vector2(550, 300)
-		});
 
 		Add(_comp = new FlexContainer()
 		{
