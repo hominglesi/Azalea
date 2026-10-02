@@ -75,15 +75,6 @@ public class HostBuilder
 		_preferences.ConfigName = configName;
 		return this;
 	}
-
-	public HostBuilder EnableTracing()
-	{
-		if (_preferences.PersistentDirectory is null)
-			throw new Exception("Must setup persistent directory before setting up config");
-
-		_preferences.TracingEnabled = true;
-		return this;
-	}
 }
 internal struct HostPreferences
 {
@@ -94,7 +85,6 @@ internal struct HostPreferences
 	public bool? Resizable = null;
 	public WindowState? StartingState = null;
 	public string? Title = null;
-	public bool TracingEnabled = false;
 	public bool? VSync = null;
 
 	public HostPreferences() { }

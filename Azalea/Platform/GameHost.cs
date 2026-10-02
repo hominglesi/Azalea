@@ -1,6 +1,5 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Design.Scenes;
-using Azalea.Editing;
 using Azalea.Extentions;
 using Azalea.Graphics;
 using Azalea.Graphics.Rendering;
@@ -84,26 +83,20 @@ public abstract class GameHost
 
 	protected abstract void RunGameLoop();
 
-	private long _frameStart;
 	private float _accumulator;
 	protected virtual void ProcessGameLoop()
 	{
-		_frameStart = PerformanceTrace.StartEvent();
-
-		
 		_accumulator += Time.DeltaTime;
 
 		Scheduler.InvokeScheduled();
 
 		while (_accumulator >= __fixedUpdateFrametime)
 		{
-			PerformanceTrace.RunAndTrace(CallOnFixedUpdate, "FixedUpdate");
+			CallOnFixedUpdate();
 			_accumulator -= __fixedUpdateFrametime;
 		}
 
-		PerformanceTrace.RunAndTrace(CallOnUpdate, "Update");
-
-		PerformanceTrace.AddEvent(_frameStart, "Frame");
+		CallOnUpdate();
 	}
 
 	public virtual void CallOnUpdate()

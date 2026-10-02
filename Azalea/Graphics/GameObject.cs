@@ -1,7 +1,6 @@
 ﻿using Azalea.Amends;
 using Azalea.Design.Components;
 using Azalea.Design.Containers;
-using Azalea.Editing.Legacy;
 using Azalea.Extentions;
 using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics.Colors;
@@ -33,7 +32,6 @@ public partial class GameObject : Amendable, IGameObject
 	#region Transform
 
 	private float _x;
-	[HideInInspector]
 	public float X
 	{
 		get => _x;
@@ -48,7 +46,6 @@ public partial class GameObject : Amendable, IGameObject
 	}
 
 	private float _y;
-	[HideInInspector]
 	public float Y
 	{
 		get => _y;
@@ -77,7 +74,6 @@ public partial class GameObject : Amendable, IGameObject
 	}
 
 	private float _width;
-	[HideInInspector]
 	public virtual float Width
 	{
 		get => _width;
@@ -92,7 +88,6 @@ public partial class GameObject : Amendable, IGameObject
 	}
 
 	private float _height;
-	[HideInInspector]
 	public virtual float Height
 	{
 		get => _height;
@@ -356,8 +351,6 @@ public partial class GameObject : Amendable, IGameObject
 	internal Vector2 RequiredParentSizeToFit => computeRequiredParentSizeToFit();
 
 	private float _fillAspectRatio = 1;
-
-	[HideInInspector]
 	public float FillAspectRatio
 	{
 		get => _fillAspectRatio;
@@ -378,7 +371,6 @@ public partial class GameObject : Amendable, IGameObject
 	#endregion
 
 	private Vector2 _scale = Vector2.One;
-
 	public Vector2 Scale
 	{
 		get => _scale;
@@ -393,7 +385,6 @@ public partial class GameObject : Amendable, IGameObject
 	}
 
 	private FillMode _fillMode;
-
 	public FillMode FillMode
 	{
 		get => _fillMode;
@@ -410,7 +401,6 @@ public partial class GameObject : Amendable, IGameObject
 	protected virtual Vector2 DrawScale => Scale;
 
 	private Anchor _origin = Anchor.TopLeft;
-
 	public Anchor Origin
 	{
 		get => _origin;
@@ -456,7 +446,6 @@ public partial class GameObject : Amendable, IGameObject
 	}
 
 	private Anchor _anchor = Anchor.TopLeft;
-
 	public Anchor Anchor
 	{
 		get => _anchor;
@@ -529,7 +518,6 @@ public partial class GameObject : Amendable, IGameObject
 	internal bool IsPartOfComposite => ChildID != 0;
 
 	private float depth;
-	[HideInInspector]
 	public float Depth
 	{
 		get => depth;

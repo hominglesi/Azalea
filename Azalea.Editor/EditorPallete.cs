@@ -1,6 +1,7 @@
 ﻿using Azalea.Graphics.Colors;
 
-namespace Azalea.Editing;
+namespace Azalea.Editor;
+
 public static class EditorPallete
 {
 	public static Color HoverBackground => new(180);

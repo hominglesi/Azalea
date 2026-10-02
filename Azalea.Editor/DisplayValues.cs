@@ -1,6 +1,5 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Design.Shapes;
-using Azalea.Editing.Legacy;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
@@ -8,7 +7,6 @@ using System;
 using System.Numerics;
 
 namespace Azalea.Editing;
-[SelectPointerIgnored]
 internal class DisplayValues : FlexContainer
 {
 	internal DisplayValues()

@@ -1,5 +1,4 @@
-﻿using Azalea.Editing;
-using Azalea.Graphics;
+﻿using Azalea.Graphics;
 using Azalea.Graphics.Rendering;
 using Azalea.IO.Configs;
 using Azalea.IO.Resources;
@@ -32,9 +31,6 @@ internal class DesktopGameHost : GameHost
 
 		if (prefs.ConfigName is not null)
 			ConfigProvider = new FileConfigProvider(prefs.ConfigName);
-
-		if (prefs.TracingEnabled)
-			PerformanceTrace.Enabled = true;
 	}
 
 	public override void Run(AzaleaGame game)
@@ -48,12 +44,6 @@ internal class DesktopGameHost : GameHost
 	protected override void RunGameLoop()
 	{
 		ProcessGameLoop();
-
-		if (PerformanceTrace.Enabled)
-		{
-			using var traceStream = Assets.PersistentStore.GetOrCreateStream("trace.txt");
-			PerformanceTrace.SaveEventsTo(traceStream);
-		}
 	}
 
 	internal override IAudioManager CreateAudioManager()

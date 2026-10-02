@@ -4,6 +4,7 @@ using Azalea.Design.Docking;
 using Azalea.Design.Scenes;
 using Azalea.Editing;
 using Azalea.Editor.DebugWindows;
+using Azalea.Editor.Views.Gamepads;
 using Azalea.Editor.Views.MsdfGen;
 using Azalea.Editor.Views.ResourceExploring;
 using Azalea.Graphics;
@@ -21,12 +22,10 @@ public class EditorWrapper : AzaleaGame
 {
 	private readonly AzaleaGame _wrappedGame;
 	private readonly BasicDockingContainer _mainContainer;
-	private readonly Composition _gameDockable;
+	private readonly DisplayValues _displayValues;
 
 	internal EditorWrapper(AzaleaGame game)
 	{
-		_wrappedGame = game;
-
 		Assets.AddToMainStore(new NamespacedResourceStore(new EmbeddedResourceStore(typeof(EditorWrapper).Assembly), "Resources"));
 
 		Add(_mainContainer = new BasicDockingContainer()
@@ -36,10 +35,10 @@ public class EditorWrapper : AzaleaGame
 		});
 		_mainContainer.ContentBackground.Color = Palette.White;
 
-		_mainContainer.AddDockable("Game", _gameDockable = new Composition()
+		_mainContainer.AddDockable("Game", new Composition()
 		{
 			RelativeSizeAxes = Axes.Both,
-			Child = new EditorContainer(game)
+			Child = game
 		});
 		_mainContainer.AddDockable("Resource Explorer", new EditorResourceExplorer(Assets.FileSystemStore)
 		{
@@ -50,10 +49,16 @@ public class EditorWrapper : AzaleaGame
 		{
 			RelativeSizeAxes = Axes.Both
 		});
+		_mainContainer.AddDockable("Gamepad Viewer", new GamepadViewer());
 
-		_cameraWindow = new(_wrappedGame);
-		_globalWindow = new(_wrappedGame);
-		_classWindow = new(_wrappedGame);
+		Add(_displayValues = new DisplayValues());
+		_displayValues.AddDisplayedValue("Input", () => App.Window.Thread.AverageWorkDuration.ToString("0.00ms"));
+		_displayValues.AddDisplayedValue("Scheduling", () => App.Scheduler.Thread.AverageWorkDuration.ToString("0.00ms"));
+		_displayValues.AddDisplayedValue("Rendering", () => App.Renderer.Thread.AverageWorkDuration.ToString("0.00ms"));
+
+		_cameraWindow = new(game);
+		_globalWindow = new(game);
+		_classWindow = new(game);
 	}
 
 	public static AzaleaGame Wrap(AzaleaGame game) => new EditorWrapper(game);

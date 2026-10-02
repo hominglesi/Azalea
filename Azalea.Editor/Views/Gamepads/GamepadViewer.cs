@@ -8,10 +8,10 @@ using Azalea.IO.Resources;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace Azalea.Editing.Views;
+namespace Azalea.Editor.Views.Gamepads;
 internal class GamepadViewer : Composition
 {
-	private List<GamepadDisplay> _gamepadDisplays = new();
+	private List<GamepadDisplay> _gamepadDisplays = [];
 
 	public GamepadViewer()
 	{
@@ -22,7 +22,6 @@ internal class GamepadViewer : Composition
 			Texture = Assets.GetTexture("Textures/background-pattern.png"),
 			RelativeSizeAxes = Axes.Both,
 		});
-
 	}
 
 	protected override void Update()
@@ -49,7 +48,6 @@ internal class GamepadViewer : Composition
 			Remove(lastDisplay);
 			_gamepadDisplays.Remove(lastDisplay);
 		}
-
 	}
 
 	private class GamepadDisplay : Composition
@@ -242,8 +240,7 @@ internal class GamepadViewer : Composition
 					Origin = Anchor.Center,
 					X = 276 + (horizontalDirection * 62),
 					Y = 245,
-					Children = new GameObject[]
-					{
+					Children = [
 						new Sprite()
 						{
 							Texture = getTexture("gamepad-thumb-pressed.png")
@@ -252,7 +249,7 @@ internal class GamepadViewer : Composition
 						{
 							Texture = getTexture("gamepad-thumb.png")
 						}
-					}
+					]
 				};
 		}
 		private class ButtonDisplay : Composition

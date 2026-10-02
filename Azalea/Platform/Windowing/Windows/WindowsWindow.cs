@@ -82,6 +82,8 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 				Console.WriteLine("The Main method has not been marked with an [STAThread] attribute. You may experience some strange behaviours.");
 		}
 
+		_xInputManager = new XInputManager();
+
 		// Set actual window position
 		Win32.GetWindowRect(Handle, out windowRect);
 		Position = new Vector2Int(windowRect.X, windowRect.Y);
