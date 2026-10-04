@@ -1,5 +1,5 @@
 ﻿using Azalea.Graphics.Textures;
-using Azalea.Sounds;
+using Azalea.Platform.Audio;
 using Azalea.Utils;
 using System;
 using System.IO;
@@ -103,7 +103,7 @@ public static partial class Assets
 	/// <summary>
 	/// Gets a sound from the main resource store.
 	/// </summary>
-	public static Sound GetSound(string path) => MainStore.GetSound(path);
+	public static Sounds.Sound GetSound(string path) => MainStore.GetSound(path);
 
 	/// <summary>
 	/// Gets a short sound byte from the main resource store.

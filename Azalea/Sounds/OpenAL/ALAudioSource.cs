@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 
 namespace Azalea.Sounds.OpenAL;
+
 internal class ALAudioSource : IAudioSource
 {
 	private readonly ALAudioManager _audioManager;

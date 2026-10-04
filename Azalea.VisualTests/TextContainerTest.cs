@@ -3,11 +3,11 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
-using Azalea.Platform;
-using Azalea.Utils;
 using Azalea.Platform.Windowing;
+using Azalea.Utils;
 
 namespace Azalea.VisualTests;
+
 public class TextContainerTest : TestScene
 {
 	private ScrollableContainer _scrollable;
@@ -55,7 +55,6 @@ public class TextContainerTest : TestScene
 
 			_flex.Add(container);
 		}
-
 	}
 
 	protected override void Initialize()
@@ -66,7 +65,7 @@ public class TextContainerTest : TestScene
 
 	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		if(e.Key == Keys.Space)
+		if (e.Key == Keys.Space)
 		{
 			_scrollable.Size = _scrollable.ToLocalSpace(e.State.MousePosition);
 			return true;

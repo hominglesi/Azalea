@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Azalea.Sounds.FFmpeg;
+
 internal unsafe partial class FFmpegStreamReader : Disposable
 {
 	const int AV_TIME_BASE = 0xf4240;
@@ -20,6 +21,7 @@ internal unsafe partial class FFmpegStreamReader : Disposable
 
 	private readonly byte* _ioBuffer;
 	private readonly int _audioStreamIndex = -1;
+	private readonly Stream _stream;
 	private readonly GCHandle _streamHandle;
 	private readonly AVFormatContext* _formatContext;
 	private readonly AVIOContext* _avioContext;
@@ -60,8 +62,10 @@ internal unsafe partial class FFmpegStreamReader : Disposable
 
 	private static bool _supressLogging = false;
 
-	public unsafe FFmpegStreamReader(Stream stream)
+	public FFmpegStreamReader(Stream stream)
 	{
+		_stream = stream;
+
 		_ioBuffer = (byte*)av_malloc(__ioBufferSize);
 
 		_streamHandle = GCHandle.Alloc(stream);
@@ -309,6 +313,7 @@ internal unsafe partial class FFmpegStreamReader : Disposable
 		}
 
 		_streamHandle.Free();
+		_stream.Dispose();
 
 		// Freeing the buffer results in a crash
 		// We are currently just tanking the leak

@@ -7,14 +7,12 @@ using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
-using System.Runtime.Serialization;
-using System.Text;
 
 namespace Azalea.Platform.Windowing.Windows;
+
 internal class WindowsWindow(string title, Vector2Int clientSize, bool initiallyVisible, bool initializeOle)
 	: PlatformWindow(title, clientSize, initiallyVisible)
 {
@@ -73,7 +71,7 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 		if (Handle == nint.Zero)
 			throw new Exception($"Could not create Window. (Error {Marshal.GetLastWin32Error()})");
 
-		if(initializeOle)
+		if (initializeOle)
 		{
 			var oleStatus = Win32.OleInitialize(0);
 			if (oleStatus == 0)
@@ -97,7 +95,7 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 		Win32.GetCursorPos(out var mousePoint);
 		Win32.ScreenToClient(Handle, ref mousePoint);
 
-		if(_lastMousePoint != mousePoint)
+		if (_lastMousePoint != mousePoint)
 		{
 			EnqueueInputEvent(new MouseMoveEvent(new Vector2(mousePoint.x, mousePoint.y)));
 			_lastMousePoint = mousePoint;
@@ -463,7 +461,7 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 							{
 								var buffer = new Span<char>(p, size + 1);
 								if (Win32.DragQueryFileW(dropHandle, x, buffer, (uint)buffer.Length) > 0)
-									files[x] = buffer.ToString();
+									files[x] = buffer[..^1].ToString();
 							}
 							finally { NativeMemory.Free(p); }
 						}

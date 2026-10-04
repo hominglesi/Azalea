@@ -2,6 +2,7 @@
 using System.Text;
 
 namespace Azalea.Utils;
+
 public static class TextUtils
 {
 	private static string[] words = new[]{"lorem", "ipsum", "dolor", "sit", "amet", "consectetuer",
@@ -35,6 +36,6 @@ public static class TextUtils
 		var minutes = (int)Math.Round(secondDuration) / 60;
 		var seconds = (int)Math.Round(secondDuration % 60);
 
-		return $"{minutes}:{seconds}";
+		return $"{minutes}:{seconds:00}";
 	}
 }

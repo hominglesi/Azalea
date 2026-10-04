@@ -1,8 +1,8 @@
-﻿using Azalea.Utils;
-using System;
+﻿using System;
 
 namespace Azalea.Platform.Audio.OpenAL;
-internal partial class ALByteSource(uint handle)
+
+internal class ALByteSource(uint handle)
 {
 	public readonly uint Handle = handle;
 

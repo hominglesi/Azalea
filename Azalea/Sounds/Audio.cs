@@ -1,16 +1,12 @@
 ﻿using Azalea.Platform;
 
 namespace Azalea.Sounds;
+
 public static class Audio
 {
 	private static IAudioManager? _instance;
 	public static IAudioManager Instance => _instance ??= GameHost.Instance.AudioManager;
 
-	public static float MasterVolume
-	{
-		get => Instance.MasterVolume;
-		set => Instance.MasterVolume = value;
-	}
 
 	public static IAudioInstance Play(Sound sound, float gain = 1, bool looping = false)
 		=> Instance.Play(sound, gain, looping);

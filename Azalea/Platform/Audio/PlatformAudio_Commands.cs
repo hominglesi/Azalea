@@ -1,7 +1,9 @@
-﻿using Azalea.Threading;
+﻿using Azalea.Sounds;
+using Azalea.Threading;
 using System.Diagnostics;
 
 namespace Azalea.Platform.Audio;
+
 public abstract class AudioCommand : ThreadCommand
 {
 	internal static volatile new int TotalCreated = 0;
@@ -48,6 +50,26 @@ internal partial class PlayByteCommand : AudioCommand
 {
 	public AudioByteInstance Instance;
 	public SoundByte SoundByte;
+}
+
+
+[ThreadCommand(generateHandler: false)]
+internal partial class PlayCommand : AudioCommand
+{
+	public AudioInstance Instance;
+	public Sound SoundByte;
+}
+
+internal static class PlayCommand_Handler
+{
+	internal static IAudioInstance Play(this ICommandHandler<AudioCommand> handler, Sound sound, float gain, bool looping)
+	{
+		Debug.Assert(handler is PlatformAudio);
+
+		var instance = new AudioInstance((PlatformAudio)handler, looping, gain);
+		handler.Enqueue(PlayCommand.Borrow(instance, sound));
+		return instance;
+	}
 }
 
 internal static class PlayByteCommand_Handler
