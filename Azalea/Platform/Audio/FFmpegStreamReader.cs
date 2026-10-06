@@ -1,5 +1,4 @@
-﻿using Azalea.Sounds.FFmpeg.Native;
-using Azalea.Utils;
+﻿using Azalea.Utils;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -7,7 +6,9 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace Azalea.Sounds.FFmpeg;
+using static Azalea.Native.FFmpeg.FFmpeg;
+
+namespace Azalea.Platform.Audio;
 
 internal unsafe partial class FFmpegStreamReader : Disposable
 {

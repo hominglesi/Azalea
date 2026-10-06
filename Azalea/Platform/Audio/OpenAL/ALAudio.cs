@@ -1,5 +1,4 @@
 ﻿using Azalea.Native.OpenAL;
-using Azalea.Sounds.FFmpeg;
 using System.Buffers;
 using System.Diagnostics;
 

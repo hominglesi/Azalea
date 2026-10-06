@@ -11,6 +11,7 @@ using Azalea.Simulations;
 using Azalea.Threading;
 using System;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Azalea.Platform;
@@ -50,10 +51,16 @@ public abstract class GameHost
 
 		_instance = this;
 
-		Prepare();
+		if (NativeLibrary.TryLoad("soft_oal", out var _) == false)
+		{
+			throw new Exception("Native binaries could not be loaded!\n" +
+				"If you are a developer make sure to specify a RuntimeIdentifier in the project. " +
+				"Valid runtimes are: 'win-x64'.\n" +
+				"If you are a user and have moved the executable file " +
+				"make sure to move all the other files with it.");
+		}
 
 		Loader = new GLLoader();
-
 		Audio = PlatformAudio.Create();
 
 		#endregion
@@ -65,8 +72,6 @@ public abstract class GameHost
 		_root = new Composition();
 		Time.Setup();
 	}
-
-	protected virtual void Prepare() { }
 
 	public virtual void Run(AzaleaGame game)
 	{

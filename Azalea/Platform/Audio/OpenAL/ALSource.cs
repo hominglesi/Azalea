@@ -1,5 +1,4 @@
-﻿using Azalea.Sounds.FFmpeg;
-using System;
+﻿using System;
 
 namespace Azalea.Platform.Audio.OpenAL;
 

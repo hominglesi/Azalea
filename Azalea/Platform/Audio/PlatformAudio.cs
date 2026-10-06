@@ -1,13 +1,13 @@
 ﻿using Azalea.Platform.Audio.OpenAL;
 using Azalea.Platform.Audio.Windows;
 using Azalea.Threading;
-using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Azalea.Platform.Audio;
+
 public abstract partial class PlatformAudio : ICommandHandler<AudioCommand>
 {
 	internal Action<IAudioInstance>? InstanceStarted;
@@ -36,10 +36,7 @@ public abstract partial class PlatformAudio : ICommandHandler<AudioCommand>
 		public override string DisplayName => "Audio Thread";
 
 		public ManualResetEvent InitializedEvent = new(false);
-		protected override void Initialize()
-		{
-
-		}
+		protected override void Initialize() { }
 
 		protected override void Update()
 			=> _audio.UpdateLogic();
