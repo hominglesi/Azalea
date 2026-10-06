@@ -8,8 +8,6 @@ namespace Azalea.Platform;
 
 internal class DesktopGameHost : GameHost
 {
-	private readonly Vector2Int _defaultWindowSize = new(1280, 720);
-
 	internal DesktopGameHost(HostPreferences prefs)
 		: base(prefs)
 	{

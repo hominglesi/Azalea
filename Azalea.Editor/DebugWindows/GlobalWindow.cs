@@ -3,7 +3,6 @@ using Azalea.Editor.Design.Gui;
 using Azalea.Platform;
 using Azalea.Platform.Loading;
 using Azalea.Platform.Rendering;
-using Azalea.Platform.Rendering.OpenGL;
 using Azalea.Threading;
 using Azalea.Utils;
 using System;
@@ -11,6 +10,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 namespace Azalea.Editor.DebugWindows;
+
 internal class GlobalWindow(AzaleaGame game)
 {
 	private AzaleaGame _game = game;
@@ -66,10 +66,10 @@ internal class GlobalWindow(AzaleaGame game)
 
 			_window.FinishGroup();
 
-			GameHost.Instance.Applications.OnItemAdded += applicaiton => Scheduler.Schedule(
-				() => createApplicationGroup(applicaiton));
-			GameHost.Instance.Applications.OnItemRemoved += application => Scheduler.Schedule(
-				() => removeApplicationGroup(application));
+			GameHost.Instance.Applications.OnItemAdded +=
+				applicaiton => _window.App.Scheduler.InvokeAction(() => createApplicationGroup(applicaiton));
+			GameHost.Instance.Applications.OnItemRemoved +=
+				application => _window.App.Scheduler.InvokeAction(() => removeApplicationGroup(application));
 
 			_window.FinishGroup();
 			_window.AddGroup("ThreadCommands");

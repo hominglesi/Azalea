@@ -4,7 +4,8 @@ using System;
 using System.Diagnostics;
 
 namespace Azalea.Platform.Scheduling;
-public class PlatformScheduler
+
+public class PlatformScheduler : ICommandHandler<ThreadCommand>
 {
 	protected PlatformScheduler(Windowing.PlatformWindow window)
 	{
@@ -19,6 +20,8 @@ public class PlatformScheduler
 
 		Thread.Stop();
 	}
+
+	public ICommandAwaitable? Enqueue(ThreadCommand command) => Thread.Enqueue(command);
 
 	public void InjectProtocol(Action<Windowing.PlatformWindow, PlatformRenderer> protocol)
 		=> Thread.InjectProtocol(protocol);
@@ -38,13 +41,27 @@ public class PlatformScheduler
 			: base(interval)
 		{
 			Window = window;
-			//For now a window has to have a renderer to enable scheduling!
+
 			Debug.Assert(window.SubscribedRenderer is not null);
 			Renderer = window.SubscribedRenderer;
 		}
 
 		protected override void Initialize() { }
 		protected override void Update() => Protocol?.Invoke(Window, Renderer);
+
+		protected override void HandleCommand(ThreadCommand command)
+		{
+			switch (command)
+			{
+				case InvokeActionCommand(var action):
+					action.Invoke();
+					break;
+				default:
+					throw new NotImplementedException("Command handling hasn't been implemented");
+			}
+
+			command.Return();
+		}
 
 		private readonly object _protocolInjectionLock = new();
 		internal Action<Windowing.PlatformWindow, PlatformRenderer>? Protocol = null;

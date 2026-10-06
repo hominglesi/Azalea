@@ -8,9 +8,6 @@ using Azalea.Graphics.Sprites;
 using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
 using Azalea.Platform;
-using Azalea.Threading;
-using System;
-using System.Threading.Tasks;
 
 namespace Azalea.VisualTests;
 
@@ -63,32 +60,6 @@ public class TestingTestScene : TestScene
 
 			container.Add(sprite);
 		}*/
-
-		Console.WriteLine("gas");
-
-		Scheduler.Run(() =>
-		{
-			_ = Scheduler.Schedule(() => Console.WriteLine("Ide Gas 0"));
-			return Task.CompletedTask;
-		});
-
-		var promise = Scheduler.Run(async () =>
-		{
-			await Task.Delay(1000);
-			Console.WriteLine("gas 1");
-		});
-
-		promise.ThenRun(async () =>
-		{
-			await Task.Delay(1000);
-			Console.WriteLine("gas 2");
-		});
-
-		promise.ThenRun(async () =>
-		{
-			await Task.Delay(2000);
-			Console.WriteLine("gas 3");
-		});
 
 		var tileset = Assets.MainStore.GetTileset("MapForTiled/TilesForMap.tsx");
 

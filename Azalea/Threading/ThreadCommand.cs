@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace Azalea.Threading;
+
 public abstract class ThreadCommand
 {
 	public static volatile int TotalCreated = 0;
@@ -15,6 +16,12 @@ public abstract class ThreadCommand
 	protected virtual void Cleanup() { }
 
 	public override string ToString() => GetType().Name;
+}
+
+[ThreadCommand]
+public partial class InvokeActionCommand : ThreadCommand
+{
+	public Action Action;
 }
 
 [AttributeUsage(AttributeTargets.Class)]

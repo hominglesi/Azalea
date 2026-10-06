@@ -6,6 +6,7 @@ using Azalea.Threading;
 using System.Numerics;
 
 namespace Azalea.Editor.DebugWindows.Inspectors;
+
 internal class PlatformRendererInspector
 {
 	public static GUIWindow Create(Application app, PlatformRenderer renderer, GUIWindow? origin = null)
@@ -21,8 +22,8 @@ internal class PlatformRendererInspector
 		{
 			renderer.Thread.SnapshotNextFrame = true;
 		});
-		renderer.Thread.CommandSnapshotCreated += commands => Scheduler.Schedule(
-			() =>
+		renderer.Thread.CommandSnapshotCreated += commands =>
+			window.App.Scheduler.InvokeAction(() =>
 			{
 				commandsGroup!.Clear();
 				window.SelectGroup(commandsGroup);
