@@ -1,5 +1,4 @@
 ﻿using Azalea.Sounds.FFmpeg.Native;
-using Azalea.Sounds.OpenAL;
 using Azalea.Utils;
 using System;
 using System.Buffers;
@@ -32,9 +31,11 @@ internal unsafe partial class FFmpegStreamReader : Disposable
 	private readonly AVPacket* _packet;
 	private readonly AVFrame* _frame;
 
+	private readonly static delegate* unmanaged[Cdecl]<void*, int, byte*, byte*, void> _logCallback;
 	static FFmpegStreamReader()
 	{
-		av_log_set_callback(&logCallback);
+		_logCallback = &logCallback;
+		av_log_set_callback(_logCallback);
 	}
 
 	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
@@ -61,6 +62,7 @@ internal unsafe partial class FFmpegStreamReader : Disposable
 	}
 
 	private static bool _supressLogging = false;
+	public static int FREQUENCY = 48000;
 
 	public FFmpegStreamReader(Stream stream)
 	{
@@ -154,7 +156,7 @@ internal unsafe partial class FFmpegStreamReader : Disposable
 			&swr,
 			&outLayout,
 			AV_SAMPLE_FMT_S16,
-			ALAudioManager.DEVICE_FREQUENCY, // This is kinda hard-coded for now but it will be changed
+			FREQUENCY, // This is kinda hard-coded for now but it will be changed
 
 			&inLayout,
 			_codecContext->sample_fmt,
@@ -183,7 +185,7 @@ internal unsafe partial class FFmpegStreamReader : Disposable
 	{
 		// Since we now do the resampling ourselves, this will always just be
 		// the device frequency
-		sampleRate = ALAudioManager.DEVICE_FREQUENCY;
+		sampleRate = FREQUENCY;
 
 		if (Disposed)
 		{
@@ -209,7 +211,7 @@ internal unsafe partial class FFmpegStreamReader : Disposable
 
 	private bool readChunk(out byte[] pcm, out int pcmLength, out int sampleRate, out float startTime)
 	{
-		sampleRate = ALAudioManager.DEVICE_FREQUENCY;
+		sampleRate = FREQUENCY;
 
 		if (_pendingChunks.Count > 0)
 		{

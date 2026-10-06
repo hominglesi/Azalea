@@ -2,15 +2,12 @@
 using Azalea.Design.Scenes;
 using Azalea.Extentions;
 using Azalea.Graphics;
-using Azalea.Graphics.Rendering;
-using Azalea.Inputs;
 using Azalea.IO.Configs;
 using Azalea.Lists;
 using Azalea.Platform.Audio;
 using Azalea.Platform.Loading;
 using Azalea.Platform.Loading.OpenGL;
 using Azalea.Simulations;
-using Azalea.Sounds;
 using Azalea.Threading;
 using System;
 using System.Numerics;
@@ -29,22 +26,20 @@ public abstract class GameHost
 
 	public PlatformLoader Loader { get; }
 
+	public PlatformAudio Audio { get; }
+
 	#endregion
 
 	private const float __fixedUpdateFrametime = 1f / 60;
 
 	public readonly ObservableList<Application> Applications = [];
 
-	public IAudioManager AudioManager => _audioThread.AudioManager;
 	public IConfigProvider? ConfigProvider { get; protected set; }
 	public SceneContainer SceneManager { get; }
 	public PhysicsGenerator Physics { get; }
 	public IClipboard Clipboard { get; }
 
 	private readonly Composition _root;
-
-	private AudioThread _audioThread;
-	public PlatformAudio Audio;
 
 	internal GameHost(HostPreferences prefs)
 	{
@@ -55,20 +50,23 @@ public abstract class GameHost
 
 		_instance = this;
 
+		Prepare();
+
 		Loader = new GLLoader();
+
+		Audio = PlatformAudio.Create();
 
 		#endregion
 
-		_audioThread = new AudioThread(this);
 		Clipboard = CreateClipboard();
 		Physics = new PhysicsGenerator();
 		SceneManager = new SceneContainer();
 
-		Audio = PlatformAudio.Create();
-
 		_root = new Composition();
 		Time.Setup();
 	}
+
+	protected virtual void Prepare() { }
 
 	public virtual void Run(AzaleaGame game)
 	{
@@ -145,7 +143,6 @@ public abstract class GameHost
 		_empty.Reset();
 	}
 
-	internal abstract IAudioManager CreateAudioManager();
 	internal abstract IClipboard CreateClipboard();
 	public abstract ITrayIcon CreateTrayIcon(string iconName, Image icon);
 

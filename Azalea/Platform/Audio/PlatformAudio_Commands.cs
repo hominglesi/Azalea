@@ -1,5 +1,4 @@
-﻿using Azalea.Sounds;
-using Azalea.Threading;
+﻿using Azalea.Threading;
 using System.Diagnostics;
 
 namespace Azalea.Platform.Audio;
@@ -60,9 +59,9 @@ internal partial class PlayCommand : AudioCommand
 	public Sound SoundByte;
 }
 
-internal static class PlayCommand_Handler
+public static class PlayCommand_Handler
 {
-	internal static IAudioInstance Play(this ICommandHandler<AudioCommand> handler, Sound sound, float gain, bool looping)
+	public static IAudioInstance Play(this ICommandHandler<AudioCommand> handler, Sound sound, float gain = 1, bool looping = false)
 	{
 		Debug.Assert(handler is PlatformAudio);
 
@@ -72,9 +71,9 @@ internal static class PlayCommand_Handler
 	}
 }
 
-internal static class PlayByteCommand_Handler
+public static class PlayByteCommand_Handler
 {
-	internal static IAudioInstance PlayByte(this ICommandHandler<AudioCommand> handler, SoundByte soundByte, float gain, bool looping)
+	public static IAudioInstance PlayByte(this ICommandHandler<AudioCommand> handler, SoundByte soundByte, float gain = 1, bool looping = false)
 	{
 		Debug.Assert(handler is PlatformAudio);
 

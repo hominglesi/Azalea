@@ -1,12 +1,12 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Design.Tiled;
 using Azalea.Graphics.Sprites;
-using Azalea.Inputs;
 using Azalea.IO.Resources;
 using Azalea.Platform;
 using System.Numerics;
 
 namespace Azalea.VisualTests;
+
 internal class CameraTest : TestScene
 {
 	private CameraContainer _worldContainer;

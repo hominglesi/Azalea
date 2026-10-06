@@ -2,17 +2,14 @@
 using Azalea.Design.Containers;
 using Azalea.Design.Shapes;
 using Azalea.Design.Tiled;
-using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.Textures;
-using Azalea.Inputs;
 using Azalea.IO.Resources;
 using Azalea.Platform;
 using Azalea.Threading;
 using System;
-using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Azalea.VisualTests;
@@ -55,6 +52,7 @@ public class TestingTestScene : TestScene
 
 		Add(container);
 
+		/*
 		foreach (var imageURL in _imageURLs)
 		{
 			var sprite = new Sprite()
@@ -64,7 +62,7 @@ public class TestingTestScene : TestScene
 			};
 
 			container.Add(sprite);
-		}
+		}*/
 
 		Console.WriteLine("gas");
 

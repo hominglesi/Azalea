@@ -1,12 +1,8 @@
 ﻿using Azalea.Graphics;
-using Azalea.Graphics.Rendering;
 using Azalea.IO.Configs;
 using Azalea.IO.Resources;
-using Azalea.Platform.Audio.Windows;
 using Azalea.Platform.Windows;
-using Azalea.Sounds;
 using Azalea.Sounds.FFmpeg;
-using Azalea.Sounds.OpenAL;
 using Azalea.Threading;
 using System;
 using System.IO;
@@ -14,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Azalea.Platform;
+
 internal class DesktopGameHost : GameHost
 {
 	private readonly Vector2Int _defaultWindowSize = new(1280, 720);
@@ -21,8 +18,6 @@ internal class DesktopGameHost : GameHost
 	internal DesktopGameHost(HostPreferences prefs)
 		: base(prefs)
 	{
-		setupNativeLibraries();
-
 		if (prefs.PersistentDirectory is not null)
 			Assets.SetupPersistentStore(prefs.PersistentDirectory);
 
@@ -33,35 +28,7 @@ internal class DesktopGameHost : GameHost
 			ConfigProvider = new FileConfigProvider(prefs.ConfigName);
 	}
 
-	public override void Run(AzaleaGame game)
-	{
-		base.Run(game);
-
-		ConfigProvider?.Save();
-		((ALAudioManager)AudioManager)?.Dispose();
-	}
-
-	protected override void RunGameLoop()
-	{
-		ProcessGameLoop();
-	}
-
-	internal override IAudioManager CreateAudioManager()
-	{
-		var deviceNotificationClient = new WindowsAudioDeviceNotificationClient();
-		return new ALAudioManager(deviceNotificationClient);
-	}
-	internal override IClipboard CreateClipboard()
-		=> new WindowsClipboard();
-
-	public override ITrayIcon CreateTrayIcon(string iconName, Image icon)
-	{
-		ArgumentNullException.ThrowIfNull(icon, nameof(icon));
-
-		return null;
-	}
-
-	private void setupNativeLibraries()
+	protected override void Prepare()
 	{
 		NativeLibrary.SetDllImportResolver(typeof(AzaleaGame).Assembly,
 			(libraryName, assembly, searchPath) =>
@@ -110,5 +77,27 @@ internal class DesktopGameHost : GameHost
 
 		static string createPath(string file)
 					=> Path.Combine(AppContext.BaseDirectory, file);
+	}
+
+	public override void Run(AzaleaGame game)
+	{
+		base.Run(game);
+
+		ConfigProvider?.Save();
+	}
+
+	protected override void RunGameLoop()
+	{
+		ProcessGameLoop();
+	}
+
+	internal override IClipboard CreateClipboard()
+		=> new WindowsClipboard();
+
+	public override ITrayIcon CreateTrayIcon(string iconName, Image icon)
+	{
+		ArgumentNullException.ThrowIfNull(icon, nameof(icon));
+
+		return null;
 	}
 }

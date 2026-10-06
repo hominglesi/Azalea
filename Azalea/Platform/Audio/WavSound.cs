@@ -5,7 +5,7 @@ using System.Buffers.Binary;
 using System.Diagnostics;
 using System.IO;
 
-namespace Azalea.Sounds;
+namespace Azalea.Platform.Audio;
 
 //http://soundfile.sapp.org/doc/WaveFormat/
 internal class WavSound

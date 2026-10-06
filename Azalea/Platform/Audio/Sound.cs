@@ -1,7 +1,8 @@
 ﻿using Azalea.IO.Resources;
 using System.IO;
 
-namespace Azalea.Sounds;
+namespace Azalea.Platform.Audio;
+
 public class Sound
 {
 	private readonly IResourceStore _containingStore;

@@ -133,6 +133,7 @@ internal class ALAudio : PlatformAudio
 
 				var deviceFrequency = 0;
 				ALC.GetIntegerv(_device, ALC.FREQUENCY, 1, ref deviceFrequency);
+				FFmpegStreamReader.FREQUENCY = deviceFrequency;
 
 				var sourceHandles = new uint[AudioSources.Length];
 				AL.GenSources(AudioSources.Length, ref sourceHandles[0]);

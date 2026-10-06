@@ -1,13 +1,9 @@
-﻿using Azalea.Graphics.Rendering;
-using Azalea.Graphics.Textures;
+﻿using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
 using Azalea.Numerics;
 using Azalea.Platform;
-using Azalea.Platform.Loading.OpenGL;
 using Azalea.Platform.Rendering;
 using Azalea.Platform.Rendering.Coordination;
-using Azalea.Platform.Rendering.OpenGL;
-using System;
 using System.Numerics;
 
 namespace Azalea.Graphics.Sprites;
@@ -77,13 +73,13 @@ public class Sprite : GameObject
 
 
 		if (Texture is not null)
-			Texture.Bind(coordinator);
+			Texture.Bind(coordinator, Time);
 		else
 			coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
 
 		coordinator.BindShader(Shader ?? GameHost.Instance.Loader.DefaultQuadShader);
 
-		if(Texture is null)
+		if (Texture is null)
 			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, Rectangle.One);
 		else
 			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, Texture.GetUVCoordinates(Time));

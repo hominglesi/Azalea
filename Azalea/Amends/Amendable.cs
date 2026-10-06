@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 namespace Azalea.Amends;
+
 public abstract class Amendable
 {
 	private List<IAmend> _amends = new();
@@ -53,11 +54,13 @@ public abstract class Amendable
 
 	public void FinishAmends()
 	{
-		foreach (var amend in _amends)
+		var i = 0;
+		while (_amends.Count > i)
 		{
-			if (amend.HasStarted == false) amend.Start();
+			if (_amends[i].HasStarted == false)
+				_amends[i].Start();
 
-			amend.Finish();
+			_amends[i++].Finish();
 		}
 
 		_amends.Clear();

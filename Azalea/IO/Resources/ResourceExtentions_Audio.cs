@@ -1,6 +1,5 @@
 ﻿using Azalea.Platform;
 using Azalea.Platform.Audio;
-using Azalea.Sounds;
 using System;
 
 namespace Azalea.IO.Resources;
