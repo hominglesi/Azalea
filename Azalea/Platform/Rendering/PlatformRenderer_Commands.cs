@@ -264,24 +264,6 @@ internal static class GenerateVertexArrayCommand_Handler
 	}
 }
 
-[ThreadCommand(generateHandler: false)]
-internal partial class GetUniformLocationCommand : RenderCommand
-{
-	public UniformLocation UniformLocation;
-	public Program Program;
-	public string Name;
-}
-
-internal static class GetUniformLocationCommand_Handler
-{
-	public static UniformLocation GetUniformLocation(this ICommandHandler<RenderCommand> consumer, Program program, string name)
-	{
-		var uniformLocation = new UniformLocation();
-		consumer.Enqueue(GetUniformLocationCommand.Borrow(uniformLocation, program, name));
-		return uniformLocation;
-	}
-}
-
 [ThreadCommand]
 internal partial class PolygonModeCommand : RenderCommand
 {
@@ -337,29 +319,20 @@ internal partial class TexParameteriCommand : RenderCommand
 }
 
 [ThreadCommand]
-internal partial class Uniform1iCommand : RenderCommand
+internal partial class Uniform1fCommand : RenderCommand
 {
-	public UniformLocation UniformLocation;
-	public int Int1;
+	public Program Program;
+	public string UniformName;
+	public float Float;
 }
 
 [ThreadCommand]
-internal partial class Uniform4fCommand : RenderCommand
+internal partial class Uniform2fCommand : RenderCommand
 {
-	public UniformLocation UniformLocation;
-	public float Value0;
-	public float Value1;
-	public float Value2;
-	public float Value3;
-}
-
-[ThreadCommand]
-internal partial class UniformMatrix4fvCommand : RenderCommand
-{
-	public UniformLocation UniformLocation;
-	public int Count;
-	public bool Transpose;
-	public Matrix4x4 Value;
+	public Program Program;
+	public string UniformName;
+	public float Float1;
+	public float Float2;
 }
 
 [ThreadCommand]

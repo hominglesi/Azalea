@@ -1,18 +1,16 @@
 ﻿using Azalea.Graphics.Camera;
-using Azalea.Graphics.Colors;
 using Azalea.Native.OpenGL;
 using Azalea.Numerics;
-using Azalea.Platform.Loading;
 using Azalea.Platform.Loading.OpenGL;
 using Azalea.Platform.Windowing;
 using System;
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 
 namespace Azalea.Platform.Rendering.OpenGL;
+
 internal partial class GLRenderer : PlatformRenderer
 {
 	private const bool _redrawOnResize = true;
@@ -244,12 +242,6 @@ internal partial class GLRenderer : PlatformRenderer
 				GL.GenVertexArrays(1, ref vertexArrayHandle);
 				vertexArray.Initialize(vertexArrayHandle);
 				break;
-			case GetUniformLocationCommand(var uniformLocation, var program, var name):
-				program.AssureInitialized();
-				var nameBytes = Encoding.UTF8.GetBytes(name + "\0");
-				int uniformLocationHandle = GL.GetUniformLocation(program.Handle.Value, nameBytes);
-				uniformLocation.Initialize(uniformLocationHandle);
-				break;
 			case PolygonModeCommand(var face, var mode):
 				GL.PolygonMode(face, mode);
 				break;
@@ -376,17 +368,11 @@ internal partial class GLRenderer : PlatformRenderer
 				GL.TexParameteri(target, parameter, value);
 				GL.BindTexture(target, 0);
 				break;
-			case Uniform1iCommand(var uniformLocation, var int0):
-				Debug.Assert(uniformLocation.Handle is not null);
-				GL.Uniform1i(uniformLocation.Handle.Value, int0);
+			case Uniform1fCommand(var program, var uniformName, var int0):
+				GL.Uniform1f(getUniformLocation(program, uniformName), int0);
 				break;
-			case Uniform4fCommand(var uniformLocation, var float0, var float1, var float2, var float3):
-				Debug.Assert(uniformLocation.Handle is not null);
-				GL.Uniform4f(uniformLocation.Handle.Value, float0, float1, float2, float3);
-				break;
-			case UniformMatrix4fvCommand(var uniformLocation, var count, var transpose, Matrix4x4 value):
-				Debug.Assert(uniformLocation.Handle is not null);
-				GL.UniformMatrix4fv(uniformLocation.Handle.Value, count, transpose, ref value);
+			case Uniform2fCommand(var program, var uniformName, var float0, var float1):
+				GL.Uniform2f(getUniformLocation(program, uniformName), float0, float1);
 				break;
 			case UseProgramCommand(var program):
 				program.AssureInitialized();

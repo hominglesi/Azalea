@@ -8,7 +8,6 @@ using Azalea.Platform.Audio;
 using Azalea.Platform.Loading;
 using Azalea.Platform.Loading.OpenGL;
 using Azalea.Simulations;
-using Azalea.Threading;
 using System;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -90,8 +89,6 @@ public abstract class GameHost
 	protected virtual void ProcessGameLoop()
 	{
 		_accumulator += Time.DeltaTime;
-
-		Scheduler.InvokeScheduled();
 
 		while (_accumulator >= __fixedUpdateFrametime)
 		{

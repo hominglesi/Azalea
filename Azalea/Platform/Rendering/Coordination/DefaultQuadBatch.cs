@@ -6,13 +6,10 @@ using System.Buffers;
 using System.Numerics;
 
 namespace Azalea.Platform.Rendering.Coordination;
+
 public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 {
 	private readonly PlatformRenderer _renderer;
-
-	private readonly UniformLocation _projectionUniform;
-	private readonly UniformLocation _textureUniform;
-
 	private readonly VertexArray _vertexArray;
 	private readonly Buffer _vertexArrayVertices;
 

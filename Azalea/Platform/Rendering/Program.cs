@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace Azalea.Platform.Rendering;
+
 public class Program : IShader
 {
 	internal uint? Handle { get; private set; }
+	internal Dictionary<string, int>? UniformLocations;
 
 	public Program() { }
 

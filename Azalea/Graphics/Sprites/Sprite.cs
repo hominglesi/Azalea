@@ -41,35 +41,29 @@ public class Sprite : GameObject
 		_time += Platform.Time.DeltaTime;
 	}
 
+	private static IShader? _loadingShader;
+
 	public override void Draw(RenderCoordinator coordinator)
 	{
 		if (Alpha <= 0) return;
 
-		/*
-		if (Texture is PromisedTexture promised && promised.IsResolved == false)
+		if (Texture is PromisedTexture promised && promised.IsLoaded == false)
 		{
-			if (_loadingShader is null)
-			{
-				_loadingShader = ShaderBuilder.FromShaderCode(
-					Assets.GetText("Shaders/quad_vertex.glsl")!,
-					Assets.GetText("Shaders/loading_fragment.glsl")!);
+			_loadingShader ??= GameHost.Instance.Loader.LoadShader(
+					Assets.GetText("Shaders/DefaultQuadVertex.glsl")!,
+					Assets.GetText("Shaders/LoadingFragment.glsl")!);
 
-				ShaderLibrary.RegisterShader("LoadingShader", _loadingShader);
-			}
+			coordinator.BindShader(_loadingShader);
 
-			renderer.BindShader(_loadingShader);
+			coordinator.Uniform("u_Time", Time);
+			coordinator.Uniform("u_Offset", ScreenSpaceDrawQuad.TopLeft.X, ScreenSpaceDrawQuad.TopLeft.Y);
+			coordinator.Uniform("u_Resolution", ScreenSpaceDrawQuad.Width, ScreenSpaceDrawQuad.Height);
+			coordinator.Uniform("u_ScreenResolution", App.Window.ClientSize.X, App.Window.ClientSize.Y);
 
-			_loadingShader.NativeShader.SetUniform("u_Time", Time);
-			_loadingShader.NativeShader.SetUniform("u_Offset", ScreenSpaceDrawQuad.TopLeft.X, ScreenSpaceDrawQuad.TopLeft.Y);
-			_loadingShader.NativeShader.SetUniform("u_Resolution", ScreenSpaceDrawQuad.Width, ScreenSpaceDrawQuad.Height);
-			_loadingShader.NativeShader.SetUniform("u_ScreenResolution", App.Window.ClientSize.X, App.Window.ClientSize.Y);
-
-			renderer.DrawQuad(renderer.WhitePixel.GetNativeTexture(), ScreenSpaceDrawQuad, DrawColorInfo);
-
-			renderer.BindShader(renderer.DefaultQuadShader);
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, Rectangle.One);
+			coordinator.FlushRenderBatch();
 			return;
 		}
-		 */
 
 
 		if (Texture is not null)

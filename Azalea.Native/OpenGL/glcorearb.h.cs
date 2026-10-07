@@ -131,6 +131,12 @@ public static partial class GL
 	private delegate void Uniform1iDelegate(int location, int v0);
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml")]
+	private delegate void Uniform1fDelegate(int location, float v0);
+
+	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml")]
+	private delegate void Uniform2fDelegate(int location, float v0, float v1);
+
+	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml")]
 	private delegate void Uniform4fDelegate(int location, float v0, float v1, float v2, float v3);
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml")]

@@ -1,19 +1,15 @@
-﻿using Azalea.IO.Resources;
-using Azalea.Numerics;
+﻿using Azalea.Numerics;
+using Azalea.Platform.Rendering;
 using Azalea.Platform.Rendering.Coordination;
-using Azalea.Threading;
 using System;
 using System.Numerics;
 
 namespace Azalea.Graphics.Textures;
+
 public class PromisedTexture : ITexture
 {
-	private readonly ValuePromise<ITexture> _promise;
-	private readonly ITexture _loadingTexture;
-
-	public bool IsResolved => _promise.IsResolved;
-
-	public Platform.Rendering.NativeTexture? NewTexture => null;
+	private readonly NativeTexture _texture;
+	public bool IsLoaded => _texture.IsReady();
 
 	public int Width => throw new NotImplementedException();
 
@@ -21,25 +17,19 @@ public class PromisedTexture : ITexture
 
 	public Vector2 Size => throw new NotImplementedException();
 
-	public PromisedTexture(ValuePromise<ITexture> promise, ITexture? loadingTexture = null)
+	public PromisedTexture(NativeTexture texture)
 	{
-		_loadingTexture = loadingTexture ?? Assets.GetTexture("Textures/azalea-icon.png");
-		_promise = promise;
+		_texture = texture;
 	}
 
 	public Rectangle GetUVCoordinates(float time)
 	{
-		if (IsResolved == false)
-			return _loadingTexture.GetUVCoordinates(time);
-
-		return _promise.Value.GetUVCoordinates(time);
+		return Rectangle.One;
 	}
 
 	public void Bind(RenderCoordinator coordinator, float time)
 	{
-		if (IsResolved == false)
-			_loadingTexture.Bind(coordinator, time);
-		else
-			_promise.Value.Bind(coordinator, time);
+		if (IsLoaded)
+			coordinator.BindTexture(_texture);
 	}
 }

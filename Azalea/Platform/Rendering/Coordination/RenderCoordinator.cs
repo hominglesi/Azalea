@@ -1,9 +1,5 @@
-﻿using Azalea.Graphics.Textures;
-using Azalea.Native.OpenGL;
+﻿using Azalea.Native.OpenGL;
 using Azalea.Numerics;
-using Azalea.Platform.Loading;
-using Azalea.Platform.Loading.OpenGL;
-using Azalea.Platform.Rendering.OpenGL;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
@@ -11,6 +7,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Azalea.Platform.Rendering.Coordination;
+
 public class RenderCoordinator
 {
 	public PlatformRenderer Renderer { get; }
@@ -106,6 +103,10 @@ public class RenderCoordinator
 		_commandQueue.UseProgram((Program)shader);
 		_boundShader = shader;
 	}
+
+	public void Uniform(string uniformName, float v) => _commandQueue.Uniform1f((Program)_boundShader, uniformName, v);
+	public void Uniform(string uniformName, float v1, float v2) => _commandQueue.Uniform2f((Program)_boundShader, uniformName, v1, v2);
+
 	#endregion
 	#region Texture
 	private NativeTexture? _boundTexture;

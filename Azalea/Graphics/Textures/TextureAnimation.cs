@@ -6,12 +6,11 @@ using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Graphics.Textures;
+
 public class TextureAnimation : ITexture
 {
 	private readonly List<(ITexture, float)> _frames = [];
 	private float _totalDuration;
-
-	public Platform.Rendering.NativeTexture? NewTexture => null;
 
 	public int Width => throw new NotImplementedException();
 

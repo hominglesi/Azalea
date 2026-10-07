@@ -49,7 +49,6 @@ public class TestingTestScene : TestScene
 
 		Add(container);
 
-		/*
 		foreach (var imageURL in _imageURLs)
 		{
 			var sprite = new Sprite()
@@ -59,7 +58,7 @@ public class TestingTestScene : TestScene
 			};
 
 			container.Add(sprite);
-		}*/
+		}
 
 		var tileset = Assets.MainStore.GetTileset("MapForTiled/TilesForMap.tsx");
 

@@ -1,11 +1,9 @@
-﻿using Azalea.Graphics.Rendering;
+﻿using Azalea.Graphics;
 using Azalea.Graphics.Textures;
 using Azalea.Platform;
 using Azalea.Platform.Loading;
-using Azalea.Platform.Loading.OpenGL;
-using Azalea.Platform.Rendering.OpenGL;
-using Azalea.Threading;
 using System;
+using System.Threading.Tasks;
 
 namespace Azalea.IO.Resources;
 
@@ -29,44 +27,32 @@ public static partial class ResourceStoreExtentions
 		return texture;
 	}
 
-	private static readonly ResourceCache<ValuePromise<ITexture>> _texturePromiseCache = new();
-
-	public static ValuePromise<ITexture> GetTexturePromise(this IResourceStore store, string path, TextureFiltering filtering = TextureFiltering.Nearest)
+	public static ITexture GetTextureAsync(this IResourceStore store, string path, TextureFiltering filtering = TextureFiltering.Nearest)
 	{
 		if (_textureCache.TryGetValue(store, path, out var cached))
-			return new ValuePromise<ITexture>(cached);
+			return cached;
 
-		if (_texturePromiseCache.TryGetValue(store, path, out var cachedPromise))
-			return cachedPromise;
+		var nativeTexture = GameHost.Instance.Loader.CreateEmptyTexture();
+		var texture = new PromisedTexture(nativeTexture);
+		_textureCache.AddValue(store, path, texture);
 
-		var promise = new Promise<ITexture>();
-		var result = new ValuePromise<ITexture>(promise);
-
-		_texturePromiseCache.AddValue(store, path, result);
-
-		Scheduler.Run(async () =>
+		Task.Run(async () =>
 		{
-			var image = await store.GetImagePromise(path);
+			var stream = store.GetStream(path);
 
-			if (image is null)
-			{
-				promise.Resolve(Assets.MissingTexture);
-				return;
-			}
+			if (stream is null)
+				return Task.CompletedTask;
 
-			var newTexture = GameHost.Instance.Loader.CreateTexture(image.Width, image.Height, image.Data, false);
-			var texture = new Texture(newTexture);
-			_textureCache.AddValue(store, path, texture);
-			promise.Resolve(texture);
+			var image = Image.FromStream(stream);
+
+			if (stream is null)
+				return Task.CompletedTask;
+
+			GameHost.Instance.Loader.CreateTexture(image.Width, image.Height, image.Data, false, nativeTexture);
+
+			return Task.CompletedTask;
 		});
 
-		return result;
-	}
-
-	public static PromisedTexture GetTextureAsync(this IResourceStore store, string path, TextureFiltering filtering = TextureFiltering.Nearest)
-	{
-		var promise = GetTexturePromise(store, path, filtering);
-
-		return new PromisedTexture(promise);
+		return texture;
 	}
 }

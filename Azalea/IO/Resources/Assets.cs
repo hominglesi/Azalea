@@ -93,7 +93,7 @@ public static partial class Assets
 	/// <summary>
 	/// Gets a texture promise from the main resource store.
 	/// </summary>
-	public static PromisedTexture GetTextureAsync(string path) => MainStore.GetTextureAsync(path);
+	public static ITexture GetTextureAsync(string path) => MainStore.GetTextureAsync(path);
 
 	/// <summary>
 	/// Gets text from the main resource store.
