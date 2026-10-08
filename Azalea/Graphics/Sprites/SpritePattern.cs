@@ -1,18 +1,24 @@
-﻿using Azalea.Graphics.Rendering;
-using Azalea.Graphics.Textures;
+﻿using Azalea.Graphics.Textures;
 using Azalea.Numerics;
+using Azalea.Platform;
+using Azalea.Platform.Rendering.Coordination;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace Azalea.Graphics.Sprites;
+
 public class SpritePattern : Sprite
 {
-	/*
-	protected override void DrawTexture(IRenderer renderer, ITexture texture)
+	public override void Draw(RenderCoordinator coordinator)
 	{
-		var patternSize = DrawSize / texture.Size;
+		Debug.Assert(Texture is Texture);
+
+		var tex = (Texture)Texture;
+		var patternSize = DrawSize / tex.Size;
 		var textureUV = new Rectangle(Vector2.Zero, patternSize);
 
-		renderer.DrawQuad(texture.GetNativeTexture(), ScreenSpaceDrawQuad, DrawColorInfo, textureUV);
+		coordinator.BindShader(Shader ?? GameHost.Instance.Loader.DefaultQuadShader);
+		coordinator.BindTexture(tex.NativeTexture);
+		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, textureUV);
 	}
-	*/
 }

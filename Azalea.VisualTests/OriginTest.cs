@@ -1,11 +1,11 @@
 ﻿using Azalea.Graphics.Sprites;
-using Azalea.Inputs;
+using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
-using Azalea.Platform;
 using Azalea.Utils;
 using System.Numerics;
 
 namespace Azalea.VisualTests;
+
 internal class OriginTest : TestScene
 {
 	private Sprite _player;
@@ -18,7 +18,7 @@ internal class OriginTest : TestScene
 		Add(_player = new Sprite()
 		{
 			Size = new(64, 96),
-			Texture = Assets.GetTexture("Textures/baseSprite.png"),
+			Texture = Assets.MainStore.GetTexture("Textures/baseSprite.png", TextureFiltering.Nearest),
 			Origin = Graphics.Anchor.Center,
 		});
 
@@ -27,7 +27,7 @@ internal class OriginTest : TestScene
 			Size = new(128, 64),
 			Origin = Graphics.Anchor.Custom,
 			OriginPosition = new(120, 40),
-			Texture = Assets.GetTexture("Textures/Bolter.png"),
+			Texture = Assets.MainStore.GetTexture("Textures/Bolter.png", TextureFiltering.Nearest),
 
 		});
 	}

@@ -1,4 +1,5 @@
-﻿using Azalea.Platform.Rendering;
+﻿using Azalea.Graphics.Textures;
+using Azalea.Platform.Rendering;
 using Azalea.Threading;
 
 namespace Azalea.Platform.Loading;
@@ -29,16 +30,17 @@ internal partial class CreateTextureCommand : LoadingCommand
 	public int Height;
 	public byte[]? Pixels;
 	public bool GenerateMipmap;
+	public TextureFiltering Filtering;
 }
 
 internal static class CreateTextureCommand_Handler
 {
-	internal static NativeTexture CreateTexture(this ICommandHandler<LoadingCommand> handler, int width, int height, byte[]? pixels, bool generateMipmap = false, NativeTexture? texture = null)
+	internal static NativeTexture CreateTexture(this ICommandHandler<LoadingCommand> handler, int width, int height, byte[]? pixels, bool generateMipmap, TextureFiltering filtering, NativeTexture? texture = null)
 	{
 		texture ??= ((PlatformLoader)handler).CreateEmptyTexture();
 		texture.SetSize(width, height);
 		texture.BeginLoadingOperation();
-		handler.Enqueue(CreateTextureCommand.Borrow(texture, width, height, pixels, generateMipmap));
+		handler.Enqueue(CreateTextureCommand.Borrow(texture, width, height, pixels, generateMipmap, filtering));
 		return texture;
 	}
 }

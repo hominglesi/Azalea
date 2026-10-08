@@ -1,4 +1,5 @@
 ﻿// SHIPPABLE
+using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
 using Azalea.Native.OpenGL;
 using Azalea.Platform.Rendering;
@@ -26,7 +27,7 @@ internal class GLLoader : PlatformLoader
 		Context = GLContext.Create(dummyDeviceContext);
 		Context.MakeCurrent();
 
-		WhitePixel = this.CreateTexture(1, 1, [byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue], false);
+		WhitePixel = this.CreateTexture(1, 1, [byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue], false, TextureFiltering.Nearest);
 
 		var quadVertex = Assets.GetText("Shaders/DefaultQuadVertex.glsl")!;
 		var quadFragment = Assets.GetText("Shaders/DefaultQuadFragment.glsl")!;
@@ -40,12 +41,15 @@ internal class GLLoader : PlatformLoader
 	{
 		switch (command)
 		{
-			case CreateTextureCommand(var texture, var width, var height, var pixels, var generateMipmap):
+			case CreateTextureCommand(var texture, var width, var height, var pixels, var generateMipmap, var filtering):
 				uint textureHandle = 0;
 				GL.GenTextures(1, ref textureHandle);
 				GL.BindTexture(GL.TEXTURE_2D, textureHandle);
-				GL.TexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-				GL.TexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+
+				var filter = filtering == TextureFiltering.Linear ? GL.LINEAR : GL.NEAREST;
+
+				GL.TexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, filter);
+				GL.TexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, filter);
 
 				if (pixels is null)
 					GL.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, IntPtr.Zero);

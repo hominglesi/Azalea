@@ -136,7 +136,7 @@ public readonly struct Tileset
 		}
 
 		// Create our Texture
-		var newTexture = GameHost.Instance.Loader.CreateTexture(atlas.Width, atlas.Height, atlas.Data, false);
+		var newTexture = GameHost.Instance.Loader.CreateTexture(atlas.Width, atlas.Height, atlas.Data, false, TextureFiltering.Nearest);
 		var atlasTexture = new Texture(newTexture);
 
 		// Create all texture regions
