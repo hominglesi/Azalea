@@ -25,7 +25,21 @@ public class Sprite : GameObject
 			_time = 0;
 
 			if (Size == Vector2.Zero)
-				Size = new Vector2(_texture?.Width ?? 0, _texture?.Height ?? 0);
+			{
+				switch (_texture)
+				{
+					case Texture tex:
+						Size = new Vector2(tex.Width, tex.Height);
+						break;
+					case TextureAnimation texAnim:
+						if (texAnim.Frames.Count == 0)
+							break;
+
+						var first = texAnim.GetTextureAt(0);
+						Size = first.Size;
+						break;
+				}
+			}
 		}
 	}
 
@@ -47,35 +61,44 @@ public class Sprite : GameObject
 	{
 		if (Alpha <= 0) return;
 
-		if (Texture is PromisedTexture promised && promised.IsLoaded == false)
+		switch (Texture)
 		{
-			_loadingShader ??= GameHost.Instance.Loader.LoadShader(
+			case Texture tex:
+				if (tex.IsLoaded)
+				{
+					coordinator.BindShader(Shader ?? GameHost.Instance.Loader.DefaultQuadShader);
+					coordinator.BindTexture(tex.NativeTexture);
+					coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, tex.UVCoordinates);
+				}
+				else
+				{
+					_loadingShader ??= GameHost.Instance.Loader.LoadShader(
 					Assets.GetText("Shaders/DefaultQuadVertex.glsl")!,
 					Assets.GetText("Shaders/LoadingFragment.glsl")!);
 
-			coordinator.BindShader(_loadingShader);
+					coordinator.BindShader(_loadingShader);
 
-			coordinator.Uniform("u_Time", Time);
-			coordinator.Uniform("u_Offset", ScreenSpaceDrawQuad.TopLeft.X, ScreenSpaceDrawQuad.TopLeft.Y);
-			coordinator.Uniform("u_Resolution", ScreenSpaceDrawQuad.Width, ScreenSpaceDrawQuad.Height);
-			coordinator.Uniform("u_ScreenResolution", App.Window.ClientSize.X, App.Window.ClientSize.Y);
+					coordinator.Uniform("u_Time", Time);
+					coordinator.Uniform("u_Offset", ScreenSpaceDrawQuad.TopLeft.X, ScreenSpaceDrawQuad.TopLeft.Y);
+					coordinator.Uniform("u_Resolution", ScreenSpaceDrawQuad.Width, ScreenSpaceDrawQuad.Height);
+					coordinator.Uniform("u_ScreenResolution", App.Window.ClientSize.X, App.Window.ClientSize.Y);
 
-			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, Rectangle.One);
-			coordinator.FlushRenderBatch();
-			return;
+					coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, Rectangle.One);
+					coordinator.FlushRenderBatch();
+				}
+
+				break;
+			case TextureAnimation texAnim:
+				coordinator.BindShader(Shader ?? GameHost.Instance.Loader.DefaultQuadShader);
+				var texAnimFrame = texAnim.GetTextureAt(Time);
+				coordinator.BindTexture(texAnimFrame.NativeTexture);
+				coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, texAnimFrame.UVCoordinates);
+				break;
+			default:
+				coordinator.BindShader(Shader ?? GameHost.Instance.Loader.DefaultQuadShader);
+				coordinator.BindTexture(Assets.WhitePixelNative);
+				coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, Rectangle.One);
+				break;
 		}
-
-
-		if (Texture is not null)
-			Texture.Bind(coordinator, Time);
-		else
-			coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
-
-		coordinator.BindShader(Shader ?? GameHost.Instance.Loader.DefaultQuadShader);
-
-		if (Texture is null)
-			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, Rectangle.One);
-		else
-			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, Texture.GetUVCoordinates(Time));
 	}
 }

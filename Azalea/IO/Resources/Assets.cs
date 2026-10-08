@@ -1,5 +1,7 @@
 ﻿using Azalea.Graphics.Textures;
+using Azalea.Platform;
 using Azalea.Platform.Audio;
+using Azalea.Platform.Rendering;
 using Azalea.Utils;
 using System;
 using System.IO;
@@ -70,10 +72,23 @@ public static partial class Assets
 		_reflectedStore = new Storage(path);
 	}
 
+	private static Texture _whitePixel;
+	public static Texture WhitePixel
+	{
+		get
+		{
+			if (_whitePixel is not null)
+				return _whitePixel;
+
+			return _whitePixel = new Texture(WhitePixelNative);
+		}
+	}
+	public static NativeTexture WhitePixelNative => GameHost.Instance.Loader.WhitePixel;
+
 	/// <summary>
 	/// Returned texture used when a requested texture doesn't exist.
 	/// </summary>
-	public static ITexture MissingTexture => GetTexture("Textures/missing-texture.png");
+	public static Texture MissingTexture => GetTexture("Textures/missing-texture.png");
 
 	/// <summary>
 	/// Makes a resource store available for use from the main resource store.
@@ -88,12 +103,12 @@ public static partial class Assets
 	/// <summary>
 	/// Gets a texture from the main resource store.
 	/// </summary>
-	public static ITexture GetTexture(string path) => MainStore.GetTexture(path);
+	public static Texture GetTexture(string path) => MainStore.GetTexture(path);
 
 	/// <summary>
 	/// Gets a texture promise from the main resource store.
 	/// </summary>
-	public static ITexture GetTextureAsync(string path) => MainStore.GetTextureAsync(path);
+	public static Texture GetTextureAsync(string path) => MainStore.GetTextureAsync(path);
 
 	/// <summary>
 	/// Gets text from the main resource store.

@@ -1,15 +1,15 @@
 ﻿using Azalea.Extentions.MatrixExtentions;
 using Azalea.Graphics;
 using Azalea.Graphics.Primitives;
-using Azalea.Graphics.Rendering;
+using Azalea.IO.Resources;
 using Azalea.Numerics;
 using Azalea.Platform;
-using Azalea.Platform.Loading.OpenGL;
 using Azalea.Platform.Rendering.Coordination;
 using Azalea.Utils;
 using System.Numerics;
 
 namespace Azalea.Design.Shapes;
+
 public class Line : GameObject
 {
 	public Vector2 StartPoint { get; set; }
@@ -29,7 +29,7 @@ public class Line : GameObject
 		MatrixExtentions.TranslateFromLeft(ref matrix, StartPoint);
 		MatrixExtentions.RotateFromLeft(ref matrix, rotation);
 
-		coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
+		coordinator.BindTexture(Assets.WhitePixelNative);
 		coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);
 		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(rectangle) * matrix, DrawColorQuad, Rectangle.One);
 	}

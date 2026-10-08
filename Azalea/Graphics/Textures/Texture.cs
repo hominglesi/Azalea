@@ -1,15 +1,19 @@
 ﻿using Azalea.Numerics;
 using Azalea.Platform.Rendering;
-using Azalea.Platform.Rendering.Coordination;
-using System;
 using System.Numerics;
 namespace Azalea.Graphics.Textures;
 
 public class Texture : ITexture
 {
-	private readonly NativeTexture _newTexture;
+	internal readonly NativeTexture NativeTexture;
+	internal bool IsLoaded => NativeTexture.IsReady();
 
-	private Rectangle _uvCoordinates = Rectangle.One;
+	public Texture(ITexture other)
+		: this(((Texture)other).NativeTexture) { }
+
+	internal Texture(NativeTexture newTexture) => NativeTexture = newTexture;
+
+	internal Rectangle UVCoordinates { get; private set; } = Rectangle.One;
 	private RectangleInt _region = new(-1, -1, -1, -1);
 	public RectangleInt Region
 	{
@@ -20,11 +24,11 @@ public class Texture : ITexture
 
 			_region = value;
 
-			_uvCoordinates = new Rectangle(
-				_region.X / (float)_newTexture.Width,
-				_region.Y / (float)_newTexture.Height,
-				_region.Width / (float)_newTexture.Width,
-				_region.Height / (float)_newTexture.Height);
+			UVCoordinates = new Rectangle(
+				_region.X / (float)NativeTexture.Width,
+				_region.Y / (float)NativeTexture.Height,
+				_region.Width / (float)NativeTexture.Width,
+				_region.Height / (float)NativeTexture.Height);
 		}
 	}
 
@@ -33,7 +37,7 @@ public class Texture : ITexture
 		get
 		{
 			if (_region.Width == -1)
-				return _newTexture.Width;
+				return NativeTexture.Width;
 
 			return _region.Width;
 		}
@@ -44,7 +48,7 @@ public class Texture : ITexture
 		get
 		{
 			if (_region.Height == -1)
-				return _newTexture.Height;
+				return NativeTexture.Height;
 
 			return _region.Height;
 		}
@@ -55,21 +59,9 @@ public class Texture : ITexture
 		get
 		{
 			if (_region.Width == -1)
-				return new(_newTexture.Width, _newTexture.Height);
+				return new(NativeTexture.Width, NativeTexture.Height);
 
 			return _region.Size;
 		}
 	}
-
-	public Texture(ITexture other)
-		: this(((Texture)other)._newTexture) { }
-
-	internal Texture(NativeTexture newTexture)
-	{
-		_newTexture = newTexture;
-	}
-
-	public Rectangle GetUVCoordinates(float time) => _uvCoordinates;
-
-	public void Bind(RenderCoordinator coordinator, float time = 0) => coordinator.BindTexture(_newTexture);
 }

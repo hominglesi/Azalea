@@ -19,6 +19,8 @@ public abstract partial class PlatformLoader : ICommandHandler<LoadingCommand>
 		Thread.InitializedEvent.WaitOne();
 
 		Debug.Assert(WhitePixel is not null);
+		Debug.Assert(DefaultQuadShader is not null);
+		Debug.Assert(DefaultTextShader is not null);
 	}
 
 	protected abstract void InitializationLogic();

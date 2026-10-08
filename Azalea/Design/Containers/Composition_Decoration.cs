@@ -1,14 +1,14 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Primitives;
-using Azalea.Graphics.Rendering;
+using Azalea.IO.Resources;
 using Azalea.Layout;
 using Azalea.Numerics;
 using Azalea.Platform;
-using Azalea.Platform.Loading.OpenGL;
 using Azalea.Platform.Rendering.Coordination;
 
 namespace Azalea.Design.Containers;
+
 public partial class Composition
 {
 	private ColorQuad _backgroundColorQuad;
@@ -56,7 +56,7 @@ public partial class Composition
 			_backgroundColorBacking.Validate();
 		}
 
-		coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
+		coordinator.BindTexture(Assets.WhitePixelNative);
 		coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);
 		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, _backgroundColorQuad, Rectangle.One);
 	}
@@ -227,7 +227,7 @@ public partial class Composition
 			color.BottomLeft,
 			color.TopLeft);
 
-		coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
+		coordinator.BindTexture(Assets.WhitePixelNative);
 		coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);
 
 		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(topRect) * DrawInfo.Matrix, topColor, Rectangle.One);

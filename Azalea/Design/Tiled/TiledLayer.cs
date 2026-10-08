@@ -1,6 +1,5 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.Primitives;
-using Azalea.Graphics.Rendering;
 using Azalea.IO.Tiled;
 using Azalea.Platform;
 using Azalea.Platform.Rendering.Coordination;
@@ -8,6 +7,7 @@ using System.Numerics;
 using static Azalea.IO.Tiled.Tilemap;
 
 namespace Azalea.Design.Tiled;
+
 public class TiledLayer : GameObject
 {
 	protected Tilemap Tilemap { get; init; }
@@ -56,9 +56,9 @@ public class TiledLayer : GameObject
 				if (texture is null)
 					continue;
 
-				texture.Bind(coordinator);
+				coordinator.BindTexture(texture.NativeTexture);
 				coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);
-				coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorQuad, texture.GetUVCoordinates());
+				coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorQuad, texture.UVCoordinates);
 			}
 		}
 	}

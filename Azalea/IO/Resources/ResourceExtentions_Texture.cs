@@ -9,9 +9,9 @@ namespace Azalea.IO.Resources;
 
 public static partial class ResourceStoreExtentions
 {
-	private static readonly ResourceCache<ITexture> _textureCache = new();
+	private static readonly ResourceCache<Texture> _textureCache = new();
 
-	public static ITexture GetTexture(this IResourceStore store, string path, TextureFiltering filtering = TextureFiltering.Nearest)
+	public static Texture GetTexture(this IResourceStore store, string path, TextureFiltering filtering = TextureFiltering.Nearest)
 	{
 		if (_textureCache.TryGetValue(store, path, out var cached))
 			return cached;
@@ -27,13 +27,13 @@ public static partial class ResourceStoreExtentions
 		return texture;
 	}
 
-	public static ITexture GetTextureAsync(this IResourceStore store, string path, TextureFiltering filtering = TextureFiltering.Nearest)
+	public static Texture GetTextureAsync(this IResourceStore store, string path, TextureFiltering filtering = TextureFiltering.Nearest)
 	{
 		if (_textureCache.TryGetValue(store, path, out var cached))
 			return cached;
 
 		var nativeTexture = GameHost.Instance.Loader.CreateEmptyTexture();
-		var texture = new PromisedTexture(nativeTexture);
+		var texture = new Texture(nativeTexture);
 		_textureCache.AddValue(store, path, texture);
 
 		Task.Run(async () =>

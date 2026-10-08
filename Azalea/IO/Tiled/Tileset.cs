@@ -1,6 +1,5 @@
 ﻿using Azalea.Extentions;
 using Azalea.Graphics;
-using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
 using Azalea.Numerics;
@@ -9,9 +8,9 @@ using Azalea.Platform.Loading;
 using Azalea.Utils;
 using System;
 using System.IO;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Azalea.IO.Tiled;
+
 public readonly struct Tileset
 {
 	public string Name { get; init; }
@@ -22,7 +21,7 @@ public readonly struct Tileset
 	public int Spacing { get; init; }
 	public int Margin { get; init; }
 	public Texture Source { get; init; }
-	public ITexture[] Tiles { get; init; }
+	public Texture[] Tiles { get; init; }
 
 	public static Tileset Load(IResourceStore store, string path)
 	{

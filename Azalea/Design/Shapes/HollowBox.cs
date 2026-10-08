@@ -1,13 +1,13 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Primitives;
-using Azalea.Graphics.Rendering;
+using Azalea.IO.Resources;
 using Azalea.Numerics;
 using Azalea.Platform;
-using Azalea.Platform.Loading.OpenGL;
 using Azalea.Platform.Rendering.Coordination;
 
 namespace Azalea.Design.Shapes;
+
 public partial class HollowBox : GameObject
 {
 	public Boundary Thickness { get; set; } = new(3);
@@ -122,7 +122,7 @@ public partial class HollowBox : GameObject
 			color.BottomLeft,
 			color.TopLeft);
 
-		coordinator.BindTexture(GameHost.Instance.Loader.WhitePixel);
+		coordinator.BindTexture(Assets.WhitePixelNative);
 		coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);
 
 		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(topRect) * DrawInfo.Matrix, topColor, Rectangle.One);

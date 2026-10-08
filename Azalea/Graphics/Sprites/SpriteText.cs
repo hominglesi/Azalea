@@ -1,6 +1,4 @@
-﻿using Azalea.Graphics.Rendering;
-using Azalea.IO.Resources;
-using Azalea.Platform;
+﻿using Azalea.Platform;
 using Azalea.Platform.Rendering.Coordination;
 using Azalea.Text;
 using System;
@@ -66,9 +64,9 @@ public class SpriteText : GameObject
 		{
 			var quad = ToScreenSpace(character.DrawRectangle);
 
-			character.Texture.Bind(coordinator);
+			coordinator.BindTexture(character.Texture.NativeTexture);
 
-			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorQuad, character.Texture.GetUVCoordinates());
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorQuad, character.Texture.UVCoordinates);
 		}
 	}
 }

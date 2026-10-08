@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Text;
+
 internal class TextLayoutProvider()
 {
 	private bool _isValid = false;
@@ -109,7 +110,7 @@ internal class TextLayoutProvider()
 	public struct Character
 	{
 		public char RepresentedCharacter;
-		public ITexture Texture;
+		public Texture Texture;
 
 		public Rectangle DrawRectangle;
 	}
