@@ -4,6 +4,8 @@ namespace Azalea.Native.FFmpeg;
 
 public static unsafe partial class FFmpeg
 {
+	public const int SWS_BILINEAR = 2;
+
 	public struct SwrContext;
 
 	[LibraryImport("swresample")]

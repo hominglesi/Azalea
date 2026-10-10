@@ -4,6 +4,10 @@ namespace Azalea.Native.FFmpeg;
 
 public static unsafe partial class FFmpeg
 {
+	public const int AVSEEK_SIZE = 0x10000;
+	public const int AVSEEK_FORCE = 0x20000;
+	public const int AVFMT_FLAG_CUSTOM_IO = 0x0080;
+
 	public struct AVChapter
 	{
 		public long id;
@@ -157,6 +161,14 @@ public static unsafe partial class FFmpeg
 		public AVClass* priv_class;
 	}
 
+	public struct AVProbeData
+	{
+		public byte* filename;
+		public byte* buf;
+		public int buf_size;
+		public byte* mime_type;
+	}
+
 	public struct AVProgram
 	{
 		public int id;
@@ -256,10 +268,16 @@ public static unsafe partial class FFmpeg
 	}
 
 	[LibraryImport("avformat")]
+	public static partial AVInputFormat* av_probe_input_format2(ref AVProbeData pd, int is_opened, ref int score_max);
+
+	[LibraryImport("avformat")]
 	public static partial int av_read_frame(AVFormatContext* s, AVPacket* pkt);
 
 	[LibraryImport("avformat")]
 	public static partial int av_seek_frame(AVFormatContext* s, int stream_index, long timestamp, int flags);
+
+	[LibraryImport("avformat")]
+	public static partial int av_find_best_stream(AVFormatContext* ic, AVMediaType type, int wanted_stream_nb, int related_stream, AVCodec** decoder_ret, int flags);
 
 	[LibraryImport("avformat")]
 	public static partial AVFormatContext* avformat_alloc_context();

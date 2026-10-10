@@ -6,6 +6,10 @@ namespace Azalea.Native.FFmpeg;
 
 public static unsafe partial class FFmpeg
 {
+	public static int AVERROR<T>(T error) => -Convert.ToInt32(error);
+	public const int AVERROR_EOF = -541478213;
+	public const int EAGAIN = 11;
+
 	public struct AVBuffer;
 
 	public struct AVBufferRef
@@ -119,6 +123,17 @@ public static unsafe partial class FFmpeg
 
 	public struct AVIAMFMixPresentation;
 
+	public enum AVMediaType
+	{
+		AVMEDIA_TYPE_UNKNOWN = -1,
+		AVMEDIA_TYPE_VIDEO,
+		AVMEDIA_TYPE_AUDIO,
+		AVMEDIA_TYPE_DATA,
+		AVMEDIA_TYPE_SUBTITLE,
+		AVMEDIA_TYPE_ATTACHMENT,
+		AVMEDIA_TYPE_NB
+	}
+
 	public struct AVOption
 	{
 		public byte name;
@@ -155,6 +170,12 @@ public static unsafe partial class FFmpeg
 		public byte sep;
 	}
 
+	public enum AVPixelFormat
+	{
+		AV_PIX_FMT_NONE = -1,
+		AV_PIX_FMT_RGBA = 26,
+	}
+
 	public struct AVRational(int num, int den)
 	{
 		public int num = num;
@@ -172,6 +193,9 @@ public static unsafe partial class FFmpeg
 
 	[LibraryImport("avutil")]
 	public static partial void av_frame_free(AVFrame** frame);
+
+	[LibraryImport("avutil")]
+	public static partial void av_freep(void* ptr);
 
 	public static AVRational av_inv_q(AVRational q) => new(q.den, q.num);
 
@@ -191,4 +215,7 @@ public static unsafe partial class FFmpeg
 
 	[LibraryImport("avutil")]
 	public static partial int av_samples_get_buffer_size(int* linesize, int nb_channels, int nb_samples, int sample_fmt, int align);
+
+	[LibraryImport("avutil")]
+	public static partial int av_strerror(int errnum, byte* errbuf, int errbuf_size);
 }

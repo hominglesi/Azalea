@@ -13,7 +13,6 @@ namespace Azalea.Platform.Audio;
 internal unsafe partial class FFmpegStreamReader : Disposable
 {
 	const int AV_TIME_BASE = 0xf4240;
-	const int AVERROR_EOF = -541478213;
 
 	const int __ioBufferSize = 4096;
 
@@ -83,7 +82,6 @@ internal unsafe partial class FFmpegStreamReader : Disposable
 			stream.CanSeek ? (nint)_seekPtr : nint.Zero
 			);
 
-		const int AVFMT_FLAG_CUSTOM_IO = 0x80;
 		AVFormatContext* formatCtx = avformat_alloc_context();
 		formatCtx->pb = avioCtx;
 		formatCtx->flags |= AVFMT_FLAG_CUSTOM_IO;

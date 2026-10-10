@@ -1,4 +1,5 @@
-﻿using Azalea.Numerics;
+﻿using Azalea.IO;
+using Azalea.Numerics;
 using StbImageSharp;
 using System;
 using System.IO;
@@ -56,7 +57,17 @@ public class Image
 		ImageResult? image = null;
 
 		if (stream.CanSeek)
-			image = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
+		{
+			var origin = stream.Position;
+			var isWebP = FFmpegImageReader.IsWebP(stream);
+
+			stream.Position = origin;
+
+			if (isWebP)
+				return FFmpegImageReader.ReadWebP(stream);
+			else
+				image = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
+		}
 		else
 		{
 			// StbImageSharp requires that all streams are seekable so

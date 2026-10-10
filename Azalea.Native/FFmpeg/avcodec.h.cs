@@ -4,6 +4,8 @@ namespace Azalea.Native.FFmpeg;
 
 public static unsafe partial class FFmpeg
 {
+	public const int AV_INPUT_BUFFER_PADDING_SIZE = 64;
+
 	public struct AVCodec
 	{
 		public byte* name;
