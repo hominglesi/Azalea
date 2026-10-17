@@ -1,5 +1,4 @@
-﻿using Azalea.Caching;
-using Azalea.Design.Containers;
+﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
 
 namespace Azalea.Editor.Design.Gui;
@@ -7,8 +6,8 @@ namespace Azalea.Editor.Design.Gui;
 public class GUICounter : TextContainer
 {
 	private string _labelText;
+	private int _lastValue;
 	private int _value;
-	private readonly Cached _displayedValue = new();
 
 	internal GUICounter(string text, int initialValue)
 		: base(spriteText => spriteText.Font = GUIConstants.Font)
@@ -17,41 +16,17 @@ public class GUICounter : TextContainer
 		AutoSizeAxes = Axes.Y;
 
 		_labelText = text;
-		_value = initialValue;
+		_value = _lastValue = initialValue;
 	}
 
-	public int Value
-	{
-		get => _value;
-		set
-		{
-			if (value == _value)
-				return;
-
-			_value = value;
-			_displayedValue.Invalidate();
-		}
-	}
-
-	public new string Text
-	{
-		get => _labelText;
-		set
-		{
-			if (value == _labelText)
-				return;
-
-			_labelText = value;
-			_displayedValue.Invalidate();
-		}
-	}
+	public int Value { get; set; }
 
 	protected override void Update()
 	{
-		if (_displayedValue.IsValid == false)
+		if (_lastValue != Value)
 		{
-			base.Text = _labelText + _value.ToString();
-			_displayedValue.Validate();
+			Text = _labelText + _value.ToString();
+			_lastValue = Value;
 		}
 	}
 }

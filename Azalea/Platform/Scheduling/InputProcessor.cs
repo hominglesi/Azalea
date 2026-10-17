@@ -1,5 +1,4 @@
 ﻿using Azalea.Graphics;
-using Azalea.Graphics.Camera;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.Inputs.Gamepads;
@@ -43,7 +42,7 @@ public class InputProcessor
 		switch (e)
 		{
 			case MouseMoveEvent(var position):
-				State.MousePosition = MainCamera.Instance.ToWorldSpace(position);
+				State.MousePosition = position;
 				reprocessHoveredObjects(State.MousePosition);
 				break;
 			case MouseDownEvent(var button, var position):

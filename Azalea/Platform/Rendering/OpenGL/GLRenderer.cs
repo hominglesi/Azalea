@@ -1,5 +1,4 @@
-﻿using Azalea.Graphics.Camera;
-using Azalea.Native.OpenGL;
+﻿using Azalea.Native.OpenGL;
 using Azalea.Numerics;
 using Azalea.Platform.Loading.OpenGL;
 using Azalea.Platform.Windowing;
@@ -265,7 +264,11 @@ internal partial class GLRenderer : PlatformRenderer
 				if (screenFramebuffer.Size != targetFramebufferSize)
 				{
 					GL.BindBuffer(GL.UNIFORM_BUFFER, _uniformBuffer.Handle!.Value);
-					var projectionMatrix = MainCamera.Instance.CreateProjectionMatrix(targetFramebufferSize);
+					var projectionMatrix = Matrix4x4.CreateOrthographicOffCenter(
+						0, targetFramebufferSize.X,
+						targetFramebufferSize.Y, 0,
+						0.1f, 100);
+
 					GL.BufferSubData(GL.UNIFORM_BUFFER, 0, Marshal.SizeOf<Matrix4x4>(), (nint)(&projectionMatrix));
 					GL.BindBuffer(GL.UNIFORM_BUFFER, 0);
 
@@ -294,8 +297,7 @@ internal partial class GLRenderer : PlatformRenderer
 
 				if (_scissorRectangle is not null)
 				{
-					var screenRectangle =
-						MainCamera.Instance.ToWorldSpace(_scissorRectangle.Value);
+					var screenRectangle = _scissorRectangle.Value;
 
 					if (screenRectangle.Width < 0) screenRectangle.Width = 0;
 					if (screenRectangle.Height < 0) screenRectangle.Height = 0;

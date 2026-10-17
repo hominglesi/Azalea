@@ -19,16 +19,8 @@ public struct DrawInfo(Matrix3? matrix = null, Matrix3? matrixInverse = null)
 	public void ApplyRotation(float rotation)
 	{
 		float radians = MathUtils.DegreesToRadians(rotation);
-		if (AzaleaSettings.RotateClockwise)
-		{
-			MatrixExtentions.RotateFromLeft(ref Matrix, radians);
-			MatrixExtentions.RotateFromRight(ref MatrixInverse, -radians);
-		}
-		else
-		{
-			MatrixExtentions.RotateFromLeft(ref Matrix, -radians);
-			MatrixExtentions.RotateFromRight(ref MatrixInverse, radians);
-		}
+		MatrixExtentions.RotateFromLeft(ref Matrix, radians);
+		MatrixExtentions.RotateFromRight(ref MatrixInverse, -radians);
 	}
 
 	public void ApplyScale(Vector2 scale)

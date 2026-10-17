@@ -652,7 +652,7 @@ public partial class GameObject : Amendable, IGameObject
 	{
 		get
 		{
-			if (_drawInfoBacking.IsValid == false || AzaleaSettings.DontCacheDrawInfo == true)
+			if (_drawInfoBacking.IsValid == false)
 			{
 				_drawInfo = computeDrawInfo();
 				_drawInfoBacking.Validate();

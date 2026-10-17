@@ -49,22 +49,18 @@ public class EditorWrapper : AzaleaGame
 		_displayValues.AddDisplayedValue("Scheduling", () => App.Scheduler.Thread.AverageWorkDuration.ToString("0.00ms"));
 		_displayValues.AddDisplayedValue("Rendering", () => App.Renderer.Thread.AverageWorkDuration.ToString("0.00ms"));
 
-		_cameraWindow = new(game);
 		_globalWindow = new(game);
 		_classWindow = new(game);
 	}
 
 	public static AzaleaGame Wrap(AzaleaGame game) => new EditorWrapper(game);
 
-	private readonly CameraWindow _cameraWindow;
 	private readonly GlobalWindow _globalWindow;
 	private readonly ClassWindow _classWindow;
 
 	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		if (e.Key == Keys.F1 && e.State.ShiftPressed)
-			_cameraWindow.Toggle();
-		else if (e.Key == Keys.F2 && e.State.ShiftPressed)
+		if (e.Key == Keys.F2 && e.State.ShiftPressed)
 			_globalWindow.Toggle();
 		else if (e.Key == Keys.F3 && e.State.ShiftPressed)
 			_classWindow.Toggle();
