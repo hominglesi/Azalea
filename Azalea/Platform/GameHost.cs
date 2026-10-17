@@ -1,14 +1,11 @@
-﻿using Azalea.Design.Containers;
-using Azalea.Design.Scenes;
-using Azalea.Extentions;
-using Azalea.Graphics;
+﻿using Azalea.Graphics;
 using Azalea.IO.Configs;
+using Azalea.IO.Resources;
 using Azalea.Lists;
 using Azalea.Platform.Audio;
 using Azalea.Platform.Loading;
-using Azalea.Platform.Loading.OpenGL;
 using System;
-using System.Numerics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -16,37 +13,15 @@ namespace Azalea.Platform;
 
 public abstract class GameHost
 {
-	#region SHIPPABLE
-
 	private static GameHost? _instance;
 
 	public static GameHost Instance => _instance
 		?? throw new InvalidOperationException("A GameHost has not yet been initialized!");
 
-	public PlatformLoader Loader { get; }
-
-	public PlatformAudio Audio { get; }
-
-	#endregion
-
-	private const float __fixedUpdateFrametime = 1f / 60;
-
-	public readonly ObservableList<Application> Applications = [];
-
-	public IConfigProvider? ConfigProvider { get; protected set; }
-	public SceneContainer SceneManager { get; }
-	public IClipboard Clipboard { get; }
-
-	private readonly Composition _root;
-
-	internal GameHost(HostPreferences prefs)
+	public static GameHost Create()
 	{
-		#region SHIPPABLE
-
 		if (_instance is not null)
 			throw new InvalidOperationException("Only one instance of GameHost may be created!");
-
-		_instance = this;
 
 		if (NativeLibrary.TryLoad("soft_oal", out var _) == false)
 		{
@@ -57,63 +32,67 @@ public abstract class GameHost
 				"make sure to move all the other files with it.");
 		}
 
-		Loader = new GLLoader();
-		Audio = PlatformAudio.Create();
+		if (RuntimeInformation.ProcessArchitecture == Architecture.Wasm)
+		{
+			var webAssembly = Assembly.Load("Azalea.Web");
+			var webHostType = webAssembly.GetType("Azalea.Web.Platform.WebHost")!;
+			var bindingFlags = BindingFlags.NonPublic | BindingFlags.Instance;
+			_instance = (GameHost)Activator.CreateInstance(webHostType, bindingFlags, null, null, null)!;
+			return _instance;
+		}
 
-		#endregion
+		_instance = new DesktopGameHost();
+		return _instance;
+	}
+
+	internal GameHost()
+	{
+		Loader = CreateLoader();
+		Audio = CreateAudio();
 
 		Clipboard = CreateClipboard();
-		SceneManager = new SceneContainer();
 
-		_root = new Composition();
 		Time.Setup();
 	}
 
-	public virtual void Run(AzaleaGame game)
+	public PlatformLoader Loader { get; }
+	protected abstract PlatformLoader CreateLoader();
+
+	public PlatformAudio Audio { get; }
+	protected abstract PlatformAudio CreateAudio();
+
+	public IClipboard Clipboard { get; }
+	protected abstract IClipboard CreateClipboard();
+
+	public IConfigProvider? ConfigProvider { get; protected set; }
+
+	protected virtual IConfigProvider? CreateConfigProvider(string path) => null;
+	public void SetupConfig(string path = "config.cfg")
 	{
-		GameObject rootObject = game;
+		if (ConfigProvider is not null)
+			throw new Exception("A config provider has already been set up!");
 
-		_root.Add(rootObject);
-
-		game.AddInternal(SceneManager);
-
-		RunGameLoop();
+		ConfigProvider = CreateConfigProvider(path);
 	}
 
-	protected abstract void RunGameLoop();
-
-	private float _accumulator;
-	protected virtual void ProcessGameLoop()
+	public void SaveConfig()
 	{
-		_accumulator += Time.DeltaTime;
+		if (ConfigProvider is null)
+			throw new Exception("A config provider has not been set up!");
 
-		while (_accumulator >= __fixedUpdateFrametime)
-		{
-			CallOnFixedUpdate();
-			_accumulator -= __fixedUpdateFrametime;
-		}
-
-		CallOnUpdate();
+		ConfigProvider.Save();
 	}
 
-	public virtual void CallOnUpdate()
-	{
-		_root.Size = Vector2Extentions.ComponentMax(Vector2.One, _root.Size);
+	public void SetupPersistentDirectory(string path) => Assets.SetupPersistentStore(path);
+	public void SetupReflectedDirectory(string path) => Assets.SetupReflectedStore(path);
 
-		_root.UpdateSubTree();
-	}
-
-	public virtual void CallOnFixedUpdate()
-	{
-		_root.FixedUpdateSubTree();
-	}
-
-	public Application CreateApplication(AzaleaGame game, string? title = null, Vector2Int? clientSize = null)
+	public readonly ObservableList<Application> Applications = [];
+	public Application CreateApplication(AzaleaGame game, string? title = null, Vector2Int? clientSize = null, bool visible = true)
 	{
 		clientSize ??= new(800, 600);
 		title ??= "Azalea Application";
 
-		var application = new Application(game, title, clientSize.Value);
+		var application = new Application(game, title, clientSize.Value, visible);
 		Applications.Add(application);
 
 		application.OnClosed += () => onApplicationClosed(application);
@@ -140,14 +119,7 @@ public abstract class GameHost
 		_empty.Reset();
 	}
 
-	internal abstract IClipboard CreateClipboard();
 	public abstract ITrayIcon CreateTrayIcon(string iconName, Image icon);
 
 	public virtual DateTime GetCurrentTime() => Time.GetCurrentPreciseTime();
-
-	internal static void CheckForbidden(object? preference, string errorMessage)
-	{
-		if (preference is not null)
-			throw new ArgumentException(errorMessage);
-	}
 }

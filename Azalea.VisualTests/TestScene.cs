@@ -1,5 +1,4 @@
 ﻿using Azalea.Design.Containers;
-using Azalea.Design.Scenes;
 using Azalea.Design.UserInterface;
 using Azalea.Design.UserInterface.Basic;
 using Azalea.Graphics;
@@ -11,7 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Azalea.VisualTests;
 
-public class TestScene : Scene
+public class TestScene : Composition
 {
 	private const float __sidebarWidth = 400;
 	private static readonly Color __accentColor = new(0, 46, 70);
@@ -24,6 +23,7 @@ public class TestScene : Scene
 	public TestScene()
 	{
 		BackgroundColor = Palette.Flowers.Azalea;
+		RelativeSizeAxes = Axes.Both;
 	}
 
 	private int _nextSidebarIndex = 0;

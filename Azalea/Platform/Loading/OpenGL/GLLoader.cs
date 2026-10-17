@@ -1,5 +1,4 @@
-﻿// SHIPPABLE
-using Azalea.Graphics.Textures;
+﻿using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
 using Azalea.Native.OpenGL;
 using Azalea.Platform.Rendering;

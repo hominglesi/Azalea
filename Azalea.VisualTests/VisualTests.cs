@@ -1,6 +1,5 @@
 ﻿using Azalea.Amends;
 using Azalea.Design.Containers;
-using Azalea.Design.Scenes;
 using Azalea.Design.Shapes;
 using Azalea.Design.UserInterface;
 using Azalea.Graphics;
@@ -76,7 +75,7 @@ public class VisualTests : AzaleaGame
 		}
 	}
 
-	private class TestSelectScene : Scene
+	private class TestSelectScene : Composition
 	{
 		private readonly VisualTests _parent;
 		private readonly FlexContainer _testContainer;
@@ -84,6 +83,8 @@ public class VisualTests : AzaleaGame
 		public TestSelectScene(VisualTests parent, IEnumerable<string> tests)
 		{
 			_parent = parent;
+
+			RelativeSizeAxes = Axes.Both;
 
 			Add(_testContainer = new FlexContainer()
 			{

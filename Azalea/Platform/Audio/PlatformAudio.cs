@@ -1,9 +1,6 @@
-﻿using Azalea.Platform.Audio.OpenAL;
-using Azalea.Platform.Audio.Windows;
-using Azalea.Threading;
+﻿using Azalea.Threading;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Azalea.Platform.Audio;
@@ -51,16 +48,4 @@ public abstract partial class PlatformAudio : ICommandHandler<AudioCommand>
 	}
 
 	#endregion
-
-	public static PlatformAudio Create()
-	{
-		var newAudio = RuntimeInformation.ProcessArchitecture switch
-		{
-			Architecture.X64 or Architecture.X86 => new ALAudio(new WindowsAudioDeviceNotificationClient()),
-			_ => throw new NotSupportedException(
-				$"Platform '{RuntimeInformation.ProcessArchitecture}' is not supported")
-		};
-
-		return newAudio;
-	}
 }

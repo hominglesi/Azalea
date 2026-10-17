@@ -11,17 +11,17 @@ namespace Azalea.Platform;
 public sealed class Application
 {
 	public readonly AzaleaGame Game;
-	public readonly Windowing.PlatformWindow Window;
+	public readonly PlatformWindow Window;
 	public readonly PlatformRenderer Renderer;
 	public readonly PlatformScheduler Scheduler;
 	public readonly InputProcessor Input;
 
-	internal Application(AzaleaGame game, string title, Vector2Int clientSize)
+	internal Application(AzaleaGame game, string title, Vector2Int clientSize, bool visible)
 	{
 		Game = game;
 		Game.App = this;
 
-		Window = Windowing.PlatformWindow.Create(title, clientSize);
+		Window = PlatformWindow.Create(title, clientSize, visible);
 		Window.Center();
 
 		Renderer = PlatformRenderer.AttachRenderer(Window);
