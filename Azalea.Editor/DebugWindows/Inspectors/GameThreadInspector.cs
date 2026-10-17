@@ -1,9 +1,9 @@
 ﻿using Azalea.Editor.Design.Gui;
 using Azalea.Extentions;
 using Azalea.Threading;
-using Azalea.Utils;
 
 namespace Azalea.Editor.DebugWindows.Inspectors;
+
 internal class GameThreadInspector
 {
 	public static void Inject<T>(GUIWindow window, GameThread<T> thread)

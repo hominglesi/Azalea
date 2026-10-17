@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace Azalea.Platform.Rendering;
+
 public class Framebuffer
 {
 	internal uint? Handle { get; private set; }

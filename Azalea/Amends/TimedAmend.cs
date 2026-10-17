@@ -1,17 +1,12 @@
 ﻿using System;
 
 namespace Azalea.Amends;
-public class TimedAmend<T> : Amend<T>
-{
-	protected float StartingDuration;
-	protected float RemainingDuration;
 
-	public TimedAmend(T target, Action<T>? action, float duration)
-		: base(target, action)
-	{
-		StartingDuration = duration;
-		RemainingDuration = duration;
-	}
+public class TimedAmend<T>(T target, Action<T>? action, float duration)
+	: Amend<T>(target, action)
+{
+	protected float StartingDuration = duration;
+	protected float RemainingDuration = duration;
 
 	public override void Update(float deltaTime)
 	{

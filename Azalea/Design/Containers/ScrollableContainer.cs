@@ -8,6 +8,7 @@ using System;
 using System.Numerics;
 
 namespace Azalea.Design.Containers;
+
 public class ScrollableContainer : ContentContainer
 {
 	public Slider ScrollBar { get; init; }
@@ -71,10 +72,9 @@ public class ScrollableContainer : ContentContainer
 	}
 
 	private Vector2 _scrollRange;
-	private Vector2 getScrollRange(float scrollHeight, float contentHeight)
+	private static Vector2 getScrollRange(float scrollHeight, float contentHeight)
 	{
 		var range = new Vector2(0, -(contentHeight - scrollHeight));
-
 
 		if (range.Y > 0) range.Y = 0;
 		return range;

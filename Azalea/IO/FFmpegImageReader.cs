@@ -93,7 +93,7 @@ internal unsafe class FFmpegImageReader
 
 		if (found == false)
 		{
-			avcodec_send_packet(cc, null);
+			_ = avcodec_send_packet(cc, null);
 			check(avcodec_receive_frame(cc, frame), "avcodec_receive_frame");
 		}
 

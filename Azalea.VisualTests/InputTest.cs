@@ -5,6 +5,7 @@ using Azalea.Inputs.Events;
 using System;
 
 namespace Azalea.VisualTests;
+
 public class InputTest : TestScene
 {
 	public InputTest()
@@ -35,13 +36,9 @@ public class InputTest : TestScene
 		return false;
 	}
 
-	private class InputLoggingObject : Box
+	private class InputLoggingObject(string name) : Box
 	{
-		private string _name;
-		public InputLoggingObject(string name)
-		{
-			_name = name;
-		}
+		private readonly string _name = name;
 
 		protected override bool OnHover(HoverEvent e)
 		{

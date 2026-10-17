@@ -4,24 +4,16 @@ using System;
 
 namespace Azalea.Numerics;
 
-public struct RectangleInt : IEquatable<RectangleInt>
+public struct RectangleInt(int x, int y, int width, int height) : IEquatable<RectangleInt>
 {
 	public static RectangleInt Zero { get; } = new RectangleInt(0, 0, 0, 0);
 	public static RectangleInt One { get; } = new RectangleInt(0, 0, 1, 1);
 
-	public int X;
-	public int Y;
+	public int X = x;
+	public int Y = y;
 
-	public int Width;
-	public int Height;
-
-	public RectangleInt(int x, int y, int width, int height)
-	{
-		X = x;
-		Y = y;
-		Width = width;
-		Height = height;
-	}
+	public int Width = width;
+	public int Height = height;
 
 	public RectangleInt(Vector2Int position, Vector2Int size)
 		: this(position.X, position.Y, size.X, size.Y) { }

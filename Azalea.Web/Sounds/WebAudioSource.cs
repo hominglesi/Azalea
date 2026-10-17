@@ -1,6 +1,5 @@
-﻿using Azalea.Sounds;
+﻿namespace Azalea.Web.Sounds;
 
-namespace Azalea.Web.Sounds;
 internal class WebAudioSource : AudioSource
 {
 	public object Handle;

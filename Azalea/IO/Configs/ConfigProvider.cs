@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.IO.Configs;
+
 internal abstract class ConfigProvider : IConfigProvider
 {
-	protected Dictionary<string, string> Dictionary = new();
+	protected Dictionary<string, string> Dictionary = [];
 
 	public abstract void Save();
 

@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 
 namespace Azalea.Inputs;
+
 public class GamepadDPad
 {
 	private float _horizontal;

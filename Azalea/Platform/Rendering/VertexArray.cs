@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace Azalea.Platform.Rendering;
+
 public class VertexArray
 {
 	internal uint? Handle { get; private set; }

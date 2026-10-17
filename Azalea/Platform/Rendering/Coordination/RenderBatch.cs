@@ -1,13 +1,9 @@
 ﻿namespace Azalea.Platform.Rendering.Coordination;
-public abstract class RenderBatch<T> : IRenderBatch
+
+public abstract class RenderBatch<T>(RenderCoordinator coordinator) : IRenderBatch
 	where T : struct
 {
-	private readonly RenderCoordinator _coordinator;
-
-	public RenderBatch(RenderCoordinator coordinator)
-	{
-		_coordinator = coordinator;
-	}
+	private readonly RenderCoordinator _coordinator = coordinator;
 
 	public void Add(T vertex)
 	{

@@ -1,6 +1,4 @@
 ﻿using Azalea.Graphics;
-using Azalea.Graphics.OpenGL.Enums;
-using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Textures;
 using Azalea.Utils;
 using System;

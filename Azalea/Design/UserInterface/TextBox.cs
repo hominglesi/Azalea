@@ -7,6 +7,7 @@ using System;
 using System.Numerics;
 
 namespace Azalea.Design.UserInterface;
+
 public abstract class TextBox(Action<SpriteText>? creationParameters = null) : TextContainer(creationParameters)
 {
 	private int _caratPosition = 0;
@@ -102,10 +103,10 @@ public abstract class TextBox(Action<SpriteText>? creationParameters = null) : T
 	{
 		if (_caratPosition == 0) return;
 
-		var newText = _text.Substring(0, _caratPosition - 1);
+		var newText = _text[..(_caratPosition - 1)];
 
 		if (_caratPosition < _text.Length)
-			newText += _text.Substring(_caratPosition, _text.Length - _caratPosition);
+			newText += _text[_caratPosition..];
 
 		_caratPosition--;
 
@@ -147,7 +148,7 @@ public abstract class TextBox(Action<SpriteText>? creationParameters = null) : T
 
 				caratIndex += text.Text.Length;
 			}
-			else if (child is FlowNewLine line)
+			else if (child is FlowNewLine)
 			{
 				caratIndex++;
 			}

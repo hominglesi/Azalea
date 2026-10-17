@@ -1,6 +1,7 @@
 ﻿using Azalea.IO.Configs;
 
 namespace Azalea.Web.IO;
+
 internal class WebConfigProvider : ConfigProvider
 {
 	public WebConfigProvider()

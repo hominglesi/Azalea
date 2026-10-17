@@ -7,6 +7,7 @@ using System;
 using System.Numerics;
 
 namespace Azalea.Design.UserInterface.Basic;
+
 public class BasicTextBox : TextBox
 {
 	private Box _carat { get; init; }

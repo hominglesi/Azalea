@@ -1,4 +1,5 @@
 ﻿namespace Azalea.Platform;
+
 public static class Clipboard
 {
 	private static IClipboard? _instance;

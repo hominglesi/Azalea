@@ -6,7 +6,7 @@ namespace Azalea.IO.Resources;
 
 public static partial class ResourceStoreExtentions
 {
-	private static ResourceCache<Sound> _soundCache = new();
+	private readonly static ResourceCache<Sound> _soundCache = new();
 
 	public static Sound GetSound(this IResourceStore store, string path)
 	{
@@ -18,9 +18,9 @@ public static partial class ResourceStoreExtentions
 		return sound;
 	}
 
-	private static ResourceCache<Platform.Audio.SoundByte> _soundByteCache = new();
+	private readonly static ResourceCache<SoundByte> _soundByteCache = new();
 
-	public static Platform.Audio.SoundByte GetSoundByte(this IResourceStore store, string path)
+	public static SoundByte GetSoundByte(this IResourceStore store, string path)
 	{
 		if (_soundByteCache.TryGetValue(store, path, out var cached))
 			return cached;

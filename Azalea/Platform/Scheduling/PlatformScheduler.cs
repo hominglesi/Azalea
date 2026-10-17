@@ -2,6 +2,7 @@
 using Azalea.Threading;
 using System;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Azalea.Platform.Scheduling;
 
@@ -63,7 +64,7 @@ public class PlatformScheduler : ICommandHandler<ThreadCommand>
 			command.Return();
 		}
 
-		private readonly object _protocolInjectionLock = new();
+		private readonly Lock _protocolInjectionLock = new();
 		internal Action<Windowing.PlatformWindow, PlatformRenderer>? Protocol = null;
 
 		public void InjectProtocol(Action<Windowing.PlatformWindow, PlatformRenderer> protocol)

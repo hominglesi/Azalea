@@ -1,16 +1,15 @@
 ﻿using Azalea.Design.Shapes;
 using Azalea.Graphics.Colors;
-using Azalea.Graphics.Rendering;
-using Azalea.Platform.Windowing;
 using Azalea.Numerics;
-using Azalea.Platform;
+using Azalea.Platform.Rendering;
+using Azalea.Platform.Windowing;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Azalea.Platform.Rendering;
 
 namespace Azalea.VisualTests.Breakout;
+
 public class BreakoutTest : TestScene
 {
 	public const int GameWidth = 1024;
@@ -22,9 +21,9 @@ public class BreakoutTest : TestScene
 	public const int PaddleHeight = 20;
 	public const int PaddleOffset = 10;
 
-	private BreakoutChunk _chunkRoot;
-	private List<BreakoutBall> _balls = new();
-	private List<Box> _tempBoxes = new();
+	private readonly BreakoutChunk _chunkRoot;
+	private readonly List<BreakoutBall> _balls = [];
+	private readonly List<Box> _tempBoxes = [];
 
 	public BreakoutTest()
 	{
@@ -79,7 +78,7 @@ public class BreakoutTest : TestScene
 		App.Window.Center();
 	}
 
-	private Color getColorFromPosition(int x, int y)
+	private static Color getColorFromPosition(int x, int y)
 	{
 		var hue = MathUtils.Map(x, 0, GameWidth, 0, 350);
 		var luminance = MathUtils.Map(y, 0, BlocksHeight, 0.25f, 0.85f);
@@ -87,7 +86,7 @@ public class BreakoutTest : TestScene
 		return Graphics.Colors.Color.FromHSL(new(hue, 0.95f, luminance, 1));
 	}
 
-	private List<BreakoutBall> _createdBalls = new();
+	private readonly List<BreakoutBall> _createdBalls = [];
 	protected override void UpdateAfterChildren()
 	{
 		foreach (var ball in _balls)

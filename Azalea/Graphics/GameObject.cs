@@ -5,7 +5,6 @@ using Azalea.Extentions;
 using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Primitives;
-using Azalea.Graphics.Rendering;
 using Azalea.Inputs.Events;
 using Azalea.Layout;
 using Azalea.Numerics;
@@ -83,7 +82,7 @@ public partial class GameObject : Amendable, IGameObject
 
 			_width = value;
 
-			invalidateParentSizeDependencies(Invalidation.DrawSize, Axes.X);
+			invalidateParentSizeDependencies(Invalidation.DrawSize);
 		}
 	}
 
@@ -97,7 +96,7 @@ public partial class GameObject : Amendable, IGameObject
 
 			_height = value;
 
-			invalidateParentSizeDependencies(Invalidation.DrawSize, Axes.Y);
+			invalidateParentSizeDependencies(Invalidation.DrawSize);
 		}
 	}
 
@@ -108,18 +107,10 @@ public partial class GameObject : Amendable, IGameObject
 		{
 			if (value == Size) return;
 
-			var changedAxes = Axes.None;
-
-			if (_width != value.X)
-				changedAxes |= Axes.X;
-
-			if (_height != value.Y)
-				changedAxes |= Axes.Y;
-
 			_width = value.X;
 			_height = value.Y;
 
-			invalidateParentSizeDependencies(Invalidation.DrawSize, changedAxes);
+			invalidateParentSizeDependencies(Invalidation.DrawSize);
 		}
 	}
 
@@ -146,7 +137,7 @@ public partial class GameObject : Amendable, IGameObject
 	{
 		if (Active == false) return;
 
-		if(_initialized == false)
+		if (_initialized == false)
 		{
 			Initialize();
 			_initialized = true;
@@ -259,7 +250,7 @@ public partial class GameObject : Amendable, IGameObject
 
 			_negativeSize = value;
 
-			invalidateParentSizeDependencies(Invalidation.DrawSize, Axes.Both);
+			invalidateParentSizeDependencies(Invalidation.DrawSize);
 		}
 	}
 
@@ -683,7 +674,10 @@ public partial class GameObject : Amendable, IGameObject
 		if (Parent != null)
 			pos += Parent.ChildOffset;
 
-		di.ApplyTransformations(pos, Scale, Rotation, Vector2.Zero, OriginPosition);
+		if (pos != Vector2.Zero) di.ApplyTranslation(pos);
+		if (Rotation != 0) di.ApplyRotation(Rotation);
+		if (Scale != Vector2.Zero) di.ApplyScale(Scale);
+		if (OriginPosition != Vector2.Zero) di.ApplyOrigin(OriginPosition);
 
 		return di;
 	}
@@ -692,7 +686,7 @@ public partial class GameObject : Amendable, IGameObject
 
 	#region Components
 
-	private List<Component> _components = new();
+	private readonly List<Component> _components = [];
 
 	public void AddComponent(Component component)
 	{
@@ -851,11 +845,11 @@ public partial class GameObject : Amendable, IGameObject
 		}
 	}
 
-	private void invalidateParentSizeDependencies(Invalidation invalidation, Axes changedAxes)
+	private void invalidateParentSizeDependencies(Invalidation invalidation)
 	{
 		invalidate(invalidation, InvalidationSource.Self, false);
 
-		Parent?.InvalidateChildrenSizeDependencies(invalidation, changedAxes, this);
+		Parent?.Invalidate(invalidation, InvalidationSource.Child);
 	}
 
 	#region DrawInfo-based conversions

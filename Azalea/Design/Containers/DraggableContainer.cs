@@ -5,6 +5,7 @@ using System;
 using System.Numerics;
 
 namespace Azalea.Design.Containers;
+
 public class DraggableContainer : Composition
 {
 	private bool _isDragging;
@@ -28,7 +29,7 @@ public class DraggableContainer : Composition
 		}
 	}
 
-	private DragArea _dragArea;
+	private readonly DragArea _dragArea;
 	public GameObject DragAreaObject => _dragArea;
 
 	public DraggableContainer()

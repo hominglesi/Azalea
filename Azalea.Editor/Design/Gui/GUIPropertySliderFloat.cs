@@ -2,10 +2,10 @@
 using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
-using Azalea.Utils;
 using Azalea.Utils.Proxies;
 
 namespace Azalea.Editor.Design.Gui;
+
 public class GUIPropertySliderFloat : Composition
 {
 	private readonly IProxy<float> _proxy;
@@ -52,7 +52,7 @@ public class GUIPropertySliderFloat : Composition
 
 	protected override void Update()
 	{
-		if(_proxy.HasNewValue(out float newValue))
+		if (_proxy.HasNewValue(out float newValue))
 			Slider.Value = toSliderRange(newValue);
 	}
 

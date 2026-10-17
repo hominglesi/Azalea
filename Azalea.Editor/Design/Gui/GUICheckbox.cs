@@ -6,6 +6,7 @@ using Azalea.IO.Resources;
 using System;
 
 namespace Azalea.Editor.Design.Gui;
+
 public class GUICheckbox : FlexContainer
 {
 	private readonly Sprite _checkmarkSprite;

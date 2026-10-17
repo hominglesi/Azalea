@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace Azalea.Utils;
+
 public abstract class Disposable : IDisposable
 {
 	protected readonly object DisposeLock = new();

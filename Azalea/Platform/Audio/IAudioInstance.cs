@@ -1,13 +1,11 @@
-﻿using Azalea.Utils;
-using System;
+﻿namespace Azalea.Platform.Audio;
 
-namespace Azalea.Platform.Audio;
 public partial interface IAudioInstance
 {
 	internal PlatformAudio Owner { get; }
 	public bool Looping { get; }
 	public double Duration { get; }
-	
+
 	public AudioInstanceState State { get; }
 	public float Gain { get; }
 	public float Timestamp { get; }

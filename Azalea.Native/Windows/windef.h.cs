@@ -1,4 +1,5 @@
 ﻿namespace Azalea.Native.Windows;
+
 public static partial class Win32
 {
 	public struct POINT

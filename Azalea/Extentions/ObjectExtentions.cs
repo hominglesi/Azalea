@@ -1,5 +1,4 @@
-﻿using Azalea.Utils;
-using Azalea.Utils.Proxies;
+﻿using Azalea.Utils.Proxies;
 using System;
 
 namespace Azalea.Extentions;

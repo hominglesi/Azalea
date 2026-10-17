@@ -27,7 +27,7 @@ internal static class CreateSoundByteCommand_Handler
 {
 	internal static SoundByte CreateSoundByte(this ICommandHandler<AudioCommand> handler, byte[] data, int dataLength, int format, int frequency)
 	{
-		var duration = AudioUtils.CalculateDuration(data, dataLength, format, frequency);
+		var duration = AudioUtils.CalculateDuration(dataLength, format, frequency);
 
 		var soundByte = new SoundByte(duration);
 		handler.Enqueue(CreateSoundByteCommand.Borrow(soundByte, data, dataLength, format, frequency));

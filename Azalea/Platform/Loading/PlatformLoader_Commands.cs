@@ -38,7 +38,8 @@ internal static class CreateTextureCommand_Handler
 	internal static NativeTexture CreateTexture(this ICommandHandler<LoadingCommand> handler, int width, int height, byte[]? pixels, bool generateMipmap, TextureFiltering filtering, NativeTexture? texture = null)
 	{
 		texture ??= ((PlatformLoader)handler).CreateEmptyTexture();
-		texture.SetSize(width, height);
+		texture.Width = width;
+		texture.Height = height;
 		texture.BeginLoadingOperation();
 		handler.Enqueue(CreateTextureCommand.Borrow(texture, width, height, pixels, generateMipmap, filtering));
 		return texture;

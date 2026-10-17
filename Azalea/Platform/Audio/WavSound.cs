@@ -26,7 +26,7 @@ internal class WavSound
 		if (wav[index++] != 'R' || wav[index++] != 'I' || wav[index++] != 'F' || wav[index++] != 'F')
 			throw new ArgumentException("Given stream is not of a valid .wav file");
 
-		int chunkSize = BinaryPrimitives.ReadInt32LittleEndian(wav.Slice(index, 4));
+		//int chunkSize = BinaryPrimitives.ReadInt32LittleEndian(wav.Slice(index, 4));
 		index += 4;
 
 		if (wav[index++] != 'W' || wav[index++] != 'A' || wav[index++] != 'V' || wav[index++] != 'E')
@@ -77,14 +77,12 @@ internal class WavSound
 
 	private short _audioFormat;
 	private short _numChannels;
-	private int _byteRate;
-	private short _blockAlign;
 	private short _bitsPerSample;
 
-	private int _dataOffset;
-	private int _dataLength;
-	private int _lengthInSamples;
-	private float _length;
+	private readonly int _dataOffset;
+	private readonly int _dataLength;
+	private readonly int _lengthInSamples;
+	private readonly float _length;
 
 	private void readFmtSubchunk(ReadOnlySpan<byte> data, int offset)
 	{
@@ -101,12 +99,11 @@ internal class WavSound
 			offset += 2;
 			Frequency = BinaryPrimitives.ReadInt32LittleEndian(data.Slice(offset, 4));
 			offset += 4;
-			_byteRate = BinaryPrimitives.ReadInt32LittleEndian(data.Slice(offset, 4));
+			// Byte Rate
 			offset += 4;
-			_blockAlign = BinaryPrimitives.ReadInt16LittleEndian(data.Slice(offset, 2));
+			// Block Align
 			offset += 2;
 			_bitsPerSample = BinaryPrimitives.ReadInt16LittleEndian(data.Slice(offset, 2));
-			offset += 2;
 
 			if (_numChannels == 1)
 			{

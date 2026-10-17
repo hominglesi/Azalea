@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 
 namespace Azalea.Native.Windows;
+
 public static partial class Win32
 {
 	private const string User32Path = "user32.dll";
@@ -142,20 +143,13 @@ public static partial class Win32
 	public static partial bool GetWindowRect(nint hWnd, out RECT lpRect);
 
 	[StructLayout(LayoutKind.Sequential)]
-	public readonly struct ICONINFO
+	public readonly struct ICONINFO(nint mask, nint color)
 	{
-		// We have to use int instead of bool since C# doesn't want to marshal bool
 		private readonly int fIcon = 1;
 		public readonly uint xHotspot = 0;
 		public readonly uint yHotspot = 0;
-		public readonly nint hbmMask;
-		public readonly nint hbmColor;
-
-		public ICONINFO(nint mask, nint color)
-		{
-			hbmMask = mask;
-			hbmColor = color;
-		}
+		public readonly nint hbmMask = mask;
+		public readonly nint hbmColor = color;
 	}
 
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-isiconic">Official Documentation</see></summary>
@@ -290,7 +284,7 @@ public static partial class Win32
 		NOMOVE = 0x0002,
 		NOOWNERZORDER = 0x0200,
 		NOREDRAW = 0x0008,
-		NOREPOSITION = 0x0200,
+		NOREPOSITION = NOOWNERZORDER,
 		NOSENDCHANGING = 0x0400,
 		NOSIZE = 0x0001,
 		NOZORDER = 0x0004,

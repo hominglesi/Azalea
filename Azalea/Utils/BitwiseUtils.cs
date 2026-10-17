@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Azalea.Utils;
+
 public static class BitwiseUtils
 {
 	public static short GetLowOrderValue(IntPtr value) => (short)(long)value;
@@ -11,6 +13,7 @@ public static class BitwiseUtils
 	public static ushort MergeValues(byte highOrder, byte lowOrder)
 		=> (ushort)((highOrder << 8) | lowOrder);
 
+	[SuppressMessage("Reliability", "CA2020:Prevent behavioral change")]
 	public static bool GetSpecificBit(IntPtr value, int bitIndex) => ((int)value & (1 << bitIndex - 1)) != 0;
 	public static bool GetSpecificBit(int value, int bitIndex) => (value & (1 << bitIndex - 1)) != 0;
 }

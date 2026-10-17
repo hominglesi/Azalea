@@ -4,14 +4,9 @@ using System;
 using System.IO;
 
 namespace Azalea.Platform;
-public abstract class PlatformWindow : Disposable, IWindow
+
+public abstract class PlatformWindow(string title, Vector2Int clientSize, WindowState state) : Disposable, IWindow
 {
-	public PlatformWindow(string title, Vector2Int clientSize, WindowState state)
-	{
-		_title = title;
-		_clientSize = clientSize;
-		_state = state;
-	}
 
 	#region Size
 
@@ -33,7 +28,7 @@ public abstract class PlatformWindow : Disposable, IWindow
 		}
 	}
 
-	private Vector2Int _clientSize;
+	private Vector2Int _clientSize = clientSize;
 	protected abstract void SetClientSizeImplementation(Vector2Int clientSize);
 	public Vector2Int ClientSize
 	{
@@ -110,7 +105,7 @@ public abstract class PlatformWindow : Disposable, IWindow
 
 	#region State
 
-	protected WindowState _state;
+	protected WindowState _state = state;
 	private Vector2Int _preFullscreenPosition;
 	private Vector2Int _preFullscreenSize;
 	protected abstract void MinimizeImplementation();
@@ -157,7 +152,7 @@ public abstract class PlatformWindow : Disposable, IWindow
 
 	#region OtherProperties
 
-	private string _title;
+	private string _title = title;
 	protected abstract void SetTitleImplementation(string title);
 	public string Title
 	{

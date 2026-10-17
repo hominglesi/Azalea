@@ -1,11 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 
 namespace Azalea.SourceGeneration;
 
@@ -87,7 +84,7 @@ internal class ThreadCommandGenerator : IIncrementalGenerator
 
 			// TotalCreated
 			builder.AppendLine("internal static volatile new int TotalCreated = 0;");
-			
+
 			#region BorrowMethod
 
 			builder.Append($"public static {item.Details.Name} Borrow(");
@@ -100,7 +97,7 @@ internal class ThreadCommandGenerator : IIncrementalGenerator
 
 			foreach (var property in item.Properties)
 				builder.AppendLine($"command.{property.Item2} = __{property.Item2};");
-			if(item.IsAwaitable) builder.AppendLine("command._completedEvent.Reset();");
+			if (item.IsAwaitable) builder.AppendLine("command._completedEvent.Reset();");
 
 			builder.Append("return command;");
 			builder.EndScope();
@@ -180,7 +177,9 @@ internal class ThreadCommandGenerator : IIncrementalGenerator
 				builder.AppendLine(")");
 				builder.Append($"\t=> handler.Enqueue({item.Details.Name}.Borrow(");
 				appendAllParameters(builder, item, types: false);
-				builder.Append("));");
+				builder.Append("))");
+				if (item.IsAwaitable) builder.Append('!');
+				builder.Append(';');
 				builder.EndScope();
 			}
 
@@ -192,7 +191,7 @@ internal class ThreadCommandGenerator : IIncrementalGenerator
 
 		return builder.ToString();
 
-		void appendAllParameters(SourceBuilder builder, ThreadCommandData command, bool types = true, bool @out = false)
+		static void appendAllParameters(SourceBuilder builder, ThreadCommandData command, bool types = true, bool @out = false)
 		{
 			for (int i = 0; i < command.Properties.Count; i++)
 			{

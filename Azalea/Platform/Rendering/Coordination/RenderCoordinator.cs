@@ -4,7 +4,6 @@ using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Azalea.Platform.Rendering.Coordination;
 
@@ -24,9 +23,12 @@ public class RenderCoordinator
 	#region CommandQueue
 
 	public RenderCommandGroup? _commandQueue;
-	[MemberNotNull(nameof(_commandQueue))]
-	private void assertQueueExists() => Debug.Assert(_commandQueue is not null,
-		"Command queue does not exist!");
+	private RenderCommandGroup getCommandQueue()
+	{
+		Debug.Assert(_commandQueue is not null, "Command queue does not exist!");
+		return _commandQueue;
+	}
+
 	private void assertQueueDoesNotExist() => Debug.Assert(_commandQueue is null,
 		"Command queue already exists!");
 
@@ -43,9 +45,7 @@ public class RenderCoordinator
 
 	public RenderCommandGroup EndCommandQueue()
 	{
-		assertQueueExists();
-
-		var commandQueue = _commandQueue;
+		var commandQueue = getCommandQueue();
 		_commandQueue = null;
 
 		Debug.Assert(_scissorStack.Count == 0);
@@ -65,17 +65,15 @@ public class RenderCoordinator
 
 	public void PushScissor(RectangleInt scissorRect)
 	{
-		assertQueueExists();
-
 		FlushRenderBatch();
 
 		_scissorStack.Push(scissorRect);
-		_commandQueue.Scissor(scissorRect);
+		getCommandQueue().Scissor(scissorRect);
 	}
 
 	public void PopScissor()
 	{
-		assertQueueExists();
+		var commandQueue = getCommandQueue();
 		assertScissorExists();
 
 		FlushRenderBatch();
@@ -83,9 +81,9 @@ public class RenderCoordinator
 		_scissorStack.Pop();
 
 		if (_scissorStack.Count == 0)
-			_commandQueue.Scissor(null);
+			commandQueue.Scissor(null);
 		else
-			_commandQueue.Scissor(_scissorStack.Peek());
+			commandQueue.Scissor(_scissorStack.Peek());
 	}
 
 	#endregion
@@ -97,15 +95,20 @@ public class RenderCoordinator
 		if (_boundShader == shader)
 			return;
 
-		assertQueueExists();
 		FlushRenderBatch();
 
-		_commandQueue.UseProgram((Program)shader);
+		getCommandQueue().UseProgram((Program)shader);
 		_boundShader = shader;
 	}
 
-	public void Uniform(string uniformName, float v) => _commandQueue.Uniform1f((Program)_boundShader, uniformName, v);
-	public void Uniform(string uniformName, float v1, float v2) => _commandQueue.Uniform2f((Program)_boundShader, uniformName, v1, v2);
+	private Program getBoundProgram()
+	{
+		Debug.Assert(_boundShader is not null);
+		return (Program)_boundShader;
+	}
+
+	public void Uniform(string uniformName, float v) => getCommandQueue().Uniform1f(getBoundProgram(), uniformName, v);
+	public void Uniform(string uniformName, float v1, float v2) => getCommandQueue().Uniform2f(getBoundProgram(), uniformName, v1, v2);
 
 	#endregion
 	#region Texture
@@ -116,10 +119,9 @@ public class RenderCoordinator
 		if (_boundTexture == texture)
 			return;
 
-		assertQueueExists();
 		FlushRenderBatch();
 
-		_commandQueue.BindTexture(GL.TEXTURE_2D, texture);
+		getCommandQueue().BindTexture(GL.TEXTURE_2D, texture);
 		_boundTexture = texture;
 	}
 
@@ -132,8 +134,6 @@ public class RenderCoordinator
 		if (_activeRenderBatch == renderBatch)
 			return;
 
-		assertQueueExists();
-
 		FlushRenderBatch();
 
 		_activeRenderBatch = renderBatch;
@@ -144,9 +144,9 @@ public class RenderCoordinator
 		if (_activeRenderBatch is null)
 			return;
 
-		assertQueueExists();
+		var commandQueue = getCommandQueue();
 
-		_activeRenderBatch.Draw(_commandQueue);
+		_activeRenderBatch.Draw(commandQueue);
 		_activeRenderBatch = null;
 	}
 

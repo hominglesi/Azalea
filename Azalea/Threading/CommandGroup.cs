@@ -1,11 +1,13 @@
 ﻿using Azalea.Utils;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Azalea.Threading;
+
 public class CommandGroup<T> : ICommandHandler<T>, IPoolable
 	where T : ThreadCommand
 {
-	private readonly object _commandsLock = new();
+	private readonly Lock _commandsLock = new();
 	private readonly Queue<T> _commands = [];
 
 	public virtual ICommandAwaitable? Enqueue(T command)

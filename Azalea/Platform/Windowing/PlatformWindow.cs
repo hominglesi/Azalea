@@ -1,18 +1,17 @@
-﻿using Azalea.Inputs;
-using Azalea.Inputs.Events;
+﻿using Azalea.Inputs.Events;
 using Azalea.Inputs.Gamepads;
 using Azalea.IO.Resources;
 using Azalea.Platform.Rendering;
 using Azalea.Platform.Scheduling;
 using Azalea.Platform.Windowing.Windows;
 using Azalea.Threading;
-using Azalea.Utils;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Channels;
 
 namespace Azalea.Platform.Windowing;
+
 public abstract partial class PlatformWindow : ICommandHandler<WindowCommand>
 {
 	protected PlatformWindow(string title, Vector2Int clientSize, bool initiallyVisible)
@@ -82,7 +81,7 @@ public abstract partial class PlatformWindow : ICommandHandler<WindowCommand>
 	}
 
 	internal bool DeviceContextBorrowed = false;
-	private readonly object _deviceContextOwnerLock = new();
+	private readonly Lock _deviceContextOwnerLock = new();
 	protected abstract IPlatformDeviceContext GetDeviceContext();
 	public IPlatformDeviceContext BorrowDeviceContext()
 	{

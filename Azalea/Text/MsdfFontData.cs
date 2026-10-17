@@ -1,26 +1,23 @@
 ﻿using Azalea.Graphics.Textures;
 using Azalea.Numerics;
-using Azalea.Platform;
-using Azalea.Platform.Loading;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text.RegularExpressions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Azalea.Text;
+
 public class MsdfFontData
 {
-	private ITexture _spriteSheet;
+	private readonly Texture _spriteSheet;
+	private readonly Dictionary<char, Character> _characters;
 
-	private Dictionary<char, Character> _characters;
-
-	public MsdfFontData(string csvData, ITexture spriteSheet)
+	public MsdfFontData(string csvData, Texture spriteSheet)
 	{
 		_spriteSheet = spriteSheet;
 
 		var csvSpan = csvData.AsSpan();
-		var csvLineCount = Regex.Matches(csvData, Environment.NewLine).Count;
+		var csvLineCount = Regex.Count(csvData, Environment.NewLine);
 
 		_characters = new Dictionary<char, Character>(csvLineCount);
 
@@ -65,7 +62,7 @@ public class MsdfFontData
 		// never be used
 		if (character._texture is null)
 		{
-			character._texture = new Texture(_spriteSheet)
+			character._texture = new Texture(_spriteSheet.NativeTexture)
 			{
 				Region = new RectangleInt(character.Position, character.Size)
 			};

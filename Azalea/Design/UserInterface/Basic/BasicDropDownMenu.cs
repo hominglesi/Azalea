@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Design.UserInterface.Basic;
+
 public class BasicDropDownMenu : AbstractDropDownMenu<string>
 {
 	public readonly Sprite Arrow;
@@ -225,9 +226,8 @@ public class BasicDropDownMenu : AbstractDropDownMenu<string>
 
 	public class BasicDropDownExpanded : Composition
 	{
-		private BasicDropDownMenu _parentMenu;
+		private readonly BasicDropDownMenu _parentMenu;
 
-		private readonly Box _shadow;
 		private readonly FlexContainer _inner;
 		public BasicDropDownExpanded(BasicDropDownMenu parentMenu)
 		{
@@ -239,7 +239,7 @@ public class BasicDropDownMenu : AbstractDropDownMenu<string>
 			RelativeSizeAxes = Axes.X;
 			AutoSizeAxes = Axes.Y;
 
-			Add(_shadow = new Box()
+			Add(new Box()
 			{
 				RelativeSizeAxes = Axes.Both,
 				Color = new Color(0, 0, 0, 100),
@@ -274,7 +274,7 @@ public class BasicDropDownMenu : AbstractDropDownMenu<string>
 	{
 		public Action? OnSelected;
 
-		private BasicDropDownMenu _parentMenu;
+		private readonly BasicDropDownMenu _parentMenu;
 
 		public string Name;
 		public string Value;

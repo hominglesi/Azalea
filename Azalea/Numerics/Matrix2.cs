@@ -1,24 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Azalea.Numerics;
-public struct Matrix2 : IEquatable<Matrix2>
+
+public struct Matrix2(Vector2 row0, Vector2 row1) : IEquatable<Matrix2>
 {
-	public Vector2 Row0;
-	public Vector2 Row1;
+	public Vector2 Row0 = row0;
+	public Vector2 Row1 = row1;
 
 	public static readonly Matrix2 Identity = new(Vector2.UnitX, Vector2.UnitY);
 	public static readonly Matrix2 Zero = new(Vector2.Zero, Vector2.Zero);
-
-	public Matrix2(Vector2 row0, Vector2 row1)
-	{
-		Row0 = row0;
-		Row1 = row1;
-	}
 
 	public float M11 { readonly get => Row0.X; set => Row0.X = value; }
 	public float M12 { readonly get => Row0.Y; set => Row0.Y = value; }
@@ -38,8 +29,7 @@ public struct Matrix2 : IEquatable<Matrix2>
 
 	public static Matrix2 Mult(Matrix2 left, Matrix2 right)
 	{
-		Matrix2 result;
-		Mult(ref left, ref right, out result);
+		Mult(ref left, ref right, out Matrix2 result);
 		return result;
 	}
 

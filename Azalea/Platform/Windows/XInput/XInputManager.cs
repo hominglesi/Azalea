@@ -1,9 +1,9 @@
 ﻿using Azalea.Inputs;
 using Azalea.Inputs.Gamepads;
 using Azalea.Native.Windows;
-using Azalea.Platform.Windows.XInput;
 
-namespace Azalea.Platform.Windows;
+namespace Azalea.Platform.Windows.XInput;
+
 internal class XInputManager : IGamepadManager
 {
 	private const int _gamepadMaxCount = 4;

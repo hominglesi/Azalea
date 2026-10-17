@@ -1,7 +1,7 @@
-﻿using Azalea.Graphics;
-using System;
+﻿using System;
 
 namespace Azalea.Inputs.Events;
+
 public abstract class InputEvent
 {
 	private InputState? _state;

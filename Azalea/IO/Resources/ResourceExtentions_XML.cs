@@ -2,9 +2,10 @@
 using System.Xml;
 
 namespace Azalea.IO.Resources;
+
 public static partial class ResourceExtentions_XML
 {
-	private static ResourceCache<XmlDocument> _xmlCache = new();
+	private readonly static ResourceCache<XmlDocument> _xmlCache = new();
 	public static XmlDocument? GetXML(this IResourceStore store, string path)
 	{
 		if (_xmlCache.TryGetValue(store, path, out var cached))

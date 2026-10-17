@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace Azalea;
+
 public class HostBuilder
 {
 	private HostPreferences _preferences;

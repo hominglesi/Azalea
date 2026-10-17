@@ -10,8 +10,8 @@ namespace Azalea.VisualTests;
 
 public class TextContainerTest : TestScene
 {
-	private ScrollableContainer _scrollable;
-	private FlexContainer _flex;
+	private readonly ScrollableContainer _scrollable;
+	private readonly FlexContainer _flex;
 
 	public TextContainerTest()
 	{

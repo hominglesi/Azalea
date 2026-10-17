@@ -1,23 +1,17 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace Azalea.Platform.Rendering;
+
 public abstract class NativeTexture
 {
-	public int Width { get; private set; }
-	public int Height { get; private set; }
-
-	internal void SetSize(int width, int heigth)
-	{
-		Width = width;
-		Height = heigth;
-	}
+	public int Width { get; internal set; }
+	public int Height { get; internal set; }
 
 	internal virtual bool IsReady() => true;
 
-	private readonly object _lock = new();
+	private readonly Lock _lock = new();
 	private volatile int _loadingOperations = 1;
 	private readonly ManualResetEvent _readyEvent = new(false);
 	internal void AssureReady()

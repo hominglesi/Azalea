@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 
 namespace Azalea.Threading;
+
 internal class AtomicCounter
 {
 	private int _value;

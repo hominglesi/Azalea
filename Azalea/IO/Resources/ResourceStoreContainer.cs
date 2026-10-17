@@ -2,9 +2,10 @@
 using System.IO;
 
 namespace Azalea.IO.Resources;
+
 public class ResourceStoreContainer : IResourceStore
 {
-	private readonly List<IResourceStore> _stores = new();
+	private readonly List<IResourceStore> _stores = [];
 
 	public void AddStore(IResourceStore store)
 	{

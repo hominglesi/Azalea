@@ -1,10 +1,10 @@
 ﻿using Azalea.Graphics;
-using Azalea.Graphics.Rendering;
 using Azalea.IO.Configs;
 using Azalea.Platform.Rendering;
 using System;
 
 namespace Azalea.VisualTests.UnitTesting;
+
 public class UnitTestsScene : TestScene
 {
 	private readonly static float __menuBarHeight = 30;

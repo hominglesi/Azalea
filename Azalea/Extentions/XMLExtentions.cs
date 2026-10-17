@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Xml;
 
 namespace Azalea.Extentions;
+
 public static class XMLExtentions
 {
 	public static bool ContainsAttribute(this XmlNode node, string attibuteName)

@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 
 namespace Azalea.Native.OpenAL;
+
 public static partial class ALC
 {
 	private const string SoftOalPath = "soft_oal.dll";

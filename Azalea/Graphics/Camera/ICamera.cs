@@ -2,6 +2,7 @@
 using System.Numerics;
 
 namespace Azalea.Graphics.Camera;
+
 public interface ICamera
 {
 	public Vector2 Position { get; set; }

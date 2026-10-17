@@ -72,7 +72,7 @@ public static partial class Assets
 		_reflectedStore = new Storage(path);
 	}
 
-	private static Texture _whitePixel;
+	private static Texture? _whitePixel;
 	public static Texture WhitePixel
 	{
 		get

@@ -6,6 +6,7 @@ using Azalea.Graphics.Colors;
 using Azalea.Inputs.Events;
 
 namespace Azalea.Editor.Design;
+
 internal class EditorScrollbar : Slider
 {
 	private const float _animationSpeed = 0.15f;

@@ -10,13 +10,12 @@ using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.IO.Configs;
 using Azalea.IO.Resources;
-using Azalea.Platform;
+using Azalea.Platform.Windowing;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Azalea.Platform.Windowing;
 
 namespace Azalea.VisualTests;
 
@@ -24,8 +23,8 @@ public class VisualTests : AzaleaGame
 {
 	private const string __currentSceneKey = "currentScene";
 
-	private List<string> _tests;
-	private TestSelectScene _testSelectScene;
+	private readonly List<string> _tests;
+	private readonly TestSelectScene _testSelectScene;
 
 	static VisualTests()
 	{
@@ -51,7 +50,7 @@ public class VisualTests : AzaleaGame
 
 	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		if(e.Key == Keys.Escape)
+		if (e.Key == Keys.Escape)
 		{
 			goToSceneSelect();
 			return true;
@@ -80,7 +79,7 @@ public class VisualTests : AzaleaGame
 	private class TestSelectScene : Scene
 	{
 		private readonly VisualTests _parent;
-		private FlexContainer _testContainer;
+		private readonly FlexContainer _testContainer;
 
 		public TestSelectScene(VisualTests parent, IEnumerable<string> tests)
 		{
@@ -118,9 +117,8 @@ public class VisualTests : AzaleaGame
 
 	private class TestButton : Button
 	{
-		private SpriteText _text;
-		private Sprite _background;
-		private Box _whiteOverlay;
+		private readonly SpriteText _text;
+		private readonly Box _whiteOverlay;
 
 		public TestButton()
 		{
@@ -130,7 +128,7 @@ public class VisualTests : AzaleaGame
 			BorderThickness = new(2);
 			Margin = new(4);
 
-			Add(_background = new()
+			Add(new Sprite()
 			{
 				RelativeSizeAxes = Axes.Both,
 				Texture = Assets.GetTexture("Textures/TestSelect/test-button.png")

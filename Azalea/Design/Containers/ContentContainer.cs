@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Design.Containers;
+
 public class ContentContainer : Composition
 {
 	protected Composition ContentComposition { get; init; }

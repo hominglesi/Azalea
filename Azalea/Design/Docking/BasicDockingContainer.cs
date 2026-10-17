@@ -7,6 +7,7 @@ using System;
 using System.Numerics;
 
 namespace Azalea.Design.Docking;
+
 public class BasicDockingContainer : DockingContainer
 {
 	public Box NavigationBackground { get; }

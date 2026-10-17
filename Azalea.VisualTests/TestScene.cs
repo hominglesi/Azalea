@@ -28,31 +28,28 @@ public class TestScene : Scene
 
 	private int _nextSidebarIndex = 0;
 
-	private void initializeSidebar()
-	{
-		if (Sidebar is not null)
-			throw new InvalidOperationException("Sidebar has already been initialized");
-
-		RelativeSizeAxes = Axes.Both;
-		NegativeSize = new(__sidebarWidth, 0);
-		X = __sidebarWidth;
-
-		Add(Sidebar = new FlexContainer()
-		{
-			Width = __sidebarWidth,
-			RelativeSizeAxes = Axes.Y,
-			X = -__sidebarWidth,
-			BackgroundColor = __accentColor,
-			Direction = FlexDirection.Vertical,
-			Spacing = new(0, 10)
-		});
-	}
-
 	[MemberNotNull(nameof(Sidebar))]
 	private void assertDropdownExists()
 	{
 		if (Sidebar is null)
-			initializeSidebar();
+		{
+			if (Sidebar is not null)
+				throw new InvalidOperationException("Sidebar has already been initialized");
+
+			RelativeSizeAxes = Axes.Both;
+			NegativeSize = new(__sidebarWidth, 0);
+			X = __sidebarWidth;
+
+			Add(Sidebar = new FlexContainer()
+			{
+				Width = __sidebarWidth,
+				RelativeSizeAxes = Axes.Y,
+				X = -__sidebarWidth,
+				BackgroundColor = __accentColor,
+				Direction = FlexDirection.Vertical,
+				Spacing = new(0, 10)
+			});
+		}
 	}
 
 	protected BasicDropDownMenu AddDropdownMenu()
@@ -101,7 +98,7 @@ public class TestScene : Scene
 		return button;
 	}
 
-	protected FlexContainer CreateFullscreenVerticalFlex(GameObject[] children)
+	protected static FlexContainer CreateFullscreenVerticalFlex(GameObject[] children)
 	{
 		return new FlexContainer()
 		{
@@ -113,7 +110,7 @@ public class TestScene : Scene
 		};
 	}
 
-	protected BasicButton CreateActionButton(string text, Action action)
+	protected static BasicButton CreateActionButton(string text, Action action)
 	{
 		return new BasicButton()
 		{
@@ -123,7 +120,7 @@ public class TestScene : Scene
 		};
 	}
 
-	protected FlexContainer CreateObservedContainer(GameObject[] children)
+	protected static FlexContainer CreateObservedContainer(GameObject[] children)
 	{
 		return new FlexContainer()
 		{
@@ -135,7 +132,7 @@ public class TestScene : Scene
 		};
 	}
 
-	protected FlexContainer CreateObservedValue<T>(string name, ObservedValue<T>.ValueDelegate getter, ObservedValue<T>.LoggerDelegate? logger = null)
+	protected static FlexContainer CreateObservedValue<T>(string name, ObservedValue<T>.ValueDelegate getter, ObservedValue<T>.LoggerDelegate? logger = null)
 	{
 		return new ObservedValue<T>(name, getter, logger);
 	}
@@ -146,8 +143,8 @@ public class TestScene : Scene
 		public delegate string LoggerDelegate(T value);
 
 		protected ValueDelegate _getter;
-		private LoggerDelegate? _logger;
-		private SpriteText _valueText;
+		private readonly LoggerDelegate? _logger;
+		private readonly SpriteText _valueText;
 
 		public virtual T Value => _getter.Invoke();
 
@@ -158,17 +155,16 @@ public class TestScene : Scene
 
 			RelativeSizeAxes = Axes.X;
 			Size = new(1, 25);
-			Children = new GameObject[]
-			{
+			Children = [
 				new SpriteText()
 				{
 					Text = $"{name}: "
 				},
 				_valueText = new SpriteText()
-			};
+			];
 
 			_lastValue = Value;
-			_valueText.Text = Value.ToString();
+			_valueText.Text = Value?.ToString() ?? "";
 		}
 
 		private T _lastValue;
@@ -177,7 +173,7 @@ public class TestScene : Scene
 		{
 			if (EqualityComparer<T>.Default.Equals(Value, _lastValue) == false)
 			{
-				_valueText.Text = Value.ToString()!;
+				_valueText.Text = Value?.ToString() ?? "";
 				var logMessage = _logger?.Invoke(Value);
 				if (logMessage is not null) Console.WriteLine(logMessage);
 				_lastValue = Value;

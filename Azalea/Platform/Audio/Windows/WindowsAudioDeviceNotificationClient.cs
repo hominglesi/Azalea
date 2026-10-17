@@ -3,6 +3,7 @@ using System;
 using System.Runtime.InteropServices;
 
 namespace Azalea.Platform.Audio.Windows;
+
 internal class WindowsAudioDeviceNotificationClient : Win32.IMMNotificationClient, IAudioDeviceNotificationClient
 {
 	private readonly Win32.IMMDeviceEnumerator _deviceEnumerator;

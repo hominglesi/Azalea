@@ -2,6 +2,7 @@
 using Azalea.Graphics;
 
 namespace Azalea.Design.Scenes;
+
 public class SceneContainer : Composition
 {
 	public Scene? CurrentScene { get; private set; }

@@ -1,15 +1,12 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
 using Azalea.IO.Resources;
-using Azalea.Platform;
 using Azalea.Platform.Windowing;
 
 namespace Azalea;
 
 public abstract class AzaleaGame : Composition
 {
-	public static AzaleaGame? RENDERED_GAME;
-
 	public AzaleaGame()
 	{
 		RelativeSizeAxes = Axes.Both;

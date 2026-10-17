@@ -1,10 +1,9 @@
-﻿using Azalea.Caching;
-using Azalea.Design.Containers;
+﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
-using Azalea.Utils;
 using Azalea.Utils.Proxies;
 
 namespace Azalea.Editor.Design.Gui;
+
 public class GUIPropertyLabel<T> : TextContainer
 {
 	private readonly string _label;

@@ -2,6 +2,7 @@
 using System;
 
 namespace Azalea.Platform.Windowing;
+
 public class TrayIcon
 {
 	internal uint? Handle { get; private set; }

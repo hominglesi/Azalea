@@ -2,12 +2,11 @@
 using Azalea.Editor;
 using Azalea.VisualTests;
 using System;
-using System.Threading;
 
 internal class Program
 {
 	[STAThread]
-	private static void Main(string[] args)
+	private static void Main(string[] _)
 	{
 		var host = new HostBuilder()
 			.SetResizable(true)

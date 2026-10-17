@@ -6,15 +6,14 @@ using Azalea.Utils;
 using System.Numerics;
 
 namespace Azalea.VisualTests;
+
 public class AutoSizeTest : TestScene
 {
-	private Composition _composition;
-
-	private FlexContainer _flex;
+	private readonly FlexContainer _flex;
 
 	public AutoSizeTest()
 	{
-		Add(_composition = new Composition()
+		Add(new Composition()
 		{
 			Position = new(100),
 			AutoSizeAxes = Graphics.Axes.Both,
@@ -45,7 +44,7 @@ public class AutoSizeTest : TestScene
 			regenerateText();
 			return true;
 		}
-			
+
 		return false;
 	}
 

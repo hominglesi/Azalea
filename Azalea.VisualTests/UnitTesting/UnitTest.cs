@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 
 namespace Azalea.VisualTests.UnitTesting;
+
 public abstract class UnitTest : UnitTestBase
 {
 	public UnitTestSuite? Suite { get; set; }
 	public UnitTestContainer? TestContainer { get; set; }
-	public List<TestStep> Steps { get; init; } = new();
+	public List<TestStep> Steps { get; init; } = [];
 
 	public Application App => TestContainer!.App;
 
@@ -27,37 +28,20 @@ public abstract class UnitTest : UnitTestBase
 	}
 }
 
-public class TestStep
+public class TestStep(string name)
 {
-	public readonly string Name;
-
-	public TestStep(string name)
-	{
-		Name = name;
-	}
+	public readonly string Name = name;
 }
 
-public class TestStepOperation : TestStep
+public class TestStepOperation(string name, Action action) : TestStep(name)
 {
-	public readonly Action Action;
-
-	public TestStepOperation(string name, Action action)
-		: base(name)
-	{
-		Action = action;
-	}
+	public readonly Action Action = action;
 }
 
 public delegate bool TestStepResultDelegate();
 
-public class TestStepResult : TestStep
+public class TestStepResult(string name, TestStepResultDelegate action) : TestStep(name)
 {
 
-	public readonly TestStepResultDelegate Action;
-
-	public TestStepResult(string name, TestStepResultDelegate action)
-		: base(name)
-	{
-		Action = action;
-	}
+	public readonly TestStepResultDelegate Action = action;
 }

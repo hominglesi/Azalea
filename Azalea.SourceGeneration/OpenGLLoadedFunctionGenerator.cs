@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 
 namespace Azalea.SourceGeneration;
 
@@ -98,7 +97,7 @@ internal class OpenGLLoadedFunctionGenerator : IIncrementalGenerator
 
 		return builder.ToString();
 
-		void appendAllParameters(SourceBuilder builder, OpenGLLoadedFunctionData command, bool types = true)
+		static void appendAllParameters(SourceBuilder builder, OpenGLLoadedFunctionData command, bool types = true)
 		{
 			for (int i = 0; i < command.Arguments.Length; i++)
 			{

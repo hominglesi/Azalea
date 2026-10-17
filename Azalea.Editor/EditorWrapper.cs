@@ -1,26 +1,19 @@
 ﻿using Azalea.Design.Containers;
-using Azalea.Design.Controls;
 using Azalea.Design.Docking;
-using Azalea.Design.Scenes;
-using Azalea.Editing;
 using Azalea.Editor.DebugWindows;
 using Azalea.Editor.Views.Gamepads;
 using Azalea.Editor.Views.MsdfGen;
 using Azalea.Editor.Views.ResourceExploring;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
-using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
-using System;
-using System.Diagnostics;
 
 namespace Azalea.Editor;
 
 public class EditorWrapper : AzaleaGame
 {
-	private readonly AzaleaGame _wrappedGame;
 	private readonly BasicDockingContainer _mainContainer;
 	private readonly DisplayValues _displayValues;
 

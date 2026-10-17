@@ -1,4 +1,5 @@
 ﻿namespace Azalea.Inputs;
+
 public enum GamepadButton
 {
 	A = 0,

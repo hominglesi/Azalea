@@ -1,12 +1,11 @@
 ﻿using Azalea.Editor.Design.Gui;
 using Azalea.Graphics.Camera;
-using Azalea.Inputs;
-using Azalea.Platform;
 
 namespace Azalea.Editor.DebugWindows;
+
 internal class CameraWindow(AzaleaGame game)
 {
-	private AzaleaGame _game = game;
+	private readonly AzaleaGame _game = game;
 	private GUIWindow? _window;
 	private bool _shown = false;
 

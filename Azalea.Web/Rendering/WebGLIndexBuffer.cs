@@ -1,5 +1,4 @@
-﻿using Azalea.Graphics.OpenGL.Enums;
-using Azalea.Utils;
+﻿using Azalea.Utils;
 using System;
 using System.Runtime.InteropServices;
 

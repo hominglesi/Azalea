@@ -2,6 +2,7 @@
 using System.Numerics;
 
 namespace Azalea.Graphics.Camera;
+
 internal class OrthogonalCamera : ICamera
 {
 	public Vector2 Position { get; set; } = Vector2.Zero;

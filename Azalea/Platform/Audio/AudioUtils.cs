@@ -2,9 +2,10 @@
 using System;
 
 namespace Azalea.Platform.Audio;
+
 public static class AudioUtils
 {
-	public static double CalculateDuration(byte[] pcmData, int dataLength, int format, int frequency)
+	public static double CalculateDuration(int dataLength, int format, int frequency)
 	{
 		var channels = format switch
 		{

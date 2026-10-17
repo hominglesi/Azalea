@@ -47,7 +47,7 @@ internal unsafe partial class FFmpegStreamReader : Disposable
 
 		var buffer = stackalloc byte[1024];
 		var printPrefix = 1;
-		av_log_format_line2(ptr, level, format, args, buffer, 1024, &printPrefix);
+		_ = av_log_format_line2(ptr, level, format, args, buffer, 1024, &printPrefix);
 		var message = Marshal.PtrToStringAnsi((IntPtr)buffer);
 
 		if (message is null) return;
@@ -117,7 +117,7 @@ internal unsafe partial class FFmpegStreamReader : Disposable
 			}
 		}
 
-		avformat_find_stream_info(formatCtx, null);
+		_ = avformat_find_stream_info(formatCtx, null);
 
 		TotalDuration = formatCtx->duration / (float)AV_TIME_BASE;
 		if (TotalDuration < 0) TotalDuration = -1;
@@ -136,10 +136,10 @@ internal unsafe partial class FFmpegStreamReader : Disposable
 		AVCodec* codec = avcodec_find_decoder(codecPar->codec_id);
 
 		_codecContext = avcodec_alloc_context3(codec);
-		avcodec_parameters_to_context(_codecContext, codecPar);
+		_ = avcodec_parameters_to_context(_codecContext, codecPar);
 
 		_codecContext->pkt_timebase = formatCtx->streams[_audioStreamIndex]->time_base;
-		avcodec_open2(_codecContext, codec, null);
+		_ = avcodec_open2(_codecContext, codec, null);
 
 		AVChannelLayout outLayout;
 		av_channel_layout_default(&outLayout, 2);
@@ -166,7 +166,7 @@ internal unsafe partial class FFmpegStreamReader : Disposable
 		const int SWR_RESAMPLER_SOXR = 1;
 		av_opt_set_int(swr, "resampler", SWR_RESAMPLER_SOXR, 0);
 
-		swr_init(swr);
+		_ = swr_init(swr);
 
 		_packet = av_packet_alloc();
 		_frame = av_frame_alloc();
@@ -235,7 +235,7 @@ internal unsafe partial class FFmpegStreamReader : Disposable
 
 		if (_packet->stream_index == _audioStreamIndex)
 		{
-			avcodec_send_packet(_codecContext, _packet);
+			_ = avcodec_send_packet(_codecContext, _packet);
 
 			while (avcodec_receive_frame(_codecContext, _frame) == 0)
 			{
@@ -287,9 +287,9 @@ internal unsafe partial class FFmpegStreamReader : Disposable
 		var seekTimestamp = seconds * AV_TIME_BASE;
 
 		const int AVSEEK_FLAG_BACKWARD = 0x1;
-		av_seek_frame(_formatContext, -1, (long)seekTimestamp, AVSEEK_FLAG_BACKWARD);
+		_ = av_seek_frame(_formatContext, -1, (long)seekTimestamp, AVSEEK_FLAG_BACKWARD);
 		avcodec_flush_buffers(_codecContext);
-		swr_init(_swr);
+		_ = swr_init(_swr);
 	}
 
 	protected override void OnDispose()
@@ -346,9 +346,9 @@ internal unsafe partial class FFmpegStreamReader : Disposable
 		return buffer;
 	}
 
-	private delegate* unmanaged<void*, byte*, int, int> _readPacketPtr = &readPacket;
+	private readonly delegate* unmanaged<void*, byte*, int, int> _readPacketPtr = &readPacket;
 	[UnmanagedCallersOnly]
-	private static unsafe int readPacket(void* ptr, byte* buffer, int bufferSize)
+	private static int readPacket(void* ptr, byte* buffer, int bufferSize)
 	{
 		GCHandle handle = GCHandle.FromIntPtr((IntPtr)ptr);
 		if (handle.Target is null)
@@ -365,9 +365,9 @@ internal unsafe partial class FFmpegStreamReader : Disposable
 		return bytesRead > 0 ? bytesRead : AVERROR_EOF;
 	}
 
-	private delegate* unmanaged<void*, long, int, long> _seekPtr = &seek;
+	private readonly delegate* unmanaged<void*, long, int, long> _seekPtr = &seek;
 	[UnmanagedCallersOnly]
-	private static unsafe long seek(void* ptr, long offset, int whence)
+	private static long seek(void* ptr, long offset, int whence)
 	{
 		GCHandle handle = GCHandle.FromIntPtr((IntPtr)ptr);
 		if (handle.Target is null)

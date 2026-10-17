@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace Azalea.Platform.Audio;
+
 public class SoundByte(double duration)
 {
 	internal uint? Handle { get; private set; }

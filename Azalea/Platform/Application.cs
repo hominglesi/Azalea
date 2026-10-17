@@ -1,23 +1,13 @@
-﻿using Azalea.Design.Containers;
-using Azalea.Design.Schemes;
-using Azalea.Design.Shapes;
-using Azalea.Extentions;
-using Azalea.Graphics;
-using Azalea.Graphics.Colors;
-using Azalea.Graphics.Sprites;
-using Azalea.Inputs;
-using Azalea.Inputs.Events;
-using Azalea.IO.Resources;
+﻿using Azalea.Extentions;
 using Azalea.Native.OpenGL;
 using Azalea.Platform.Rendering;
 using Azalea.Platform.Scheduling;
 using Azalea.Platform.Windowing;
 using Azalea.Utils;
 using System;
-using System.Collections.Generic;
-using System.Numerics;
 
 namespace Azalea.Platform;
+
 public sealed class Application
 {
 	public readonly AzaleaGame Game;
@@ -65,7 +55,7 @@ public sealed class Application
 			Game.UpdateSubTree();
 
 			Input.Process(win.PendingInputEvents);
-			
+
 			var renderQueue = coordinator.BeginCommandQueue();
 			renderQueue.PrepareRendering(clientSize);
 

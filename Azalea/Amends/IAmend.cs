@@ -1,4 +1,5 @@
 ﻿namespace Azalea.Amends;
+
 public interface IAmend
 {
 	public bool IsFinished { get; }

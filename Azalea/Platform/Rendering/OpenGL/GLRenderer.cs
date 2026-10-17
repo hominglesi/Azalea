@@ -20,7 +20,7 @@ internal partial class GLRenderer : PlatformRenderer
 	private readonly IPlatformDeviceContext _deviceContext;
 	private GLContext? _context;
 
-	private Buffer _uniformBuffer;
+	private readonly Buffer _uniformBuffer;
 
 	private int _activeScreenFramebuffer = 0;
 	private int _lastActiveScreenFramebuffer = 0;
@@ -359,6 +359,9 @@ internal partial class GLRenderer : PlatformRenderer
 				else
 					GL.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, in pixels[0]);
 
+				if (generateMipmap)
+					GL.GenerateMipmap(GL.TEXTURE_2D);
+
 				GL.BindTexture(GL.TEXTURE_2D, 0);
 
 				break;
@@ -388,18 +391,6 @@ internal partial class GLRenderer : PlatformRenderer
 		command.Return();
 	}
 
-	protected override bool TryHandleCommand(RenderCommand command)
-	{
-		switch (command)
-		{
-			case GenerateProgramCommand(var program, var vertexShaderCode, var fragmentShaderCode):
-				Console.WriteLine("AAA");
-				return true;
-		}
-
-		return false;
-	}
-
 	private static void onDebugMessage(uint source, uint type, uint id, uint severity, int length, nint message, nint userParam)
 	{
 		if (severity == GL.DEBUG_SEVERITY_NOTIFICATION)
@@ -408,18 +399,11 @@ internal partial class GLRenderer : PlatformRenderer
 		Console.WriteLine(Marshal.PtrToStringAnsi(message, length));
 	}
 
-	private struct ScreenFramebuffer
+	private struct ScreenFramebuffer(Framebuffer framebuffer, GLTexture texture, Vector2Int size)
 	{
-		public readonly Framebuffer Framebuffer;
-		public readonly GLTexture Texture;
+		public readonly Framebuffer Framebuffer = framebuffer;
+		public readonly GLTexture Texture = texture;
 		public object TextureLock = new();
-		public Vector2Int Size;
-
-		public ScreenFramebuffer(Framebuffer framebuffer, GLTexture texture, Vector2Int size)
-		{
-			Framebuffer = framebuffer;
-			Texture = texture;
-			Size = size;
-		}
+		public Vector2Int Size = size;
 	}
 }

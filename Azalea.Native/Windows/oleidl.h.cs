@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices.ComTypes;
 
 namespace Azalea.Native.Windows;
+
 public static partial class Win32
 {
 	[ComImport]

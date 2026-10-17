@@ -39,11 +39,11 @@ internal static class GenerationExtentions
 		var builder = ImmutableArray.CreateBuilder<Details>(4);
 		var current = symbol.ContainingType;
 
-		while(current is not null)
+		while (current is not null)
 		{
 			var typeParameters = ImmutableArray<string>.Empty;
 
-			if(current.TypeParameters.Length > 0)
+			if (current.TypeParameters.Length > 0)
 			{
 				var parametersBuilder = ImmutableArray.CreateBuilder<string>();
 				foreach (var typeParam in current.TypeParameters)

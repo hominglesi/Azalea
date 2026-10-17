@@ -3,6 +3,7 @@ using System;
 using System.Runtime.InteropServices;
 
 namespace Azalea.Platform.Windows;
+
 internal class WindowsClipboard : IClipboard
 {
 	public string? GetText()

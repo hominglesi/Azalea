@@ -9,9 +9,10 @@ using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Editor.Views.Gamepads;
+
 internal class GamepadViewer : Composition
 {
-	private List<GamepadDisplay> _gamepadDisplays = [];
+	private readonly List<GamepadDisplay> _gamepadDisplays = [];
 
 	public GamepadViewer()
 	{
@@ -52,9 +53,8 @@ internal class GamepadViewer : Composition
 
 	private class GamepadDisplay : Composition
 	{
-		private FlexContainer _inner;
-
-		private GamepadLayoutDisplay _layoutDisplay;
+		private readonly FlexContainer _inner;
+		private readonly GamepadLayoutDisplay _layoutDisplay;
 
 		public GamepadDisplay()
 		{
@@ -86,33 +86,33 @@ internal class GamepadViewer : Composition
 
 		private class GamepadLayoutDisplay : Composition
 		{
-			private Sprite _xButtonPressed;
-			private Sprite _yButtonPressed;
-			private Sprite _aButtonPressed;
-			private Sprite _bButtonPressed;
+			private readonly Sprite _xButtonPressed;
+			private readonly Sprite _yButtonPressed;
+			private readonly Sprite _aButtonPressed;
+			private readonly Sprite _bButtonPressed;
 
-			private Sprite _upDPadPressed;
-			private Sprite _downDPadPressed;
-			private Sprite _leftDPadPressed;
-			private Sprite _rightDPadPressed;
+			private readonly Sprite _upDPadPressed;
+			private readonly Sprite _downDPadPressed;
+			private readonly Sprite _leftDPadPressed;
+			private readonly Sprite _rightDPadPressed;
 
-			private Sprite _backButtonPressed;
-			private Sprite _startButtonPressed;
+			private readonly Sprite _backButtonPressed;
+			private readonly Sprite _startButtonPressed;
 
-			private Sprite _leftBumperPressed;
-			private Sprite _rightBumperPressed;
+			private readonly Sprite _leftBumperPressed;
+			private readonly Sprite _rightBumperPressed;
 
-			private Sprite _leftTriggerPressed;
-			private Sprite _rightTriggerPressed;
+			private readonly Sprite _leftTriggerPressed;
+			private readonly Sprite _rightTriggerPressed;
 
-			private Composition _leftThumb;
-			private Composition _rightThumb;
-			private Vector2 _leftThumbPosition;
-			private Vector2 _rightThumbPosition;
-			private float _thumbMaxDelta = 20f;
+			private readonly Composition _leftThumb;
+			private readonly Composition _rightThumb;
+			private readonly Vector2 _leftThumbPosition;
+			private readonly Vector2 _rightThumbPosition;
+			private readonly float _thumbMaxDelta = 20f;
 
-			private Sprite _leftThumbPressed;
-			private Sprite _rightThumbPressed;
+			private readonly Sprite _leftThumbPressed;
+			private readonly Sprite _rightThumbPressed;
 
 			public GamepadLayoutDisplay()
 			{
@@ -180,14 +180,14 @@ internal class GamepadViewer : Composition
 					+ (gamepad.GetRightStick().GetVectorCircular() * _thumbMaxDelta);
 			}
 
-			private void updateButtonAlpha(Sprite sprite,
+			private static void updateButtonAlpha(Sprite sprite,
 				GamepadButton button, IGamepad gamepad)
 				=> sprite.Alpha = gamepad.GetButton(button).Pressed ? 1 : 0;
 
-			private void updateDPadAlpha(Sprite sprite, ButtonState button)
+			private static void updateDPadAlpha(Sprite sprite, ButtonState button)
 				=> sprite.Alpha = button.Pressed ? 1 : 0;
 
-			private Sprite createButtonPressed(Vector2 direction)
+			private static Sprite createButtonPressed(Vector2 direction)
 				=> new()
 				{
 					Texture = getTexture("gamepad-button-pressed.png"),
@@ -196,7 +196,7 @@ internal class GamepadViewer : Composition
 					Y = 165 + (direction.Y * 30)
 				};
 
-			private Sprite createDPadPressed(Vector2 direction, float rotation = 0)
+			private static Sprite createDPadPressed(Vector2 direction, float rotation = 0)
 				=> new()
 				{
 					Texture = getTexture("gamepad-dpad-pressed.png"),
@@ -206,7 +206,7 @@ internal class GamepadViewer : Composition
 					Y = 167 + (direction.Y * 26)
 				};
 
-			private Sprite createButtonSmallPressed(float horizontalDirection)
+			private static Sprite createButtonSmallPressed(float horizontalDirection)
 				=> new()
 				{
 					Texture = getTexture("gamepad-button-small-pressed.png"),
@@ -215,7 +215,7 @@ internal class GamepadViewer : Composition
 					Y = 142
 				};
 
-			private Sprite createBumperPressed(float horizontalDirection)
+			private static Sprite createBumperPressed(float horizontalDirection)
 				=> new()
 				{
 					Texture = getTexture("gamepad-bumper-pressed.png"),
@@ -224,7 +224,7 @@ internal class GamepadViewer : Composition
 					Y = 42
 				};
 
-			private Sprite createTriggerPressed(float horizontalDirection)
+			private static Sprite createTriggerPressed(float horizontalDirection)
 				=> new()
 				{
 					Texture = getTexture("gamepad-trigger-pressed.png"),
@@ -233,7 +233,7 @@ internal class GamepadViewer : Composition
 					Y = 45
 				};
 
-			private Composition createThumb(float horizontalDirection)
+			private static Composition createThumb(float horizontalDirection)
 				=> new()
 				{
 					Size = new(62),
@@ -278,7 +278,7 @@ internal class GamepadViewer : Composition
 
 		private class ValueDisplay : Composition
 		{
-			private SpriteText _text;
+			private readonly SpriteText _text;
 			public ValueDisplay()
 			{
 				Size = new(40);
@@ -298,6 +298,6 @@ internal class GamepadViewer : Composition
 		}
 	}
 
-	private static ITexture getTexture(string name)
+	private static Texture getTexture(string name)
 		=> Assets.GetTexture("Textures/Editing/GamepadViewer/" + name);
 }

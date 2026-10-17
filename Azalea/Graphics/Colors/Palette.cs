@@ -1,4 +1,5 @@
 ﻿namespace Azalea.Graphics.Colors;
+
 public static class Palette
 {
 	public static Color Aqua => new(0, 255, 255);

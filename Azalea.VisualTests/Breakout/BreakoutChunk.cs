@@ -4,16 +4,12 @@ using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.VisualTests.Breakout;
-public class BreakoutChunk
-{
-	public Rectangle BoundingBox { get; set; }
-	public List<BreakoutChunk> SubChunks { get; set; } = new();
-	public List<Box> Bricks { get; set; } = new();
 
-	public BreakoutChunk(Rectangle boundingBox)
-	{
-		BoundingBox = boundingBox;
-	}
+public class BreakoutChunk(Rectangle boundingBox)
+{
+	public Rectangle BoundingBox { get; set; } = boundingBox;
+	public List<BreakoutChunk> SubChunks { get; set; } = [];
+	public List<Box> Bricks { get; set; } = [];
 
 	public void AddBrick(Box brick)
 	{
@@ -24,9 +20,8 @@ public class BreakoutChunk
 	{
 		foreach (var chunk in SubChunks)
 		{
-			if (chunk.Bricks.Contains(brick))
+			if (chunk.Bricks.Remove(brick))
 			{
-				chunk.Bricks.Remove(brick);
 				if (chunk.Bricks.Count == 0)
 					SubChunks.Remove(chunk);
 
@@ -39,7 +34,8 @@ public class BreakoutChunk
 					SubChunks.Remove(chunk);
 
 				return true;
-			};
+			}
+			;
 		}
 
 		return false;

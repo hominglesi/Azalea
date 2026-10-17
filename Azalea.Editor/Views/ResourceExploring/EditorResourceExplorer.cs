@@ -1,5 +1,4 @@
 ﻿using Azalea.Design.Containers;
-using Azalea.Editing;
 using Azalea.Editor.Views.ResourceExploring.Views;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
@@ -9,6 +8,7 @@ using Azalea.IO.Resources;
 using System;
 
 namespace Azalea.Editor.Views.ResourceExploring;
+
 public class EditorResourceExplorer : Composition
 {
 	private const float __headerHeight = 44;

@@ -1,10 +1,9 @@
-using Azalea.Graphics;
 using Azalea.IO.Resources;
 using Azalea.Platform;
 using Azalea.Platform.Windowing;
-using System;
 
 namespace Azalea.VisualTests;
+
 public class IWindowTest : TestScene
 {
 	public IWindowTest()

@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 
 namespace Azalea.IO.Resources;
+
 public class ResourceCache<T>
 {
-	private static readonly Dictionary<IResourceStore, Dictionary<string, T>> _cache = new();
+	private static readonly Dictionary<IResourceStore, Dictionary<string, T>> _cache = [];
 	public bool TryGetValue(IResourceStore store, string path, out T value)
 	{
 		lock (_cache)

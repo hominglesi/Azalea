@@ -3,6 +3,7 @@ using Azalea.Native.Windows;
 using Azalea.Utils;
 
 namespace Azalea.Platform.Windows.XInput;
+
 internal class XInputGamepad : IGamepad
 {
 	private readonly ButtonState[] _buttons = new ButtonState[12];

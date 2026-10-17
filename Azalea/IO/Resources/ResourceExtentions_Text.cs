@@ -2,9 +2,10 @@
 using System.IO;
 
 namespace Azalea.IO.Resources;
+
 public static partial class ResourceStoreExtentions
 {
-	private static ResourceCache<string> _textCache = new();
+	private readonly static ResourceCache<string> _textCache = new();
 	public static string? GetText(this IResourceStore store, string path)
 	{
 		if (_textCache.TryGetValue(store, path, out var cached))

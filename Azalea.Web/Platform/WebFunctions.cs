@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices.JavaScript;
 
 namespace Azalea.Web.Platform;
+
 internal static partial class WebFunctions
 {
 	private const string ImportString = "JSImports";

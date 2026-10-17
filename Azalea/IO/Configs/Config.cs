@@ -3,6 +3,7 @@ using System;
 using System.Numerics;
 
 namespace Azalea.IO.Configs;
+
 public static class Config
 {
 	private static IConfigProvider? _instance;

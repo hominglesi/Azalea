@@ -2,6 +2,7 @@
 using System.Text;
 
 namespace Azalea.IO.Configs;
+
 internal static class ConfigParser
 {
 	internal static string Format(Dictionary<string, string> keyValuePairs)

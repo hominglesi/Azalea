@@ -1,7 +1,7 @@
-﻿using Azalea.Native.OpenGL;
-using System;
+﻿using System;
 
 namespace Azalea.Platform.Rendering.OpenGL;
+
 internal class GLTexture : NativeTexture
 {
 	public uint Handle { get; private set; } = 0;

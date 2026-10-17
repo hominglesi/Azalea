@@ -2,11 +2,10 @@
 using System.Numerics;
 
 namespace Azalea.Amends;
-public class Vector2Amend<T> : TimedPropertyAmend<T, Vector2>
-{
-	public Vector2Amend(T target, string propertyName, Vector2 value, float duration, bool relative)
-		: base(target, propertyName, value, duration, relative) { }
 
+public class Vector2Amend<T>(T target, string propertyName, Vector2 value, float duration, bool relative)
+	: TimedPropertyAmend<T, Vector2>(target, propertyName, value, duration, relative)
+{
 	protected override void SetStartAndTargetValue(Vector2 value, Vector2 currentValue, bool relative)
 	{
 		StartingValue = currentValue;

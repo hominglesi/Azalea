@@ -215,24 +215,6 @@ internal partial class GenerateMipmapCommand : RenderCommand
 }
 
 [ThreadCommand(generateHandler: false)]
-internal partial class GenerateProgramCommand : RenderCommand
-{
-	public Program Program;
-	public string VertexShaderCode;
-	public string FragmentShaderCode;
-}
-
-internal static class GenerateProgramCommand_Handler
-{
-	public static Program GenerateProgram(this ICommandHandler<RenderCommand> consumer, string vertexShaderCode, string fragmentShaderCode)
-	{
-		var program = new Program();
-		consumer.Enqueue(GenerateProgramCommand.Borrow(program, vertexShaderCode, fragmentShaderCode));
-		return program;
-	}
-}
-
-[ThreadCommand(generateHandler: false)]
 internal partial class GenerateTextureCommand : RenderCommand
 {
 	public NativeTexture Texture;

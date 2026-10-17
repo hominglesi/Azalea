@@ -1,10 +1,10 @@
 ﻿using Azalea.Graphics;
-using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Design.Containers;
+
 public abstract class BasicWindowContainer : Composition
 {
 	#region Dragging
@@ -12,7 +12,7 @@ public abstract class BasicWindowContainer : Composition
 	private Vector2 _previousDragPosition;
 	private bool _isBeingDragged;
 
-	private readonly List<GameObject> _draggableSurfaces = new();
+	private readonly List<GameObject> _draggableSurfaces = [];
 
 	protected void AddDragableSurface(GameObject surface)
 	{

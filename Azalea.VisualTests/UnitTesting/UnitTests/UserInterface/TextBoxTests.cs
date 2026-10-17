@@ -3,11 +3,11 @@ using Azalea.Design.UserInterface.Basic;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Inputs;
-using Azalea.Utils;
 
 #pragma warning disable CS8602, CS8618
 
-namespace Azalea.VisualTests.UnitTesting.UserInterface.UserInput;
+namespace Azalea.VisualTests.UnitTesting.UnitTests.UserInterface;
+
 public class TextBoxTests : UnitTestSuite
 {
 	public class InputTest : UnitTest

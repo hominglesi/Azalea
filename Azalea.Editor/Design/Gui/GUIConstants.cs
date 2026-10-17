@@ -2,6 +2,7 @@
 using Azalea.Graphics.Sprites;
 
 namespace Azalea.Editor.Design.Gui;
+
 internal static class GUIConstants
 {
 	public const float ElementHeight = 19;

@@ -1,11 +1,9 @@
 ﻿using Azalea;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
-using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
-using Azalea.Platform;
 using Azalea.Platform.Rendering;
 using Azalea.Platform.Windowing;
 using SampleGame.Elements;
@@ -51,7 +49,7 @@ public class MemoryGame : AzaleaGame
 
 	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		if(e.Key == Keys.P)
+		if (e.Key == Keys.P)
 		{
 			_logic?.Solve();
 			return true;

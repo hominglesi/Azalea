@@ -1,4 +1,5 @@
 ﻿namespace Azalea.Graphics.Colors;
+
 public partial struct ColorQuad
 {
 	public readonly ColorQuad ModifyHue(float value)

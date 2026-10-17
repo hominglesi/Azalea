@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices.JavaScript;
 
 namespace Azalea.Web.Sounds;
+
 internal static partial class WebAudio
 {
 	private const string ImportString = "JSImports";

@@ -8,6 +8,7 @@ using Azalea.Utils;
 using System.Numerics;
 
 namespace Azalea.VisualTests;
+
 public class DockingTest : TestScene
 {
 	public BasicDockingContainer _leftDocker;
@@ -111,8 +112,7 @@ public class DockingTest : TestScene
 			RelativeSizeAxes = Axes.Both,
 			Direction = FlexDirection.Vertical,
 			Spacing = new(20),
-			Children = new[]
-			{
+			Children = [
 				new SpriteText() {Text = "Property 1: 42.63"},
 				new SpriteText() {Text = "Property 2: \"Text\""},
 				new SpriteText() {Text = "Property 3: true"},
@@ -120,7 +120,7 @@ public class DockingTest : TestScene
 				new SpriteText() {Text = "Property 5: 882"},
 				new SpriteText() {Text = "Property 6: false"},
 				new SpriteText() {Text = "Property 7: \"Names\""},
-			}
+			]
 		});
 	}
 

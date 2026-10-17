@@ -1,15 +1,11 @@
-﻿using Azalea.Design.UserInterface;
-using Azalea.Graphics;
+﻿using Azalea.Graphics;
 using Azalea.Graphics.Camera;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.Inputs.Gamepads;
 using Azalea.Utils.Proxies;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Numerics;
-using System.Text;
 using System.Threading.Channels;
 
 namespace Azalea.Platform.Scheduling;
@@ -91,7 +87,7 @@ public class InputProcessor
 					obj.TriggerEvent(e);
 
 				break;
-			case KeyDownEvent(var key, var isRepeat):
+			case KeyDownEvent(var key, var _):
 				State.SetKeyPressed(key, true);
 				foreach (var obj in getNonPositionalInputQueue())
 					if (obj.TriggerEvent(e) == true) break;
@@ -119,7 +115,7 @@ public class InputProcessor
 		}
 	}
 
-	private IReadOnlyList<GameObject> getNonPositionalInputQueue()
+	private List<GameObject> getNonPositionalInputQueue()
 	{
 		var inputQueue = new List<GameObject>();
 		_root.BuildNonPositionalInputQueue(inputQueue);
@@ -128,7 +124,7 @@ public class InputProcessor
 		return inputQueue;
 	}
 
-	private IReadOnlyList<GameObject> getPositionalInputQueue(Vector2 position)
+	private List<GameObject> getPositionalInputQueue(Vector2 position)
 	{
 		var inputQueue = new List<GameObject>();
 		_root.BuildPositionalInputQueue(position, inputQueue);
@@ -192,7 +188,7 @@ public class InputProcessor
 			obj.TriggerEvent(new HoverLostEvent());
 		}
 
-		if(_droppableCursor != showDroppableCursor)
+		if (_droppableCursor != showDroppableCursor)
 		{
 			_droppableCursor = showDroppableCursor;
 			_droppableCursorProxy.SetValue(_droppableCursor);

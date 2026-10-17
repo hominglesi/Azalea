@@ -1,8 +1,8 @@
 ﻿using Azalea.Native.Windows;
-using Azalea.Utils;
 using System;
 
 namespace Azalea.Platform.Windowing.Windows;
+
 internal partial class WindowsDeviceContext : IPlatformDeviceContext
 {
 	public nint Handle { get; private init; }

@@ -8,9 +8,6 @@ public class Texture : ITexture
 	internal readonly NativeTexture NativeTexture;
 	internal bool IsLoaded => NativeTexture.IsReady();
 
-	public Texture(ITexture other)
-		: this(((Texture)other).NativeTexture) { }
-
 	internal Texture(NativeTexture newTexture) => NativeTexture = newTexture;
 
 	internal Rectangle UVCoordinates { get; private set; } = Rectangle.One;

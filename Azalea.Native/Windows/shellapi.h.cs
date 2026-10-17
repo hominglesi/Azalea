@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Azalea.Native.Windows;
+
 public static partial class Win32
 {
 	private const string Shell32Path = "shell32.dll";

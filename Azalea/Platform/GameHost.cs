@@ -7,7 +7,6 @@ using Azalea.Lists;
 using Azalea.Platform.Audio;
 using Azalea.Platform.Loading;
 using Azalea.Platform.Loading.OpenGL;
-using Azalea.Simulations;
 using System;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -36,7 +35,6 @@ public abstract class GameHost
 
 	public IConfigProvider? ConfigProvider { get; protected set; }
 	public SceneContainer SceneManager { get; }
-	public PhysicsGenerator Physics { get; }
 	public IClipboard Clipboard { get; }
 
 	private readonly Composition _root;
@@ -65,7 +63,6 @@ public abstract class GameHost
 		#endregion
 
 		Clipboard = CreateClipboard();
-		Physics = new PhysicsGenerator();
 		SceneManager = new SceneContainer();
 
 		_root = new Composition();
@@ -109,8 +106,6 @@ public abstract class GameHost
 	public virtual void CallOnFixedUpdate()
 	{
 		_root.FixedUpdateSubTree();
-
-		Physics.Update();
 	}
 
 	public Application CreateApplication(AzaleaGame game, string? title = null, Vector2Int? clientSize = null)
@@ -134,7 +129,7 @@ public abstract class GameHost
 			_empty.Set();
 	}
 
-	private ManualResetEvent _empty = new(false);
+	private readonly ManualResetEvent _empty = new(false);
 
 	public void WaitUntilEmpty()
 	{

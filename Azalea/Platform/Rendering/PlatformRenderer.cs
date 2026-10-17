@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading;
 
 namespace Azalea.Platform.Rendering;
+
 public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 {
 	internal PlatformRenderer()
@@ -37,18 +38,10 @@ public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 
 	protected abstract void HandleCommandLogic(RenderCommand command);
 
-	public ICommandAwaitable? Enqueue(RenderCommand command)
-	{
-		if (TryHandleCommand(command))
-			return null;
-
-		return Thread.Enqueue(command);
-	}
-
-	protected virtual bool TryHandleCommand(RenderCommand command) => false;
+	public ICommandAwaitable? Enqueue(RenderCommand command) => Thread.Enqueue(command);
 
 	private RenderCommandGroup? _stagedQueue = null;
-	private readonly object _stagedQueueLock = new();
+	private readonly Lock _stagedQueueLock = new();
 
 	internal int StagedQueueOverrides { get; private set; }
 

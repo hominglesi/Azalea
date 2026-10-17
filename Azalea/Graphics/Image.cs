@@ -6,28 +6,13 @@ using System.IO;
 
 namespace Azalea.Graphics;
 
-public class Image
+public class Image(int width, int height, byte[] data)
 {
-	private byte[] _data;
-	private int _width;
-	private int _height;
+	public byte[] Data { get; private init; } = data;
+	public int Width { get; private init; } = width;
+	public int Height { get; private init; } = height;
 
-	public int Width => _width;
-	public int Height => _height;
-	public byte[] Data => _data;
-
-	public Image(int width, int height, byte[] data)
-	{
-		_width = width;
-		_height = height;
-		_data = data;
-	}
-
-	public Image(int width, int height)
-		: this(width, height, new byte[width * height * 4])
-	{
-
-	}
+	public Image(int width, int height) : this(width, height, new byte[width * height * 4]) { }
 
 	public void CopyFromSource(Image source, RectangleInt sourceArea, RectangleInt targetArea)
 	{
@@ -37,17 +22,17 @@ public class Image
 		for (int i = 0; i < sourceArea.Height; i++)
 		{
 			var verticalOffsetSource = (sourceArea.Y + i) * source.Width;
-			var verticalOffsetTarget = (targetArea.Y + i) * _width;
+			var verticalOffsetTarget = (targetArea.Y + i) * Width;
 
 			for (int j = 0; j < sourceArea.Width; j++)
 			{
 				var offsetSource = verticalOffsetSource + sourceArea.X + j;
 				var offsetTarget = verticalOffsetTarget + targetArea.X + j;
 
-				_data[offsetTarget * 4] = source.Data[offsetSource * 4];
-				_data[offsetTarget * 4 + 1] = source.Data[offsetSource * 4 + 1];
-				_data[offsetTarget * 4 + 2] = source.Data[offsetSource * 4 + 2];
-				_data[offsetTarget * 4 + 3] = source.Data[offsetSource * 4 + 3];
+				Data[offsetTarget * 4] = source.Data[offsetSource * 4];
+				Data[offsetTarget * 4 + 1] = source.Data[offsetSource * 4 + 1];
+				Data[offsetTarget * 4 + 2] = source.Data[offsetSource * 4 + 2];
+				Data[offsetTarget * 4 + 3] = source.Data[offsetSource * 4 + 3];
 			}
 		}
 	}

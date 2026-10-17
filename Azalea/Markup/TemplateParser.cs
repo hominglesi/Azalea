@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Xml;
 
 namespace Azalea.Markup;
+
 public static class TemplateConverter
 {
 	public static GameObject Parse(string xmlString)

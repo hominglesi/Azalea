@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices.JavaScript;
 
 namespace Azalea.Web.IO;
+
 internal static partial class WebLocalStorage
 {
 	private const string ImportString = "JSImports";

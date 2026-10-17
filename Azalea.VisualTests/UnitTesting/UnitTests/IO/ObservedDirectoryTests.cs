@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace Azalea.VisualTests.UnitTesting.UnitTests.IO;
+
 public class ObservedDirectoryTests : UnitTestSuite
 {
 	protected static ObservedDirectory? ObservedDirectory;

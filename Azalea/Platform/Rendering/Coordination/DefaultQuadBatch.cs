@@ -99,7 +99,7 @@ public class DefaultQuadBatch : RenderBatch<DefaultQuadBatchVertex>
 		commandQueue.BindVertexArray(_vertexArray);
 		commandQueue.BindBuffer(GL.ARRAY_BUFFER, _vertexArrayVertices);
 
-		commandQueue.BufferData(GL.ARRAY_BUFFER, _nextVertex * _vertexSize * sizeof(float), _vertices, GL.DYNAMIC_DRAW, true);
+		commandQueue.BufferData(GL.ARRAY_BUFFER, _nextVertex * _vertexSize * sizeof(float), _vertices!, GL.DYNAMIC_DRAW, true);
 
 		commandQueue.DrawElements(GL.TRIANGLES, (_nextVertex / 4) * 6, GL.UNSIGNED_INT, 0);
 

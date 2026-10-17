@@ -3,6 +3,7 @@ using Azalea.Design.Containers;
 using Azalea.Graphics;
 
 namespace Azalea.Editor.Design.Gui;
+
 public class GUICounter : TextContainer
 {
 	private string _labelText;

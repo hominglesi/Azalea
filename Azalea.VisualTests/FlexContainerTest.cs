@@ -8,17 +8,18 @@ using Azalea.Utils;
 using System;
 
 namespace Azalea.VisualTests;
+
 public class FlexContainerTest : TestScene
 {
-	private BasicButton _createSampleButton;
+	private readonly BasicButton _createSampleButton;
 
-	private BasicDropDownMenu _directionMenu;
-	private BasicDropDownMenu _wrappingMenu;
-	private BasicDropDownMenu _justificationMenu;
-	private BasicDropDownMenu _itemAlignmentMenu;
-	private BasicDropDownMenu _contentAlignmentMenu;
-	private BasicDropDownMenu _spacingHorizontalMenu;
-	private BasicDropDownMenu _spacingVerticalMenu;
+	private readonly BasicDropDownMenu _directionMenu;
+	private readonly BasicDropDownMenu _wrappingMenu;
+	private readonly BasicDropDownMenu _justificationMenu;
+	private readonly BasicDropDownMenu _itemAlignmentMenu;
+	private readonly BasicDropDownMenu _contentAlignmentMenu;
+	private readonly BasicDropDownMenu _spacingHorizontalMenu;
+	private readonly BasicDropDownMenu _spacingVerticalMenu;
 
 	public FlexContainerTest()
 	{
@@ -112,7 +113,7 @@ public class FlexContainerTest : TestScene
 		};
 	}
 
-	private FlexContainer _flex;
+	private FlexContainer? _flex;
 
 	private void createSampleFlex()
 	{

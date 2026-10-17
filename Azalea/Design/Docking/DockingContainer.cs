@@ -4,9 +4,10 @@ using System;
 using System.Collections.Generic;
 
 namespace Azalea.Design.Docking;
+
 public abstract class DockingContainer : ContentContainer
 {
-	protected List<Dockable> Dockables = new();
+	protected List<Dockable> Dockables = [];
 	protected Dockable? FocusedDockable;
 
 	public void AddDockable(string name, GameObject content)
@@ -60,15 +61,9 @@ public abstract class DockingContainer : ContentContainer
 		throw new InvalidOperationException("Cannot focus content that is not already part of this docking container");
 	}
 
-	protected class Dockable
+	protected class Dockable(string name, GameObject content)
 	{
-		public string Name { get; }
-		public GameObject Content { get; }
-
-		public Dockable(string name, GameObject content)
-		{
-			Name = name;
-			Content = content;
-		}
+		public string Name { get; } = name;
+		public GameObject Content { get; } = content;
 	}
 }

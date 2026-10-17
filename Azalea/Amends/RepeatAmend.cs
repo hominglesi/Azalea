@@ -1,17 +1,12 @@
 ﻿using System;
 
 namespace Azalea.Amends;
-public class RepeatAmend<T> : Amend<T>, IRepeatableAmend
-{
-	private float _repeatInterval;
-	private float _remainingTime;
 
-	public RepeatAmend(T target, Action<T>? action, float repeatInterval)
-		: base(target, action)
-	{
-		_repeatInterval = repeatInterval;
-		_remainingTime = 0;
-	}
+public class RepeatAmend<T>(T target, Action<T>? action, float repeatInterval)
+	: Amend<T>(target, action), IRepeatableAmend
+{
+	private readonly float _repeatInterval = repeatInterval;
+	private float _remainingTime = 0;
 
 	public override void Update(float deltaTime)
 	{

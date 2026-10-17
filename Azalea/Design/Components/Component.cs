@@ -2,6 +2,7 @@
 using System;
 
 namespace Azalea.Design.Components;
+
 public abstract class Component
 {
 	private GameObject? _parent;

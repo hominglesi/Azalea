@@ -3,12 +3,12 @@ using Azalea.Extentions;
 using Azalea.IO.Resources;
 using Azalea.Platform.Windowing;
 using Azalea.Platform.Windowing.Windows;
-using Azalea.Utils;
 using System;
 using System.Diagnostics;
 using System.Numerics;
 
 namespace Azalea.Editor.DebugWindows.Inspectors;
+
 internal class PlatformWindowInspector
 {
 	public static GUIWindow Create(Platform.Application app, PlatformWindow window, GUIWindow? origin = null)

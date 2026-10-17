@@ -2,6 +2,7 @@
 using System.Numerics;
 
 namespace Azalea.Inputs;
+
 public class GamepadAnalogStick
 {
 	public float Horizontal { get; internal set; }

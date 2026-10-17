@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 
 namespace Azalea.Native.Windows;
+
 public static partial class Win32
 {
 	[StructLayout(LayoutKind.Sequential)]

@@ -3,6 +3,7 @@ using System;
 using System.Runtime.InteropServices;
 
 namespace Azalea.Platform.Windows;
+
 internal partial class WindowsWaitableTimer : Disposable
 {
 	private readonly nint _timer;

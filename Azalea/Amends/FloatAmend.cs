@@ -1,11 +1,10 @@
 ﻿using Azalea.Utils;
 
 namespace Azalea.Amends;
-public class FloatAmend<T> : TimedPropertyAmend<T, float>
-{
-	public FloatAmend(T target, string propertyName, float value, float duration, bool relative)
-		: base(target, propertyName, value, duration, relative) { }
 
+public class FloatAmend<T>(T target, string propertyName, float value, float duration, bool relative)
+	: TimedPropertyAmend<T, float>(target, propertyName, value, duration, relative)
+{
 	protected override void SetStartAndTargetValue(float value, float currentValue, bool relative)
 	{
 		StartingValue = currentValue;

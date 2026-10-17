@@ -6,6 +6,7 @@ using Azalea.Inputs.Events;
 using System;
 
 namespace Azalea.Editor.Design.Gui;
+
 public class GUIButton : Composition
 {
 	public readonly SpriteText Label;

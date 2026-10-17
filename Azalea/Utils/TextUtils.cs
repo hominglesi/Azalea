@@ -5,9 +5,9 @@ namespace Azalea.Utils;
 
 public static class TextUtils
 {
-	private static string[] words = new[]{"lorem", "ipsum", "dolor", "sit", "amet", "consectetuer",
+	private readonly static string[] words = ["lorem", "ipsum", "dolor", "sit", "amet", "consectetuer",
 		"adipiscing", "elit", "sed", "diam", "nonummy", "nibh", "euismod",
-		"tincidunt", "ut", "laoreet", "dolore", "magna", "aliquam", "erat"};
+		"tincidunt", "ut", "laoreet", "dolore", "magna", "aliquam", "erat"];
 
 	public static string GenerateLoremIpsum(int wordCount)
 	{

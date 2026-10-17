@@ -7,6 +7,7 @@ using System;
 #pragma warning disable CS8602, CS8618
 
 namespace Azalea.VisualTests.UnitTesting.UnitTests.SceneGraph;
+
 public class GameObjectInvalidation : UnitTestSuite
 {
 	public class InvalidateAlpha : UnitTest

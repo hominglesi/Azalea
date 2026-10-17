@@ -1,16 +1,15 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics.Sprites;
-using Azalea.Inputs;
-using Azalea.Inputs.Events;
 using Azalea.Platform;
 using System;
 
 namespace Azalea.VisualTests;
+
 public class FrameRateTest : TestScene
 {
-	private SpriteText _elapsedTimeText;
-	private SpriteText _deltaTimeText;
-	private SpriteText _fixedDeltaTimeText;
+	private readonly SpriteText _elapsedTimeText;
+	private readonly SpriteText _deltaTimeText;
+	private readonly SpriteText _fixedDeltaTimeText;
 
 	public FrameRateTest()
 	{

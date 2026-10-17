@@ -6,9 +6,10 @@ using Azalea.Platform;
 using System.Numerics;
 
 namespace Azalea.VisualTests;
+
 public class PanningTest : TestScene
 {
-	private CameraContainer _container;
+	private readonly CameraContainer _container;
 
 	public PanningTest()
 	{
@@ -16,8 +17,7 @@ public class PanningTest : TestScene
 		{
 			RelativeSizeAxes = Graphics.Axes.Both,
 			Origin = Graphics.Anchor.Center,
-			Children = new[]
-			{
+			Children = [
 				new BasicButton()
 				{
 					Position = new(900, 900),
@@ -46,7 +46,7 @@ public class PanningTest : TestScene
 					Width = 320,
 					Height = 100
 				}
-			}
+			]
 		});
 	}
 

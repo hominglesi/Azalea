@@ -1,6 +1,5 @@
 ﻿using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics;
-using Azalea.Graphics.Rendering;
 using Azalea.Layout;
 using Azalea.Lists;
 using Azalea.Numerics;
@@ -32,7 +31,7 @@ public partial class Composition : GameObject
 	protected internal IReadOnlyList<GameObject> InternalChildren => _internalChildren;
 	private ulong _currentChildID;
 
-	private List<GameObject> _publicChildren = [];
+	private readonly List<GameObject> _publicChildren = [];
 
 	public virtual IReadOnlyList<GameObject> Children
 	{
@@ -232,12 +231,8 @@ public partial class Composition : GameObject
 		if (invalidation == Invalidation.None)
 			return anyInvalidated;
 
-		IReadOnlyList<GameObject> targetChildren = _internalChildren;
-
-		for (int i = 0; i < targetChildren.Count; ++i)
+		foreach (var c in _internalChildren)
 		{
-			GameObject c = targetChildren[i];
-
 			Invalidation childInvalidation = invalidation;
 			if ((invalidation & Invalidation.RequiredParentSizeToFit) > 0)
 				childInvalidation |= Invalidation.DrawInfo;
@@ -505,20 +500,6 @@ public partial class Composition : GameObject
 			child.BuildPositionalInputQueue(screenSpacePos, queue);
 
 		return true;
-	}
-
-	internal void InvalidateChildrenSizeDependencies(Invalidation invalidation, Axes axes, GameObject source)
-	{
-		//bool wasValid = childrenSizeDependencies.IsValid;
-
-		Invalidate(invalidation, InvalidationSource.Child);
-
-		//axes &= ~source.BypassAutoSizedAxes;
-
-		//axes &= AutoSizeAxes;
-
-		//if (wasValid && axes == Axes.None)
-		//childrenSizeDependencies.Validate();w
 	}
 
 	protected class ChildComparer(Composition owner) : IComparer<GameObject>

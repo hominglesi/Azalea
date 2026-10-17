@@ -6,7 +6,7 @@ namespace Azalea.IO.Resources;
 
 public static partial class ResourceStoreExtentions
 {
-	private static ResourceCache<MsdfFontData> _msdfFontDataCache = new();
+	private readonly static ResourceCache<MsdfFontData> _msdfFontDataCache = new();
 
 	public static MsdfFontData GetMsdfFont(this IResourceStore store, string csvPath, string spriteSheetPath)
 	{
@@ -27,7 +27,7 @@ public static partial class ResourceStoreExtentions
 		return msdfData;
 	}
 
-	private static ResourceCache<(string, string)> _msdfFontNameCache = new();
+	private readonly static ResourceCache<(string, string)> _msdfFontNameCache = new();
 
 	public static MsdfFontData GetMsdfFontByName(this IResourceStore store, string name)
 	{

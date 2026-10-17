@@ -13,14 +13,10 @@ namespace Azalea.VisualTests;
 
 public class TestingTestScene : TestScene
 {
-	private Composition _wrapper;
-	private Composition _comp;
-	private TextContainer _composition;
-	private Box _cursor;
-	private Box _igrac;
-	private Sprite _sprite;
+	private readonly TextContainer _composition;
+	private readonly Sprite _sprite;
 
-	private string[] _imageURLs = [
+	private readonly string[] _imageURLs = [
 		"https://coverartarchive.org/release/7ef86f4d-2895-4c81-a0ab-c112d9958e5a/front-250",
 		"https://coverartarchive.org/release/c394f14d-aed7-4f6b-814c-e11761b48401/front-250",
 		"https://coverartarchive.org/release/560db4c2-5af5-4ef0-a9e0-b56fca3d8bea/front-250",
@@ -35,8 +31,6 @@ public class TestingTestScene : TestScene
 		"https://f4.bcbits.com/img/a0566082154_10.jpg"
 		];
 
-
-	private SpriteText _scrollDisplay;
 
 	public TestingTestScene()
 	{
@@ -118,13 +112,13 @@ public class TestingTestScene : TestScene
 			}
 		}
 
-		Add(_igrac = new()
+		Add(new()
 		{
 			Color = Palette.Orange,
 			Size = new(50, 50),
 			Origin = Anchor.BottomCenter
 		});
-		Add(_wrapper = new Composition()
+		Add(new Composition()
 		{
 			RelativeSizeAxes = Axes.Both,
 			Child = _composition = new TextContainer(t =>
@@ -152,26 +146,25 @@ public class TestingTestScene : TestScene
 		_composition.AddText("Text3 ", t => { t.Color = Palette.Black; });
 		_composition.AddText("Text4 ");
 
-		Add(_comp = new FlexContainer()
+		Add(new FlexContainer()
 		{
 			Direction = FlexDirection.Vertical,
 			Wrapping = FlexWrapping.NoWrapping,
 			BackgroundColor = Palette.Red,
 			AutoSizeAxes = Axes.Both,
-			Children = new GameObject[] {
+			Children = [
 				new Box()
 				{
 					Color = new Color(10, 10, 10, 10),
 					Size = new(50, 50),
 					Position = new(30, 30)
 				},
-
 				new Box()
 				{
 					Color = new Color(10, 10, 10, 10),
 					Size = new(50, 50)
-				},
-			}
+				}
+			]
 		});
 
 
@@ -203,7 +196,7 @@ public class TestingTestScene : TestScene
 			BorderThickness = new(6)
 		});
 
-		Add(_scrollDisplay = new SpriteText()
+		Add(new SpriteText()
 		{
 			Position = new(700, 100),
 			Text = "0"
@@ -224,51 +217,14 @@ public class TestingTestScene : TestScene
 			}
 		});
 
-		Add(_cursor = new Box()
+		Add(new Box()
 		{
 			Size = new(50, 50)
 		});
 	}
 
-	private float _elapsedTime = 0;
 	protected override void Update()
 	{
 		_sprite.Position += App.Input.State.GetDirectionalMovement() * Time.DeltaTime * 200;
-
-		/*
-		_elapsedTime += Time.DeltaTime;
-		Console.WriteLine(_elapsedTime);
-
-		_igrac.Position = Input.MousePosition;
-
-		_igrac.GetFirstParentOfType<Composition>().ChangeChildDepth(_igrac, -_igrac.Y);*/
-
-		//_composition.Size = Input.MousePosition - _composition.ToScreenSpace(_composition.Position);
-		//_scrollDisplay.Text = (float.Parse(_scrollDisplay.Text) + Input.MouseWheelDelta).ToString();
-
-
-		/*
-		_cursor.Position = Input.MousePosition;
-
-		if (Input.GetKey(Keys.Space).DownOrRepeat) Console.WriteLine("Pressed space");
-
-		if (Input.GetKey(Keys.M).Down)
-		{
-			//_comp.Invalidate(Invalidation.RequiredParentSizeToFit, InvalidationSource.Child);
-			_comp.InternalComposition.Invalidate(Invalidation.RequiredParentSizeToFit, InvalidationSource.Child);
-		}
-
-		if (Input.GetKey(Keys.P).Down)
-		{
-			AzaleaGame.Main.Host.Window.State = WindowState.Normal;
-		}
-		else if (Input.GetKey(Keys.O).Down)
-		{
-			AzaleaGame.Main.Host.Window.State = WindowState.Minimized;
-		}
-		else if (Input.GetKey(Keys.I).Down)
-		{
-			AzaleaGame.Main.Host.Window.State = WindowState.Maximized;
-		}*/
 	}
 }

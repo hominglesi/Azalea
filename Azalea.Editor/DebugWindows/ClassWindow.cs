@@ -3,9 +3,10 @@ using System;
 using System.Linq;
 
 namespace Azalea.Editor.DebugWindows;
+
 internal class ClassWindow(AzaleaGame game)
 {
-	private AzaleaGame _game = game;
+	private readonly AzaleaGame _game = game;
 	private GUIWindow? _window;
 	private bool _shown = false;
 

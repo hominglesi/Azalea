@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 namespace Azalea.VisualTests.UnitTesting;
+
 public abstract class UnitTestSuite : UnitTestBase
 {
 	public List<UnitTest> Tests { get; init; } = [];

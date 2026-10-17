@@ -27,9 +27,9 @@ public static partial class GL
 	public sealed class OpenGLLoadedFunctionAttribute(
 		string? docs = null, string? overrideName = null, bool automaticPrefix = true) : Attribute
 	{
-		private string? _docs = docs;
-		private string? _overrideName = overrideName;
-		private bool _automaticPrefix = automaticPrefix;
+		private readonly string? _docs = docs;
+		private readonly string? _overrideName = overrideName;
+		private readonly bool _automaticPrefix = automaticPrefix;
 	}
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glAttachShader.xhtml")]

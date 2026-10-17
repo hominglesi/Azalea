@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace Azalea.Lists;
+
 public class ObservableList<T> : IEnumerable<T>
 {
 	private readonly List<T> _list;

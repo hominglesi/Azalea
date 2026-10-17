@@ -7,13 +7,13 @@ using Azalea.Graphics.Sprites;
 using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
 using Azalea.Platform;
-using Azalea.Utils;
 using Azalea.Utils.Proxies;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Editor.Design.Gui;
+
 public class GUIWindow : BasicWindowContainer
 {
 	private const float __titleBarHeight = 20;
@@ -89,7 +89,7 @@ public class GUIWindow : BasicWindowContainer
 			_groupStack.Peek().Add(gameObject);
 	}
 
-	public void RemoveElement(GameObject obj) => obj.Parent!.Remove(obj);
+	public static void RemoveElement(GameObject obj) => obj.Parent!.Remove(obj);
 
 	private readonly Stack<Composition> _groupStack = [];
 

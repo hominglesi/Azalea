@@ -7,6 +7,7 @@ using Azalea.Utils;
 using System;
 
 namespace Azalea.Editor.Design.Gui;
+
 public class GUISliderFloat : Composition
 {
 	private readonly float _minValue;

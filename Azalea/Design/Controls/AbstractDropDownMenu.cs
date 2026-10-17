@@ -1,11 +1,11 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
-using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using System;
 using System.Collections.Generic;
 
 namespace Azalea.Design.Controls;
+
 public abstract class AbstractDropDownMenu<T> : Composition
 	where T : IEquatable<T>
 {

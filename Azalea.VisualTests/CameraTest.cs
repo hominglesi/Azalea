@@ -9,8 +9,8 @@ namespace Azalea.VisualTests;
 
 internal class CameraTest : TestScene
 {
-	private CameraContainer _worldContainer;
-	private Sprite _player;
+	private readonly CameraContainer _worldContainer;
+	private readonly Sprite _player;
 
 	public CameraTest()
 	{

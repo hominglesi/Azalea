@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 
 namespace Azalea.Native.Windows;
+
 public static partial class Win32
 {
 	private const string Gdi32Path = "gdi32.dll";

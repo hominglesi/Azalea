@@ -3,6 +3,7 @@ using Azalea.Graphics;
 using System;
 
 namespace Azalea.Editor.Design.Gui;
+
 public class GUILabel : TextContainer
 {
 	internal GUILabel(string text)

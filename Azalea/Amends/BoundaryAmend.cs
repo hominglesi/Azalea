@@ -2,11 +2,10 @@
 using Azalea.Utils;
 
 namespace Azalea.Amends;
-public class BoundaryAmend<T> : TimedPropertyAmend<T, Boundary>
-{
-	public BoundaryAmend(T target, string propertyName, Boundary value, float duration, bool relative)
-		: base(target, propertyName, value, duration, relative) { }
 
+public class BoundaryAmend<T>(T target, string propertyName, Boundary value, float duration, bool relative)
+	: TimedPropertyAmend<T, Boundary>(target, propertyName, value, duration, relative)
+{
 	protected override void SetStartAndTargetValue(Boundary value, Boundary currentValue, bool relative)
 	{
 		StartingValue = currentValue;

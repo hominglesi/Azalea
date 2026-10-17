@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace Azalea.Platform.Rendering.OpenGL;
+
 internal class GLContext
 {
 	public nint Handle { get; init; }

@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 
 namespace Azalea.Utils;
+
 public class ObjectPool<T>
 	where T : IPoolable, new()
 {

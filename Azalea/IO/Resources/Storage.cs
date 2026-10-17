@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace Azalea.IO.Resources;
+
 public class Storage : IResourceStore
 {
 	public string Path { get; init; }

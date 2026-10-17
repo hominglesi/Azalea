@@ -2,6 +2,7 @@
 using System.Reflection;
 
 namespace Azalea.Amends;
+
 public abstract class TimedPropertyAmend<T1, T2> : TimedAmend<T1>
 {
 	private readonly PropertyInfo _property;

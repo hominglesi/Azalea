@@ -5,16 +5,10 @@ using System.Runtime.InteropServices;
 namespace Azalea;
 
 [StructLayout(LayoutKind.Sequential)]
-public struct Vector2Int : IEquatable<Vector2Int>
+public struct Vector2Int(int x, int y) : IEquatable<Vector2Int>
 {
-	public int X;
-	public int Y;
-
-	public Vector2Int(int x, int y)
-	{
-		X = x;
-		Y = y;
-	}
+	public int X = x;
+	public int Y = y;
 
 	public Vector2Int(int value)
 		: this(value, value) { }

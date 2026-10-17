@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Azalea.Utils.Proxies;
+﻿namespace Azalea.Utils.Proxies;
 
 public interface IProxy<T>
 {

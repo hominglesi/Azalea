@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Azalea.VisualTests.UnitTesting;
+
 public class UnitTestsSidebar : Composition
 {
 	private readonly static float __dropDownHeight = 145;
@@ -27,8 +28,8 @@ public class UnitTestsSidebar : Composition
 
 	public readonly BasicDropDownMenu SuiteSelectMenu;
 	public readonly BasicDropDownMenu TestSelectMenu;
-	private FlexContainer _headerContainer;
-	private FlexContainer _stepContainer;
+	private readonly FlexContainer _headerContainer;
+	private readonly FlexContainer _stepContainer;
 
 	public UnitTestsSidebar()
 	{
@@ -82,14 +83,14 @@ public class UnitTestsSidebar : Composition
 		});
 	}
 
-	private SpriteText customizeDropDownMenuLabel(SpriteText text)
+	private static SpriteText customizeDropDownMenuLabel(SpriteText text)
 	{
 		text.Origin = Anchor.CenterLeft;
 		text.X = 60;
 		return text;
 	}
 
-	private BasicDropDownMenu customizeDropDownMenu(BasicDropDownMenu menu)
+	private static BasicDropDownMenu customizeDropDownMenu(BasicDropDownMenu menu)
 	{
 		menu.RelativePositionAxes = Axes.X;
 		menu.X = 0.5f;
@@ -118,17 +119,14 @@ public class UnitTestsSidebar : Composition
 	}
 
 	private int _nextStep = 0;
-	private List<TestStep> _steps = new();
-	private List<TestStepButton> _stepButtons = new();
+	private readonly List<TestStep> _steps = [];
+	private readonly List<TestStepButton> _stepButtons = [];
 
 	public void AddSteps(List<TestStep> steps)
 	{
-		var lastStep = _steps.Count;
-
 		for (int i = 0; i < steps.Count; i++)
 		{
 			var step = steps[i];
-			var stepIndex = lastStep + i;
 			TestStepButton? button = null;
 
 			if (step is TestStepOperation)
@@ -264,11 +262,7 @@ public class UnitTestsSidebar : Composition
 		}
 	}
 
-	private class TestStepOperationButton : TestStepButton
-	{
-		public TestStepOperationButton(string text)
-			: base(text) { }
-	}
+	private class TestStepOperationButton(string text) : TestStepButton(text);
 
 	private class TestStepResultButton : TestStepButton
 	{

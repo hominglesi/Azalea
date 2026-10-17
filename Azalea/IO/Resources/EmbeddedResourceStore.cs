@@ -3,10 +3,11 @@ using System.IO;
 using System.Reflection;
 
 namespace Azalea.IO.Resources;
+
 public class EmbeddedResourceStore : IResourceStore
 {
-	private Assembly _assembly;
-	private string _prefix;
+	private readonly Assembly _assembly;
+	private readonly string _prefix;
 
 	public EmbeddedResourceStore(Assembly assembly)
 	{
@@ -37,7 +38,7 @@ public class EmbeddedResourceStore : IResourceStore
 
 	public IEnumerable<(string, bool)> GetAvalibleResources(string subPath = "")
 	{
-		List<string> directories = new();
+		List<string> directories = [];
 
 		foreach (var resourceName in _assembly.GetManifestResourceNames())
 		{

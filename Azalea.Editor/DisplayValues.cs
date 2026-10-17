@@ -6,7 +6,8 @@ using Azalea.Graphics.Sprites;
 using System;
 using System.Numerics;
 
-namespace Azalea.Editing;
+namespace Azalea.Editor;
+
 internal class DisplayValues : FlexContainer
 {
 	internal DisplayValues()

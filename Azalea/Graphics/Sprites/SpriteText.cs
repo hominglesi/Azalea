@@ -8,7 +8,7 @@ namespace Azalea.Graphics.Sprites;
 
 public class SpriteText : GameObject
 {
-	private TextLayoutProvider _layoutProvider = new();
+	private readonly TextLayoutProvider _layoutProvider = new();
 
 	public FontUsage Font
 	{

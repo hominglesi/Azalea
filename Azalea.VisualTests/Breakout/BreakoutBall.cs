@@ -3,16 +3,12 @@ using Azalea.Platform;
 using System.Numerics;
 
 namespace Azalea.VisualTests.Breakout;
-public class BreakoutBall : Box
+
+public class BreakoutBall(Vector2 direction) : Box
 {
 	public const float BallSpeed = 5f;
 
-	public Vector2 Direction;
-
-	public BreakoutBall(Vector2 direction)
-	{
-		Direction = direction;
-	}
+	public Vector2 Direction = direction;
 
 	protected override void Update()
 	{

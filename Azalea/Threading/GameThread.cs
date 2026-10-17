@@ -1,8 +1,6 @@
 ﻿using Azalea.Platform;
 using Azalea.Platform.Windows;
-using Azalea.Utils;
 using System;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Channels;
 
@@ -103,7 +101,7 @@ internal abstract partial class GameThread<T> : ICommandHandler<T>
 	private readonly Channel<T> _pendingCommands = Channel.CreateUnbounded<T>(
 		new() { SingleReader = true }
 	);
-	private readonly object _pendingCommandsLock = new();
+	private readonly Lock _pendingCommandsLock = new();
 
 	public virtual ICommandAwaitable? Enqueue(T command)
 	{
@@ -143,11 +141,11 @@ internal abstract partial class GameThread<T> : ICommandHandler<T>
 
 	private int _tickIndex = 0;
 	private double _tickSum = 0;
-	private double[] _tickList = new double[100];
+	private readonly double[] _tickList = new double[100];
 	private DateTime _lastTickTime;
 
 	private double _workSum = 0;
-	private double[] _workDurationList = new double[100];
+	private readonly double[] _workDurationList = new double[100];
 	private DateTime _workBeginTime;
 
 	public double AverageInterval { get; private set; }

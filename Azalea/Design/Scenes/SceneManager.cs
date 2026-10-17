@@ -1,6 +1,7 @@
 ﻿using Azalea.Platform;
 
 namespace Azalea.Design.Scenes;
+
 public static class SceneManager
 {
 	private static SceneContainer? _instance;

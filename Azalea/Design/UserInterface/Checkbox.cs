@@ -5,6 +5,7 @@ using Azalea.Inputs.Events;
 using System;
 
 namespace Azalea.Design.UserInterface;
+
 public class Checkbox : Composition
 {
 	public bool Checked { get; private set; }

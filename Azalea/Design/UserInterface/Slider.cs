@@ -1,12 +1,12 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
-using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.Utils;
 using System;
 using System.Numerics;
 
 namespace Azalea.Design.UserInterface;
+
 public abstract class Slider : Composition
 {
 	public Slider()
@@ -74,7 +74,8 @@ public abstract class Slider : Composition
 		{
 			if (_direction == value) return;
 			_direction = value;
-			uncacheSliderRange();
+
+			updateHeadPosition();
 		}
 	}
 
@@ -91,14 +92,9 @@ public abstract class Slider : Composition
 		}
 	}
 
-	private void uncacheSliderRange()
-	{
-		_sliderRangeCached = false;
-		updateHeadPosition();
-	}
-
 	private void updateHeadPosition()
 	{
+		_sliderRangeCached = false;
 		var pixelValue = MathUtils.Map(Value, 0, 1, SliderRange.X, SliderRange.Y);
 
 		if (Direction == SliderDirection.Horizontal)
@@ -163,7 +159,10 @@ public abstract class Slider : Composition
 	{
 		if (_lastDrawSize != DrawSize || _lastHeadLength != _headLength)
 		{
-			uncacheSliderRange();
+			updateHeadPosition();
+
+			_lastDrawSize = DrawSize;
+			_lastHeadLength = _headLength;
 		}
 
 		if (IsHeld)

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Azalea.Editor.Views.ResourceExploring;
+
 public abstract class ResourceExplorer : Composition
 {
 	private readonly IResourceStore _store;

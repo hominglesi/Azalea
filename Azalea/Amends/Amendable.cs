@@ -5,7 +5,7 @@ namespace Azalea.Amends;
 
 public abstract class Amendable
 {
-	private List<IAmend> _amends = new();
+	private readonly List<IAmend> _amends = [];
 
 	public int AmendCount => _amends.Count;
 

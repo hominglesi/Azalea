@@ -4,6 +4,7 @@ using Azalea.Platform.Scheduling;
 using System.Numerics;
 
 namespace Azalea.Editor.DebugWindows.Inspectors;
+
 internal class PlatformSchedulerInspector
 {
 	public static GUIWindow Create(Application app, PlatformScheduler scheduler, GUIWindow? origin = null)

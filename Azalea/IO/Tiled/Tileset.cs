@@ -20,7 +20,6 @@ public readonly struct Tileset
 	public Vector2Int TileSize { get; init; }
 	public int Spacing { get; init; }
 	public int Margin { get; init; }
-	public Texture Source { get; init; }
 	public Texture[] Tiles { get; init; }
 
 	public static Tileset Load(IResourceStore store, string path)
@@ -136,15 +135,14 @@ public readonly struct Tileset
 		}
 
 		// Create our Texture
-		var newTexture = GameHost.Instance.Loader.CreateTexture(atlas.Width, atlas.Height, atlas.Data, false, TextureFiltering.Nearest);
-		var atlasTexture = new Texture(newTexture);
+		var nativeTexture = GameHost.Instance.Loader.CreateTexture(atlas.Width, atlas.Height, atlas.Data, false, TextureFiltering.Nearest);
 
 		// Create all texture regions
 
 		textureSeeker = Vector2Int.Zero;
 		for (int i = 0; i < tiles.Length; i++)
 		{
-			tiles[i] = new Texture(atlasTexture)
+			tiles[i] = new Texture(nativeTexture)
 			{
 				Region = new RectangleInt(textureSeeker + Vector2Int.One, tileSize)
 			};
@@ -166,7 +164,6 @@ public readonly struct Tileset
 			TileSize = tileSize,
 			Spacing = spacing,
 			Margin = margin,
-			Source = atlasTexture,
 			Tiles = tiles
 		};
 	}

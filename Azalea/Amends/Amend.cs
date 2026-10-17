@@ -1,19 +1,14 @@
 ﻿using System;
 
 namespace Azalea.Amends;
-public abstract class Amend<T> : IAmend
+
+public abstract class Amend<T>(T target, Action<T>? action) : IAmend
 {
-	protected T Target;
-	protected Action<T>? Action;
+	protected T Target = target;
+	protected Action<T>? Action = action;
 
 	public bool IsFinished { get; protected set; }
 	public bool HasStarted { get; protected set; }
-
-	public Amend(T target, Action<T>? action)
-	{
-		Target = target;
-		Action = action;
-	}
 
 	public virtual void Start()
 	{

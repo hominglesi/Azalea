@@ -1,5 +1,4 @@
-﻿using Azalea.Graphics.OpenGL;
-using Azalea.Utils;
+﻿using Azalea.Utils;
 
 namespace Azalea.Web.Rendering;
 

@@ -2,6 +2,7 @@
 using Azalea.Graphics;
 
 namespace Azalea.Editor.Design.Gui;
+
 public class GUIGroup : Composition
 {
 	private const float __leftMargin = 10;

@@ -1,8 +1,8 @@
 ﻿using Azalea.Platform.Audio.OpenAL;
-using Azalea.Utils;
 using System;
 
 namespace Azalea.Platform.Audio;
+
 internal partial class AudioByteInstance(PlatformAudio owner, bool looping, float gain, double duration) : IAudioInstance
 {
 	internal ALByteSource? Source;

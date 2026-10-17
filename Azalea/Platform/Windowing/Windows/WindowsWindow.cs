@@ -3,6 +3,7 @@ using Azalea.Inputs.Events;
 using Azalea.Inputs.Gamepads;
 using Azalea.Native.Windows;
 using Azalea.Platform.Windows;
+using Azalea.Platform.Windows.XInput;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
