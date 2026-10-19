@@ -2,7 +2,6 @@
 using Azalea.Design.Tiled;
 using Azalea.Graphics.Sprites;
 using Azalea.IO.Resources;
-using Azalea.Platform;
 using System.Numerics;
 
 namespace Azalea.VisualTests;
@@ -67,7 +66,7 @@ internal class CameraTest : TestScene
 		var movement = App.Input.State.GetDirectionalMovement();
 		if (movement != Vector2.Zero)
 		{
-			_player.Position += movement * 3 * Time.DeltaTime * 60;
+			_player.Position += movement * 3 * App.Scheduler.DeltaTime * 60;
 			_worldContainer.ChangeChildDepth(_player, -_player.Y);
 		}
 	}

@@ -1,6 +1,5 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics.Sprites;
-using Azalea.Platform;
 using System;
 
 namespace Azalea.VisualTests;
@@ -30,11 +29,11 @@ public class FrameRateTest : TestScene
 	private DateTime? _startTime;
 	protected override void Update()
 	{
-		_startTime ??= Time.GetCurrentPreciseTime();
+		_startTime ??= App.Scheduler.GetRunningTime();
 
-		_elapsedTimeText.Text = (Time.GetPreciseMilisecondsSince(_startTime.Value) / 1000).ToString();
+		_elapsedTimeText.Text = (App.Scheduler.GetMilisecondsSince(_startTime.Value) / 1000).ToString();
 
-		_deltaTimeCounter += Time.DeltaTime;
+		_deltaTimeCounter += App.Scheduler.DeltaTime;
 		_deltaTimeText.Text = _deltaTimeCounter.ToString();
 	}
 

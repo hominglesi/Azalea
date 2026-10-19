@@ -37,9 +37,9 @@ public abstract class NativeTexture
 				return;
 			}
 
-			var startTime = Time.GetCurrentPreciseTime();
+			var startTime = GameHost.Instance.Loader.Thread.GetRunningTime();
 			_readyEvent.WaitOne();
-			Console.WriteLine($"Waited for texture {Time.GetPreciseMilisecondsSince(startTime)}ms");
+			Console.WriteLine($"Waited for texture {GameHost.Instance.Loader.Thread.GetMilisecondsSince(startTime)}ms");
 
 			Debug.Assert(State == TextureState.Ready);
 			Debug.Assert(IsReady());

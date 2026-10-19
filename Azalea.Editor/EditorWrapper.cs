@@ -15,7 +15,7 @@ namespace Azalea.Editor;
 public class EditorWrapper : AzaleaGame
 {
 	private readonly BasicDockingContainer _mainContainer;
-	private readonly DisplayValues _displayValues;
+	public DisplayValues DisplayValues { get; }
 
 	internal EditorWrapper(AzaleaGame game)
 	{
@@ -44,16 +44,16 @@ public class EditorWrapper : AzaleaGame
 		});
 		_mainContainer.AddDockable("Gamepad Viewer", new GamepadViewer());
 
-		Add(_displayValues = new DisplayValues());
-		_displayValues.AddDisplayedValue("Input", () => App.Window.Thread.AverageWorkDuration.ToString("0.00ms"));
-		_displayValues.AddDisplayedValue("Scheduling", () => App.Scheduler.Thread.AverageWorkDuration.ToString("0.00ms"));
-		_displayValues.AddDisplayedValue("Rendering", () => App.Renderer.Thread.AverageWorkDuration.ToString("0.00ms"));
+		Add(DisplayValues = new DisplayValues());
+		DisplayValues.AddDisplayedValue("Input", () => $"{App.Window.Thread.AverageFrequency:0ups} ({App.Window.Thread.AverageWorkDuration:0.00ms})");
+		DisplayValues.AddDisplayedValue("Scheduling", () => $"{App.Scheduler.Thread.AverageFrequency:0ups} ({App.Scheduler.Thread.AverageWorkDuration:0.00ms})");
+		DisplayValues.AddDisplayedValue("Rendering", () => $"{App.Renderer.Thread.AverageFrequency:0fps} ({App.Renderer.Thread.AverageWorkDuration:0.00ms})");
 
 		_globalWindow = new(game);
 		_classWindow = new(game);
 	}
 
-	public static AzaleaGame Wrap(AzaleaGame game) => new EditorWrapper(game);
+	public static EditorWrapper Wrap(AzaleaGame game) => new EditorWrapper(game);
 
 	private readonly GlobalWindow _globalWindow;
 	private readonly ClassWindow _classWindow;

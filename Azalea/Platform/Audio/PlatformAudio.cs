@@ -36,9 +36,6 @@ public abstract partial class PlatformAudio : ICommandHandler<AudioCommand>
 		protected override void Update()
 		{
 			_audio.UpdateLogic();
-
-			// Don't ask why the audio thread updates time
-			Time.UpdateDeltaTime();
 		}
 
 		protected override void HandleCommand(AudioCommand command)

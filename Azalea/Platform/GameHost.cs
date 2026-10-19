@@ -50,8 +50,6 @@ public abstract class GameHost
 		Audio = CreateAudio();
 
 		Clipboard = CreateClipboard();
-
-		Time.Setup();
 	}
 
 	public PlatformLoader Loader { get; }
@@ -117,6 +115,4 @@ public abstract class GameHost
 		_empty.WaitOne();
 		_empty.Reset();
 	}
-
-	public virtual DateTime GetCurrentTime() => Time.GetCurrentPreciseTime();
 }

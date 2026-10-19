@@ -7,7 +7,6 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
-using Azalea.Platform;
 
 namespace Azalea.VisualTests;
 
@@ -225,6 +224,6 @@ public class TestingTestScene : TestScene
 
 	protected override void Update()
 	{
-		_sprite.Position += App.Input.State.GetDirectionalMovement() * Time.DeltaTime * 200;
+		_sprite.Position += App.Input.State.GetDirectionalMovement() * App.Scheduler.DeltaTime * 200;
 	}
 }

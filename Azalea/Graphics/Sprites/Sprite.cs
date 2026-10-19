@@ -52,7 +52,7 @@ public class Sprite : GameObject
 	{
 		base.Update();
 
-		_time += Platform.Time.DeltaTime;
+		_time += App.Scheduler.DeltaTime;
 	}
 
 	private static IShader? _loadingShader;

@@ -8,7 +8,7 @@ using System.Numerics;
 
 namespace Azalea.Editor;
 
-internal class DisplayValues : FlexContainer
+public class DisplayValues : FlexContainer
 {
 	internal DisplayValues()
 	{
@@ -24,9 +24,6 @@ internal class DisplayValues : FlexContainer
 
 	public void AddDisplayedValue(string name, Func<object> getValue)
 		=> Add(new DisplayedValue(name, getValue));
-
-	public void ClearDisplayedValues()
-		=> Clear();
 
 	public void RemoveDisplayedValue(int index)
 		=> Remove(Children[index]);

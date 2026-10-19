@@ -29,9 +29,9 @@ public class Program : IShader
 		if (Handle is not null)
 			return;
 
-		var startTime = Time.GetCurrentPreciseTime();
+		var startTime = GameHost.Instance.Loader.Thread.GetRunningTime();
 		_initializedEvent.WaitOne();
-		Console.WriteLine($"Waited for shader {Time.GetPreciseMilisecondsSince(startTime)}ms");
+		Console.WriteLine($"Waited for shader {GameHost.Instance.Loader.Thread.GetMilisecondsSince(startTime)}ms");
 		Debug.Assert(Handle is not null);
 	}
 }

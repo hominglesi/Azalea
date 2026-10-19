@@ -105,14 +105,14 @@ public class IWindowTest : TestScene
 	{
 		if (_focusTimer > 0)
 		{
-			_focusTimer -= Time.DeltaTime;
+			_focusTimer -= App.Scheduler.DeltaTime;
 			if (_focusTimer <= 0)
 				App.Window.Focus();
 		}
 
 		if (_attentionTimer > 0)
 		{
-			_attentionTimer -= Time.DeltaTime;
+			_attentionTimer -= App.Scheduler.DeltaTime;
 			if (_attentionTimer <= 0)
 				App.Window.RequestAttention();
 		}

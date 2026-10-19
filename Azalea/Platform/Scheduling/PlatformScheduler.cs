@@ -27,6 +27,10 @@ public class PlatformScheduler : ICommandHandler<ThreadCommand>
 	public void InjectProtocol(Action<Windowing.PlatformWindow, PlatformRenderer> protocol)
 		=> Thread.InjectProtocol(protocol);
 
+	public DateTime GetRunningTime() => Thread.GetRunningTime();
+	public float GetMilisecondsSince(DateTime time) => Thread.GetMilisecondsSince(time);
+	public float DeltaTime => Thread.DeltaTime;
+
 	#region ScheduleThread
 
 	internal readonly ScheduleThread Thread;

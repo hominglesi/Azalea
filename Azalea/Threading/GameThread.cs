@@ -1,6 +1,6 @@
-﻿using Azalea.Platform;
-using Azalea.Platform.Windows;
+﻿using Azalea.Platform.Windows;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Channels;
 
@@ -45,6 +45,7 @@ internal abstract partial class GameThread<T> : ICommandHandler<T>
 
 		_running = true;
 		NativeThread.Start();
+		_stopwatch.Start();
 		Running = true;
 	}
 
@@ -72,17 +73,15 @@ internal abstract partial class GameThread<T> : ICommandHandler<T>
 		_timer = new WindowsWaitableTimer(TargetInterval);
 		_timer.Start();
 
-		_lastTickTime = Time.GetCurrentPreciseTime();
-
 		try
 		{
 			while (_running)
 			{
-				_workBeginTime = Time.GetCurrentPreciseTime();
+				var workBegan = GetRunningTime();
 				HandleCommands();
 				Update();
 
-				updateActualInterval();
+				updateTime(workBegan);
 				_timer.Wait();
 			}
 		}
@@ -137,38 +136,43 @@ internal abstract partial class GameThread<T> : ICommandHandler<T>
 
 	#endregion
 
-	#region Interval Calculations
+	#region Time
+
+	private readonly Stopwatch _stopwatch = new();
+	public DateTime GetRunningTime() => new(_stopwatch.ElapsedTicks);
+	public float GetMilisecondsSince(DateTime time) => (float)GetRunningTime().Subtract(time).TotalMilliseconds;
+
+	public float DeltaTime { get; private set; }
+	private DateTime _lastTickTime;
 
 	private int _tickIndex = 0;
 	private double _tickSum = 0;
 	private readonly double[] _tickList = new double[100];
-	private DateTime _lastTickTime;
 
 	private double _workSum = 0;
 	private readonly double[] _workDurationList = new double[100];
-	private DateTime _workBeginTime;
 
 	public double AverageInterval { get; private set; }
 	public double AverageFrequency { get; private set; }
 	public double AverageWorkDuration { get; private set; }
 
-	private void updateActualInterval()
+	private void updateTime(DateTime workBegan)
 	{
-		var tickTime = Time.GetCurrentPreciseTime();
-		var deltaTime = tickTime.Subtract(_lastTickTime).TotalMilliseconds;
-		_lastTickTime = tickTime;
+		var tickTime = GetRunningTime();
+		DeltaTime = (float)tickTime.Subtract(_lastTickTime).TotalSeconds;
 
 		_tickSum -= _tickList[_tickIndex];
-		_tickSum += deltaTime;
-		_tickList[_tickIndex] = deltaTime;
+		_tickSum += (DeltaTime * 1000);
+		_tickList[_tickIndex] = (DeltaTime * 1000);
 
-		var workDuration = tickTime.Subtract(_workBeginTime).TotalMilliseconds;
+		var workDuration = tickTime.Subtract(workBegan).TotalMilliseconds;
 
 		_workSum -= _workDurationList[_tickIndex];
 		_workSum += workDuration;
 		_workDurationList[_tickIndex] = workDuration;
 
 		_tickIndex = (_tickIndex + 1) % _tickList.Length;
+		_lastTickTime = tickTime;
 
 		if (_tickIndex % 20 == 0)
 		{

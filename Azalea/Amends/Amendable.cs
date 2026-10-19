@@ -1,4 +1,4 @@
-﻿using Azalea.Platform;
+﻿using Azalea.Graphics;
 using System.Collections.Generic;
 
 namespace Azalea.Amends;
@@ -11,7 +11,6 @@ public abstract class Amendable
 
 	public void UpdateAmends()
 	{
-		var deltaTime = Time.DeltaTime;
 		var soloBreak = true;
 
 		for (int i = 0; i < _amends.Count; i++)
@@ -37,7 +36,8 @@ public abstract class Amendable
 
 			if (amend.HasStarted == false) amend.Start();
 
-			amend.Update(deltaTime);
+			if (this is GameObject obj)
+				amend.Update(obj.App.Scheduler.DeltaTime);
 
 			if (amend.IsFinished)
 			{

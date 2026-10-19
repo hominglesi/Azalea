@@ -2,7 +2,6 @@
 using Azalea.Design.UserInterface;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
-using Azalea.Platform;
 using System.Numerics;
 
 namespace Azalea.VisualTests;
@@ -52,8 +51,8 @@ public class PanningTest : TestScene
 
 	protected override void Update()
 	{
-		var panSpeed = 0.5f * Time.DeltaTimeMs;
-		_container.Position += App.Input.State.GetDirectionalMovement() * panSpeed;
+		var panSpeed = 500 * App.Scheduler.DeltaTime;
+		_container.Position -= App.Input.State.GetDirectionalMovement() * panSpeed;
 	}
 
 	protected override bool OnKeyDown(KeyDownEvent e)
