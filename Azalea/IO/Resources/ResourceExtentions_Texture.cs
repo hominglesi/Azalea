@@ -1,7 +1,7 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.Textures;
 using Azalea.Platform;
-using Azalea.Platform.Loading;
+using Azalea.Platform.Rendering;
 using System;
 using System.Threading.Tasks;
 
@@ -42,7 +42,7 @@ public static partial class ResourceStoreExtentions
 
 			if (stream is null)
 			{
-				nativeTexture.FinishLoadingOperation();
+				nativeTexture.SetState(TextureState.Missing);
 				return Task.CompletedTask;
 			}
 
@@ -50,11 +50,11 @@ public static partial class ResourceStoreExtentions
 
 			if (stream is null)
 			{
-				nativeTexture.FinishLoadingOperation();
+				nativeTexture.SetState(TextureState.Missing);
 				return Task.CompletedTask;
 			}
 
-			GameHost.Instance.Loader.CreateTexture(image.Width, image.Height, image.Data, false, filtering);
+			GameHost.Instance.Loader.CreateTexture(image.Width, image.Height, image.Data, false, filtering, nativeTexture);
 
 			return Task.CompletedTask;
 		});

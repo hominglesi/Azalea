@@ -9,16 +9,29 @@ public abstract class NativeTexture
 	public int Width { get; internal set; }
 	public int Height { get; internal set; }
 
-	internal virtual bool IsReady() => true;
-
 	private readonly Lock _lock = new();
-	private volatile int _loadingOperations = 1;
+	public TextureState State { get; private set; } = TextureState.Loading;
+	internal void SetState(TextureState state)
+	{
+		lock (_lock)
+		{
+			if (State == state) return;
+
+			State = state;
+
+			if (State == TextureState.Ready)
+				_readyEvent.Set();
+		}
+	}
+
+	protected virtual bool IsReady() => true;
+
 	private readonly ManualResetEvent _readyEvent = new(false);
 	internal void AssureReady()
 	{
 		lock (_lock)
 		{
-			if (_loadingOperations == 0)
+			if (State == TextureState.Ready)
 			{
 				Debug.Assert(IsReady());
 				return;
@@ -28,27 +41,15 @@ public abstract class NativeTexture
 			_readyEvent.WaitOne();
 			Console.WriteLine($"Waited for texture {Time.GetPreciseMilisecondsSince(startTime)}ms");
 
-			Debug.Assert(_loadingOperations == 0);
+			Debug.Assert(State == TextureState.Ready);
 			Debug.Assert(IsReady());
 		}
 	}
+}
 
-	internal void BeginLoadingOperation()
-	{
-		lock (_lock)
-		{
-			if (_loadingOperations == 0)
-				_readyEvent.Reset();
-
-			_loadingOperations++;
-		}
-	}
-
-	internal void FinishLoadingOperation()
-	{
-		_loadingOperations--;
-
-		if (_loadingOperations == 0)
-			_readyEvent.Set();
-	}
+public enum TextureState
+{
+	Ready = 0,
+	Loading = 1,
+	Missing = 2,
 }

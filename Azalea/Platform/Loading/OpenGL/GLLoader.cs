@@ -61,7 +61,6 @@ internal class GLLoader : PlatformLoader
 				GL.Flush();
 
 				((GLTexture)texture).Initialize(textureHandle);
-				texture.FinishLoadingOperation();
 
 				LoadedTextures.Add(texture);
 

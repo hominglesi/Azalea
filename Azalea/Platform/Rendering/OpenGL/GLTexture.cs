@@ -12,8 +12,8 @@ internal class GLTexture : NativeTexture
 			throw new Exception("GLTexture cannot be initialized multiple times!");
 
 		Handle = handle;
-		FinishLoadingOperation();
+		SetState(TextureState.Ready);
 	}
 
-	internal override bool IsReady() => Handle != 0;
+	protected override bool IsReady() => Handle != 0;
 }

@@ -40,7 +40,6 @@ public abstract partial class PlatformLoader
 		texture ??= CreateEmptyTexture();
 		texture.Width = width;
 		texture.Height = height;
-		texture.BeginLoadingOperation();
 		Enqueue(CreateTextureCommand.Borrow(texture, width, height, pixels, generateMipmap, filtering));
 		return texture;
 	}

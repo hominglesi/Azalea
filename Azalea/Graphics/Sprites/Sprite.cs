@@ -64,27 +64,33 @@ public class Sprite : GameObject
 		switch (Texture)
 		{
 			case Texture tex:
-				if (tex.IsLoaded)
+				switch (tex.NativeTexture.State)
 				{
-					coordinator.BindShader(Shader ?? GameHost.Instance.Loader.DefaultQuadShader);
-					coordinator.BindTexture(tex.NativeTexture);
-					coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, tex.UVCoordinates);
-				}
-				else
-				{
-					_loadingShader ??= GameHost.Instance.Loader.LoadShader(
+					case TextureState.Ready:
+						coordinator.BindShader(Shader ?? GameHost.Instance.Loader.DefaultQuadShader);
+						coordinator.BindTexture(tex.NativeTexture);
+						coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, tex.UVCoordinates);
+						break;
+					case TextureState.Loading:
+						_loadingShader ??= GameHost.Instance.Loader.LoadShader(
 					Assets.GetText("Shaders/DefaultQuadVertex.glsl")!,
 					Assets.GetText("Shaders/LoadingFragment.glsl")!);
 
-					coordinator.BindShader(_loadingShader);
+						coordinator.BindShader(_loadingShader);
 
-					coordinator.Uniform("u_Time", Time);
-					coordinator.Uniform("u_Offset", ScreenSpaceDrawQuad.TopLeft.X, ScreenSpaceDrawQuad.TopLeft.Y);
-					coordinator.Uniform("u_Resolution", ScreenSpaceDrawQuad.Width, ScreenSpaceDrawQuad.Height);
-					coordinator.Uniform("u_ScreenResolution", App.Window.ClientSize.X, App.Window.ClientSize.Y);
+						coordinator.Uniform("u_Time", Time);
+						coordinator.Uniform("u_Offset", ScreenSpaceDrawQuad.TopLeft.X, ScreenSpaceDrawQuad.TopLeft.Y);
+						coordinator.Uniform("u_Resolution", ScreenSpaceDrawQuad.Width, ScreenSpaceDrawQuad.Height);
+						coordinator.Uniform("u_ScreenResolution", App.Window.ClientSize.X, App.Window.ClientSize.Y);
 
-					coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, Rectangle.One);
-					coordinator.FlushRenderBatch();
+						coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, Rectangle.One);
+						coordinator.FlushRenderBatch();
+						break;
+					case TextureState.Missing:
+						coordinator.BindShader(Shader ?? GameHost.Instance.Loader.DefaultQuadShader);
+						coordinator.BindTexture(Assets.MissingTexture.NativeTexture);
+						coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, ScreenSpaceDrawQuad, DrawColorQuad, Rectangle.One);
+						break;
 				}
 
 				break;
