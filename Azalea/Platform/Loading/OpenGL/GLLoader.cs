@@ -15,7 +15,7 @@ internal class GLLoader : PlatformLoader
 
 	protected override void InitializationLogic()
 	{
-		var dummyWindow = Windowing.PlatformWindow.Create("", Vector2Int.Zero, initiallyVisible: false, initializeOle: false);
+		var dummyWindow = Windowing.PlatformWindow.Create(Vector2Int.Zero, initiallyVisible: false, initializeOle: false);
 		var dummyDeviceContext = dummyWindow.BorrowDeviceContext();
 
 		var dummyContext = GLContext.CreateSimple(dummyDeviceContext);

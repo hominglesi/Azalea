@@ -1,6 +1,5 @@
 ﻿using Azalea.Native.OpenGL;
 using Azalea.Native.Windows;
-using Azalea.Platform.Loading;
 using Azalea.Platform.Loading.OpenGL;
 using Azalea.Platform.Windowing;
 using Azalea.Platform.Windowing.Windows;

@@ -17,14 +17,14 @@ public abstract class RenderCommand : ThreadCommand
 	}
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class BindBufferCommand : RenderCommand
 {
 	public int Type;
 	public Buffer? Buffer;
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class BindBufferRangeCommand : RenderCommand
 {
 	public int Type;
@@ -34,21 +34,21 @@ internal partial class BindBufferRangeCommand : RenderCommand
 	public nint Size;
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class BindFramebufferCommand : RenderCommand
 {
 	public int Type;
 	public Framebuffer Framebuffer;
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class BindTextureCommand : RenderCommand
 {
 	public int Type;
 	public NativeTexture Texture;
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class BindVertexArrayCommand : RenderCommand
 {
 	public VertexArray? VertexArray;
@@ -57,14 +57,14 @@ internal partial class BindVertexArrayCommand : RenderCommand
 		=> $"BindVertexArray({(VertexArray is null ? 0 : VertexArray.Handle)})";
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class BlendFunctionCommand : RenderCommand
 {
 	public int SourceFactor;
 	public int DestinationFactor;
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class BufferDataCommand : RenderCommand
 {
 	public int Type;
@@ -80,7 +80,7 @@ internal partial class BufferDataCommand : RenderCommand
 	}
 }
 
-[ThreadCommand(displayName: "BufferData")]
+[ThreadCommand(displayName: "BufferData", generateHandler: true)]
 internal partial class BufferDataEmptyCommand : RenderCommand
 {
 	public int Type;
@@ -88,7 +88,7 @@ internal partial class BufferDataEmptyCommand : RenderCommand
 	public int Hint;
 }
 
-[ThreadCommand(displayName: "BufferData")]
+[ThreadCommand(displayName: "BufferData", generateHandler: true)]
 internal partial class BufferDataFloatCommand : RenderCommand
 {
 	public int Type;
@@ -104,7 +104,7 @@ internal partial class BufferDataFloatCommand : RenderCommand
 	}
 }
 
-[ThreadCommand(displayName: "BufferData")]
+[ThreadCommand(displayName: "BufferData", generateHandler: true)]
 internal partial class BufferDataUIntCommand : RenderCommand
 {
 	public int Type;
@@ -120,7 +120,7 @@ internal partial class BufferDataUIntCommand : RenderCommand
 	}
 }
 
-[ThreadCommand(displayName: "BufferSubData")]
+[ThreadCommand(displayName: "BufferSubData", generateHandler: true)]
 internal partial class BufferSubDataMatrix4x4Command : RenderCommand
 {
 	public int Type;
@@ -128,21 +128,13 @@ internal partial class BufferSubDataMatrix4x4Command : RenderCommand
 	public Matrix4x4 Data;
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class DisableCommand : RenderCommand
 {
 	public int Capability;
 }
 
-[ThreadCommand]
-internal partial class DrawArraysCommand : RenderCommand
-{
-	public int Mode;
-	public int First;
-	public int Count;
-}
-
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class DrawElementsCommand : RenderCommand
 {
 	public int Mode;
@@ -153,19 +145,19 @@ internal partial class DrawElementsCommand : RenderCommand
 	public override string ToString() => $"DrawElements({Count})";
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class EnableCommand : RenderCommand
 {
 	public int Capability;
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class EnableVertexAttribArrayCommand : RenderCommand
 {
 	public uint Index;
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class FramebufferTexture2DCommand : RenderCommand
 {
 	public Framebuffer Framebuffer;
@@ -176,7 +168,7 @@ internal partial class FramebufferTexture2DCommand : RenderCommand
 	public int Level;
 }
 
-[ThreadCommand(generateHandler: false)]
+[ThreadCommand]
 internal partial class GenerateBufferCommand : RenderCommand
 {
 	public Buffer Buffer;
@@ -192,7 +184,7 @@ internal static class GenerateBufferComand_Handler
 	}
 }
 
-[ThreadCommand(generateHandler: false)]
+[ThreadCommand]
 internal partial class GenerateFramebufferCommand : RenderCommand
 {
 	public Framebuffer Framebuffer;
@@ -209,12 +201,6 @@ internal static class GenerateFramebufferCommand_Handler
 }
 
 [ThreadCommand]
-internal partial class GenerateMipmapCommand : RenderCommand
-{
-	public int Target;
-}
-
-[ThreadCommand(generateHandler: false)]
 internal partial class GenerateTextureCommand : RenderCommand
 {
 	public NativeTexture Texture;
@@ -230,7 +216,7 @@ internal static class GenerateTextureCommand_Handler
 	}
 }
 
-[ThreadCommand(generateHandler: false)]
+[ThreadCommand]
 internal partial class GenerateVertexArrayCommand : RenderCommand
 {
 	public VertexArray VertexArray;
@@ -246,23 +232,23 @@ internal static class GenerateVertexArrayCommand_Handler
 	}
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class PolygonModeCommand : RenderCommand
 {
 	public int Face;
 	public int Mode;
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class PrepareRenderingCommand : RenderCommand
 {
 	public Vector2Int IntendedClientSize;
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class PrintErrorsCommand : RenderCommand { }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class ScissorCommand : RenderCommand
 {
 	public RectangleInt? Rectangle;
@@ -272,35 +258,16 @@ internal partial class ScissorCommand : RenderCommand
 }
 
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class SetClearColorCommand : RenderCommand
 {
 	public Color Color;
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class SwapBuffersCommand : RenderCommand { }
 
-[ThreadCommand]
-internal partial class TexImage2DCommand : RenderCommand
-{
-	public NativeTexture Texture;
-	public int Width;
-	public int Height;
-	public byte[]? Pixels;
-	public bool GenerateMipmap;
-}
-
-[ThreadCommand]
-internal partial class TexParameteriCommand : RenderCommand
-{
-	public NativeTexture Texture;
-	public int Target;
-	public int Parameter;
-	public int Value;
-}
-
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class Uniform1fCommand : RenderCommand
 {
 	public Program Program;
@@ -308,7 +275,7 @@ internal partial class Uniform1fCommand : RenderCommand
 	public float Float;
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class Uniform2fCommand : RenderCommand
 {
 	public Program Program;
@@ -317,7 +284,7 @@ internal partial class Uniform2fCommand : RenderCommand
 	public float Float2;
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class UseProgramCommand : RenderCommand
 {
 	public Program Program;
@@ -325,7 +292,7 @@ internal partial class UseProgramCommand : RenderCommand
 	public override string ToString() => $"UseProgram({Program.Handle})";
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 internal partial class VertexAttribPointerCommand : RenderCommand
 {
 	public uint Index;
@@ -335,5 +302,3 @@ internal partial class VertexAttribPointerCommand : RenderCommand
 	public int Stride;
 	public nint Pointer;
 }
-
-

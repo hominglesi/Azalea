@@ -194,9 +194,6 @@ internal partial class GLRenderer : PlatformRenderer
 			case DisableCommand(var capability):
 				GL.Disable(capability);
 				break;
-			case DrawArraysCommand(var mode, var first, var count):
-				GL.DrawArrays(mode, first, count);
-				break;
 			case DrawElementsCommand(var mode, var count, var type, var offset):
 				GL.DrawElements(mode, count, type, offset);
 				break;
@@ -222,9 +219,6 @@ internal partial class GLRenderer : PlatformRenderer
 				uint framebufferHandle = 0;
 				GL.GenFramebuffers(1, ref framebufferHandle);
 				framebuffer.Initialize(framebufferHandle);
-				break;
-			case GenerateMipmapCommand(var target):
-				GL.GenerateMipmap(target);
 				break;
 			case GenerateTextureCommand(var texture):
 				uint textureHandle = 0;
@@ -352,26 +346,6 @@ internal partial class GLRenderer : PlatformRenderer
 				_lastActiveScreenFramebuffer = _activeScreenFramebuffer;
 				_activeScreenFramebuffer = (_activeScreenFramebuffer + 1) % __screenFramebufferCount;
 				Monitor.Exit(screenFramebuffer.TextureLock);
-				break;
-			case TexImage2DCommand(var texture, var width, var height, var pixels, var generateMipmap):
-				GL.BindTexture(GL.TEXTURE_2D, ((GLTexture)texture).Handle);
-
-				if (pixels is null)
-					GL.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, IntPtr.Zero);
-				else
-					GL.TexImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, in pixels[0]);
-
-				if (generateMipmap)
-					GL.GenerateMipmap(GL.TEXTURE_2D);
-
-				GL.BindTexture(GL.TEXTURE_2D, 0);
-
-				break;
-			case TexParameteriCommand(var texture, var target, var parameter, var value):
-				texture.AssureReady();
-				GL.BindTexture(target, ((GLTexture)texture).Handle);
-				GL.TexParameteri(target, parameter, value);
-				GL.BindTexture(target, 0);
 				break;
 			case Uniform1fCommand(var program, var uniformName, var int0):
 				GL.Uniform1f(getUniformLocation(program, uniformName), int0);

@@ -54,6 +54,9 @@ internal class ThreadCommandGenerator : IIncrementalGenerator
 		{
 			builder.BeginNamespace(item.Details.Namespace);
 
+			for (int i = item.Details.ContainingDetails.Length - 1; i >= 0; i--)
+				builder.BeginClass(item.Details.ContainingDetails[i]);
+
 			builder.AppendAccessibility(item.Details.AccessModifier);
 
 			builder.Append($"partial class {item.Details.Name}");
@@ -155,6 +158,9 @@ internal class ThreadCommandGenerator : IIncrementalGenerator
 			}
 
 			#endregion
+
+			for (int i = item.Details.ContainingDetails.Length - 1; i >= 0; i--)
+				builder.EndScope();
 
 			builder.EndScope();
 

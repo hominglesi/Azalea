@@ -299,6 +299,9 @@ internal class ALAudio : PlatformAudio
 				}
 
 				break;
+			case SetMasterVolume(var volume):
+				AL.Listenerf(AL.GAIN, volume);
+				break;
 			case StopInstanceCommand(var instance):
 				switch (instance)
 				{

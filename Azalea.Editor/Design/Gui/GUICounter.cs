@@ -5,9 +5,8 @@ namespace Azalea.Editor.Design.Gui;
 
 public class GUICounter : TextContainer
 {
-	private string _labelText;
+	private readonly string _labelText;
 	private int _lastValue;
-	private int _value;
 
 	internal GUICounter(string text, int initialValue)
 		: base(spriteText => spriteText.Font = GUIConstants.Font)
@@ -16,7 +15,8 @@ public class GUICounter : TextContainer
 		AutoSizeAxes = Axes.Y;
 
 		_labelText = text;
-		_value = _lastValue = initialValue;
+		Value = _lastValue = initialValue;
+		Text = _labelText + Value.ToString();
 	}
 
 	public int Value { get; set; }
@@ -25,7 +25,7 @@ public class GUICounter : TextContainer
 	{
 		if (_lastValue != Value)
 		{
-			Text = _labelText + _value.ToString();
+			Text = _labelText + Value.ToString();
 			_lastValue = Value;
 		}
 	}

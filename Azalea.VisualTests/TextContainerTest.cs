@@ -3,7 +3,6 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
-using Azalea.Platform.Windowing;
 using Azalea.Utils;
 
 namespace Azalea.VisualTests;
@@ -59,7 +58,7 @@ public class TextContainerTest : TestScene
 
 	protected override void Initialize()
 	{
-		App.Window.SetClientSize(new(1680, 960));
+		App.Window.ClientSize = new(1680, 960);
 		App.Window.Center();
 	}
 

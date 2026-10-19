@@ -1,6 +1,5 @@
 using Azalea.IO.Resources;
 using Azalea.Platform;
-using Azalea.Platform.Windowing;
 
 namespace Azalea.VisualTests;
 
@@ -14,29 +13,29 @@ public class IWindowTest : TestScene
 				() => GameHost.Instance.CreateApplication(new VisualTests())),
 			CreateActionButton(
 				"Set size to 700, 700",
-				() => App.Window.SetSize(new(700, 700))),
+				() => App.Window.Size = new(700, 700)),
 			CreateActionButton(
 				"Set client size to 700, 700",
-				() => App.Window.SetClientSize(new(700, 700))),
+				() => App.Window.ClientSize = new(700, 700)),
 			CreateActionButton("Restore window", () => App.Window.Restore()),
 			CreateActionButton("Minimize window", () => App.Window.Minimize()),
 			CreateActionButton("Maximize window", () => App.Window.Maximize()),
 			CreateActionButton("Fullscreen window", () => App.Window.Fullscreen()),
 			CreateActionButton(
 				"Set Resizable to 'true'",
-				() => App.Window.SetResizable(true)),
+				() => App.Window.Resizable = true),
 			CreateActionButton(
 				"Set Resizable to 'false'",
-				() => App.Window.SetResizable(false)),
+				() => App.Window.Resizable = false),
 			CreateActionButton(
 				"Set Title to 'Azalea Game'",
-				() => App.Window.SetTitle("Azalea Game")),
+				() => App.Window.Title = "Azalea Game"),
 			CreateActionButton(
 				"Set Title to 'Ide Gas'",
-				() => App.Window.SetTitle("Ide Gas")),
+				() => App.Window.Title = "Ide Gas"),
 			CreateActionButton(
 				"Set Title to ''",
-				() => App.Window.SetTitle("")),
+				() => App.Window.Title = ""),
 			CreateActionButton(
 				"Set icon to Azalea flower",
 				() => App.Window.SetIcon(Assets.MainStore.GetImage("Textures/azalea-icon.png"))),
@@ -48,22 +47,22 @@ public class IWindowTest : TestScene
 				() => App.Window.SetIcon(null)),
 			CreateActionButton(
 				"Show cursor",
-				() => App.Window.SetCursorVisible(true)),
+				() => App.Window.CursorVisible = true),
 			CreateActionButton(
 				"Hide cursor",
-				() => App.Window.SetCursorVisible(false)),
+				() => App.Window.CursorVisible = false),
 			CreateActionButton(
 				"Set position to 0",
-				() => App.Window.SetPosition(Vector2Int.Zero)),
+				() => App.Window.Position = Vector2Int.Zero),
 			CreateActionButton(
 				"Set client position to 0",
-				() => App.Window.SetPosition(Vector2Int.Zero)),
+				() => App.Window.Position = Vector2Int.Zero),
 			CreateActionButton(
 				"Move window by (25, 25)",
-				() => App.Window.SetPosition(App.Window.Position + new Vector2Int(25, 25))),
+				() => App.Window.Position = App.Window.Position + new Vector2Int(25, 25)),
 			CreateActionButton(
 				"Enlarge window by (25, 25)",
-				() => App.Window.SetClientSize(App.Window.ClientSize + new Vector2Int(25, 25))),
+				() => App.Window.ClientSize = App.Window.ClientSize + new Vector2Int(25, 25)),
 			CreateActionButton("Center window", () => App.Window.Center()),
 			CreateActionButton(
 				"Request Attention in 1.5 seconds",

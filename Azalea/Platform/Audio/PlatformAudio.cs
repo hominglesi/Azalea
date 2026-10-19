@@ -16,8 +16,6 @@ public abstract partial class PlatformAudio : ICommandHandler<AudioCommand>
 		Thread.Start();
 	}
 
-	public float MasterVolume { get; internal set; } = 1.0f;
-
 	protected abstract void HandleCommandLogic(AudioCommand command);
 	protected abstract void UpdateLogic();
 	public ICommandAwaitable? Enqueue(AudioCommand command) => Thread.Enqueue(command);

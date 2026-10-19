@@ -1,8 +1,10 @@
 ﻿using Azalea.Editor.DebugWindows.Inspectors;
 using Azalea.Editor.Design.Gui;
 using Azalea.Platform;
+using Azalea.Platform.Audio;
 using Azalea.Platform.Loading;
 using Azalea.Platform.Rendering;
+using Azalea.Platform.Windowing;
 using Azalea.Threading;
 using Azalea.Utils;
 using System;
@@ -88,6 +90,16 @@ internal class GlobalWindow(AzaleaGame game)
 			otherCommandsCount -= LoadingCommand.TotalCreated;
 			_window.FinishGroup();
 
+			var windowCommands = _window.AddGroup("Window Commands");
+			var windowCreatedCounter = _window.AddCounter("Total Created: ", WindowCommand.TotalCreated);
+			otherCommandsCount -= WindowCommand.TotalCreated;
+			_window.FinishGroup();
+
+			var audioCommands = _window.AddGroup("Audio Commands");
+			var audioCreatedCounter = _window.AddCounter("Total Created: ", AudioCommand.TotalCreated);
+			otherCommandsCount -= AudioCommand.TotalCreated;
+			_window.FinishGroup();
+
 			var otherCommands = _window.AddGroup("Other Commands");
 			var otherCreatedCounter = _window.AddCounter("Total Created: ", otherCommandsCount);
 			_window.FinishGroup();
@@ -103,6 +115,10 @@ internal class GlobalWindow(AzaleaGame game)
 					_window.SelectGroup(renderCommands);
 				else if (commandType.IsSubclassOf(typeof(LoadingCommand)))
 					_window.SelectGroup(loadingCommands);
+				else if (commandType.IsSubclassOf(typeof(WindowCommand)))
+					_window.SelectGroup(windowCommands);
+				else if (commandType.IsSubclassOf(typeof(AudioCommand)))
+					_window.SelectGroup(audioCommands);
 				else
 					_window.SelectGroup(otherCommands);
 
@@ -119,9 +135,13 @@ internal class GlobalWindow(AzaleaGame game)
 				totalCreatedCounter.Value = ThreadCommand.TotalCreated;
 				renderCreatedCounter.Value = RenderCommand.TotalCreated;
 				loadingCreatedCounter.Value = LoadingCommand.TotalCreated;
+				windowCreatedCounter.Value = WindowCommand.TotalCreated;
+				audioCreatedCounter.Value = AudioCommand.TotalCreated;
 				otherCreatedCounter.Value = ThreadCommand.TotalCreated
 					- RenderCommand.TotalCreated
-					- LoadingCommand.TotalCreated;
+					- LoadingCommand.TotalCreated
+					- WindowCommand.TotalCreated
+					- AudioCommand.TotalCreated;
 
 				commandDisplays[command.GetType()].Value++;
 			};

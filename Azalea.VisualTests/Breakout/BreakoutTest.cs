@@ -2,7 +2,6 @@
 using Azalea.Graphics.Colors;
 using Azalea.Numerics;
 using Azalea.Platform.Rendering;
-using Azalea.Platform.Windowing;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
@@ -73,8 +72,8 @@ public class BreakoutTest : TestScene
 	protected override void Initialize()
 	{
 		App.Renderer.SetClearColor(Palette.Black);
-		App.Window.SetClientSize(new(GameWidth, GameHeight));
-		App.Window.SetResizable(false);
+		App.Window.ClientSize = new(GameWidth, GameHeight);
+		App.Window.Resizable = false;
 		App.Window.Center();
 	}
 

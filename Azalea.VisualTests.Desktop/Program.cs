@@ -14,7 +14,7 @@ internal class Program
 		host.SetupReflectedDirectory("../../../../../../Azalea.VisualTests/");
 		host.SetupConfig();
 
-		var app = host.CreateApplication(EditorWrapper.Wrap(new VisualTests()), "Azalea Visual Tests", new Vector2Int(1600, 900));
+		host.CreateApplication(EditorWrapper.Wrap(new VisualTests()), "Azalea Visual Tests", new Vector2Int(1600, 900));
 
 		host.WaitUntilEmpty();
 		host.SaveConfig();

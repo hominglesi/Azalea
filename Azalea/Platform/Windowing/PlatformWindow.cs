@@ -14,15 +14,10 @@ namespace Azalea.Platform.Windowing;
 
 public abstract partial class PlatformWindow : ICommandHandler<WindowCommand>
 {
-	protected PlatformWindow(string title, Vector2Int clientSize, bool initiallyVisible)
+	protected PlatformWindow(Vector2Int clientSize, bool initiallyVisible)
 	{
-		Title = title;
 		Shown = initiallyVisible;
-		Position = new Vector2Int(100, 100);
-		ClientPosition = new Vector2Int(100, 100);
-		Size = clientSize;
-		ClientSize = clientSize;
-		Resizable = true;
+		_clientSize = clientSize;
 		CursorVisible = true;
 
 		Thread = new WindowThread(this);
@@ -38,19 +33,7 @@ public abstract partial class PlatformWindow : ICommandHandler<WindowCommand>
 
 	public virtual string PlatformType => "Abstract Window";
 
-	public string Title { get; protected set; }
 	public bool Shown { get; protected set; }
-	public Vector2Int Position { get; protected set; }
-	public Vector2Int ClientPosition { get; protected set; }
-	public Vector2Int Size { get; protected set; }
-	public Vector2Int ClientSize
-	{
-		get;
-		protected set { if (field == value) return; field = value; OnResized?.Invoke(value); }
-	}
-	internal event Action<Vector2Int>? OnResized;
-	public bool Resizable { get; protected set; }
-	public bool CursorVisible { get; protected set; }
 	internal bool ShowDroppableCursor { get; set; }
 	public bool Closed
 	{
@@ -148,11 +131,11 @@ public abstract partial class PlatformWindow : ICommandHandler<WindowCommand>
 
 	#endregion
 
-	public static PlatformWindow Create(string title, Vector2Int size, bool initiallyVisible = true, bool initializeOle = true)
+	public static PlatformWindow Create(Vector2Int size, bool initiallyVisible = true, bool initializeOle = true)
 	{
 		var newWindow = RuntimeInformation.ProcessArchitecture switch
 		{
-			Architecture.X64 or Architecture.X86 => new WindowsWindow(title, size, initiallyVisible, initializeOle),
+			Architecture.X64 or Architecture.X86 => new WindowsWindow(size, initiallyVisible, initializeOle),
 			_ => throw new NotSupportedException(
 				$"Platform '{RuntimeInformation.ProcessArchitecture}' is not supported")
 		};

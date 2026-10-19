@@ -21,7 +21,8 @@ public sealed class Application
 		Game = game;
 		Game.App = this;
 
-		Window = PlatformWindow.Create(title, clientSize, visible);
+		Window = PlatformWindow.Create(clientSize, visible);
+		Window.Title = title;
 		Window.Center();
 
 		Renderer = PlatformRenderer.AttachRenderer(Window);

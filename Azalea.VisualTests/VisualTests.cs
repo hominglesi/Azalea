@@ -9,7 +9,6 @@ using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.IO.Configs;
 using Azalea.IO.Resources;
-using Azalea.Platform.Windowing;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
@@ -70,7 +69,7 @@ public class VisualTests : AzaleaGame
 		if (_currentScene == null || _currentScene != _testSelectScene)
 		{
 			setScene(_testSelectScene);
-			App.Window.SetClientSize(new(1600, 900));
+			App.Window.ClientSize = new(1600, 900);
 			App.Window.Center();
 		}
 	}

@@ -14,46 +14,42 @@ public abstract class LoadingCommand : ThreadCommand
 	}
 }
 
-[ThreadCommand(generateHandler: false)]
-internal partial class CreateProgramCommand : LoadingCommand
+public abstract partial class PlatformLoader
 {
-	public Program Program;
-	public string VertexShaderCode;
-	public string FragmentShaderCode;
-}
-
-[ThreadCommand(generateHandler: false)]
-internal partial class CreateTextureCommand : LoadingCommand
-{
-	public NativeTexture Texture;
-	public int Width;
-	public int Height;
-	public byte[]? Pixels;
-	public bool GenerateMipmap;
-	public TextureFiltering Filtering;
-}
-
-internal static class CreateTextureCommand_Handler
-{
-	internal static NativeTexture CreateTexture(this ICommandHandler<LoadingCommand> handler, int width, int height, byte[]? pixels, bool generateMipmap, TextureFiltering filtering, NativeTexture? texture = null)
+	[ThreadCommand]
+	internal partial class CreateProgramCommand : LoadingCommand
 	{
-		texture ??= ((PlatformLoader)handler).CreateEmptyTexture();
+		public Program Program;
+		public string VertexShaderCode;
+		public string FragmentShaderCode;
+	}
+
+	[ThreadCommand]
+	internal partial class CreateTextureCommand : LoadingCommand
+	{
+		public NativeTexture Texture;
+		public int Width;
+		public int Height;
+		public byte[]? Pixels;
+		public bool GenerateMipmap;
+		public TextureFiltering Filtering;
+	}
+
+	internal NativeTexture CreateTexture(int width, int height, byte[]? pixels, bool generateMipmap, TextureFiltering filtering, NativeTexture? texture = null)
+	{
+		texture ??= CreateEmptyTexture();
 		texture.Width = width;
 		texture.Height = height;
 		texture.BeginLoadingOperation();
-		handler.Enqueue(CreateTextureCommand.Borrow(texture, width, height, pixels, generateMipmap, filtering));
+		Enqueue(CreateTextureCommand.Borrow(texture, width, height, pixels, generateMipmap, filtering));
 		return texture;
 	}
+
+	[ThreadCommand(awaitable: true)]
+	internal partial class RebindContextCommand : LoadingCommand;
+	internal ICommandAwaitable RebindContext() => Enqueue(RebindContextCommand.Borrow())!;
+
+	[ThreadCommand(awaitable: true)]
+	internal partial class ReleaseContextCommand : LoadingCommand;
+	internal ICommandAwaitable ReleaseContext() => Enqueue(ReleaseContextCommand.Borrow())!;
 }
-
-[ThreadCommand]
-internal partial class GenerateTextureCommand : LoadingCommand
-{
-	public NativeTexture Texture;
-}
-
-[ThreadCommand(awaitable: true)]
-internal partial class RebindContextCommand : LoadingCommand { }
-
-[ThreadCommand(awaitable: true)]
-internal partial class ReleaseContextCommand : LoadingCommand { }

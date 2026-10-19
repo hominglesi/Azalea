@@ -18,14 +18,14 @@ public abstract class ThreadCommand
 	public override string ToString() => GetType().Name;
 }
 
-[ThreadCommand]
+[ThreadCommand(generateHandler: true)]
 public partial class InvokeActionCommand : ThreadCommand
 {
 	public Action Action;
 }
 
 [AttributeUsage(AttributeTargets.Class)]
-public sealed class ThreadCommandAttribute(bool awaitable = false, bool generateHandler = true, string? displayName = null) : Attribute
+public sealed class ThreadCommandAttribute(bool awaitable = false, bool generateHandler = false, string? displayName = null) : Attribute
 {
 	private readonly bool _awaitable = awaitable;
 	private readonly bool _generateHandler = generateHandler;

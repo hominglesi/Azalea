@@ -1,5 +1,4 @@
-﻿using Azalea.Graphics;
-using Azalea.IO.Configs;
+﻿using Azalea.IO.Configs;
 using Azalea.IO.Resources;
 using Azalea.Lists;
 using Azalea.Platform.Audio;
@@ -118,8 +117,6 @@ public abstract class GameHost
 		_empty.WaitOne();
 		_empty.Reset();
 	}
-
-	public abstract ITrayIcon CreateTrayIcon(string iconName, Image icon);
 
 	public virtual DateTime GetCurrentTime() => Time.GetCurrentPreciseTime();
 }

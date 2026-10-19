@@ -20,6 +20,8 @@ internal class PlatformAudioInspector
 
 		var loopingCheckbox = window.AddCheckbox("Looping", false);
 		var gainSlider = window.AddSliderFloat("Gain", 0, 1, 0.2f, "0.00");
+		var masterVolumeSlider = window.AddSliderFloat("Master Volume", 0, 1, 1, "0.00");
+		masterVolumeSlider.OnValueChanged(volume => audio.MasterVolume = volume);
 
 		window.AddButton("Play click", () => audio.PlayByte(Assets.MainStore.GetSoundByte("Audio/click.wav"), gainSlider.Slider.Value, loopingCheckbox.Checked));
 

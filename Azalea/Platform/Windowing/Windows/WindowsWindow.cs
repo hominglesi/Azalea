@@ -14,8 +14,8 @@ using System.Runtime.InteropServices.ComTypes;
 
 namespace Azalea.Platform.Windowing.Windows;
 
-internal class WindowsWindow(string title, Vector2Int clientSize, bool initiallyVisible, bool initializeOle)
-	: PlatformWindow(title, clientSize, initiallyVisible)
+internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible, bool initializeOle)
+	: PlatformWindow(clientSize, initiallyVisible)
 {
 	private static int _nextClassId = 0;
 	private Win32.WNDPROC? _windowProcedure;
@@ -85,8 +85,8 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 
 		// Set actual window position
 		Win32.GetWindowRect(Handle, out windowRect);
-		Position = new Vector2Int(windowRect.X, windowRect.Y);
-		Size = new Vector2Int(windowRect.Width, windowRect.Height);
+		_position = new Vector2Int(windowRect.X, windowRect.Y);
+		_size = new Vector2Int(windowRect.Width, windowRect.Height);
 	}
 
 	private Win32.POINT _lastMousePoint;
@@ -270,7 +270,6 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 				break;
 			case SetTitleCommand(var title):
 				Win32.SetWindowTextW(Handle, title);
-				Title = title;
 				break;
 			case ShowCommand:
 				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOW);
@@ -305,24 +304,26 @@ internal class WindowsWindow(string title, Vector2Int clientSize, bool initially
 				Win32.GetClientRect(Handle, out var rect);
 				Win32.ClientToScreen(Handle, ref clientPosition);
 
-				Size = new Vector2Int(windosPos.cx, windosPos.cy);
-				ClientSize = new Vector2Int(rect.Width, rect.Height);
+				_size = new Vector2Int(windosPos.cx, windosPos.cy);
+				_clientSize = new Vector2Int(rect.Width, rect.Height);
+				InvokeOnResized();
 
-				Position = new Vector2Int(windosPos.x, windosPos.y);
-				ClientPosition = new Vector2Int(clientPosition.x, clientPosition.y);
+				_position = new Vector2Int(windosPos.x, windosPos.y);
+				_clientPosition = new Vector2Int(clientPosition.x, clientPosition.y);
 
 				return 0;
 			case Win32.WindowMessage.MOVE:
 				// WM_WINDOWPOSCHANGED handles position changes but
 				// it can miss when client position is changed.
 
-				ClientPosition = BitwiseUtils.SplitValue(lParam);
+				_clientPosition = BitwiseUtils.SplitValue(lParam);
 				return 0;
 			case Win32.WindowMessage.SIZE:
 				// WM_WINDOWPOSCHANGED handles size changes but
 				// it can miss when client size is changed.
 
-				ClientSize = BitwiseUtils.SplitValue(lParam);
+				_clientSize = BitwiseUtils.SplitValue(lParam);
+				InvokeOnResized();
 				return 0;
 			case Win32.WindowMessage.SHOWWINDOW:
 				Shown = wParam != nint.Zero;
