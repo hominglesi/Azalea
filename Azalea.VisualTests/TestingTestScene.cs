@@ -2,32 +2,20 @@
 using Azalea.Design.Containers;
 using Azalea.Design.Shapes;
 using Azalea.Design.Tiled;
-using Azalea.Design.UserInterface;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Graphics.Textures;
-using Azalea.Inputs;
 using Azalea.IO.Resources;
-using Azalea.Platform;
-using Azalea.Threading;
-using System;
-using System.Numerics;
-using System.Threading.Tasks;
 
 namespace Azalea.VisualTests;
 
 public class TestingTestScene : TestScene
 {
-	private Composition _wrapper;
-	private Composition _comp;
-	private TextContainer _composition;
-	private BasicTextBoxOld _text;
-	private Box _cursor;
-	private Box _igrac;
-	private Sprite _sprite;
+	private readonly TextContainer _composition;
+	private readonly Sprite _sprite;
 
-	private string[] _imageURLs = [
+	private readonly string[] _imageURLs = [
 		"https://coverartarchive.org/release/7ef86f4d-2895-4c81-a0ab-c112d9958e5a/front-250",
 		"https://coverartarchive.org/release/c394f14d-aed7-4f6b-814c-e11761b48401/front-250",
 		"https://coverartarchive.org/release/560db4c2-5af5-4ef0-a9e0-b56fca3d8bea/front-250",
@@ -42,8 +30,6 @@ public class TestingTestScene : TestScene
 		"https://f4.bcbits.com/img/a0566082154_10.jpg"
 		];
 
-
-	private SpriteText _scrollDisplay;
 
 	public TestingTestScene()
 	{
@@ -66,32 +52,6 @@ public class TestingTestScene : TestScene
 
 			container.Add(sprite);
 		}
-
-		Console.WriteLine("gas");
-
-		Scheduler.Run(() =>
-		{
-			_ = Scheduler.Schedule(() => Console.WriteLine("Ide Gas 0"));
-			return Task.CompletedTask;
-		});
-
-		var promise = Scheduler.Run(async () =>
-		{
-			await Task.Delay(1000);
-			Console.WriteLine("gas 1");
-		});
-
-		promise.ThenRun(async () =>
-		{
-			await Task.Delay(1000);
-			Console.WriteLine("gas 2");
-		});
-
-		promise.ThenRun(async () =>
-		{
-			await Task.Delay(2000);
-			Console.WriteLine("gas 3");
-		});
 
 		var tileset = Assets.MainStore.GetTileset("MapForTiled/TilesForMap.tsx");
 
@@ -151,13 +111,13 @@ public class TestingTestScene : TestScene
 			}
 		}
 
-		Add(_igrac = new()
+		Add(new()
 		{
 			Color = Palette.Orange,
 			Size = new(50, 50),
 			Origin = Anchor.BottomCenter
 		});
-		Add(_wrapper = new Composition()
+		Add(new Composition()
 		{
 			RelativeSizeAxes = Axes.Both,
 			Child = _composition = new TextContainer(t =>
@@ -185,48 +145,25 @@ public class TestingTestScene : TestScene
 		_composition.AddText("Text3 ", t => { t.Color = Palette.Black; });
 		_composition.AddText("Text4 ");
 
-		Add(_text = new BasicTextBoxOld()
-		{
-			Width = 500,
-			Height = 30,
-			Position = new Vector2(500, 500),
-			Text = "Ide Gas",
-			Alpha = 0
-		}
-		.RepositionBy(new(-100, 0), 0)
-		.RepositionBy(new(100, 0), 1.5f)
-		.ChangeAlphaTo(1, 1.5f)
-		.Then()
-		.Loop(x => x.RepositionBy(new(0, -100), 1)
-				.Then().RepositionBy(new(0, 100), 1), 2));
-
-		Add(new BasicTextBoxOld()
-		{
-			Width = 500,
-			Height = 30,
-			Position = new Vector2(550, 300)
-		});
-
-		Add(_comp = new FlexContainer()
+		Add(new FlexContainer()
 		{
 			Direction = FlexDirection.Vertical,
 			Wrapping = FlexWrapping.NoWrapping,
 			BackgroundColor = Palette.Red,
 			AutoSizeAxes = Axes.Both,
-			Children = new GameObject[] {
+			Children = [
 				new Box()
 				{
 					Color = new Color(10, 10, 10, 10),
 					Size = new(50, 50),
 					Position = new(30, 30)
 				},
-
 				new Box()
 				{
 					Color = new Color(10, 10, 10, 10),
 					Size = new(50, 50)
-				},
-			}
+				}
+			]
 		});
 
 
@@ -258,7 +195,7 @@ public class TestingTestScene : TestScene
 			BorderThickness = new(6)
 		});
 
-		Add(_scrollDisplay = new SpriteText()
+		Add(new SpriteText()
 		{
 			Position = new(700, 100),
 			Text = "0"
@@ -279,51 +216,14 @@ public class TestingTestScene : TestScene
 			}
 		});
 
-		Add(_cursor = new Box()
+		Add(new Box()
 		{
 			Size = new(50, 50)
 		});
 	}
 
-	private float _elapsedTime = 0;
 	protected override void Update()
 	{
-		_sprite.Position += Input.GetDirectionalMovement() * Time.DeltaTime * 200;
-
-		/*
-		_elapsedTime += Time.DeltaTime;
-		Console.WriteLine(_elapsedTime);
-
-		_igrac.Position = Input.MousePosition;
-
-		_igrac.GetFirstParentOfType<Composition>().ChangeChildDepth(_igrac, -_igrac.Y);*/
-
-		//_composition.Size = Input.MousePosition - _composition.ToScreenSpace(_composition.Position);
-		//_scrollDisplay.Text = (float.Parse(_scrollDisplay.Text) + Input.MouseWheelDelta).ToString();
-
-
-		/*
-		_cursor.Position = Input.MousePosition;
-
-		if (Input.GetKey(Keys.Space).DownOrRepeat) Console.WriteLine("Pressed space");
-
-		if (Input.GetKey(Keys.M).Down)
-		{
-			//_comp.Invalidate(Invalidation.RequiredParentSizeToFit, InvalidationSource.Child);
-			_comp.InternalComposition.Invalidate(Invalidation.RequiredParentSizeToFit, InvalidationSource.Child);
-		}
-
-		if (Input.GetKey(Keys.P).Down)
-		{
-			AzaleaGame.Main.Host.Window.State = WindowState.Normal;
-		}
-		else if (Input.GetKey(Keys.O).Down)
-		{
-			AzaleaGame.Main.Host.Window.State = WindowState.Minimized;
-		}
-		else if (Input.GetKey(Keys.I).Down)
-		{
-			AzaleaGame.Main.Host.Window.State = WindowState.Maximized;
-		}*/
+		_sprite.Position += App.Input.State.GetDirectionalMovement() * App.Scheduler.DeltaTime * 200;
 	}
 }

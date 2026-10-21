@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace Azalea.VisualTests;
+
 internal class VisualTestUtils
 {
 	public static string GetTestDisplayName(Type testType)

@@ -3,9 +3,10 @@ using System;
 using System.IO;
 
 namespace Azalea.IO.Configs;
+
 internal class FileConfigProvider : ConfigProvider
 {
-	private string _fileName;
+	private readonly string _fileName;
 
 	public FileConfigProvider(string fileName = "config.cfg")
 	{

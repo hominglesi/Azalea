@@ -1,7 +1,7 @@
-﻿using Azalea.Sounds;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace Azalea.Web.Sounds;
+
 internal class WebAudioManager : AudioManager
 {
 	public override SoundByte CreateSoundByte(ISoundData data)

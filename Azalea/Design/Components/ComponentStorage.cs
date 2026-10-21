@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Reflection;
 
 namespace Azalea.Design.Components;
+
 public static class ComponentStorage<T>
 	where T : Component, new()
 {
-	private static readonly List<T> _list = new();
+	private static readonly List<T> _list = [];
 	public static IReadOnlyList<T> GetComponents() => _list;
 
 	public static void Add(T component)
@@ -25,7 +26,7 @@ public static class ComponentStorage<T>
 
 public static class ComponentStorage
 {
-	private static Dictionary<Type, (Type, MethodInfo, MethodInfo)> _cache = new();
+	private readonly static Dictionary<Type, (Type, MethodInfo, MethodInfo)> _cache = [];
 
 	private static void cacheType(Type type)
 	{
@@ -50,7 +51,7 @@ public static class ComponentStorage
 		cacheType(type);
 
 		var (componentType, addMethod, _) = _cache[type];
-		addMethod.Invoke(componentType, new object[] { component });
+		addMethod.Invoke(componentType, [component]);
 	}
 
 	public static void Remove(Component component)
@@ -60,6 +61,6 @@ public static class ComponentStorage
 		cacheType(type);
 
 		var (componentType, _, removeMethod) = _cache[type];
-		removeMethod.Invoke(componentType, new object[] { component });
+		removeMethod.Invoke(componentType, [component]);
 	}
 }

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Azalea.VisualTests.UnitTesting;
+
 public class UnitTestsManager
 {
-	public List<UnitTestSuite> UnitTestSuites { get; init; } = new();
+	public List<UnitTestSuite> UnitTestSuites { get; init; } = [];
 
 	public UnitTestSuite SelectedSuite => UnitTestSuites[_selectedSuiteIndex];
 	private int _selectedSuiteIndex;

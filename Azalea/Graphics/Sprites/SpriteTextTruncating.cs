@@ -1,6 +1,7 @@
 ﻿using Azalea.Design.Containers;
 
 namespace Azalea.Graphics.Sprites;
+
 public class SpriteTextTruncating : Composition
 {
 	public SpriteText InternalText { get; set; }

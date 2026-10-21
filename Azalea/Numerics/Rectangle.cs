@@ -3,24 +3,16 @@ using System.Numerics;
 
 namespace Azalea.Numerics;
 
-public struct Rectangle : IEquatable<Rectangle>
+public struct Rectangle(float x, float y, float width, float height) : IEquatable<Rectangle>
 {
 	public static Rectangle Empty { get; } = new Rectangle();
 	public static Rectangle One { get; } = new Rectangle(0, 0, 1, 1);
 
-	public float X;
-	public float Y;
+	public float X = x;
+	public float Y = y;
 
-	public float Width;
-	public float Height;
-
-	public Rectangle(float x, float y, float width, float height)
-	{
-		X = x;
-		Y = y;
-		Width = width;
-		Height = height;
-	}
+	public float Width = width;
+	public float Height = height;
 
 	public Rectangle(Vector2 position, Vector2 size)
 		: this(position.X, position.Y, size.X, size.Y) { }
@@ -56,7 +48,7 @@ public struct Rectangle : IEquatable<Rectangle>
 	}
 
 	public readonly Rectangle Offset(Vector2 pos) => Offset(pos.X, pos.Y);
-	public readonly Rectangle Offset(float x, float y) => new Rectangle(X + x, Y + y, Width, Height);
+	public readonly Rectangle Offset(float x, float y) => new(X + x, Y + y, Width, Height);
 
 	public readonly bool Contains(Vector2 point)
 		=> X <= point.X && point.X < X + Width && Y <= point.Y && point.Y < Y + Height;

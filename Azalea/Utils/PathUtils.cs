@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace Azalea.Utils;
+
 public static class PathUtils
 {
 	public static string GetDirectoryFromPath(string path)
@@ -9,7 +10,7 @@ public static class PathUtils
 	public static ReadOnlySpan<char> GetDirectoryFromPath(ReadOnlySpan<char> path)
 	{
 		if (path.Contains('/') == false)
-			return ReadOnlySpan<char>.Empty;
+			return [];
 
 		var lastSlash = path.LastIndexOf('/');
 

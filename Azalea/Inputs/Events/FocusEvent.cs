@@ -1,12 +1,8 @@
 ﻿using Azalea.Graphics;
 
 namespace Azalea.Inputs.Events;
-public class FocusEvent : InputEvent
-{
-	public readonly GameObject? PreviousFocused;
 
-	public FocusEvent(GameObject? previuosFocused)
-	{
-		PreviousFocused = previuosFocused;
-	}
+public class FocusEvent(GameObject? previuosFocused) : InputEvent
+{
+	public readonly GameObject? PreviousFocused = previuosFocused;
 }

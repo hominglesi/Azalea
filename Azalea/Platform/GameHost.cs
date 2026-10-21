@@ -1,149 +1,118 @@
-﻿using Azalea.Design.Containers;
-using Azalea.Design.Scenes;
-using Azalea.Editing;
-using Azalea.Extentions;
-using Azalea.Graphics;
-using Azalea.Graphics.Rendering;
-using Azalea.Inputs;
-using Azalea.IO.Configs;
-using Azalea.Simulations;
-using Azalea.Sounds;
-using Azalea.Threading;
+﻿using Azalea.IO.Configs;
+using Azalea.IO.Resources;
+using Azalea.Lists;
+using Azalea.Platform.Audio;
+using Azalea.Platform.Loading;
 using System;
-using System.Numerics;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace Azalea.Platform;
 
 public abstract class GameHost
 {
-	private const float __fixedUpdateFrametime = 1f / 60;
+	private static GameHost? _instance;
 
-	public static GameHost Main => _main ?? throw new Exception("GameHost hasn't been created yet.");
-	private static GameHost? _main;
+	public static GameHost Instance => _instance
+		?? throw new InvalidOperationException("A GameHost has not yet been initialized!");
 
-	public IWindow Window { get; }
-	public IRenderer Renderer { get; }
-	public IAudioManager AudioManager => _audioThread.AudioManager;
-	public IConfigProvider? ConfigProvider { get; protected set; }
-	public SceneContainer SceneManager { get; }
-	public PhysicsGenerator Physics { get; }
-	public IClipboard Clipboard { get; }
-
-	private readonly Composition _root;
-	private readonly bool _editorEnabled;
-	internal EditorContainer? EditorContainer { get; private set; }
-
-	private AudioThread _audioThread;
-
-	internal GameHost(HostPreferences prefs)
+	public static GameHost Create()
 	{
-		_editorEnabled = prefs.EditorEnabled;
-		_main ??= this;
+		if (_instance is not null)
+			throw new InvalidOperationException("Only one instance of GameHost may be created!");
 
-		Window = CreateWindow(prefs);
-		Renderer = CreateRenderer(Window);
+		if (NativeLibrary.TryLoad("soft_oal", out var _) == false)
+		{
+			throw new Exception("Native binaries could not be loaded!\n" +
+				"If you are a developer make sure to specify a RuntimeIdentifier in the project. " +
+				"Valid runtimes are: 'win-x64'.\n" +
+				"If you are a user and have moved the executable file " +
+				"make sure to move all the other files with it.");
+		}
 
-		_audioThread = new AudioThread(this);
+		if (RuntimeInformation.ProcessArchitecture == Architecture.Wasm)
+		{
+			var webAssembly = Assembly.Load("Azalea.Web");
+			var webHostType = webAssembly.GetType("Azalea.Web.Platform.WebHost")!;
+			var bindingFlags = BindingFlags.NonPublic | BindingFlags.Instance;
+			_instance = (GameHost)Activator.CreateInstance(webHostType, bindingFlags, null, null, null)!;
+			return _instance;
+		}
+
+		_instance = new DesktopGameHost();
+		return _instance;
+	}
+
+	internal GameHost()
+	{
+		Loader = CreateLoader();
+		Audio = CreateAudio();
+
 		Clipboard = CreateClipboard();
-		Physics = new PhysicsGenerator();
-		SceneManager = new SceneContainer();
-
-		_root = new Composition();
 	}
 
-	public virtual void Run(AzaleaGame game)
+	public PlatformLoader Loader { get; }
+	protected abstract PlatformLoader CreateLoader();
+
+	public PlatformAudio Audio { get; }
+	protected abstract PlatformAudio CreateAudio();
+
+	public IClipboard Clipboard { get; }
+	protected abstract IClipboard CreateClipboard();
+
+	public IConfigProvider? ConfigProvider { get; protected set; }
+
+	protected virtual IConfigProvider? CreateConfigProvider(string path) => null;
+	public void SetupConfig(string path = "config.cfg")
 	{
-		GameObject rootObject = game;
-		Renderer.Initialize();
+		if (ConfigProvider is not null)
+			throw new Exception("A config provider has already been set up!");
 
-		if (_editorEnabled)
-			rootObject = EditorContainer = new EditorContainer(game);
-
-		_root.Add(rootObject);
-
-		game.AddInternal(SceneManager);
-
-		Input.Initialize(_root);
-		Time.Setup();
-
-		RunGameLoop();
+		ConfigProvider = CreateConfigProvider(path);
 	}
 
-	private bool _firstWindowShown = false;
-
-	protected abstract void RunGameLoop();
-
-	private long _frameStart;
-	private float _accumulator;
-	protected virtual void ProcessGameLoop()
+	public void SaveConfig()
 	{
-		_frameStart = PerformanceTrace.StartEvent();
+		if (ConfigProvider is null)
+			throw new Exception("A config provider has not been set up!");
 
-		Time.UpdateDeltaTime();
-		_accumulator += Time.DeltaTime;
-
-		Scheduler.InvokeScheduled();
-
-		Window.ProcessEvents();
-
-		while (_accumulator >= __fixedUpdateFrametime)
-		{
-			PerformanceTrace.RunAndTrace(CallOnFixedUpdate, "FixedUpdate");
-			_accumulator -= __fixedUpdateFrametime;
-		}
-
-		PerformanceTrace.RunAndTrace(CallOnUpdate, "Update");
-
-		if (Window.State != WindowState.Minimized)
-			PerformanceTrace.RunAndTrace(CallOnRender, "Render");
-
-		if (_firstWindowShown == false)
-		{
-			Window.Show(true);
-			_firstWindowShown = true;
-		}
-
-		PerformanceTrace.AddEvent(_frameStart, "Frame");
+		ConfigProvider.Save();
 	}
 
-	public virtual void CallOnRender()
+	public void SetupPersistentDirectory(string path) => Assets.SetupPersistentStore(path);
+	public void SetupReflectedDirectory(string path) => Assets.SetupReflectedStore(path);
+
+	public readonly ObservableList<Application> Applications = [];
+	public Application CreateApplication(AzaleaGame game, string? title = null, Vector2Int? clientSize = null, bool visible = true)
 	{
-		Renderer.BeginFrame();
-		if (Renderer.AutomaticallyClear) Renderer.Clear();
+		clientSize ??= new(800, 600);
+		title ??= "Azalea Application";
 
-		_root.Draw(Renderer);
+		var application = new Application(game, title, clientSize.Value, visible);
+		Applications.Add(application);
 
-		Renderer.FinishFrame();
+		application.OnClosed += () => onApplicationClosed(application);
+
+		return application;
 	}
 
-	public virtual void CallOnUpdate()
+	private void onApplicationClosed(Application application)
 	{
-		_root.Size = new Vector2(Window.ClientSize.X, Window.ClientSize.Y);
-		_root.Size = Vector2Extentions.ComponentMax(Vector2.One, _root.Size);
+		Applications.Remove(application);
 
-		_root.UpdateSubTree();
-
-		Input.LateUpdate();
+		if (Applications.Count == 0)
+			_closed.Set();
 	}
 
-	public virtual void CallOnFixedUpdate()
+	private readonly ManualResetEvent _closed = new(false);
+
+	public void WaitUntilClosed()
 	{
-		_root.FixedUpdateSubTree();
+		if (Applications.Count == 0)
+			return;
 
-		Physics.Update();
-	}
-
-	internal abstract IWindow CreateWindow(HostPreferences preferences);
-	internal abstract IRenderer CreateRenderer(IWindow window);
-	internal abstract IAudioManager CreateAudioManager();
-	internal abstract IClipboard CreateClipboard();
-	public abstract ITrayIcon CreateTrayIcon(string iconName, Image icon);
-
-	public virtual DateTime GetCurrentTime() => Time.GetCurrentPreciseTime();
-
-	internal static void CheckForbidden(object? preference, string errorMessage)
-	{
-		if (preference is not null)
-			throw new ArgumentException(errorMessage);
+		_closed.WaitOne();
+		_closed.Reset();
 	}
 }

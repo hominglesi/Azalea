@@ -4,6 +4,7 @@ using Azalea.Graphics.Colors;
 using System.Numerics;
 
 namespace Azalea.VisualTests.UnitTesting.UnitTests.Design;
+
 public class FlexContainerTests : UnitTestSuite
 {
 	protected static readonly FlexContainer FlexContainer = new()

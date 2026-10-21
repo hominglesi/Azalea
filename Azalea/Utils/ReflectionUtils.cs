@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 
 namespace Azalea.Utils;
+
 public static class ReflectionUtils
 {
 	public static IEnumerable<Type> GetAllTypesWithInterface(Type interfaceType)
@@ -21,7 +22,7 @@ public static class ReflectionUtils
 			.Where(t => t.IsSubclassOf(parentType));
 	}
 
-	private readonly static Dictionary<Type, FieldInfo[]> _fieldDictionary = new();
+	private readonly static Dictionary<Type, FieldInfo[]> _fieldDictionary = [];
 	public static FieldInfo[] GetAllFieldsOf<T>()
 	{
 		var structType = typeof(T);

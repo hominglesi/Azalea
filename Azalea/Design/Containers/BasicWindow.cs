@@ -3,9 +3,9 @@ using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 
 namespace Azalea.Design.Containers;
+
 public class BasicWindow : BasicWindowContainer
 {
-	private Composition _contentContainer;
 	public BasicWindow()
 	{
 		GameObject draggableBar;
@@ -19,7 +19,7 @@ public class BasicWindow : BasicWindowContainer
 			Depth = -100
 		});
 
-		AddInternal(_contentContainer = new Composition()
+		AddInternal(new Composition()
 		{
 			Position = new(0, 40),
 			RelativeSizeAxes = Axes.Both,

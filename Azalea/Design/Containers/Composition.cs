@@ -1,9 +1,9 @@
 ﻿using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics;
-using Azalea.Graphics.Rendering;
 using Azalea.Layout;
 using Azalea.Lists;
 using Azalea.Numerics;
+using Azalea.Platform.Rendering.Coordination;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
@@ -31,7 +31,7 @@ public partial class Composition : GameObject
 	protected internal IReadOnlyList<GameObject> InternalChildren => _internalChildren;
 	private ulong _currentChildID;
 
-	private List<GameObject> _publicChildren = [];
+	private readonly List<GameObject> _publicChildren = [];
 
 	public virtual IReadOnlyList<GameObject> Children
 	{
@@ -231,12 +231,8 @@ public partial class Composition : GameObject
 		if (invalidation == Invalidation.None)
 			return anyInvalidated;
 
-		IReadOnlyList<GameObject> targetChildren = _internalChildren;
-
-		for (int i = 0; i < targetChildren.Count; ++i)
+		foreach (var c in _internalChildren)
 		{
-			GameObject c = targetChildren[i];
-
 			Invalidation childInvalidation = invalidation;
 			if ((invalidation & Invalidation.RequiredParentSizeToFit) > 0)
 				childInvalidation |= Invalidation.DrawInfo;
@@ -284,9 +280,9 @@ public partial class Composition : GameObject
 			child.RemoveComponentTreeFromScene();
 	}
 
-	public override void Draw(IRenderer renderer)
+	public override void Draw(RenderCoordinator coordinator)
 	{
-		DrawBackground(renderer);
+		DrawBackground(coordinator);
 
 		if (Masking)
 		{
@@ -298,16 +294,17 @@ public partial class Composition : GameObject
 				newScissor.Y -= MathUtils.Ceiling(MaskingPadding.Top);
 				newScissor.Height += MathUtils.Ceiling(MaskingPadding.Vertical);
 			}
-			renderer.PushScissor(newScissor);
+
+			coordinator.PushScissor(newScissor);
 		}
 
 		foreach (var child in _internalChildren)
-			child.Draw(renderer);
+			child.Draw(coordinator);
 
 		if (Masking)
-			renderer.PopScissor();
+			coordinator.PopScissor();
 
-		DrawForeground(renderer);
+		DrawForeground(coordinator);
 	}
 
 	private Boundary _padding;
@@ -503,20 +500,6 @@ public partial class Composition : GameObject
 			child.BuildPositionalInputQueue(screenSpacePos, queue);
 
 		return true;
-	}
-
-	internal void InvalidateChildrenSizeDependencies(Invalidation invalidation, Axes axes, GameObject source)
-	{
-		//bool wasValid = childrenSizeDependencies.IsValid;
-
-		Invalidate(invalidation, InvalidationSource.Child);
-
-		//axes &= ~source.BypassAutoSizedAxes;
-
-		//axes &= AutoSizeAxes;
-
-		//if (wasValid && axes == Axes.None)
-		//childrenSizeDependencies.Validate();w
 	}
 
 	protected class ChildComparer(Composition owner) : IComparer<GameObject>

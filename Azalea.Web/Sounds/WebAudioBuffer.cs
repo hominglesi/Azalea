@@ -1,8 +1,8 @@
-﻿using Azalea.Sounds;
-using Azalea.Utils;
+﻿using Azalea.Utils;
 using System;
 
 namespace Azalea.Web.Sounds;
+
 internal class WebAudioBuffer : Disposable
 {
 	public object Handle { get; set; }

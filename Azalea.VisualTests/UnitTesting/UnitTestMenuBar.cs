@@ -8,6 +8,7 @@ using Azalea.Inputs.Events;
 using System;
 
 namespace Azalea.VisualTests.UnitTesting;
+
 public class UnitTestMenuBar : FlexContainer
 {
 	private readonly static Color __backgroundColor = new(0, 27, 41);

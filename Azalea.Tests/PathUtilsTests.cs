@@ -1,6 +1,7 @@
 ﻿using Azalea.Utils;
 
 namespace Azalea.Tests;
+
 public class PathUtilsTests
 {
 	[TestCase("night-sky.png", ExpectedResult = "")]

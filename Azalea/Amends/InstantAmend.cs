@@ -1,12 +1,11 @@
 ﻿using System;
 
 namespace Azalea.Amends;
-public class InstantAmend<T> : Amend<T>
+
+public class InstantAmend<T>(T target, Action<T>? action)
+	: Amend<T>(target, action)
 {
 	private bool _performed = false;
-
-	public InstantAmend(T target, Action<T>? action)
-		: base(target, action) { }
 
 	public override void Perform()
 	{

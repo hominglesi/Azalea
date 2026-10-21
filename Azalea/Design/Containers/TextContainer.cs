@@ -51,7 +51,7 @@ public class TextContainer : FlexContainer
 		}
 	}
 
-	private string[] splitText(string text)
+	private static string[] splitText(string text)
 	{
 		var words = new List<string>();
 		var builder = new StringBuilder();
@@ -82,6 +82,6 @@ public class TextContainer : FlexContainer
 		if (builder.Length > 0)
 			words.Add(builder.ToString());
 
-		return words.ToArray();
+		return [.. words];
 	}
 }

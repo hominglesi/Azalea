@@ -1,11 +1,13 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Azalea.Utils;
+
 public static class TextUtils
 {
-	private static string[] words = new[]{"lorem", "ipsum", "dolor", "sit", "amet", "consectetuer",
+	private readonly static string[] words = ["lorem", "ipsum", "dolor", "sit", "amet", "consectetuer",
 		"adipiscing", "elit", "sed", "diam", "nonummy", "nibh", "euismod",
-		"tincidunt", "ut", "laoreet", "dolore", "magna", "aliquam", "erat"};
+		"tincidunt", "ut", "laoreet", "dolore", "magna", "aliquam", "erat"];
 
 	public static string GenerateLoremIpsum(int wordCount)
 	{
@@ -27,5 +29,13 @@ public static class TextUtils
 		}
 
 		return builder.ToString();
+	}
+
+	public static string FormatTimeCodeFromSeconds(double secondDuration)
+	{
+		var minutes = (int)Math.Round(secondDuration) / 60;
+		var seconds = (int)Math.Round(secondDuration % 60);
+
+		return $"{minutes}:{seconds:00}";
 	}
 }

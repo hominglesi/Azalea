@@ -1,0 +1,77 @@
+﻿using Azalea.Extentions;
+using Azalea.Native.OpenGL;
+using Azalea.Platform.Rendering;
+using Azalea.Platform.Scheduling;
+using Azalea.Platform.Windowing;
+using Azalea.Utils;
+using System;
+
+namespace Azalea.Platform;
+
+public sealed class Application
+{
+	public readonly AzaleaGame Game;
+	public readonly PlatformWindow Window;
+	public readonly PlatformRenderer Renderer;
+	public readonly PlatformScheduler Scheduler;
+	public readonly InputProcessor Input;
+
+	internal Application(AzaleaGame game, string title, Vector2Int clientSize, bool visible)
+	{
+		Game = game;
+		Game.App = this;
+
+		Window = PlatformWindow.Create(clientSize, visible);
+		Window.Title = title;
+		Window.Center();
+
+		Renderer = PlatformRenderer.AttachRenderer(Window);
+		Scheduler = PlatformScheduler.AttachScheduler(Window);
+		Input = new InputProcessor(Game, Window.GamepadInput, Window.CreateProxy<bool>("ShowDroppableCursor"));
+
+		Window.OnClosed += () => OnClosed?.Invoke();
+
+		var commandGroup = ObjectPool<RenderCommandGroup>.Borrow();
+
+		commandGroup.Enable(GL.BLEND);
+		commandGroup.Disable(GL.CULL_FACE);
+		commandGroup.Disable(GL.DEPTH_TEST);
+		commandGroup.BlendFunction(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
+
+		Renderer.Thread.SubmitCommandGroup(commandGroup);
+
+		var coordinator = Renderer.Coordinator;
+		var quadBatch = coordinator.DefaultQuadBatch;
+
+		Renderer.PrintErrors();
+
+		Scheduler.InjectProtocol((win, rend) =>
+		{
+			var clientSize = win.ClientSize;
+
+			if (clientSize == Vector2Int.Zero)
+				return;
+
+			Game.Size = clientSize;
+			Game.UpdateSubTree();
+
+			Input.Process(win.PendingInputEvents);
+
+			var renderQueue = coordinator.BeginCommandQueue();
+			renderQueue.PrepareRendering(clientSize);
+
+			Game.Draw(Renderer.Coordinator);
+
+			quadBatch.Draw(renderQueue);
+
+			renderQueue.PrintErrors();
+
+			renderQueue.SwapBuffers();
+
+			Renderer.StageQueue(coordinator.EndCommandQueue());
+		});
+	}
+
+	public Action? OnClosed;
+	public void Close() => Window.Close();
+}

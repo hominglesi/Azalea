@@ -9,9 +9,10 @@ using System;
 using System.Collections.Generic;
 
 namespace Azalea.VisualTests;
+
 public class SchemesTest : TestScene
 {
-	private ScrollableContainer _container;
+	private readonly ScrollableContainer _container;
 
 	public SchemesTest()
 	{
@@ -132,15 +133,14 @@ public class SchemesTest : TestScene
 			{
 				RelativeSizeAxes = Axes.X,
 				AutoSizeAxes = Axes.Y,
-				Children = new GameObject[]
-				{
+				Children = [
 					new Box()
 					{
 						Size = new(5),
 						Margin = new(10)
 					},
 					obj
-				}
+				]
 			});
 
 			obj.Width = 875;

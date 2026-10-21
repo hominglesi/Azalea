@@ -3,6 +3,7 @@ using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 
 namespace Azalea.VisualTests.UnitTesting.UnitTests.Design;
+
 public class CompositionDecorationTests : UnitTestSuite
 {
 	private static readonly Composition _composition = new()

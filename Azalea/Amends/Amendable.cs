@@ -1,16 +1,16 @@
-﻿using Azalea.Platform;
+﻿using Azalea.Graphics;
 using System.Collections.Generic;
 
 namespace Azalea.Amends;
+
 public abstract class Amendable
 {
-	private List<IAmend> _amends = new();
+	private readonly List<IAmend> _amends = [];
 
 	public int AmendCount => _amends.Count;
 
 	public void UpdateAmends()
 	{
-		var deltaTime = Time.DeltaTime;
 		var soloBreak = true;
 
 		for (int i = 0; i < _amends.Count; i++)
@@ -36,7 +36,8 @@ public abstract class Amendable
 
 			if (amend.HasStarted == false) amend.Start();
 
-			amend.Update(deltaTime);
+			if (this is GameObject obj)
+				amend.Update(obj.App.Scheduler.DeltaTime);
 
 			if (amend.IsFinished)
 			{
@@ -53,11 +54,13 @@ public abstract class Amendable
 
 	public void FinishAmends()
 	{
-		foreach (var amend in _amends)
+		var i = 0;
+		while (_amends.Count > i)
 		{
-			if (amend.HasStarted == false) amend.Start();
+			if (_amends[i].HasStarted == false)
+				_amends[i].Start();
 
-			amend.Finish();
+			_amends[i++].Finish();
 		}
 
 		_amends.Clear();

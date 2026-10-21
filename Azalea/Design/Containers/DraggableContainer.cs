@@ -5,6 +5,7 @@ using System;
 using System.Numerics;
 
 namespace Azalea.Design.Containers;
+
 public class DraggableContainer : Composition
 {
 	private bool _isDragging;
@@ -28,7 +29,7 @@ public class DraggableContainer : Composition
 		}
 	}
 
-	private DragArea _dragArea;
+	private readonly DragArea _dragArea;
 	public GameObject DragAreaObject => _dragArea;
 
 	public DraggableContainer()
@@ -45,20 +46,25 @@ public class DraggableContainer : Composition
 		if (_isDragging == false)
 			return;
 
-		if (Input.GetMouseButton(MouseButton.Left).Released)
+		var mousePos = App.Input.State.MousePosition;
+
+		if (_lastPosition != mousePos)
+		{
+			var dragOffset = mousePos - _lastPosition;
+			applyDragOffset(dragOffset);
+
+			_lastPosition = mousePos;
+		}
+	}
+
+	protected override void OnMouseUp(MouseUpEvent e)
+	{
+		if (e.Button == MouseButton.Left)
 		{
 			_isDragging = false;
 			_dragOverflow = Vector2.Zero;
-			return;
 		}
 
-		if (_lastPosition != Input.MousePosition)
-		{
-			var dragOffset = Input.MousePosition - _lastPosition;
-			applyDragOffset(dragOffset);
-
-			_lastPosition = Input.MousePosition;
-		}
 	}
 
 	private Vector2 _dragOverflow;
@@ -95,7 +101,7 @@ public class DraggableContainer : Composition
 	private void onDragStarted()
 	{
 		_isDragging = true;
-		_lastPosition = Input.MousePosition;
+		_lastPosition = App.Input.State.MousePosition;
 	}
 
 	private class DragArea : GameObject

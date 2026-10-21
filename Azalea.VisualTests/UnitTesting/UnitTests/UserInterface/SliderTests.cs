@@ -6,12 +6,13 @@ using System.Numerics;
 
 #pragma warning disable CS8602, CS8618
 
-namespace Azalea.VisualTests.UnitTesting.UserInterface.UserInput;
+namespace Azalea.VisualTests.UnitTesting.UnitTests.UserInterface;
+
 public class SliderTests : UnitTestSuite
 {
 	public class ValueTest : UnitTest
 	{
-		private readonly static Vector2 __size = new Vector2(200, 30);
+		private readonly static Vector2 __size = new(200, 30);
 
 		private Slider? _slider;
 

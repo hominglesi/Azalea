@@ -6,6 +6,7 @@ using Azalea.Graphics.Sprites;
 using Azalea.Inputs.Events;
 
 namespace Azalea.Design.Controls;
+
 public class FileInputControl : AbstractFileInput
 {
 	private readonly SpriteText _chosenFileText;

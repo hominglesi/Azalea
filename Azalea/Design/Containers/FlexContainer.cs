@@ -113,18 +113,24 @@ public class FlexContainer : FlowContainer
 			{
 				var itemMainLength = getMainLength(children[i]);
 
-				if (Wrapping != FlexWrapping.NoWrapping && mainLength + itemMainLength > maxMainLength)
+				if (Wrapping != FlexWrapping.NoWrapping)
 				{
-					var crossSpacing = getCrossLength(Spacing);
-					var crossOffset = crossLength + totalCrossLength + crossSpacing;
-					nextPosition = getMainStart() + (crossOffset * getCrossDirection());
+					if (mainLength + itemMainLength > maxMainLength || children[i] is FlowNewLine)
+					{
+						var crossSpacing = getCrossLength(Spacing);
+						var crossOffset = crossLength + totalCrossLength + crossSpacing;
+						if (children[i] is FlowNewLine newLine)
+							crossOffset += newLine.Length;
 
-					totalMainLength += mainLength;
-					totalCrossLength += crossLength + crossSpacing;
-					lines[nextLine++] = new Vector2WithInt(mainLength, crossLength, nextItemLineIndex);
-					mainLength = 0f;
-					crossLength = 0f;
-					nextItemLineIndex = 0;
+						nextPosition = getMainStart() + (crossOffset * getCrossDirection());
+
+						totalMainLength += mainLength;
+						totalCrossLength += crossLength + crossSpacing;
+						lines[nextLine++] = new Vector2WithInt(mainLength, crossLength, nextItemLineIndex);
+						mainLength = 0f;
+						crossLength = 0f;
+						nextItemLineIndex = 0;
+					}
 				}
 
 				var positionOffset = itemMainLength + getMainSpacing();

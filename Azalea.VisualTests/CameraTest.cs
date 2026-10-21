@@ -1,16 +1,15 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Design.Tiled;
 using Azalea.Graphics.Sprites;
-using Azalea.Inputs;
 using Azalea.IO.Resources;
-using Azalea.Platform;
 using System.Numerics;
 
 namespace Azalea.VisualTests;
+
 internal class CameraTest : TestScene
 {
-	private CameraContainer _worldContainer;
-	private Sprite _player;
+	private readonly CameraContainer _worldContainer;
+	private readonly Sprite _player;
 
 	public CameraTest()
 	{
@@ -54,16 +53,20 @@ internal class CameraTest : TestScene
 		_worldContainer.Scale = new(2f);
 
 		_worldContainer.SetBoundaries(new(Vector2.Zero, tilemap.PixelSize));
-		_worldContainer.CenterOnObject(_player);
 		_worldContainer.SetFollowedObject(_player);
+	}
+
+	protected override void Initialize()
+	{
+		_worldContainer.CenterOnObject(_player);
 	}
 
 	protected override void Update()
 	{
-		var movement = Input.GetDirectionalMovement();
+		var movement = App.Input.State.GetDirectionalMovement();
 		if (movement != Vector2.Zero)
 		{
-			_player.Position += movement * 3 * Time.DeltaTime * 60;
+			_player.Position += movement * 3 * App.Scheduler.DeltaTime * 60;
 			_worldContainer.ChangeChildDepth(_player, -_player.Y);
 		}
 	}

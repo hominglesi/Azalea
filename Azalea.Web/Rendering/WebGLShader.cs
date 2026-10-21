@@ -1,5 +1,4 @@
 ﻿using Azalea.Graphics.Colors;
-using Azalea.Graphics.OpenGL.Enums;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;

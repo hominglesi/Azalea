@@ -3,21 +3,14 @@ using System.Numerics;
 
 namespace Azalea.Numerics;
 
-public struct Matrix3 : IEquatable<Matrix3>
+public struct Matrix3(Vector3 row0, Vector3 row1, Vector3 row2) : IEquatable<Matrix3>
 {
-	public Vector3 Row0;
-	public Vector3 Row1;
-	public Vector3 Row2;
+	public Vector3 Row0 = row0;
+	public Vector3 Row1 = row1;
+	public Vector3 Row2 = row2;
 
 	public static readonly Matrix3 Identity = new(Vector3.UnitX, Vector3.UnitY, Vector3.UnitZ);
 	public static readonly Matrix3 Zero = new(Vector3.Zero, Vector3.Zero, Vector3.Zero);
-
-	public Matrix3(Vector3 row0, Vector3 row1, Vector3 row2)
-	{
-		Row0 = row0;
-		Row1 = row1;
-		Row2 = row2;
-	}
 
 	public float M11 { readonly get => Row0.X; set => Row0.X = value; }
 	public float M12 { readonly get => Row0.Y; set => Row0.Y = value; }
@@ -41,8 +34,7 @@ public struct Matrix3 : IEquatable<Matrix3>
 
 	public static Matrix3 Mult(Matrix3 left, Matrix3 right)
 	{
-		Matrix3 result;
-		Mult(ref left, ref right, out result);
+		Mult(ref left, ref right, out Matrix3 result);
 		return result;
 	}
 

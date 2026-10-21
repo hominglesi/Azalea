@@ -1,35 +1,23 @@
 ﻿using Azalea.Design.Containers;
-using Azalea.Design.Controls;
 using Azalea.Design.Docking;
-using Azalea.Design.Scenes;
 using Azalea.Editor.DebugWindows;
+using Azalea.Editor.Views.Gamepads;
 using Azalea.Editor.Views.MsdfGen;
 using Azalea.Editor.Views.ResourceExploring;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
-using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
+using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
-using System;
-using System.Diagnostics;
 
 namespace Azalea.Editor;
 
 public class EditorWrapper : AzaleaGame
 {
-	private static EditorWrapper? _instance;
-	public static EditorWrapper Instance
-	{
-		get
-		{
-			return _instance ??= new EditorWrapper();
-		}
-	}
-
 	private readonly BasicDockingContainer _mainContainer;
-	private readonly Composition _gameDockable;
+	public DisplayValues DisplayValues { get; }
 
-	internal EditorWrapper()
+	internal EditorWrapper(AzaleaGame game)
 	{
 		Assets.AddToMainStore(new NamespacedResourceStore(new EmbeddedResourceStore(typeof(EditorWrapper).Assembly), "Resources"));
 
@@ -40,10 +28,10 @@ public class EditorWrapper : AzaleaGame
 		});
 		_mainContainer.ContentBackground.Color = Palette.White;
 
-		_mainContainer.AddDockable("Game", _gameDockable = new Composition()
+		_mainContainer.AddDockable("Game", new Composition()
 		{
 			RelativeSizeAxes = Axes.Both,
-			Child = new MissingGameDisplay()
+			Child = game
 		});
 		_mainContainer.AddDockable("Resource Explorer", new EditorResourceExplorer(Assets.FileSystemStore)
 		{
@@ -54,60 +42,31 @@ public class EditorWrapper : AzaleaGame
 		{
 			RelativeSizeAxes = Axes.Both
 		});
+		_mainContainer.AddDockable("Gamepad Viewer", new GamepadViewer());
+
+		Add(DisplayValues = new DisplayValues());
+		DisplayValues.AddDisplayedValue("Input", () => $"{App.Window.Thread.AverageFrequency:0ups} ({App.Window.Thread.AverageWorkDuration:0.00ms})");
+		DisplayValues.AddDisplayedValue("Scheduling", () => $"{App.Scheduler.Thread.AverageFrequency:0ups} ({App.Scheduler.Thread.AverageWorkDuration:0.00ms})");
+		DisplayValues.AddDisplayedValue("Rendering", () => $"{App.Renderer.Thread.AverageFrequency:0fps} ({App.Renderer.Thread.AverageWorkDuration:0.00ms})");
+
+		_globalWindow = new(game);
+		_classWindow = new(game);
 	}
 
-	private AzaleaGame? _wrappedGame;
-	public static AzaleaGame Wrap(AzaleaGame game)
+	public static EditorWrapper Wrap(AzaleaGame game) => new EditorWrapper(game);
+
+	private readonly GlobalWindow _globalWindow;
+	private readonly ClassWindow _classWindow;
+
+	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		if (Instance._wrappedGame is not null)
-			throw new Exception("Only one game can be wrapped by the editor");
+		if (e.Key == Keys.F2 && e.State.ShiftPressed)
+			_globalWindow.Toggle();
+		else if (e.Key == Keys.F3 && e.State.ShiftPressed)
+			_classWindow.Toggle();
+		else
+			return false;
 
-		Instance._wrappedGame = game;
-
-		if (game is not null)
-			Instance._gameDockable.Child = game;
-
-		return Instance;
-	}
-
-	bool _sceneContainerHandedOver = false;
-
-	protected override void Update()
-	{
-		if (_sceneContainerHandedOver == false && _wrappedGame is not null)
-		{
-			GameObject? sceneContainer = null;
-
-			foreach (var child in InternalChildren)
-				if (child is SceneContainer)
-				{
-					sceneContainer = child;
-					break;
-				}
-
-			Debug.Assert(sceneContainer is not null);
-
-			RemoveInternal(sceneContainer);
-			_wrappedGame.AddInternal(sceneContainer);
-			_sceneContainerHandedOver = true;
-		}
-
-		if (Input.GetKey(Keys.F1).Down && Input.GetKey(Keys.ShiftLeft).Pressed)
-			CameraWindow.Toggle();
-	}
-
-	private class MissingGameDisplay : Composition
-	{
-		public MissingGameDisplay()
-		{
-			RelativeSizeAxes = Axes.Both;
-			Add(new SpriteText()
-			{
-				Text = "No game provided for editor.",
-				Color = ControlConstants.DarkTextColor,
-				Anchor = Anchor.Center,
-				Origin = Anchor.Center
-			});
-		}
+		return true;
 	}
 }

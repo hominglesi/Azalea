@@ -2,6 +2,7 @@
 using Azalea.Graphics.Sprites;
 
 namespace Azalea.Design.Controls;
+
 public static class ControlConstants
 {
 	public static float InputControlHeight => 36;

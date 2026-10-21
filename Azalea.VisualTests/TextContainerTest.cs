@@ -2,20 +2,18 @@
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs;
-using Azalea.Platform;
+using Azalea.Inputs.Events;
 using Azalea.Utils;
 
 namespace Azalea.VisualTests;
+
 public class TextContainerTest : TestScene
 {
-	private ScrollableContainer _scrollable;
-	private FlexContainer _flex;
+	private readonly ScrollableContainer _scrollable;
+	private readonly FlexContainer _flex;
 
 	public TextContainerTest()
 	{
-		Window.ClientSize = new(1680, 960);
-		Window.Center();
-
 		Add(_scrollable = new ScrollableContainer()
 		{
 			BorderColor = Palette.Teal,
@@ -56,14 +54,22 @@ public class TextContainerTest : TestScene
 
 			_flex.Add(container);
 		}
-
 	}
 
-	protected override void Update()
+	protected override void Initialize()
 	{
-		if (Input.GetKey(Keys.Space).Down)
+		App.Window.ClientSize = new(1680, 960);
+		App.Window.Center();
+	}
+
+	protected override bool OnKeyDown(KeyDownEvent e)
+	{
+		if (e.Key == Keys.Space)
 		{
-			_scrollable.Size = _scrollable.ToLocalSpace(Input.MousePosition);
+			_scrollable.Size = _scrollable.ToLocalSpace(e.State.MousePosition);
+			return true;
 		}
+
+		return false;
 	}
 }

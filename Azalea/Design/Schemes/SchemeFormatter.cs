@@ -3,9 +3,10 @@ using System;
 using System.Collections.Generic;
 
 namespace Azalea.Design.Schemes;
+
 public class SchemeFormatter
 {
-	private Dictionary<string, SchemeDelegate> _schemes = new();
+	private readonly Dictionary<string, SchemeDelegate> _schemes = [];
 
 	public void AddScheme(string tag, SchemeDelegate formatFunction)
 	{
@@ -14,7 +15,7 @@ public class SchemeFormatter
 
 	public GameObject Format(string xml)
 	{
-		List<(string, int, List<object>)> openedTags = new();
+		List<(string, int, List<object>)> openedTags = [];
 
 		var tagStartIndex = -1;
 
@@ -37,7 +38,7 @@ public class SchemeFormatter
 					if (openedTags[^1].Item1 != tag) throw new Exception($"Unexpected closing tag '{tag}' at {i}");
 
 					var content = openedTags[^1].Item3;
-					content.Add(xml.Substring(openedTags[^1].Item2, tagStartIndex - 1 - openedTags[^1].Item2));
+					content.Add(xml[openedTags[^1].Item2..(tagStartIndex - 1)]);
 
 					var obj = _schemes[tag].Invoke(content);
 
@@ -62,7 +63,7 @@ public class SchemeFormatter
 				}
 				else
 				{
-					var tag = xml.Substring(tagStartIndex, i - tagStartIndex);
+					var tag = xml[tagStartIndex..i];
 
 					openedTags.Add((tag, i + 1, new List<object>()));
 				}

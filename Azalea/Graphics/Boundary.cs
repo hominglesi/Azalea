@@ -3,20 +3,12 @@ using System.Numerics;
 
 namespace Azalea.Graphics;
 
-public struct Boundary : IEquatable<Boundary>
+public struct Boundary(float top = 0, float right = 0, float bottom = 0, float left = 0) : IEquatable<Boundary>
 {
-	public float Top;
-	public float Left;
-	public float Bottom;
-	public float Right;
-
-	public Boundary(float top = 0, float right = 0, float bottom = 0, float left = 0)
-	{
-		Top = top;
-		Right = right;
-		Bottom = bottom;
-		Left = left;
-	}
+	public float Top = top;
+	public float Left = left;
+	public float Bottom = bottom;
+	public float Right = right;
 
 	public Boundary(float padding)
 		: this(padding, padding, padding, padding) { }

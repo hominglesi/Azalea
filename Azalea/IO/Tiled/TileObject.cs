@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Xml;
 
 namespace Azalea.IO.Tiled;
+
 public readonly struct TileObject
 {
 	public int Id { get; init; }
@@ -63,7 +64,7 @@ public readonly struct TileObject
 		if (objectNode.ContainsAttribute("rotation"))
 			rotation = objectNode.GetFloatAttribute("rotation");
 
-		Dictionary<string, string> properties = new();
+		Dictionary<string, string> properties = [];
 
 		if (objectNode.HasNode("properties"))
 		{

@@ -1,4 +1,5 @@
 ﻿namespace Azalea.Graphics;
+
 public enum BorderAlignment
 {
 	Outer,

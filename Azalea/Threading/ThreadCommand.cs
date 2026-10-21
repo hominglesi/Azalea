@@ -1,0 +1,44 @@
+﻿using System;
+
+namespace Azalea.Threading;
+
+public abstract class ThreadCommand
+{
+	public static volatile int TotalCreated = 0;
+	internal static Action<ThreadCommand>? OnCommandCreated;
+
+	internal ThreadCommand()
+	{
+		TotalCreated++;
+	}
+
+	public abstract void Return();
+	protected virtual void Cleanup() { }
+
+	public override string ToString() => GetType().Name;
+}
+
+[ThreadCommand(generateHandler: true)]
+public partial class InvokeActionCommand : ThreadCommand
+{
+	public Action Action;
+}
+
+[AttributeUsage(AttributeTargets.Class)]
+public sealed class ThreadCommandAttribute(bool awaitable = false, bool generateHandler = false, string? displayName = null) : Attribute
+{
+	private readonly bool _awaitable = awaitable;
+	private readonly bool _generateHandler = generateHandler;
+	private readonly string? _displayName = displayName;
+}
+
+public interface ICommandAwaitable
+{
+	public void Await();
+}
+
+public interface ICommandHandler<T>
+	where T : ThreadCommand
+{
+	public ICommandAwaitable? Enqueue(T command);
+}

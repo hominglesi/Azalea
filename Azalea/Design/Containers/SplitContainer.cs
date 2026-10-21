@@ -2,16 +2,17 @@
 using System.Numerics;
 
 namespace Azalea.Design.Containers;
+
 public class SplitContainer : Composition
 {
 	public SplitDirection Direction { get; set; } = SplitDirection.Horizontal;
 	public bool ReversedPriority { get; set; } = false;
 
-	private GameObject _firstObject;
-	private GameObject _secondObject;
+	private readonly GameObject _firstObject;
+	private readonly GameObject _secondObject;
 	public SplitContainerLine SplitLine { get; init; }
 
-	private float _minSize = 150;
+	private const float _minSize = 150;
 
 	public SplitContainer(GameObject firstObject, GameObject secondObject)
 	{
@@ -20,7 +21,7 @@ public class SplitContainer : Composition
 
 		SplitLine = CreateSplitLine();
 
-		AddRange(new GameObject[] { _firstObject, _secondObject, SplitLine });
+		AddRange([_firstObject, _secondObject, SplitLine]);
 	}
 
 	private void updateLayout()

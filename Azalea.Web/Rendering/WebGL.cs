@@ -1,5 +1,4 @@
 ﻿using Azalea.Graphics.Colors;
-using Azalea.Graphics.OpenGL.Enums;
 using System;
 using System.Runtime.InteropServices.JavaScript;
 

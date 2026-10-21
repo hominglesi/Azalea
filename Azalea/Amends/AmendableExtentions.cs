@@ -4,6 +4,7 @@ using System;
 using System.Numerics;
 
 namespace Azalea.Amends;
+
 public static class AmendableExtentions
 {
 	public static T Execute<T>(this T amendable, Action<T> action)

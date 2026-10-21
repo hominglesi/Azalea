@@ -1,12 +1,15 @@
 ﻿using Azalea.Extentions.MatrixExtentions;
 using Azalea.Graphics;
 using Azalea.Graphics.Primitives;
-using Azalea.Graphics.Rendering;
+using Azalea.IO.Resources;
 using Azalea.Numerics;
+using Azalea.Platform;
+using Azalea.Platform.Rendering.Coordination;
 using Azalea.Utils;
 using System.Numerics;
 
 namespace Azalea.Design.Shapes;
+
 public class Line : GameObject
 {
 	public Vector2 StartPoint { get; set; }
@@ -15,10 +18,8 @@ public class Line : GameObject
 
 	public float Thickness { get; set; } = 3;
 
-	public override void Draw(IRenderer renderer)
+	public override void Draw(RenderCoordinator coordinator)
 	{
-		base.Draw(renderer);
-
 		var distance = MathUtils.DistanceBetween(StartPoint, EndPoint);
 		var rectangle = new Rectangle(Vector2.Zero, new(distance, Thickness));
 		rectangle.Y -= Thickness / 2;
@@ -28,9 +29,8 @@ public class Line : GameObject
 		MatrixExtentions.TranslateFromLeft(ref matrix, StartPoint);
 		MatrixExtentions.RotateFromLeft(ref matrix, rotation);
 
-		renderer.DrawQuad(
-		Renderer.WhitePixel.GetNativeTexture(),
-		Quad.FromRectangle(rectangle) * matrix, //  quad * Info.Matrix,
-		DrawColorInfo);
+		coordinator.BindTexture(Assets.WhitePixelNative);
+		coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);
+		coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, Quad.FromRectangle(rectangle) * matrix, DrawColorQuad, Rectangle.One);
 	}
 }

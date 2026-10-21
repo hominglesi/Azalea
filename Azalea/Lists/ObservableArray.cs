@@ -21,7 +21,7 @@ public class ObservableArray<T> : IReadOnlyList<T>, IEquatable<ObservableArray<T
 
 	public bool Equals(ObservableArray<T>? other)
 	{
-		if (ReferenceEquals(null, other)) return false;
+		if (other is null) return false;
 		if (ReferenceEquals(this, other)) return true;
 
 		return _wrappedArray == other._wrappedArray;

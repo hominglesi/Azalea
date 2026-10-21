@@ -1,0 +1,146 @@
+﻿using Azalea.Platform.Rendering.Coordination;
+using Azalea.Platform.Rendering.OpenGL;
+using Azalea.Threading;
+using Azalea.Utils;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+
+namespace Azalea.Platform.Rendering;
+
+public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
+{
+	internal PlatformRenderer()
+	{
+		Thread = new RenderThread(this);
+	}
+
+	protected abstract void InitializationLogic();
+
+	private RenderCoordinator? _coordinator;
+	public RenderCoordinator Coordinator
+	{
+		get => _coordinator ??= new RenderCoordinator(this);
+	}
+
+	public Vector2Int FramebufferSize { get; set; } = Vector2Int.Zero;
+
+	public bool Stopped { get; private set; }
+	internal void Stop()
+	{
+		if (Stopped) return;
+
+		Thread.Stop();
+		Stopped = true;
+	}
+
+	#region Commands
+
+	protected abstract void HandleCommandLogic(RenderCommand command);
+
+	public ICommandAwaitable? Enqueue(RenderCommand command) => Thread.Enqueue(command);
+
+	private RenderCommandGroup? _stagedQueue = null;
+	private readonly Lock _stagedQueueLock = new();
+
+	internal int StagedQueueOverrides { get; private set; }
+
+	internal void StageQueue(RenderCommandGroup queue)
+	{
+		lock (_stagedQueueLock)
+		{
+			if (_stagedQueue is not null)
+			{
+				ObjectPool<RenderCommandGroup>.Return(_stagedQueue);
+				StagedQueueOverrides++;
+			}
+
+			_stagedQueue = queue;
+		}
+	}
+
+	internal RenderCommandGroup? RequestQueue()
+	{
+		lock (_stagedQueueLock)
+		{
+			var stagedQueue = _stagedQueue;
+			_stagedQueue = null;
+			return stagedQueue;
+		}
+	}
+
+	#endregion
+
+	#region RenderThread
+
+	internal readonly RenderThread Thread;
+
+	internal partial class RenderThread(PlatformRenderer renderer) : GameThread<RenderCommand>(1)
+	{
+		private readonly PlatformRenderer _renderer = renderer;
+
+		internal bool SnapshotNextFrame = false;
+		internal event Action<List<string>>? CommandSnapshotCreated;
+
+		public override string DisplayName => "Rendering Thread";
+
+		public ManualResetEvent InitializedEvent = new(false);
+		protected override void Initialize()
+		{
+			_renderer.InitializationLogic();
+			InitializedEvent.Set();
+		}
+
+		protected override void Update()
+		{
+			processStagedQueue();
+		}
+
+		protected override void HandleCommand(RenderCommand command)
+			=> _renderer.HandleCommandLogic(command);
+
+		internal int NoStagedQueueFrames { get; private set; }
+
+		private void processStagedQueue()
+		{
+			var stagedQueue = _renderer.RequestQueue();
+
+			if (stagedQueue is null)
+			{
+				NoStagedQueueFrames++;
+				return;
+			}
+
+			var commandSnapshot = SnapshotNextFrame ? new List<string>() : null;
+
+			var nextCommand = stagedQueue.Dequeue();
+			while (nextCommand is not null)
+			{
+				commandSnapshot?.Add(nextCommand.ToString());
+				HandleCommand(nextCommand);
+				nextCommand = stagedQueue.Dequeue();
+			}
+
+			ObjectPool<RenderCommandGroup>.Return(stagedQueue);
+
+			if (commandSnapshot is not null)
+			{
+				CommandSnapshotCreated?.Invoke(commandSnapshot);
+				SnapshotNextFrame = false;
+			}
+		}
+	}
+
+	#endregion
+
+	public static PlatformRenderer AttachRenderer(Windowing.PlatformWindow window)
+	{
+		var deviceContext = window.BorrowDeviceContext();
+
+		// For now OpenGL is hardcoded
+		var renderer = new GLRenderer(deviceContext);
+
+		window.Subscribe(renderer);
+		return renderer;
+	}
+}

@@ -1,5 +1,4 @@
 ﻿using Azalea.Design.Containers;
-using Azalea.Editing;
 using Azalea.Editor.Design;
 using Azalea.Graphics;
 using Azalea.Graphics.Sprites;
@@ -10,6 +9,7 @@ using Azalea.IO.Resources;
 using System.Collections.Generic;
 
 namespace Azalea.Editor.Views.ResourceExploring.Views;
+
 internal class LargeIconsExplorerView : ResourceExplorer
 {
 	private readonly Composition _contentContainer = new FlexContainer()
@@ -59,13 +59,16 @@ internal class LargeIconsExplorerView : ResourceExplorer
 		_contentContainer.Clear();
 	}
 
-	protected override void Update()
+	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		if (Input.GetKey(Keys.Left).Down)
+		if (e.Key == Keys.Left)
 			MoveBackward();
-
-		if (Input.GetKey(Keys.Right).Down)
+		else if (e.Key == Keys.Right)
 			MoveForward();
+		else
+			return false;
+
+		return true;
 	}
 
 	private class IconItem : Composition
@@ -115,7 +118,7 @@ internal class LargeIconsExplorerView : ResourceExplorer
 			];
 		}
 
-		private static ITexture getIcon(bool isDirectory)
+		private static Texture getIcon(bool isDirectory)
 			=> Assets.GetTexture($"Textures/{(isDirectory ? "directory" : "file")}-icon.png");
 
 		public void SetPath(string path, bool isDirectory)

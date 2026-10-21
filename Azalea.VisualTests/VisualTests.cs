@@ -1,6 +1,5 @@
 ﻿using Azalea.Amends;
 using Azalea.Design.Containers;
-using Azalea.Design.Scenes;
 using Azalea.Design.Shapes;
 using Azalea.Design.UserInterface;
 using Azalea.Graphics;
@@ -10,7 +9,6 @@ using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.IO.Configs;
 using Azalea.IO.Resources;
-using Azalea.Platform;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
@@ -23,19 +21,23 @@ public class VisualTests : AzaleaGame
 {
 	private const string __currentSceneKey = "currentScene";
 
-	private List<string> _tests;
-	private TestSelectScene _testSelectScene;
+	private readonly List<string> _tests;
+	private readonly TestSelectScene _testSelectScene;
+
+	static VisualTests()
+	{
+		Assets.AddToMainStore(new NamespacedResourceStore(new EmbeddedResourceStore(typeof(VisualTests).Assembly), "Resources"));
+		Assets.MainStore.AddMsdfFont("TitanOne-Regular", "Fonts/TitanOne-Regular.csv", "Fonts/TitanOne-Regular.bmp");
+	}
 
 	public VisualTests()
 	{
-		Assets.AddToMainStore(new NamespacedResourceStore(new EmbeddedResourceStore(typeof(VisualTests).Assembly), "Resources"));
-
-		Assets.MainStore.AddMsdfFont("TitanOne-Regular", "Fonts/TitanOne-Regular.csv", "Fonts/TitanOne-Regular.bmp");
 		_tests = ReflectionUtils.GetAllChildrenOf(typeof(TestScene)).Where(x => x.IsAbstract == false).Select(x => x.FullName).ToList()!;
 
-		_testSelectScene = new TestSelectScene(_tests);
+		_testSelectScene = new TestSelectScene(this, _tests);
 
 		BackgroundColor = new Color(40, 51, 60);
+		RelativeSizeAxes = Axes.Both;
 
 		var selectedTest = Config.Get(__currentSceneKey);
 		if (selectedTest is null || _tests.Contains(selectedTest) == false)
@@ -44,30 +46,45 @@ public class VisualTests : AzaleaGame
 			_testSelectScene.ChangeTest(selectedTest);
 	}
 
-	protected override void Update()
+	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		if (Input.GetKey(Keys.Escape).Down)
+		if (e.Key == Keys.Escape)
+		{
 			goToSceneSelect();
+			return true;
+		}
+
+		return false;
+	}
+
+	private GameObject? _currentScene;
+	private void setScene(GameObject scene)
+	{
+		_currentScene = scene;
+		Child = _currentScene;
 	}
 
 	private void goToSceneSelect()
 	{
-		var currentScene = SceneManager.CurrentScene;
-
-		if (currentScene == null || currentScene != _testSelectScene)
+		if (_currentScene == null || _currentScene != _testSelectScene)
 		{
-			SceneManager.ChangeScene(_testSelectScene);
-			Window.ClientSize = new(1600, 900);
-			Window.Center();
+			setScene(_testSelectScene);
+			App.Window.ClientSize = new(1600, 900);
+			App.Window.Center();
 		}
 	}
 
-	private class TestSelectScene : Scene
+	private class TestSelectScene : Composition
 	{
-		private FlexContainer _testContainer;
+		private readonly VisualTests _parent;
+		private readonly FlexContainer _testContainer;
 
-		public TestSelectScene(IEnumerable<string> tests)
+		public TestSelectScene(VisualTests parent, IEnumerable<string> tests)
 		{
+			_parent = parent;
+
+			RelativeSizeAxes = Axes.Both;
+
 			Add(_testContainer = new FlexContainer()
 			{
 				RelativeSizeAxes = Axes.Both,
@@ -93,16 +110,15 @@ public class VisualTests : AzaleaGame
 			var test = Activator.CreateInstance(Assembly.GetAssembly(typeof(VisualTests))!.FullName!, testName)!.Unwrap()
 			as TestScene;
 
-			SceneManager.ChangeScene(test!);
+			_parent.setScene(test!);
 			Config.Set(__currentSceneKey, testName);
 		}
 	}
 
 	private class TestButton : Button
 	{
-		private SpriteText _text;
-		private Sprite _background;
-		private Box _whiteOverlay;
+		private readonly SpriteText _text;
+		private readonly Box _whiteOverlay;
 
 		public TestButton()
 		{
@@ -112,7 +128,7 @@ public class VisualTests : AzaleaGame
 			BorderThickness = new(2);
 			Margin = new(4);
 
-			Add(_background = new()
+			Add(new Sprite()
 			{
 				RelativeSizeAxes = Axes.Both,
 				Texture = Assets.GetTexture("Textures/TestSelect/test-button.png")

@@ -1,6 +1,4 @@
-﻿using Azalea.Graphics.Rendering;
-using Azalea.Platform;
-using Azalea.Sounds;
+﻿using Azalea.Platform;
 using Azalea.Web.IO;
 using Azalea.Web.Rendering;
 using Azalea.Web.Sounds;
@@ -20,7 +18,7 @@ public class WebHost : GameHost
 
 		ConfigProvider = new WebConfigProvider();
 
-		Window.Closing += beforeClose;
+		//Window.Closing += beforeClose;
 	}
 
 	protected override void RunGameLoop()

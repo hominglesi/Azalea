@@ -1,4 +1,5 @@
 ﻿namespace Azalea.Utils;
+
 public abstract class UnmanagedObject<T> : Disposable
 {
 	public T Handle { get; init; }

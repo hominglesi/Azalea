@@ -1,10 +1,12 @@
-﻿using Azalea.Sounds;
+﻿using Azalea.Platform;
+using Azalea.Platform.Audio;
 using System;
 
 namespace Azalea.IO.Resources;
+
 public static partial class ResourceStoreExtentions
 {
-	private static ResourceCache<Sound> _soundCache = new();
+	private readonly static ResourceCache<Sound> _soundCache = new();
 
 	public static Sound GetSound(this IResourceStore store, string path)
 	{
@@ -16,7 +18,7 @@ public static partial class ResourceStoreExtentions
 		return sound;
 	}
 
-	private static ResourceCache<SoundByte> _soundByteCache = new();
+	private readonly static ResourceCache<SoundByte> _soundByteCache = new();
 
 	public static SoundByte GetSoundByte(this IResourceStore store, string path)
 	{
@@ -31,7 +33,7 @@ public static partial class ResourceStoreExtentions
 		catch (ArgumentException) { throw new ArgumentException("Sound Bytes only support .wav files"); }
 
 		var data = wav.Data.ToArray();
-		var sound = Audio.CreateSound(data, data.Length, wav.Format, wav.Frequency);
+		var sound = GameHost.Instance.Audio.CreateSoundByte(data, data.Length, wav.Format, wav.Frequency);
 
 		_soundByteCache.AddValue(store, path, sound);
 

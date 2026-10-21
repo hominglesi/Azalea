@@ -1,36 +1,14 @@
-﻿using Azalea.Graphics.Rendering;
+﻿using Azalea.Platform;
+using Azalea.Platform.Rendering.Coordination;
 using Azalea.Text;
 using System;
 using System.Numerics;
-
-#if OLDTEXT
-using System.Numerics;
-using System.Collections.Generic;
-using Azalea.Layout;
-using Azalea.Graphics.Primitives;
-using Azalea.Graphics.Textures;
-using System.Diagnostics;
-#else
-using Azalea.Graphics.Shaders;
-using Azalea.IO.Resources;
-#endif
 
 namespace Azalea.Graphics.Sprites;
 
 public class SpriteText : GameObject
 {
-	private static Shader _textShader;
-
-	static SpriteText()
-	{
-		_textShader = ShaderBuilder.FromShaderCode(
-			Assets.GetText("Shaders/quad_vertex.glsl")!,
-			Assets.GetText("Shaders/text_fragment.glsl")!);
-
-		ShaderLibrary.RegisterShader("TextShader", _textShader);
-	}
-
-	private TextLayoutProvider _layoutProvider = new();
+	private readonly TextLayoutProvider _layoutProvider = new();
 
 	public FontUsage Font
 	{
@@ -78,17 +56,17 @@ public class SpriteText : GameObject
 		set => throw new InvalidOperationException($"Cannot set {nameof(Size)} of {nameof(SpriteText)}");
 	}
 
-	public override void Draw(IRenderer renderer)
+	public override void Draw(RenderCoordinator coordinator)
 	{
-		renderer.BindShader(_textShader);
+		coordinator.BindShader(GameHost.Instance.Loader.DefaultTextShader);
 
 		foreach (var character in _layoutProvider.GetCharacters())
 		{
 			var quad = ToScreenSpace(character.DrawRectangle);
 
-			renderer.DrawQuad(character.Texture.GetNativeTexture(), quad, DrawColorInfo, character.Texture.GetUVCoordinates());
-		}
+			coordinator.BindTexture(character.Texture.NativeTexture);
 
-		renderer.BindShader(renderer.DefaultQuadShader);
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorQuad, character.Texture.UVCoordinates);
+		}
 	}
 }

@@ -10,7 +10,7 @@ namespace Azalea.Design.Containers;
 
 public abstract class FlowContainer : Composition
 {
-	private Dictionary<GameObject, float> _childOrder = new();
+	private readonly Dictionary<GameObject, float> _childOrder = [];
 
 	public FlowContainer()
 	{
@@ -117,7 +117,7 @@ public abstract class FlowContainer : Composition
 		}
 	}
 
-	public void PerformLayout()
+	public virtual void PerformLayout()
 	{
 		performLayout();
 		_layout.Validate();
@@ -126,13 +126,8 @@ public abstract class FlowContainer : Composition
 	public void AddNewLine(float newLineSize = 0)
 		=> Add(new FlowNewLine(newLineSize));
 
-	public class FlowNewLine : GameObject
+	public class FlowNewLine(float length = 0) : GameObject
 	{
-		public float Length { get; init; }
-
-		public FlowNewLine(float length = 0)
-		{
-			Length = length;
-		}
+		public float Length { get; init; } = length;
 	}
 }

@@ -2,6 +2,7 @@
 using System.Numerics;
 
 namespace Azalea.IO.Configs;
+
 public interface IConfigProvider
 {
 	internal void Save();

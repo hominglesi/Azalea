@@ -2,6 +2,7 @@
 using System.IO;
 
 namespace Azalea.IO.Resources;
+
 public class NamespacedResourceStore : IResourceStore
 {
 	private readonly IResourceStore _wrappedStore;

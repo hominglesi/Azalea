@@ -1,4 +1,5 @@
 ﻿namespace Azalea.VisualTests.UnitTesting;
+
 public class UnitTestBase
 {
 	private readonly string _parsedName;

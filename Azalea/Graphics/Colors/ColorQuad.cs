@@ -2,6 +2,7 @@
 using System.Diagnostics;
 
 namespace Azalea.Graphics.Colors;
+
 public partial struct ColorQuad : IEquatable<ColorQuad>
 {
 	public Color TopLeft;
@@ -87,7 +88,7 @@ public partial struct ColorQuad : IEquatable<ColorQuad>
 		return result;
 	}
 
-	public bool Equals(ColorQuad other)
+	public readonly bool Equals(ColorQuad other)
 	{
 		if (HasSingleColor == false)
 		{
@@ -102,7 +103,7 @@ public partial struct ColorQuad : IEquatable<ColorQuad>
 		return other.HasSingleColor && SingleColor.Equals(other.SingleColor);
 	}
 
-	public override bool Equals(object? obj) => obj is ColorQuad other && Equals(other);
+	public readonly override bool Equals(object? obj) => obj is ColorQuad other && Equals(other);
 	public static bool operator ==(ColorQuad left, ColorQuad right) => left.Equals(right);
 	public static bool operator !=(ColorQuad left, ColorQuad right) => left.Equals(right) == false;
 

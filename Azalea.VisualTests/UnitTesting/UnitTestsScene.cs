@@ -1,9 +1,10 @@
 ﻿using Azalea.Graphics;
-using Azalea.Graphics.Rendering;
 using Azalea.IO.Configs;
+using Azalea.Platform.Rendering;
 using System;
 
 namespace Azalea.VisualTests.UnitTesting;
+
 public class UnitTestsScene : TestScene
 {
 	private readonly static float __menuBarHeight = 30;
@@ -16,8 +17,6 @@ public class UnitTestsScene : TestScene
 
 	public UnitTestsScene()
 	{
-		Renderer.ClearColor = new(255, 248, 211);
-
 		_manager = new UnitTestsManager();
 
 		Add(_menuBar = new UnitTestMenuBar()
@@ -74,6 +73,11 @@ public class UnitTestsScene : TestScene
 		});
 
 		displayUnitTest(_manager.SelectedUnitTest);
+	}
+
+	protected override void Initialize()
+	{
+		App.Renderer.SetClearColor(new(255, 248, 211));
 	}
 
 	private void populateSuiteSelectMenu()

@@ -1,11 +1,13 @@
 ﻿using Azalea.Graphics;
 using Azalea.Graphics.Primitives;
-using Azalea.Graphics.Rendering;
 using Azalea.IO.Tiled;
+using Azalea.Platform;
+using Azalea.Platform.Rendering.Coordination;
 using System.Numerics;
 using static Azalea.IO.Tiled.Tilemap;
 
 namespace Azalea.Design.Tiled;
+
 public class TiledLayer : GameObject
 {
 	protected Tilemap Tilemap { get; init; }
@@ -23,7 +25,7 @@ public class TiledLayer : GameObject
 	public TiledLayer(Tilemap tilemap, int layer)
 		: this(tilemap, tilemap.Layers[layer]) { }
 
-	public override void Draw(IRenderer renderer)
+	public override void Draw(RenderCoordinator coordinator)
 	{
 		var startPosition = ScreenSpaceDrawQuad.TopLeft;
 		var tileSize = ScreenSpaceDrawQuad.Size / new Vector2(Tilemap.Width, Tilemap.Height);
@@ -51,11 +53,12 @@ public class TiledLayer : GameObject
 				var sizeRatio = texture.Size / Tilemap.TileSize;
 				var quad = new Quad(startPosition + offset - allowedPadding, tileSize * sizeRatio + allowedPadding);
 
-				renderer.DrawQuad(
-					texture.GetNativeTexture(),
-					quad,
-					DrawColorInfo,
-					texture.GetUVCoordinates());
+				if (texture is null)
+					continue;
+
+				coordinator.BindTexture(texture.NativeTexture);
+				coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);
+				coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, quad, DrawColorQuad, texture.UVCoordinates);
 			}
 		}
 	}

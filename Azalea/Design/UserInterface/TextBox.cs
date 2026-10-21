@@ -7,13 +7,14 @@ using System;
 using System.Numerics;
 
 namespace Azalea.Design.UserInterface;
-public abstract class TextBox : TextContainer
+
+public abstract class TextBox(Action<SpriteText>? creationParameters = null) : TextContainer(creationParameters)
 {
 	private int _caratPosition = 0;
-	public TextBox(Action<SpriteText>? defaultCreationParameters = null)
-		: base(defaultCreationParameters)
+
+	protected override void Initialize()
 	{
-		Input.OnTextInput += onTextInput;
+		App.Input.State.OnCharInput += onTextInput;
 	}
 
 	private string _text = "";
@@ -58,7 +59,7 @@ public abstract class TextBox : TextContainer
 		if (e.Key == Keys.Left) moveCarat(-1);
 		if (e.Key == Keys.Right) moveCarat(1);
 
-		if (e.Key == Keys.V && Input.GetKey(Keys.ControlLeft).Pressed)
+		if (e.Key == Keys.V && e.State.ControlPressed)
 		{
 			var clipboardText = Clipboard.GetText() ?? "";
 			var newText = _text.Insert(_caratPosition, clipboardText);
@@ -66,7 +67,7 @@ public abstract class TextBox : TextContainer
 			Text = newText;
 		}
 
-		if (e.Key == Keys.C && Input.GetKey(Keys.ControlLeft).Pressed)
+		if (e.Key == Keys.C && e.State.ControlPressed)
 			Clipboard.SetText(_text);
 
 		return base.OnKeyDown(e);
@@ -102,10 +103,10 @@ public abstract class TextBox : TextContainer
 	{
 		if (_caratPosition == 0) return;
 
-		var newText = _text.Substring(0, _caratPosition - 1);
+		var newText = _text[..(_caratPosition - 1)];
 
 		if (_caratPosition < _text.Length)
-			newText += _text.Substring(_caratPosition, _text.Length - _caratPosition);
+			newText += _text[_caratPosition..];
 
 		_caratPosition--;
 
@@ -147,7 +148,7 @@ public abstract class TextBox : TextContainer
 
 				caratIndex += text.Text.Length;
 			}
-			else if (child is FlowNewLine line)
+			else if (child is FlowNewLine)
 			{
 				caratIndex++;
 			}

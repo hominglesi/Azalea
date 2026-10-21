@@ -1,26 +1,19 @@
 ﻿using Azalea.Graphics.Primitives;
+using Azalea.Native.Windows;
 using System;
 
 namespace Azalea.Numerics;
 
-public struct RectangleInt : IEquatable<RectangleInt>
+public struct RectangleInt(int x, int y, int width, int height) : IEquatable<RectangleInt>
 {
 	public static RectangleInt Zero { get; } = new RectangleInt(0, 0, 0, 0);
 	public static RectangleInt One { get; } = new RectangleInt(0, 0, 1, 1);
 
-	public int X;
-	public int Y;
+	public int X = x;
+	public int Y = y;
 
-	public int Width;
-	public int Height;
-
-	public RectangleInt(int x, int y, int width, int height)
-	{
-		X = x;
-		Y = y;
-		Width = width;
-		Height = height;
-	}
+	public int Width = width;
+	public int Height = height;
 
 	public RectangleInt(Vector2Int position, Vector2Int size)
 		: this(position.X, position.Y, size.X, size.Y) { }
@@ -59,4 +52,7 @@ public struct RectangleInt : IEquatable<RectangleInt>
 			(int)Math.Round(quad.BottomRight.X - quad.TopLeft.X), (int)Math.Round(quad.BottomRight.Y - quad.TopLeft.Y));
 	public override readonly int GetHashCode() => HashCode.Combine(X, Y, Width, Height);
 	public override readonly string ToString() => $"{X}, {Y}, {Width}, {Height}";
+
+	public static explicit operator RectangleInt(Win32.RECT rect) =>
+		new(rect.X, rect.Y, rect.Width, rect.Height);
 }

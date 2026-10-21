@@ -4,14 +4,14 @@ using System.Collections.Generic;
 
 namespace Azalea.Lists;
 
-public class SortedList<T> : ICollection<T>, IReadOnlyList<T>
+public class SortedList<T>(IComparer<T> comparer) : ICollection<T>, IReadOnlyList<T>
 {
-	private readonly List<T> _list;
+	private readonly List<T> _list = [];
 
 	public int Count => _list.Count;
 	bool ICollection<T>.IsReadOnly => ((ICollection<T>)_list).IsReadOnly;
 
-	public IComparer<T> Comparer { get; }
+	public IComparer<T> Comparer { get; } = comparer;
 
 	public T this[int index]
 	{
@@ -21,12 +21,6 @@ public class SortedList<T> : ICollection<T>, IReadOnlyList<T>
 
 	public SortedList()
 		: this(Comparer<T>.Default) { }
-
-	public SortedList(IComparer<T> comparer)
-	{
-		_list = new List<T>();
-		Comparer = comparer;
-	}
 
 	public void AddRange(IEnumerable<T> collection)
 	{

@@ -6,6 +6,7 @@ using Azalea.Inputs.Events;
 using System.Collections.Generic;
 
 namespace Azalea.Design.Controls;
+
 public class DropDownMenuControl : AbstractDropDownMenu<string>
 {
 	private readonly SpriteText _selectedItemText;

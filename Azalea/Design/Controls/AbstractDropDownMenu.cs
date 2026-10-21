@@ -1,11 +1,11 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
-using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using System;
 using System.Collections.Generic;
 
 namespace Azalea.Design.Controls;
+
 public abstract class AbstractDropDownMenu<T> : Composition
 	where T : IEquatable<T>
 {
@@ -92,15 +92,12 @@ public abstract class AbstractDropDownMenu<T> : Composition
 		return true;
 	}
 
-	protected override void Update()
+	protected override void OnMouseUp(MouseUpEvent e)
 	{
-		if (Input.GetMouseButton(MouseButton.Left).Up)
-		{
-			foreach (var item in Input.GetHoveredObjects())
-				if (item == this || item == ExpandedSegment)
-					return;
+		foreach (var item in e.State.HoveredObjects)
+			if (item == this || item == ExpandedSegment)
+				return;
 
-			Contract();
-		}
+		Contract();
 	}
 }

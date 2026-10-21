@@ -40,8 +40,7 @@ public class BasicButton : Button
 	{
 		Size = new Vector2(200, 70);
 		BackgroundColor = Palette.Blue;
-		AddRange(new GameObject[]
-		{
+		AddRange([
 			HoveredBackground = new Box()
 			{
 				RelativeSizeAxes = Axes.Both,
@@ -55,7 +54,7 @@ public class BasicButton : Button
 				Anchor = Anchor.Center,
 				Origin = Anchor.Center
 			}
-		});
+		]);
 	}
 
 	protected override bool OnHover(HoverEvent e)

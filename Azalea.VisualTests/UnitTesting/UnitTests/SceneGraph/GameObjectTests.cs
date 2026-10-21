@@ -6,6 +6,7 @@ using System.Numerics;
 #pragma warning disable CS8602, CS8618
 
 namespace Azalea.VisualTests.UnitTesting.UnitTests.SceneGraph;
+
 public class GameObjectTests : UnitTestSuite
 {
 	public class GameObjectNegativeSizeTest : UnitTest

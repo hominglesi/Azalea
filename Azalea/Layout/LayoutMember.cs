@@ -2,18 +2,12 @@
 
 namespace Azalea.Layout;
 
-public abstract class LayoutMember
+public abstract class LayoutMember(Invalidation invalidation, InvalidationSource source = InvalidationSource.Default)
 {
-	public readonly Invalidation Invalidation;
-	public readonly InvalidationSource Source;
+	public readonly Invalidation Invalidation = invalidation;
+	public readonly InvalidationSource Source = source;
 	internal GameObject? Parent;
 	internal LayoutMember? Next;
-
-	public LayoutMember(Invalidation invalidation, InvalidationSource source = InvalidationSource.Default)
-	{
-		Invalidation = invalidation;
-		Source = source;
-	}
 
 	public bool IsValid { get; private set; }
 

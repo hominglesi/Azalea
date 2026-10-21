@@ -6,15 +6,16 @@ using Azalea.IO.Resources;
 using System;
 
 namespace Azalea.Editor.Design.Gui;
+
 public class GUICheckbox : FlexContainer
 {
 	private readonly Sprite _checkmarkSprite;
 
-	private bool _checked;
+	public bool Checked { get; private set; }
 
 	internal GUICheckbox(string name, bool @checked)
 	{
-		_checked = @checked;
+		Checked = @checked;
 
 		RelativeSizeAxes = Axes.X;
 		AutoSizeAxes = Axes.Y;
@@ -26,22 +27,22 @@ public class GUICheckbox : FlexContainer
 
 		AddRange([
 			new Composition(){
-				Size = new(19),
+				Size = new(GUIConstants.ElementHeight),
 				Children = [
 					new Box(){
 						RelativeSizeAxes = Axes.Both,
 						Color = GUIConstants.Colors.AccentColor,
 						ClickAction = _ => {
-							_checked = !_checked;
-							_checkmarkSprite!.Alpha = _checked? 1 : 0;
-							_checkedChanged?.Invoke(_checked);
+							Checked = !Checked;
+							_checkmarkSprite!.Alpha = Checked? 1 : 0;
+							_checkedChanged?.Invoke(Checked);
 						}
 					},
 					_checkmarkSprite = new Sprite(){
 						Texture = Assets.GetTexture("Gui/checkmark.png"),
 						Origin = Anchor.Center,
 						Anchor = Anchor.Center,
-						Alpha = _checked ? 1 : 0
+						Alpha = Checked ? 1 : 0
 					}
 				]
 			},

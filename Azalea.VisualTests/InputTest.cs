@@ -5,6 +5,7 @@ using Azalea.Inputs.Events;
 using System;
 
 namespace Azalea.VisualTests;
+
 public class InputTest : TestScene
 {
 	public InputTest()
@@ -24,22 +25,20 @@ public class InputTest : TestScene
 		});
 	}
 
-	protected override void Update()
+	protected override bool OnKeyDown(KeyDownEvent e)
 	{
-		if (Input.GetKey(Keys.P).Down)
-			Console.WriteLine("P recieved directly");
+		if (e.Key == Keys.P)
+		{
+			Console.WriteLine("P down");
+			return true;
+		}
 
-		//Console.WriteLine(Input.GetGamepad(1).GetLeftStick().GetVectorNormalized());
-		//Console.WriteLine(Input.GetGamepad(0).GetRightStick().GetVector());
+		return false;
 	}
 
-	private class InputLoggingObject : Box
+	private class InputLoggingObject(string name) : Box
 	{
-		private string _name;
-		public InputLoggingObject(string name)
-		{
-			_name = name;
-		}
+		private readonly string _name = name;
 
 		protected override bool OnHover(HoverEvent e)
 		{

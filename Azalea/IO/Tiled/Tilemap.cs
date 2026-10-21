@@ -8,6 +8,7 @@ using System.IO;
 using System.Numerics;
 
 namespace Azalea.IO.Tiled;
+
 public readonly struct Tilemap
 {
 	public string Orientation { get; init; }
@@ -23,7 +24,7 @@ public readonly struct Tilemap
 	public TileObject[] Objects { get; init; }
 	public TilemapLayer[] Layers { get; init; }
 
-	public ITexture GetTextureById(int id)
+	public Texture GetTextureById(int id)
 	{
 		foreach (var tileset in Tilesets)
 			if (id >= tileset.FirstId && id < tileset.FirstId + tileset.Source.TileCount)
@@ -110,35 +111,22 @@ public readonly struct Tilemap
 			TileHeight = tileHeight,
 			TileSize = new(tileWidth, tileHeight),
 			PixelSize = new(width * tileWidth, height * tileHeight),
-			Tilesets = tilesets.ToArray(),
-			Objects = objs.ToArray(),
-			Layers = layers.ToArray()
+			Tilesets = [.. tilesets],
+			Objects = [.. objs],
+			Layers = [.. layers]
 		};
 	}
 
-	public readonly struct TilemapSource
+	public readonly struct TilemapSource(int firstId, Tileset source)
 	{
-		public int FirstId { get; init; }
-		public Tileset Source { get; init; }
-
-		public TilemapSource(int firstId, Tileset source)
-		{
-			FirstId = firstId;
-			Source = source;
-		}
+		public int FirstId { get; init; } = firstId;
+		public Tileset Source { get; init; } = source;
 	}
 
-	public readonly struct TilemapLayer
+	public readonly struct TilemapLayer(int id, string name, int[,] data)
 	{
-		public int Id { get; init; }
-		public string Name { get; init; }
-		public int[,] Data { get; init; }
-
-		public TilemapLayer(int id, string name, int[,] data)
-		{
-			Id = id;
-			Name = name;
-			Data = data;
-		}
+		public int Id { get; init; } = id;
+		public string Name { get; init; } = name;
+		public int[,] Data { get; init; } = data;
 	}
 }

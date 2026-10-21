@@ -6,112 +6,144 @@ using Azalea.Graphics.Colors;
 using Azalea.Graphics.Sprites;
 using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
+using Azalea.Platform;
+using Azalea.Utils.Proxies;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 
 namespace Azalea.Editor.Design.Gui;
+
 public class GUIWindow : BasicWindowContainer
 {
 	private const float __titleBarHeight = 20;
 
+	private readonly Application _app;
 	private readonly Vector2 _size;
 
 	private readonly GameObject _titleBar;
 	private readonly ScrollableContainer _scrollable;
 	private readonly FlexContainer _content;
 
-	internal GUIWindow(string title, Vector2 size)
+	internal GUIWindow(Application app, string title, Vector2 position, Vector2 size)
 	{
+		_app = app;
 		Masking = true;
-		Position = new(100);
+		Position = position;
 		Size = _size = size;
-		AddRange([
-			_titleBar = new TitleBar(title, __titleBarHeight, new Color(41, 74, 122), true){
-				ExpandedChanged = expanded =>{
-					if(expanded)
-					{
-						Add(_scrollable!);
-						Size = _size;
-					}
-					else
-					{
-						Remove(_scrollable!);
-						Size = new(_size.X, __titleBarHeight);
-					}
+
+		// We don't use AddRange since it wouldn't use the overridden base.Add
+		base.Add(_titleBar = new TitleBar(title, __titleBarHeight, new Color(41, 74, 122), true)
+		{
+			ExpandedChanged = expanded =>
+			{
+				if (expanded)
+				{
+					base.Add(_scrollable!);
+					Size = _size;
 				}
-			},
-			_scrollable = new WindowScrollableContainer(){
-				RelativeSizeAxes = Axes.Both,
-				NegativeSize = new(0, __titleBarHeight),
-				Y = __titleBarHeight,
-				BackgroundColor = new Color(21, 22, 23),
-				Child = _content = new FlexContainer(){
-					RelativeSizeAxes = Axes.X,
-					AutoSizeAxes = Axes.Y,
-					Padding = new(top: 8, right: 5, bottom: 5, left: 5),
-					Direction = FlexDirection.Vertical,
-					Spacing = new(0, 4)
+				else
+				{
+					Remove(_scrollable!);
+					Size = new(_size.X, __titleBarHeight);
 				}
 			}
-
-		]);
+		});
+		base.Add(new CloseButton(__titleBarHeight)
+		{
+			Origin = Anchor.TopRight,
+			Anchor = Anchor.TopRight,
+			ClickAction = _ => Hide()
+		});
+		base.Add(_scrollable = new WindowScrollableContainer()
+		{
+			RelativeSizeAxes = Axes.Both,
+			NegativeSize = new(0, __titleBarHeight),
+			Y = __titleBarHeight,
+			BackgroundColor = new Color(21, 22, 23),
+			Child = _content = new FlexContainer()
+			{
+				RelativeSizeAxes = Axes.X,
+				AutoSizeAxes = Axes.Y,
+				Padding = new(top: 8, right: 5, bottom: 5, left: 5),
+				Direction = FlexDirection.Vertical,
+				Spacing = new(0, 4)
+			}
+		});
 
 		AddDragableSurface(_titleBar);
 	}
 
-	public static GUIWindow Create(string title, Vector2 size)
+	public static GUIWindow Create(Application app, string title, Vector2 position, Vector2 size)
 	{
-		// EditorWrapper might have not been referenced yet 
-		// so the resources would not be loaded yet
-		_ = EditorWrapper.Instance;
-
-		var window = new GUIWindow(title, size);
-		EditorWrapper.Instance.Add(window);
+		var window = new GUIWindow(app, title, position, size);
+		app.Game.Add(window);
 		return window;
 	}
 
-	private void addToWindow(GameObject obj)
+	public override void Add(GameObject gameObject)
 	{
 		if (_groupStack.Count == 0)
-			_content.Add(obj);
+			_content.Add(gameObject);
 		else
-			_groupStack.Peek().Add(obj);
+			_groupStack.Peek().Add(gameObject);
 	}
 
-	private readonly Stack<GUIGroup> _groupStack = [];
+	public static void RemoveElement(GameObject obj) => obj.Parent!.Remove(obj);
+
+	private readonly Stack<Composition> _groupStack = [];
 
 	public GUIGroup AddGroup(string name)
 	{
 		var group = new GUIGroup(name);
-		addToWindow(group);
-		_groupStack.Push(group);
+		Add(group);
+		SelectGroup(group);
 		return group;
 	}
 
-	public void FinishGroup()
-	{
-		_groupStack.Pop();
-	}
+	public void SelectGroup(Composition group) => _groupStack.Push(group);
+	public void FinishGroup() => _groupStack.Pop();
 
 	public GUILabel AddLabel(string text)
 	{
 		var label = new GUILabel(text);
-		addToWindow(label);
+		Add(label);
 		return label;
 	}
 
 	public GUILabelContinuous AddLabel(Func<string> textFunction)
 	{
 		var label = new GUILabelContinuous(textFunction);
-		addToWindow(label);
+		Add(label);
 		return label;
+	}
+
+	public GUICounter AddCounter(string text, int value)
+	{
+		var counter = new GUICounter(text, value);
+		Add(counter);
+		return counter;
+	}
+
+	public GUIPropertyLabel<T> AddPropertyLabel<T>(string label, IProxy<T> proxy,
+		string? displayString = null)
+	{
+		var propertyLabel = new GUIPropertyLabel<T>(label, proxy, displayString);
+		Add(propertyLabel);
+		return propertyLabel;
+	}
+
+	public GUIButton AddButton(string text, Action clickAction)
+	{
+		var button = new GUIButton(text, clickAction);
+		Add(button);
+		return button;
 	}
 
 	public GUICheckbox AddCheckbox(string name, bool @checked = false)
 	{
 		var checkbox = new GUICheckbox(name, @checked);
-		addToWindow(checkbox);
+		Add(checkbox);
 		return checkbox;
 	}
 
@@ -121,7 +153,16 @@ public class GUIWindow : BasicWindowContainer
 	{
 		var sliderFloat = new GUISliderFloat(
 			name, minValue, maxValue, initialValue, stringFormat, continuous);
-		addToWindow(sliderFloat);
+		Add(sliderFloat);
+		return sliderFloat;
+	}
+
+	public GUIPropertySliderFloat AddPropertySliderFloat(string name, IProxy<float> proxy,
+		float minValue = 0, float maxValue = 1, string stringFormat = "0.000")
+	{
+		var sliderFloat = new GUIPropertySliderFloat(
+			name, proxy, minValue, maxValue, stringFormat);
+		Add(sliderFloat);
 		return sliderFloat;
 	}
 
@@ -130,7 +171,7 @@ public class GUIWindow : BasicWindowContainer
 		if (Parent is null)
 			return;
 
-		EditorWrapper.Instance.Remove(this);
+		_app.Game.Remove(this);
 	}
 
 	public void Show()
@@ -138,7 +179,7 @@ public class GUIWindow : BasicWindowContainer
 		if (Parent is not null)
 			return;
 
-		EditorWrapper.Instance.Add(this);
+		_app.Game.Add(this);
 	}
 
 	protected override bool OnHover(HoverEvent e) => true;
@@ -154,6 +195,7 @@ public class GUIWindow : BasicWindowContainer
 		}
 
 		private readonly DropDownArrow _dropDownArrow;
+		internal readonly SpriteText Label;
 
 		public TitleBar(string title, float height, Color color, bool expanded)
 		{
@@ -168,7 +210,7 @@ public class GUIWindow : BasicWindowContainer
 
 			AddRange([
 				_dropDownArrow = new DropDownArrow(expanded),
-				new SpriteText(){
+				Label = new SpriteText(){
 					Text = title,
 					Font = GUIConstants.Font
 				}
@@ -189,7 +231,6 @@ public class GUIWindow : BasicWindowContainer
 				Size = new(20);
 				Add(_sprite = new Sprite()
 				{
-					Size = new(10),
 					Texture = Assets.GetTexture($"Gui/arrow-{(_expanded ? "down" : "up")}.png"),
 					Anchor = Anchor.Center,
 					Origin = Anchor.Center
@@ -206,6 +247,32 @@ public class GUIWindow : BasicWindowContainer
 			}
 		}
 	}
+
+	internal class CloseButton : Composition
+	{
+		public CloseButton(float size)
+		{
+			Size = new(size);
+			Add(new Sprite()
+			{
+				Texture = Assets.GetTexture($"Gui/cross.png"),
+				Origin = Anchor.Center,
+				Anchor = Anchor.Center
+			});
+		}
+
+		protected override bool OnHover(HoverEvent e)
+		{
+			BackgroundColor = new Color(255, 255, 255, 60);
+			return true;
+		}
+
+		protected override void OnHoverLost(HoverLostEvent e)
+		{
+			BackgroundColor = new Color(255, 255, 255, 0);
+		}
+	}
+
 	internal class WindowScrollableContainer : ScrollableContainer
 	{
 		protected override Slider CreateSlider()

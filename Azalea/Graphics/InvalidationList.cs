@@ -37,13 +37,13 @@ internal struct InvalidationList
 			| validate(childInvalidation, validation, out childInvalidation);
 	}
 
-	private bool invalidate(Invalidation target, Invalidation flags, out Invalidation result)
+	private static bool invalidate(Invalidation target, Invalidation flags, out Invalidation result)
 	{
 		result = target | (flags & Invalidation.Layout);
 		return (target & flags) != flags;
 	}
 
-	private bool validate(Invalidation target, Invalidation flags, out Invalidation result)
+	private static bool validate(Invalidation target, Invalidation flags, out Invalidation result)
 	{
 		result = target & ~flags;
 		return (target & flags) != 0;

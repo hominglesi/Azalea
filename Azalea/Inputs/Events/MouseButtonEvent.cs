@@ -2,15 +2,15 @@
 
 namespace Azalea.Inputs.Events;
 
-public class MouseButtonEvent : InputEvent
+public class MouseButtonEvent(MouseButton button, Vector2 position) : InputEvent
 {
-	public readonly MouseButton Button;
+	public readonly MouseButton Button = button;
 
-	public readonly Vector2 Position;
+	public readonly Vector2 Position = position;
 
-	protected MouseButtonEvent(MouseButton button, Vector2 position)
+	public void Deconstruct(out MouseButton button, out Vector2 position)
 	{
-		Button = button;
-		Position = position;
+		button = Button;
+		position = Position;
 	}
 }

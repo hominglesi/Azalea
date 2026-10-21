@@ -2,11 +2,6 @@
 
 namespace Azalea.Inputs.Events;
 
-public class MouseDownEvent : MouseButtonEvent
-{
-	public MouseDownEvent(MouseButton button, Vector2 position)
-		: base(button, position)
-	{
-
-	}
-}
+public class MouseDownEvent(MouseButton button, Vector2 position)
+	: MouseButtonEvent(button, position)
+{ }

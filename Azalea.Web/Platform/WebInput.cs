@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices.JavaScript;
 
 namespace Azalea.Web.Platform;
+
 internal static partial class WebInput
 {
 	private const string ImportString = "JSImports";

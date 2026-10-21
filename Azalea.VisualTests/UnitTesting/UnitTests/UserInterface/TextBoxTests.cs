@@ -3,11 +3,11 @@ using Azalea.Design.UserInterface.Basic;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Inputs;
-using Azalea.Utils;
 
 #pragma warning disable CS8602, CS8618
 
-namespace Azalea.VisualTests.UnitTesting.UserInterface.UserInput;
+namespace Azalea.VisualTests.UnitTesting.UnitTests.UserInterface;
+
 public class TextBoxTests : UnitTestSuite
 {
 	public class InputTest : UnitTest
@@ -18,27 +18,27 @@ public class TextBoxTests : UnitTestSuite
 		{
 			AddOperation("Input 'Lorem Ipsum'", () =>
 			{
-				Input.ChangeFocus(_textBox);
-				InputUtils.SimulateCharInput("Lorem Ipsum");
+				App.Input.ChangeFocus(_textBox);
+				App.Input.SimulateCharInput("Lorem Ipsum");
 			});
 			AddResult("Check if Text is 'Lorem Ipsum'", () => _textBox.Text == "Lorem Ipsum");
 
 			AddOperation("Press Backspace twice", () =>
 			{
-				Input.ChangeFocus(_textBox);
-				InputUtils.SimulateMultipleKeyInput(Keys.Backspace, 2);
+				App.Input.ChangeFocus(_textBox);
+				App.Input.SimulateKeyInput(Keys.Backspace, 2);
 			});
 			AddResult("Check if Text is 'Lorem Ips'", () => _textBox.Text == "Lorem Ips");
 
 			AddOperation("Press Left arrow 3 times", () =>
 			{
-				Input.ChangeFocus(_textBox);
-				InputUtils.SimulateMultipleKeyInput(Keys.Left, 3);
+				App.Input.ChangeFocus(_textBox);
+				App.Input.SimulateKeyInput(Keys.Left, 3);
 			});
 			AddOperation("Input 'ch'", () =>
 			{
-				Input.ChangeFocus(_textBox);
-				InputUtils.SimulateCharInput("ch");
+				App.Input.ChangeFocus(_textBox);
+				App.Input.SimulateCharInput("ch");
 			});
 			AddResult("Check if Text is 'Lorem chIps'", () => _textBox.Text == "Lorem chIps");
 

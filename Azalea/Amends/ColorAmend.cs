@@ -2,11 +2,10 @@
 using Azalea.Utils;
 
 namespace Azalea.Amends;
-public class ColorAmend<T> : TimedPropertyAmend<T, ColorQuad>
-{
-	public ColorAmend(T target, string propertyName, ColorQuad value, float duration, bool relative)
-			: base(target, propertyName, value, duration, relative) { }
 
+public class ColorAmend<T>(T target, string propertyName, ColorQuad value, float duration, bool relative)
+	: TimedPropertyAmend<T, ColorQuad>(target, propertyName, value, duration, relative)
+{
 	protected override void SetStartAndTargetValue(ColorQuad value, ColorQuad currentValue, bool relative)
 	{
 		StartingValue = currentValue;

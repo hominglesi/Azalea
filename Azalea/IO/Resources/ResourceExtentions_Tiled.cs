@@ -2,9 +2,10 @@
 using Azalea.IO.Tiled;
 
 namespace Azalea.IO.Resources;
+
 public static partial class ResourceStoreExtentions
 {
-	private static ResourceCache<Tileset> _tilesetCache = new();
+	private readonly static ResourceCache<Tileset> _tilesetCache = new();
 	public static Tileset GetTileset(this IResourceStore store, string path)
 	{
 		if (_tilesetCache.TryGetValue(store, path, out var cached))
@@ -16,7 +17,7 @@ public static partial class ResourceStoreExtentions
 		return tileset;
 	}
 
-	private static ResourceCache<Tilemap> _tilemapCache = new();
+	private readonly static ResourceCache<Tilemap> _tilemapCache = new();
 	public static Tilemap GetTilemap(this IResourceStore store, string path)
 	{
 		if (_tilemapCache.TryGetValue(store, path, out var cached))
@@ -28,7 +29,7 @@ public static partial class ResourceStoreExtentions
 		return tilemap;
 	}
 
-	private static ResourceCache<TileObject> _templateCache = new();
+	private readonly static ResourceCache<TileObject> _templateCache = new();
 	internal static TileObject GetTemplate(this IResourceStore store, string path)
 	{
 		if (_templateCache.TryGetValue(store, path, out var cached))

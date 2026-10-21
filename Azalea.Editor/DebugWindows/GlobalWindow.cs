@@ -1,0 +1,162 @@
+﻿using Azalea.Editor.DebugWindows.Inspectors;
+using Azalea.Editor.Design.Gui;
+using Azalea.Platform;
+using Azalea.Platform.Audio;
+using Azalea.Platform.Loading;
+using Azalea.Platform.Rendering;
+using Azalea.Platform.Windowing;
+using Azalea.Threading;
+using Azalea.Utils;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+
+namespace Azalea.Editor.DebugWindows;
+
+internal class GlobalWindow(AzaleaGame game)
+{
+	private readonly AzaleaGame _game = game;
+	private GUIWindow? _window;
+	private bool _shown = false;
+
+	public void Toggle()
+	{
+		_shown = !_shown;
+		if (_shown) show();
+		else hide();
+	}
+
+	private void show()
+	{
+		if (_window is null)
+		{
+			_window = GUIWindow.Create(_game.App, "Global", new(100), new(400, 400));
+
+			_window.AddGroup("Host");
+			_window.AddButton("Inspect PlatformAudio",
+					() => PlatformAudioInspector.Create(_game.App, GameHost.Instance.Audio, _window));
+			var applicationsGroup = _window.AddGroup("Applications");
+			var applicationGroups = new Dictionary<Application, GUIGroup>();
+
+			void createApplicationGroup(Application application)
+			{
+				_window!.SelectGroup(applicationsGroup);
+				var group = _window!.AddGroup("Application");
+				_window.AddButton("Close", () => application.Close());
+
+				_window.AddButton("Inspect PlatformWindow",
+					() => PlatformWindowInspector.Create(_game.App, application.Window, _window));
+				_window.AddButton("Inspect PlatformRenderer",
+					() => PlatformRendererInspector.Create(_game.App, application.Renderer, _window));
+				_window.AddButton("Inspect PlatformScheduler",
+					() => PlatformSchedulerInspector.Create(_game.App, application.Scheduler, _window));
+
+				_window.FinishGroup();
+				_window.FinishGroup();
+				applicationGroups.Add(application, group);
+			}
+
+			void removeApplicationGroup(Application application)
+			{
+				var group = applicationGroups[application];
+				applicationGroups.Remove(application);
+				applicationsGroup.Remove(group);
+			}
+
+			foreach (var application in GameHost.Instance.Applications)
+				createApplicationGroup(application);
+
+			_window.FinishGroup();
+
+			GameHost.Instance.Applications.OnItemAdded +=
+				applicaiton => _window.App.Scheduler.InvokeAction(() => createApplicationGroup(applicaiton));
+			GameHost.Instance.Applications.OnItemRemoved +=
+				application => _window.App.Scheduler.InvokeAction(() => removeApplicationGroup(application));
+
+			_window.FinishGroup();
+			_window.AddGroup("ThreadCommands");
+			var otherCommandsCount = 0;
+			var commandDisplays = new Dictionary<Type, GUICounter>();
+			var totalCreatedCounter = _window.AddCounter("Total Created: ", ThreadCommand.TotalCreated);
+			otherCommandsCount += ThreadCommand.TotalCreated;
+
+			var renderCommands = _window.AddGroup("Render Commands");
+			var renderCreatedCounter = _window.AddCounter("Total Created: ", RenderCommand.TotalCreated);
+			otherCommandsCount -= RenderCommand.TotalCreated;
+			_window.FinishGroup();
+
+			var loadingCommands = _window.AddGroup("Loading Commands");
+			var loadingCreatedCounter = _window.AddCounter("Total Created: ", LoadingCommand.TotalCreated);
+			otherCommandsCount -= LoadingCommand.TotalCreated;
+			_window.FinishGroup();
+
+			var windowCommands = _window.AddGroup("Window Commands");
+			var windowCreatedCounter = _window.AddCounter("Total Created: ", WindowCommand.TotalCreated);
+			otherCommandsCount -= WindowCommand.TotalCreated;
+			_window.FinishGroup();
+
+			var audioCommands = _window.AddGroup("Audio Commands");
+			var audioCreatedCounter = _window.AddCounter("Total Created: ", AudioCommand.TotalCreated);
+			otherCommandsCount -= AudioCommand.TotalCreated;
+			_window.FinishGroup();
+
+			var otherCommands = _window.AddGroup("Other Commands");
+			var otherCreatedCounter = _window.AddCounter("Total Created: ", otherCommandsCount);
+			_window.FinishGroup();
+
+			foreach (var commandType in ReflectionUtils.GetAllChildrenOf(typeof(ThreadCommand)))
+			{
+				if (commandType.IsAbstract)
+					continue;
+
+				var totalCreatedField = commandType.GetField("TotalCreated", BindingFlags.Static | BindingFlags.NonPublic)!;
+
+				if (commandType.IsSubclassOf(typeof(RenderCommand)))
+					_window.SelectGroup(renderCommands);
+				else if (commandType.IsSubclassOf(typeof(LoadingCommand)))
+					_window.SelectGroup(loadingCommands);
+				else if (commandType.IsSubclassOf(typeof(WindowCommand)))
+					_window.SelectGroup(windowCommands);
+				else if (commandType.IsSubclassOf(typeof(AudioCommand)))
+					_window.SelectGroup(audioCommands);
+				else
+					_window.SelectGroup(otherCommands);
+
+				var commandLabel = _window.AddCounter($"{commandType.Name}: ", (int)totalCreatedField.GetValue(null)!);
+				commandDisplays.Add(commandType, commandLabel);
+
+				_window.FinishGroup();
+			}
+
+			_window.FinishGroup();
+
+			ThreadCommand.OnCommandCreated += command =>
+			{
+				totalCreatedCounter.Value = ThreadCommand.TotalCreated;
+				renderCreatedCounter.Value = RenderCommand.TotalCreated;
+				loadingCreatedCounter.Value = LoadingCommand.TotalCreated;
+				windowCreatedCounter.Value = WindowCommand.TotalCreated;
+				audioCreatedCounter.Value = AudioCommand.TotalCreated;
+				otherCreatedCounter.Value = ThreadCommand.TotalCreated
+					- RenderCommand.TotalCreated
+					- LoadingCommand.TotalCreated
+					- WindowCommand.TotalCreated
+					- AudioCommand.TotalCreated;
+
+				commandDisplays[command.GetType()].Value++;
+			};
+
+			GLLoadingContextInspector.Inject(_window, GameHost.Instance.Loader);
+		}
+
+		_window.Show();
+	}
+
+	private void hide()
+	{
+		if (_window is null)
+			return;
+
+		_window.Hide();
+	}
+}

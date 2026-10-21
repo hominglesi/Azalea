@@ -3,6 +3,7 @@ using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 
 namespace Azalea.Design.UserInterface.Basic;
+
 public class BasicSlider : Slider
 {
 	protected override GameObject CreateBody()

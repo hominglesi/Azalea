@@ -6,42 +6,34 @@ namespace Azalea.Graphics.Colors;
 /// <summary>
 /// Represents a color with 4 byte components (Red, Green, Blue, Alpha)
 /// </summary>
-public partial struct Color
+/// <remarks>
+/// Constructs a new Color from the specified components
+/// </remarks>
+/// <param name="r">The red component of the new Color</param>
+/// <param name="g">The green component of the new Color</param>
+/// <param name="b">The blue component of the new Color</param>
+/// <param name="a">The alphe component of the new Color</param>
+public partial struct Color(byte r, byte g, byte b, byte a)
 {
 	/// <summary>
 	/// The red component of this Color
 	/// </summary>
-	public byte R;
+	public byte R = r;
 
 	/// <summary>
 	/// The green component of this Color
 	/// </summary>
-	public byte G;
+	public byte G = g;
 
 	/// <summary>
 	/// The blue color of this Color
 	/// </summary>
-	public byte B;
+	public byte B = b;
 
 	/// <summary>
 	/// The alpha component of this Color
 	/// </summary>
-	public byte A;
-
-	/// <summary>
-	/// Constructs a new Color from the specified components
-	/// </summary>
-	/// <param name="r">The red component of the new Color</param>
-	/// <param name="g">The green component of the new Color</param>
-	/// <param name="b">The blue component of the new Color</param>
-	/// <param name="a">The alphe component of the new Color</param>
-	public Color(byte r, byte g, byte b, byte a)
-	{
-		R = r;
-		G = g;
-		B = b;
-		A = a;
-	}
+	public byte A = a;
 
 	/// <summary>
 	/// Constructs a new Color from the specified components
@@ -83,23 +75,23 @@ public partial struct Color
 
 	#region Linear
 
-	private float toLinear(float srgb)
+	private static float toLinear(float srgb)
 	{
 		if (srgb == 1.0f) return 1.0f;
 
 		return srgb <= 0.04045f ? srgb / 12.92f : MathF.Pow((srgb + 0.055f) / 1.055f, 2.4f);
 	}
 
-	public Color ToLinear() => new(toLinear(RNormalized), toLinear(GNormalized), toLinear(BNormalized), ANormalized);
+	public readonly Color ToLinear() => new(toLinear(RNormalized), toLinear(GNormalized), toLinear(BNormalized), ANormalized);
 
-	private float toSRBG(float linear)
+	private static float toSRBG(float linear)
 	{
 		if (linear == 1.0f) return 1.0f;
 
 		return linear < 0.0031308f ? 12.92f * linear : 1.055f * MathF.Pow(linear, 1.0f / 2.4f) - 0.055f;
 	}
 
-	public Color ToSRBG() => new(toSRBG(RNormalized), toSRBG(GNormalized), toSRBG(BNormalized), ANormalized);
+	public readonly Color ToSRBG() => new(toSRBG(RNormalized), toSRBG(GNormalized), toSRBG(BNormalized), ANormalized);
 
 	public static Color operator *(Color first, Color second)
 	{
@@ -161,14 +153,14 @@ public partial struct Color
 		switch (hexCode.Length)
 		{
 			case 6:
-				var r = Convert.ToByte(hexCode.Substring(0, 2), 16);
+				var r = Convert.ToByte(hexCode[..2], 16);
 				var g = Convert.ToByte(hexCode.Substring(2, 2), 16);
 				var b = Convert.ToByte(hexCode.Substring(4, 2), 16);
 				return new Color(r, g, b, 255);
 			case 3:
 				//When hex is writen with 3 chars (like #c20) that is the short hand where both chars are the same (#cc2200)
 				//We can convert them with the formula cTotal = c + (c * 16)
-				var rSingle = Convert.ToByte(hexCode.Substring(0, 1), 16);
+				var rSingle = Convert.ToByte(hexCode[..1], 16);
 				var gSingle = Convert.ToByte(hexCode.Substring(1, 1), 16);
 				var bSingle = Convert.ToByte(hexCode.Substring(2, 1), 16);
 				return new Color(
@@ -185,8 +177,7 @@ public partial struct Color
 
 	#region HSL
 
-
-	private Vector4 toHSL()
+	private readonly Vector4 toHSL()
 	{
 		var max = Math.Max(RNormalized, Math.Max(GNormalized, BNormalized));
 		var min = Math.Min(RNormalized, Math.Min(GNormalized, BNormalized));
@@ -279,7 +270,7 @@ public partial struct Color
 
 	public static Color FromHSL(Vector4 hslValues)
 	{
-		Color color = new Color();
+		var color = new Color();
 		color.fromHSL(hslValues);
 		return color;
 	}
@@ -289,7 +280,7 @@ public partial struct Color
 	/// </summary>
 	public float Luminance
 	{
-		get => toHSL().Z;
+		readonly get => toHSL().Z;
 		set
 		{
 			var clamped = Math.Clamp(value, 0, 1);
@@ -305,7 +296,7 @@ public partial struct Color
 	/// </summary>
 	public float Saturation
 	{
-		get => toHSL().Y;
+		readonly get => toHSL().Y;
 		set
 		{
 			var clamped = Math.Clamp(value, 0, 1);
@@ -318,7 +309,7 @@ public partial struct Color
 
 	public float Hue
 	{
-		get => toHSL().X;
+		readonly get => toHSL().X;
 		set
 		{
 			var clamped = Math.Clamp(value, 0, 360);

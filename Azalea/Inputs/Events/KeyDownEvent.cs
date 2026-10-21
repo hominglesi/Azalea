@@ -1,12 +1,12 @@
 ﻿namespace Azalea.Inputs.Events;
 
-public class KeyDownEvent : KeyEvent
+public class KeyDownEvent(Keys key, bool isRepeat = false) : KeyEvent(key)
 {
-	public readonly bool IsRepeat;
+	public readonly bool IsRepeat = isRepeat;
 
-	public KeyDownEvent(Keys key, bool isRepeat = false)
-		: base(key)
+	public void Deconstruct(out Keys key, out bool isRepeat)
 	{
-		IsRepeat = isRepeat;
+		key = Key;
+		isRepeat = IsRepeat;
 	}
 }

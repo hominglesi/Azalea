@@ -7,6 +7,7 @@ using System;
 #pragma warning disable CS8602, CS8618
 
 namespace Azalea.VisualTests.UnitTesting.UnitTests.SceneGraph;
+
 public class GameObjectInvalidation : UnitTestSuite
 {
 	public class InvalidateAlpha : UnitTest
@@ -40,7 +41,7 @@ public class GameObjectInvalidation : UnitTestSuite
 
 			AddResult("Check if DrawColorInfo is correct", () =>
 			{
-				var colorInfo = _childBox.DrawColorInfo.Color;
+				var colorInfo = _childBox.DrawColorQuad;
 
 				if (colorInfo.TryGetSingleColor(out var color))
 				{
@@ -59,7 +60,7 @@ public class GameObjectInvalidation : UnitTestSuite
 
 			AddResult("Check if DrawColorInfo is correct", () =>
 			{
-				var colorInfo = _childBox.DrawColorInfo.Color;
+				var colorInfo = _childBox.DrawColorQuad;
 
 				if (colorInfo.TryGetSingleColor(out var color))
 				{
@@ -87,7 +88,7 @@ public class GameObjectInvalidation : UnitTestSuite
 
 			AddResult("Check if DrawColorInfo is correct", () =>
 			{
-				var colorInfo = _childBox.DrawColorInfo.Color;
+				var colorInfo = _childBox.DrawColorQuad;
 
 				if (colorInfo.TryGetSingleColor(out var color))
 				{
@@ -157,7 +158,7 @@ public class GameObjectInvalidation : UnitTestSuite
 
 			AddResult("Check if DrawColorInfo is correct", () =>
 			{
-				var colorInfo = _childBox.DrawColorInfo.Color;
+				var colorInfo = _childBox.DrawColorQuad;
 
 				if (colorInfo.TryGetSingleColor(out var color))
 				{
@@ -175,7 +176,7 @@ public class GameObjectInvalidation : UnitTestSuite
 
 			AddResult("Check if DrawColorInfo is correct", () =>
 			{
-				var colorInfo = _childBox.DrawColorInfo.Color;
+				var colorInfo = _childBox.DrawColorQuad;
 
 				if (colorInfo.TryGetSingleColor(out var color))
 				{
@@ -201,7 +202,7 @@ public class GameObjectInvalidation : UnitTestSuite
 
 			AddResult("Check if DrawColorInfo is correct", () =>
 			{
-				var colorInfo = _childBox.DrawColorInfo.Color;
+				var colorInfo = _childBox.DrawColorQuad;
 
 				if (colorInfo.TryGetSingleColor(out var color))
 				{

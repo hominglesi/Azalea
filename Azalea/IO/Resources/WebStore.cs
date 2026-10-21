@@ -3,28 +3,37 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 
 namespace Azalea.IO.Resources;
+
 internal class WebStore : IResourceStore
 {
 	private static readonly HttpClient _client;
 
 	static WebStore()
 	{
-		ServicePointManager.SecurityProtocol
-			= SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
-
 		_client = new HttpClient(new SocketsHttpHandler()
 		{
-			MaxConnectionsPerServer = 10,
 			PooledConnectionLifetime = TimeSpan.FromMinutes(5),
-			AutomaticDecompression =
-				DecompressionMethods.GZip |
-				DecompressionMethods.Deflate |
-				DecompressionMethods.Brotli
-		});
+			PooledConnectionIdleTimeout = TimeSpan.FromMinutes(2),
+			ConnectTimeout = TimeSpan.FromSeconds(15),
+			EnableMultipleHttp2Connections = true,
+			AllowAutoRedirect = true,
+			MaxConnectionsPerServer = 10,
+			UseCookies = false,
+			AutomaticDecompression = DecompressionMethods.All
+		})
+		{
+			Timeout = TimeSpan.FromSeconds(30),
+
+			DefaultRequestVersion = HttpVersion.Version20,
+			DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower
+		};
+
 		_client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+		_client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
 	}
 
 	public Stream? GetStream(string path)
@@ -36,7 +45,7 @@ internal class WebStore : IResourceStore
 
 		for (int i = 0; i < 3; i++)
 		{
-			byte[]? data = null;
+			byte[]? data;
 
 			try { data = _client.GetByteArrayAsync(path).GetAwaiter().GetResult(); }
 			catch (HttpRequestException e)

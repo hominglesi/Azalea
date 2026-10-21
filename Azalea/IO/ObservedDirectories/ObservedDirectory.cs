@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 
 namespace Azalea.IO.ObservedDirectories;
+
 public class ObservedDirectory : Disposable
 {
 	private readonly List<FileSystemWatcher> watchers = [];
@@ -264,7 +265,7 @@ public class ObservedDirectory : Disposable
 	public FileFilterDelegate? FileFilter;
 	public delegate bool FileFilterDelegate(string path);
 
-	private bool isFileConsidered(string path) => FileFilter is null ? true : FileFilter(path);
+	private bool isFileConsidered(string path) => FileFilter is null || FileFilter(path);
 
 	public void SaveCache()
 	{
@@ -278,7 +279,7 @@ public class ObservedDirectory : Disposable
 		}
 	}
 
-	private IEnumerable<string> getMetadataItems(string path = "")
+	private static IEnumerable<string> getMetadataItems(string path = "")
 	{
 		var directoryInfo = new DirectoryInfo(path);
 		bool readable = true;

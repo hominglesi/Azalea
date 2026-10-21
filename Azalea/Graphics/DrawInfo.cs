@@ -1,63 +1,40 @@
 ﻿using Azalea.Extentions.MatrixExtentions;
 using Azalea.Numerics;
 using Azalea.Utils;
-using System;
 using System.Numerics;
 
 namespace Azalea.Graphics;
 
-public struct DrawInfo
+public struct DrawInfo(Matrix3? matrix = null, Matrix3? matrixInverse = null)
 {
-	public Matrix3 Matrix;
-	public Matrix3 MatrixInverse;
+	public Matrix3 Matrix = matrix ?? Matrix3.Identity;
+	public Matrix3 MatrixInverse = matrixInverse ?? Matrix3.Identity;
 
-	public DrawInfo(Matrix3? matrix = null, Matrix3? matrixInverse = null)
+	public void ApplyTranslation(Vector2 translation)
 	{
-		Matrix = matrix ?? Matrix3.Identity;
-		MatrixInverse = matrixInverse ?? Matrix3.Identity;
+		MatrixExtentions.TranslateFromLeft(ref Matrix, translation);
+		MatrixExtentions.TranslateFromRight(ref MatrixInverse, -translation);
 	}
 
-	public void ApplyTransformations(Vector2 translation, Vector2 scale, float rotation, Vector2 shear, Vector2 origin)
+	public void ApplyRotation(float rotation)
 	{
-		if (translation != Vector2.Zero)
-		{
-			MatrixExtentions.TranslateFromLeft(ref Matrix, translation);
-			MatrixExtentions.TranslateFromRight(ref MatrixInverse, -translation);
-		}
+		float radians = MathUtils.DegreesToRadians(rotation);
+		MatrixExtentions.RotateFromLeft(ref Matrix, radians);
+		MatrixExtentions.RotateFromRight(ref MatrixInverse, -radians);
+	}
 
-		if (rotation != 0)
-		{
-			float radians = MathUtils.DegreesToRadians(rotation);
-			if (AzaleaSettings.RotateClockwise)
-			{
-				MatrixExtentions.RotateFromLeft(ref Matrix, radians);
-				MatrixExtentions.RotateFromRight(ref MatrixInverse, -radians);
-			}
-			else
-			{
-				MatrixExtentions.RotateFromLeft(ref Matrix, -radians);
-				MatrixExtentions.RotateFromRight(ref MatrixInverse, radians);
-			}
-		}
+	public void ApplyScale(Vector2 scale)
+	{
+		if (scale.X == 0) scale.X = Precision.FLOAT_EPSILON;
+		if (scale.Y == 0) scale.Y = Precision.FLOAT_EPSILON;
 
-		if (shear != Vector2.Zero)
-		{
-			throw new NotImplementedException();
-		}
+		MatrixExtentions.ScaleFromLeft(ref Matrix, scale);
+		MatrixExtentions.ScaleFromRight(ref MatrixInverse, Vector2.Divide(Vector2.One, scale));
+	}
 
-		if (scale != Vector2.One)
-		{
-			if (scale.X == 0) scale.X = Precision.FLOAT_EPSILON;
-			if (scale.Y == 0) scale.Y = Precision.FLOAT_EPSILON;
-
-			MatrixExtentions.ScaleFromLeft(ref Matrix, scale);
-			MatrixExtentions.ScaleFromRight(ref MatrixInverse, Vector2.Divide(Vector2.One, scale));
-		}
-
-		if (origin != Vector2.Zero)
-		{
-			MatrixExtentions.TranslateFromLeft(ref Matrix, -origin);
-			MatrixExtentions.TranslateFromRight(ref MatrixInverse, origin);
-		}
+	public void ApplyOrigin(Vector2 origin)
+	{
+		MatrixExtentions.TranslateFromLeft(ref Matrix, -origin);
+		MatrixExtentions.TranslateFromRight(ref MatrixInverse, origin);
 	}
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 
 namespace Azalea.Design.Controls;
+
 public abstract class AbstractFileInput : Composition
 {
 	public AcceptedFileFlags AcceptedFiles { get; set; } = AcceptedFileFlags.File;

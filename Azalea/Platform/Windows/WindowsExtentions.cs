@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 namespace Azalea.Platform.Windows;
+
 internal static class WindowsExtentions
 {
 	public static Keys KeycodeToKey(int keycode)
@@ -11,7 +12,7 @@ internal static class WindowsExtentions
 		return _keyDictionary[keycode];
 	}
 
-	private static Dictionary<int, Keys> _keyDictionary;
+	private static readonly Dictionary<int, Keys> _keyDictionary;
 	static WindowsExtentions()
 	{
 		//These are direct mappings from the virtual-key values

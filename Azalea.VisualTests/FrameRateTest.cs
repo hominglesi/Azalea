@@ -1,16 +1,14 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics.Sprites;
-using Azalea.Inputs;
-using Azalea.Inputs.Events;
-using Azalea.Platform;
 using System;
 
 namespace Azalea.VisualTests;
+
 public class FrameRateTest : TestScene
 {
-	private SpriteText _elapsedTimeText;
-	private SpriteText _deltaTimeText;
-	private SpriteText _fixedDeltaTimeText;
+	private readonly SpriteText _elapsedTimeText;
+	private readonly SpriteText _deltaTimeText;
+	private readonly SpriteText _fixedDeltaTimeText;
 
 	public FrameRateTest()
 	{
@@ -31,20 +29,12 @@ public class FrameRateTest : TestScene
 	private DateTime? _startTime;
 	protected override void Update()
 	{
-		_startTime ??= Time.GetCurrentPreciseTime();
+		_startTime ??= App.Scheduler.GetRunningTime();
 
-		_elapsedTimeText.Text = (Time.GetPreciseMilisecondsSince(_startTime.Value) / 1000).ToString();
+		_elapsedTimeText.Text = (App.Scheduler.GetMilisecondsSince(_startTime.Value) / 1000).ToString();
 
-		_deltaTimeCounter += Time.DeltaTime;
+		_deltaTimeCounter += App.Scheduler.DeltaTime;
 		_deltaTimeText.Text = _deltaTimeCounter.ToString();
-	}
-
-	protected override bool OnKeyDown(KeyDownEvent e)
-	{
-		if (e.Key == Keys.Space)
-			Window.VSync = !Window.VSync;
-
-		return base.OnKeyDown(e);
 	}
 
 	private float _fixedDeltaTimeCounter;

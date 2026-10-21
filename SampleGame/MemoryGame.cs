@@ -1,10 +1,11 @@
 ﻿using Azalea;
 using Azalea.Graphics;
 using Azalea.Graphics.Colors;
-using Azalea.Graphics.Rendering;
 using Azalea.Inputs;
+using Azalea.Inputs.Events;
 using Azalea.IO.Resources;
-using Azalea.Platform;
+using Azalea.Platform.Rendering;
+using Azalea.Platform.Windowing;
 using SampleGame.Elements;
 using System.Numerics;
 
@@ -20,9 +21,6 @@ public class MemoryGame : AzaleaGame
 
 	public MemoryGame()
 	{
-		Renderer.ClearColor = new Color(189, 223, 214);
-		Window.Resizable = true;
-
 		var assemblyStore = new NamespacedResourceStore(new EmbeddedResourceStore(typeof(MemoryGame).Assembly), "Resources");
 
 		Assets.AddToMainStore(assemblyStore);
@@ -42,8 +40,21 @@ public class MemoryGame : AzaleaGame
 		_logic = new MemoryLogic(_field);
 	}
 
-	protected override void Update()
+	protected override void Initialize()
 	{
-		if (Input.GetKey(Keys.P).Down) _logic?.Solve();
+		base.Initialize();
+		App.Renderer.SetClearColor(new Color(189, 223, 214));
+		App.Window.SetResizable(true);
+	}
+
+	protected override bool OnKeyDown(KeyDownEvent e)
+	{
+		if (e.Key == Keys.P)
+		{
+			_logic?.Solve();
+			return true;
+		}
+
+		return false;
 	}
 }

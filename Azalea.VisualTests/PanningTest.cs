@@ -1,13 +1,14 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Design.UserInterface;
 using Azalea.Inputs;
-using Azalea.Platform;
+using Azalea.Inputs.Events;
 using System.Numerics;
 
 namespace Azalea.VisualTests;
+
 public class PanningTest : TestScene
 {
-	private CameraContainer _container;
+	private readonly CameraContainer _container;
 
 	public PanningTest()
 	{
@@ -15,8 +16,7 @@ public class PanningTest : TestScene
 		{
 			RelativeSizeAxes = Graphics.Axes.Both,
 			Origin = Graphics.Anchor.Center,
-			Children = new[]
-			{
+			Children = [
 				new BasicButton()
 				{
 					Position = new(900, 900),
@@ -45,16 +45,25 @@ public class PanningTest : TestScene
 					Width = 320,
 					Height = 100
 				}
-			}
+			]
 		});
 	}
 
 	protected override void Update()
 	{
-		var panSpeed = 0.5f * Time.DeltaTimeMs;
-		_container.Position += Input.GetDirectionalMovement() * panSpeed;
+		var panSpeed = 500 * App.Scheduler.DeltaTime;
+		_container.Position -= App.Input.State.GetDirectionalMovement() * panSpeed;
+	}
 
-		if (Input.GetKey(Keys.KeypadPlus).Down) _container.Scale += new Vector2(0.15f, 0.15f);
-		if (Input.GetKey(Keys.KeypadMinus).Down) _container.Scale += new Vector2(-0.15f, -0.15f);
+	protected override bool OnKeyDown(KeyDownEvent e)
+	{
+		if (e.Key == Keys.KeypadPlus)
+			_container.Scale += new Vector2(0.15f, 0.15f);
+		else if (e.Key == Keys.KeypadMinus)
+			_container.Scale += new Vector2(-0.15f, -0.15f);
+		else
+			return false;
+
+		return true;
 	}
 }

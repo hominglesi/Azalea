@@ -1,22 +1,17 @@
 ﻿using Azalea.Design.Shapes;
-using Azalea.Platform;
 using System.Numerics;
 
 namespace Azalea.VisualTests.Breakout;
-public class BreakoutBall : Box
+
+public class BreakoutBall(Vector2 direction) : Box
 {
 	public const float BallSpeed = 5f;
 
-	public Vector2 Direction;
-
-	public BreakoutBall(Vector2 direction)
-	{
-		Direction = direction;
-	}
+	public Vector2 Direction = direction;
 
 	protected override void Update()
 	{
-		var timeStep = Time.DeltaTime;
+		var timeStep = App.Scheduler.DeltaTime;
 		if (timeStep > 0.1f)
 			timeStep = 0.1f;
 

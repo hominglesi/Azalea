@@ -1,12 +1,12 @@
 ﻿using Azalea.Graphics;
 using Azalea.Numerics;
-using Azalea.Platform;
 using System.Numerics;
 
 namespace Azalea.Design.Containers;
+
 public class CameraContainer : Composition
 {
-	private Vector2 _windowSize => Window.ClientSize;
+	private Vector2 _windowSize => App.Window.ClientSize;
 
 	public void CenterOnObject(GameObject obj)
 	{

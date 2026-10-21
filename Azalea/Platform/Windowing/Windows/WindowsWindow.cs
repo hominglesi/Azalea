@@ -1,0 +1,485 @@
+﻿using Azalea.Inputs;
+using Azalea.Inputs.Events;
+using Azalea.Inputs.Gamepads;
+using Azalea.Native.Windows;
+using Azalea.Platform.Windows;
+using Azalea.Platform.Windows.XInput;
+using Azalea.Utils;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Numerics;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
+
+namespace Azalea.Platform.Windowing.Windows;
+
+internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible, bool initializeOle)
+	: PlatformWindow(clientSize, initiallyVisible)
+{
+	private static int _nextClassId = 0;
+	private Win32.WNDPROC? _windowProcedure;
+
+	private Win32.WindowStyles _windowStyles;
+	private Win32.WindowStylesExtended _windowExtendedStyles;
+	private XInputManager? _xInputManager = null;
+	internal override IGamepadManager GamepadInput => _xInputManager!;
+
+	public override string PlatformType => "Windows";
+
+	internal ushort ClassAtom { get; private set; }
+	internal nint Handle { get; private set; }
+
+	protected override void InitializationLogic()
+	{
+		_windowProcedure = windowProcedure;
+		var classNamePtr = Marshal.StringToHGlobalUni("Azalea Window " + _nextClassId++);
+
+		var wndClass = new Win32.WNDCLASSEXW
+		{
+			lpszClassName = classNamePtr,
+			hInstance = Process.GetCurrentProcess().Handle,
+			lpfnWndProc = Marshal.GetFunctionPointerForDelegate(_windowProcedure),
+			style = Win32.WNDCLASSEXW.ClassStyles.OWNDC,
+			hCursor = Win32.LoadCursorW(nint.Zero, 32512)
+		};
+
+		ClassAtom = Win32.RegisterClassExW(ref wndClass);
+		Marshal.FreeHGlobal(classNamePtr);
+
+		_windowStyles = Win32.WindowStyles.CAPTION | Win32.WindowStyles.SIZEBOX |
+			Win32.WindowStyles.SYSMENU | Win32.WindowStyles.MINIMIZEBOX | Win32.WindowStyles.MAXIMIZEBOX;
+		if (Shown) _windowStyles |= Win32.WindowStyles.VISIBLE;
+
+		_windowExtendedStyles = Win32.WindowStylesExtended.APPWINDOW;
+
+		Win32.RECT windowRect = new(ClientPosition.X, ClientPosition.Y, ClientSize.X, ClientSize.Y);
+		Win32.AdjustWindowRectEx(ref windowRect, _windowStyles, false, _windowExtendedStyles);
+
+		Handle = Win32.CreateWindowExW(
+			_windowExtendedStyles,
+			ClassAtom,
+			Title,
+			_windowStyles,
+			windowRect.left,
+			windowRect.top,
+			windowRect.Width,
+			windowRect.Height,
+			nint.Zero,
+			nint.Zero,
+			Process.GetCurrentProcess().Handle,
+			nint.Zero);
+
+		if (Handle == nint.Zero)
+			throw new Exception($"Could not create Window. (Error {Marshal.GetLastWin32Error()})");
+
+		if (initializeOle)
+		{
+			var oleStatus = Win32.OleInitialize(0);
+			if (oleStatus == 0)
+				_ = Win32.RegisterDragDrop(Handle, new DropTarget(this));
+			else
+				Console.WriteLine("The Main method has not been marked with an [STAThread] attribute. You may experience some strange behaviours.");
+		}
+
+		_xInputManager = new XInputManager();
+
+		// Set actual window position
+		Win32.GetWindowRect(Handle, out windowRect);
+		_position = new Vector2Int(windowRect.X, windowRect.Y);
+		_size = new Vector2Int(windowRect.Width, windowRect.Height);
+	}
+
+	private Win32.POINT _lastMousePoint;
+
+	protected override void UpdateLogic()
+	{
+		Win32.GetCursorPos(out var mousePoint);
+		Win32.ScreenToClient(Handle, ref mousePoint);
+
+		if (_lastMousePoint != mousePoint)
+		{
+			EnqueueInputEvent(new MouseMoveEvent(new Vector2(mousePoint.x, mousePoint.y)));
+			_lastMousePoint = mousePoint;
+		}
+
+		_xInputManager?.Update();
+
+		while (Win32.PeekMessageW(out Win32.MSG message, 0, 0, 0, 0x0001) != 0)
+		{
+			Win32.TranslateMessage(in message);
+			Win32.DispatchMessageW(in message);
+		}
+	}
+
+	private Win32.WINDOWPLACEMENT _preFullscreenPlacement = new();
+	private bool _fullscreen = false;
+	private static uint _nextTrayIconId = 1;
+	private static Dictionary<uint, TrayIcon>? _trayIcons;
+
+	protected override void HandleCommandLogic(WindowCommand command)
+	{
+		switch (command)
+		{
+			case CenterCommand:
+				var monitor = Win32.MonitorFromWindow(Handle, Win32.MonitorFromWindowFlags.DEFAULTTONEAREST);
+				var monitorInfo = new Win32.MonitorInfo();
+				Win32.GetMonitorInfoW(monitor, ref monitorInfo);
+
+				var workArea = monitorInfo.rcWork;
+				var centerPosition = new Vector2Int(workArea.X, workArea.Y)
+					+ (new Vector2Int(workArea.Width, workArea.Height) / 2 - Size / 2);
+				Win32.SetWindowPos(Handle, IntPtr.Zero, centerPosition.X, centerPosition.Y, 0, 0, Win32.SetWindowPosFlags.NOSIZE);
+				break;
+			case CreateTrayIconCommand(var trayIcon, var title, var icon):
+				nint iconHandle = Win32.CreateIconFromPixelArray(Win32.GetDC(Handle), icon.Width, icon.Height, icon.Data);
+
+				var notifyIconData = new Win32.NOTIFYICONDATAW
+				{
+					hWnd = Handle,
+					uID = _nextTrayIconId,
+					uFlags = Win32.NotifyIconFlag.MESSAGE | Win32.NotifyIconFlag.ICON | Win32.NotifyIconFlag.TIP,
+					uCallbackMessage = Win32.WindowMessage.AZ_TRAYICON,
+					hIcon = iconHandle,
+					szTip = title
+				};
+
+				Win32.Shell_NotifyIconW(Win32.NotifyIconMessage.ADD, ref notifyIconData);
+
+				trayIcon.Initialize(_nextTrayIconId);
+
+				_trayIcons ??= [];
+				_trayIcons.Add(_nextTrayIconId, trayIcon);
+				_nextTrayIconId++;
+				break;
+			case DeleteTrayIconCommand(var trayIcon):
+				if (_trayIcons is null || trayIcon.Handle.HasValue == false
+					|| _trayIcons.ContainsKey(trayIcon.Handle.Value) == false)
+					throw new Exception("Could not delete icon!");
+
+
+				_trayIcons.Remove(trayIcon.Handle.Value);
+
+				var nid = new Win32.NOTIFYICONDATAW
+				{
+					hWnd = Handle,
+					uID = trayIcon.Handle.Value
+				};
+
+				Win32.Shell_NotifyIconW(Win32.NotifyIconMessage.DELETE, ref nid);
+
+				break;
+			case FocusCommand:
+				Win32.BringWindowToTop(Handle);
+				Win32.SetForegroundWindow(Handle);
+				Win32.SetFocus(Handle);
+				break;
+			case FullscreenCommand:
+				if (_fullscreen)
+				{
+					Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOWNORMAL);
+					return;
+				}
+
+				// We show the window as maximized:
+				// 1. In case the window was minimized
+				// 2. To get the resize animation of going fullscreen
+				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOWMAXIMIZED);
+
+				Win32.GetWindowPlacement(Handle, ref _preFullscreenPlacement);
+
+				var fullscreenStyles = _windowStyles & ~(Win32.WindowStyles.CAPTION |
+					Win32.WindowStyles.THICKFRAME | Win32.WindowStyles.MINIMIZEBOX |
+					Win32.WindowStyles.MAXIMIZEBOX | Win32.WindowStyles.SYSMENU);
+
+				Win32.SetWindowLongPtrW(Handle, Win32.WindowLongValue.Style, (nint)fullscreenStyles);
+
+				monitor = Win32.MonitorFromWindow(Handle, Win32.MonitorFromWindowFlags.DEFAULTTONEAREST);
+				monitorInfo = new Win32.MonitorInfo();
+				Win32.GetMonitorInfoW(monitor, ref monitorInfo);
+				var monitorSize = monitorInfo.rcMonitor;
+
+				Win32.SetWindowPos(Handle, nint.Zero, monitorSize.X, monitorSize.Y,
+					monitorSize.Width, monitorSize.Height, Win32.SetWindowPosFlags.FRAMECHANGED);
+
+				_fullscreen = true;
+				break;
+			case HideCommand:
+				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.HIDE);
+				break;
+			case MaximizeCommand:
+				if (_fullscreen) exitFullscreen();
+
+				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOWMAXIMIZED);
+				break;
+			case MinimizeCommand:
+				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOWMINIMIZED);
+				break;
+			case RequestAttentionCommand:
+				Win32.FlashWindow(Handle, true);
+				break;
+			case RestoreCommand:
+				if (_fullscreen) exitFullscreen();
+
+				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOWNORMAL);
+				break;
+			case SetClientPositionCommand(var clientPosition):
+				var newPosition = new Win32.RECT(clientPosition.X, clientPosition.Y, 0, 0);
+				Win32.AdjustWindowRectEx(ref newPosition, _windowStyles, false, _windowExtendedStyles);
+				Win32.SetWindowPos(Handle, IntPtr.Zero, newPosition.X, newPosition.Y, 0, 0, Win32.SetWindowPosFlags.NOSIZE);
+				break;
+			case SetClientSizeCommand(var clientSize):
+				var newSize = new Win32.RECT(0, 0, clientSize.X, clientSize.Y);
+				Win32.AdjustWindowRectEx(ref newSize, _windowStyles, false, _windowExtendedStyles);
+				Win32.SetWindowPos(Handle, IntPtr.Zero, 0, 0, newSize.Width, newSize.Height, Win32.SetWindowPosFlags.NOMOVE);
+				break;
+			case SetCursorVisibleCommand(var isVisible):
+				Win32.ShowCursor(isVisible);
+				break;
+			case SetIconCommand(var image):
+				iconHandle = IntPtr.Zero;
+				var deviceContext = Win32.GetDC(Handle);
+
+				if (image is not null)
+					iconHandle = Win32.CreateIconFromPixelArray(deviceContext, image.Width, image.Height, image.Data);
+
+				Win32.SendMessageW(Handle, Win32.WindowMessage.SETICON, nint.Zero, iconHandle);
+				Win32.SendMessageW(Handle, Win32.WindowMessage.SETICON, 1, iconHandle);
+
+				if (iconHandle != nint.Zero)
+					Win32.DeleteObject(iconHandle);
+
+				break;
+			case SetPositionCommand(var position):
+				Win32.SetWindowPos(Handle, IntPtr.Zero, position.X, position.Y, 0, 0, Win32.SetWindowPosFlags.NOSIZE);
+				break;
+			case SetResizableCommand(var resizable):
+				if (resizable)
+					_windowStyles |= Win32.WindowStyles.SIZEBOX | Win32.WindowStyles.MAXIMIZEBOX;
+				else
+					_windowStyles &= ~(Win32.WindowStyles.SIZEBOX | Win32.WindowStyles.MAXIMIZEBOX);
+
+				Win32.SetWindowLongPtrW(Handle, Win32.WindowLongValue.Style, (nint)_windowStyles);
+				break;
+			case SetSizeCommand(var size):
+				Win32.SetWindowPos(Handle, IntPtr.Zero, 0, 0, size.X, size.Y, Win32.SetWindowPosFlags.NOMOVE);
+				break;
+			case SetTitleCommand(var title):
+				Win32.SetWindowTextW(Handle, title);
+				break;
+			case ShowCommand:
+				Win32.ShowWindow(Handle, Win32.ShowWindowCommand.SHOW);
+				break;
+			default:
+				throw new NotImplementedException("Command handling hasn't been implemented");
+		}
+
+		command.Return();
+
+		void exitFullscreen()
+		{
+			Win32.SetWindowLongPtrW(Handle, Win32.WindowLongValue.Style, (nint)_windowStyles);
+			Win32.SetWindowPlacement(Handle, in _preFullscreenPlacement);
+			Win32.SetWindowPos(Handle, nint.Zero, 0, 0, 0, 0,
+				Win32.SetWindowPosFlags.NOMOVE | Win32.SetWindowPosFlags.NOSIZE |
+				Win32.SetWindowPosFlags.NOZORDER | Win32.SetWindowPosFlags.NOOWNERZORDER |
+				Win32.SetWindowPosFlags.FRAMECHANGED);
+
+			_fullscreen = false;
+		}
+	}
+
+	private nint windowProcedure(nint hWnd, uint uMsg, nint wParam, nint lParam)
+	{
+		switch ((Win32.WindowMessage)uMsg)
+		{
+			case Win32.WindowMessage.WINDOWPOSCHANGED:
+				var windosPos = Marshal.PtrToStructure<Win32.WINDOWPOS>(lParam);
+				var clientPosition = new Win32.POINT();
+
+				Win32.GetClientRect(Handle, out var rect);
+				Win32.ClientToScreen(Handle, ref clientPosition);
+
+				_size = new Vector2Int(windosPos.cx, windosPos.cy);
+				_clientSize = new Vector2Int(rect.Width, rect.Height);
+				InvokeOnResized();
+
+				_position = new Vector2Int(windosPos.x, windosPos.y);
+				_clientPosition = new Vector2Int(clientPosition.x, clientPosition.y);
+
+				return 0;
+			case Win32.WindowMessage.MOVE:
+				// WM_WINDOWPOSCHANGED handles position changes but
+				// it can miss when client position is changed.
+
+				_clientPosition = BitwiseUtils.SplitValue(lParam);
+				return 0;
+			case Win32.WindowMessage.SIZE:
+				// WM_WINDOWPOSCHANGED handles size changes but
+				// it can miss when client size is changed.
+
+				_clientSize = BitwiseUtils.SplitValue(lParam);
+				InvokeOnResized();
+				return 0;
+			case Win32.WindowMessage.SHOWWINDOW:
+				Shown = wParam != nint.Zero;
+				break;
+			case Win32.WindowMessage.CLOSE:
+				Close();
+				return 0;
+			case Win32.WindowMessage.ERASEBKGND:
+				return 1;
+			case Win32.WindowMessage.LBUTTONDOWN:
+				EnqueueInputEvent(new MouseDownEvent(MouseButton.Left, BitwiseUtils.SplitValue(lParam)));
+				Win32.SetCapture(Handle);
+				break;
+			case Win32.WindowMessage.LBUTTONUP:
+				EnqueueInputEvent(new MouseUpEvent(MouseButton.Left, BitwiseUtils.SplitValue(lParam)));
+				Win32.ReleaseCapture();
+				break;
+			case Win32.WindowMessage.RBUTTONDOWN:
+				EnqueueInputEvent(new MouseDownEvent(MouseButton.Right, BitwiseUtils.SplitValue(lParam)));
+				break;
+			case Win32.WindowMessage.RBUTTONUP:
+				EnqueueInputEvent(new MouseUpEvent(MouseButton.Right, BitwiseUtils.SplitValue(lParam)));
+				break;
+			case Win32.WindowMessage.MBUTTONDOWN:
+				EnqueueInputEvent(new MouseDownEvent(MouseButton.Middle, BitwiseUtils.SplitValue(lParam)));
+				break;
+			case Win32.WindowMessage.MBUTTONUP:
+				EnqueueInputEvent(new MouseUpEvent(MouseButton.Middle, BitwiseUtils.SplitValue(lParam)));
+				break;
+			case Win32.WindowMessage.XBUTTONDOWN:
+				var xButtonDown = MouseButton.Middle + BitwiseUtils.GetHighOrderValue(wParam);
+				EnqueueInputEvent(new MouseDownEvent(xButtonDown, BitwiseUtils.SplitValue(lParam)));
+				break;
+			case Win32.WindowMessage.XBUTTONUP:
+				var xButtonUp = MouseButton.Middle + BitwiseUtils.GetHighOrderValue(wParam);
+				EnqueueInputEvent(new MouseUpEvent(xButtonUp, BitwiseUtils.SplitValue(lParam)));
+				break;
+			case Win32.WindowMessage.KEYDOWN:
+				var isRepeat = BitwiseUtils.GetSpecificBit(lParam, 31);
+				var downKey = WindowsExtentions.KeycodeToKey((int)wParam);
+				EnqueueInputEvent(new KeyDownEvent(downKey, isRepeat));
+				break;
+			case Win32.WindowMessage.KEYUP:
+				var upKey = WindowsExtentions.KeycodeToKey((int)wParam);
+				EnqueueInputEvent(new KeyUpEvent(upKey));
+				break;
+			case Win32.WindowMessage.SYSKEYDOWN:
+				var downSysKey = WindowsExtentions.KeycodeToKey((int)wParam);
+
+				if (downSysKey == Keys.F10 || downSysKey == Keys.AltLeft)
+				{
+					var downSysKeyIsRepeat = BitwiseUtils.GetSpecificBit(lParam, 31);
+					EnqueueInputEvent(new KeyDownEvent(downSysKey, downSysKeyIsRepeat));
+					return IntPtr.Zero;
+				}
+				break;
+			case Win32.WindowMessage.CHAR:
+				EnqueueInputEvent(new CharInputEvent((char)wParam));
+				break;
+			case Win32.WindowMessage.MOUSEWHEEL:
+				var delta = BitwiseUtils.GetHighOrderValue(wParam) / 120;
+				EnqueueInputEvent(new ScrollEvent(delta));
+				break;
+			case Win32.WindowMessage.AZ_TRAYICON:
+				var iconId = (uint)wParam;
+				var iconEvent = BitwiseUtils.GetLowOrderValue(lParam);
+
+				if (_trayIcons is not null && _trayIcons.TryGetValue(iconId, out var icon))
+				{
+					switch ((Win32.WindowMessage)iconEvent)
+					{
+						case Win32.WindowMessage.MOUSEMOVE:
+						case Win32.WindowMessage.LBUTTONDOWN:
+						case Win32.WindowMessage.RBUTTONDOWN:
+						case Win32.WindowMessage.MBUTTONDOWN:
+							break;
+						case Win32.WindowMessage.LBUTTONUP:
+							icon.OnClick?.Invoke(MouseButton.Left);
+							break;
+						case Win32.WindowMessage.RBUTTONUP:
+							icon.OnClick?.Invoke(MouseButton.Right);
+							break;
+						case Win32.WindowMessage.MBUTTONUP:
+							icon.OnClick?.Invoke(MouseButton.Middle);
+							break;
+						case Win32.WindowMessage.LBUTTONDBLCLK:
+							icon.OnDoubleClick?.Invoke();
+							break;
+					}
+				}
+
+				return 0;
+		}
+
+		return Win32.DefWindowProcW(hWnd, uMsg, wParam, lParam);
+	}
+
+	private class DropTarget(WindowsWindow window) : Win32.IDropTarget
+	{
+		public int DragEnter(IDataObject dataObject, uint keyState, Win32.POINT point, ref uint effect) => 0;
+		public int DragLeave() => 0;
+
+		public int DragOver(uint keyState, Win32.POINT point, ref uint effect)
+		{
+			effect = window.ShowDroppableCursor ? 1u : 0u;
+
+			return 0;
+		}
+
+		public int Drop(IDataObject dataObject, uint keyState, Win32.POINT point, ref uint effect)
+		{
+			var format = new FORMATETC()
+			{
+				cfFormat = 15, // CF_HDROP
+				dwAspect = DVASPECT.DVASPECT_CONTENT,
+				tymed = TYMED.TYMED_HGLOBAL
+			};
+
+			string[] files;
+			dataObject.GetData(ref format, out STGMEDIUM medium);
+
+			try
+			{
+				IntPtr dropHandle = medium.unionmember;
+				int fileCount = Win32.DragQueryFileW(dropHandle, uint.MaxValue, [], 0);
+				files = new string[fileCount];
+				for (uint x = 0; x < fileCount; ++x)
+				{
+					int size = Win32.DragQueryFileW(dropHandle, x, [], 0);
+					if (size > 0)
+					{
+						unsafe
+						{
+							char* p = (char*)NativeMemory.Alloc((uint)size + 1, sizeof(char));
+
+							try
+							{
+								var buffer = new Span<char>(p, size + 1);
+								if (Win32.DragQueryFileW(dropHandle, x, buffer, (uint)buffer.Length) > 0)
+									files[x] = buffer[..^1].ToString();
+							}
+							finally { NativeMemory.Free(p); }
+						}
+					}
+				}
+			}
+			finally { Win32.ReleaseStgMedium(ref medium); }
+
+			window.EnqueueInputEvent(new FileDroppedEvent(files));
+
+			return 0;
+		}
+	}
+
+	protected override IPlatformDeviceContext GetDeviceContext()
+	{
+		var contextHandle = Win32.GetDC(Handle);
+		var deviceContext = new WindowsDeviceContext(contextHandle, ClientSize);
+		OnResized += deviceContext.UpdateClientSize;
+
+		return deviceContext;
+	}
+}

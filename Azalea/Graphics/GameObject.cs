@@ -1,15 +1,15 @@
 ﻿using Azalea.Amends;
 using Azalea.Design.Components;
 using Azalea.Design.Containers;
-using Azalea.Editing.Legacy;
 using Azalea.Extentions;
 using Azalea.Extentions.EnumExtentions;
 using Azalea.Graphics.Colors;
 using Azalea.Graphics.Primitives;
-using Azalea.Graphics.Rendering;
 using Azalea.Inputs.Events;
 using Azalea.Layout;
 using Azalea.Numerics;
+using Azalea.Platform;
+using Azalea.Platform.Rendering.Coordination;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
@@ -22,7 +22,7 @@ public partial class GameObject : Amendable, IGameObject
 	public GameObject()
 	{
 		AddLayout(_drawInfoBacking);
-		AddLayout(_drawColorInfoBacking);
+		AddLayout(_drawColorQuadBacking);
 	}
 
 	public event Action<GameObject>? OnUpdate;
@@ -31,7 +31,6 @@ public partial class GameObject : Amendable, IGameObject
 	#region Transform
 
 	private float _x;
-	[HideInInspector]
 	public float X
 	{
 		get => _x;
@@ -46,7 +45,6 @@ public partial class GameObject : Amendable, IGameObject
 	}
 
 	private float _y;
-	[HideInInspector]
 	public float Y
 	{
 		get => _y;
@@ -75,7 +73,6 @@ public partial class GameObject : Amendable, IGameObject
 	}
 
 	private float _width;
-	[HideInInspector]
 	public virtual float Width
 	{
 		get => _width;
@@ -85,12 +82,11 @@ public partial class GameObject : Amendable, IGameObject
 
 			_width = value;
 
-			invalidateParentSizeDependencies(Invalidation.DrawSize, Axes.X);
+			invalidateParentSizeDependencies(Invalidation.DrawSize);
 		}
 	}
 
 	private float _height;
-	[HideInInspector]
 	public virtual float Height
 	{
 		get => _height;
@@ -100,7 +96,7 @@ public partial class GameObject : Amendable, IGameObject
 
 			_height = value;
 
-			invalidateParentSizeDependencies(Invalidation.DrawSize, Axes.Y);
+			invalidateParentSizeDependencies(Invalidation.DrawSize);
 		}
 	}
 
@@ -111,18 +107,10 @@ public partial class GameObject : Amendable, IGameObject
 		{
 			if (value == Size) return;
 
-			var changedAxes = Axes.None;
-
-			if (_width != value.X)
-				changedAxes |= Axes.X;
-
-			if (_height != value.Y)
-				changedAxes |= Axes.Y;
-
 			_width = value.X;
 			_height = value.Y;
 
-			invalidateParentSizeDependencies(Invalidation.DrawSize, changedAxes);
+			invalidateParentSizeDependencies(Invalidation.DrawSize);
 		}
 	}
 
@@ -143,10 +131,17 @@ public partial class GameObject : Amendable, IGameObject
 	#endregion
 
 	public bool Active { get; set; } = true;
+	private bool _initialized = false;
 
 	public virtual void UpdateSubTree()
 	{
 		if (Active == false) return;
+
+		if (_initialized == false)
+		{
+			Initialize();
+			_initialized = true;
+		}
 
 		UpdateAmends();
 		Update();
@@ -160,6 +155,8 @@ public partial class GameObject : Amendable, IGameObject
 
 		FixedUpdate();
 	}
+
+	protected virtual void Initialize() { }
 
 	protected virtual void Update() { }
 
@@ -253,7 +250,7 @@ public partial class GameObject : Amendable, IGameObject
 
 			_negativeSize = value;
 
-			invalidateParentSizeDependencies(Invalidation.DrawSize, Axes.Both);
+			invalidateParentSizeDependencies(Invalidation.DrawSize);
 		}
 	}
 
@@ -345,8 +342,6 @@ public partial class GameObject : Amendable, IGameObject
 	internal Vector2 RequiredParentSizeToFit => computeRequiredParentSizeToFit();
 
 	private float _fillAspectRatio = 1;
-
-	[HideInInspector]
 	public float FillAspectRatio
 	{
 		get => _fillAspectRatio;
@@ -367,7 +362,6 @@ public partial class GameObject : Amendable, IGameObject
 	#endregion
 
 	private Vector2 _scale = Vector2.One;
-
 	public Vector2 Scale
 	{
 		get => _scale;
@@ -382,7 +376,6 @@ public partial class GameObject : Amendable, IGameObject
 	}
 
 	private FillMode _fillMode;
-
 	public FillMode FillMode
 	{
 		get => _fillMode;
@@ -399,7 +392,6 @@ public partial class GameObject : Amendable, IGameObject
 	protected virtual Vector2 DrawScale => Scale;
 
 	private Anchor _origin = Anchor.TopLeft;
-
 	public Anchor Origin
 	{
 		get => _origin;
@@ -445,7 +437,6 @@ public partial class GameObject : Amendable, IGameObject
 	}
 
 	private Anchor _anchor = Anchor.TopLeft;
-
 	public Anchor Anchor
 	{
 		get => _anchor;
@@ -518,7 +509,6 @@ public partial class GameObject : Amendable, IGameObject
 	internal bool IsPartOfComposite => ChildID != 0;
 
 	private float depth;
-	[HideInInspector]
 	public float Depth
 	{
 		get => depth;
@@ -532,6 +522,28 @@ public partial class GameObject : Amendable, IGameObject
 
 			depth = value;
 		}
+	}
+
+	private Application? _app;
+	public Application App
+	{
+		get
+		{
+			if (_app is not null)
+				return _app;
+
+			GameObject? parent = Parent;
+			while (parent is not null)
+			{
+				if (parent._app is not null)
+					return parent._app;
+
+				parent = parent.Parent;
+			}
+
+			throw new Exception("GameObject is not contained in any Application");
+		}
+		internal set { _app = value; }
 	}
 
 	private Composition? parent;
@@ -631,7 +643,7 @@ public partial class GameObject : Amendable, IGameObject
 		}
 	}
 
-	public virtual void Draw(IRenderer renderer)
+	public virtual void Draw(RenderCoordinator coordinator)
 	{
 
 	}
@@ -640,7 +652,7 @@ public partial class GameObject : Amendable, IGameObject
 	{
 		get
 		{
-			if (_drawInfoBacking.IsValid == false || AzaleaSettings.DontCacheDrawInfo == true)
+			if (_drawInfoBacking.IsValid == false)
 			{
 				_drawInfo = computeDrawInfo();
 				_drawInfoBacking.Validate();
@@ -662,7 +674,10 @@ public partial class GameObject : Amendable, IGameObject
 		if (Parent != null)
 			pos += Parent.ChildOffset;
 
-		di.ApplyTransformations(pos, Scale, Rotation, Vector2.Zero, OriginPosition);
+		if (pos != Vector2.Zero) di.ApplyTranslation(pos);
+		if (Rotation != 0) di.ApplyRotation(Rotation);
+		if (Scale != Vector2.Zero) di.ApplyScale(Scale);
+		if (OriginPosition != Vector2.Zero) di.ApplyOrigin(OriginPosition);
 
 		return di;
 	}
@@ -671,7 +686,7 @@ public partial class GameObject : Amendable, IGameObject
 
 	#region Components
 
-	private List<Component> _components = new();
+	private readonly List<Component> _components = [];
 
 	public void AddComponent(Component component)
 	{
@@ -830,11 +845,11 @@ public partial class GameObject : Amendable, IGameObject
 		}
 	}
 
-	private void invalidateParentSizeDependencies(Invalidation invalidation, Axes changedAxes)
+	private void invalidateParentSizeDependencies(Invalidation invalidation)
 	{
 		invalidate(invalidation, InvalidationSource.Self, false);
 
-		Parent?.InvalidateChildrenSizeDependencies(invalidation, changedAxes, this);
+		Parent?.Invalidate(invalidation, InvalidationSource.Child);
 	}
 
 	#region DrawInfo-based conversions
@@ -896,8 +911,6 @@ public partial class GameObject : Amendable, IGameObject
 
 	public virtual bool TriggerEvent(InputEvent e)
 	{
-		e.Target = this;
-
 		switch (e)
 		{
 			case MouseDownEvent mouseDown:
@@ -977,26 +990,26 @@ public partial class GameObject : Amendable, IGameObject
 
 	public virtual Quad ScreenSpaceDrawQuad => ToScreenSpace(DrawRectangle);
 
-	private DrawColorInfo _drawColorInfo;
-	private readonly LayoutValue _drawColorInfoBacking = new(Invalidation.Color);
-	public DrawColorInfo DrawColorInfo
+	private ColorQuad _drawColorQuad;
+	private readonly LayoutValue _drawColorQuadBacking = new(Invalidation.Color);
+	public ColorQuad DrawColorQuad
 	{
 		get
 		{
-			if (_drawColorInfoBacking.IsValid)
-				return _drawColorInfo;
+			if (_drawColorQuadBacking.IsValid)
+				return _drawColorQuad;
 
-			_drawColorInfo = Parent?.DrawColorInfo ?? new DrawColorInfo(null);
+			_drawColorQuad = Parent?.DrawColorQuad ?? ColorQuad.SolidColor(Palette.White);
 
 			var colorInfo = _color;
 
 			if (Alpha != 1) colorInfo = colorInfo.MultiplyAlpha(Alpha);
 
-			_drawColorInfo.Color.ApplyChild(colorInfo);
+			_drawColorQuad.ApplyChild(colorInfo);
 
-			_drawColorInfoBacking.Validate();
+			_drawColorQuadBacking.Validate();
 
-			return _drawColorInfo;
+			return _drawColorQuad;
 		}
 	}
 }

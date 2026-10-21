@@ -1,4 +1,5 @@
 ﻿namespace Azalea.Inputs;
+
 public interface IGamepad
 {
 	public ButtonState GetButton(GamepadButton button);
