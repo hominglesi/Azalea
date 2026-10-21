@@ -4,7 +4,6 @@ using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
 using Azalea.Numerics;
 using Azalea.Platform;
-using Azalea.Platform.Loading;
 using Azalea.Utils;
 using System;
 using System.IO;

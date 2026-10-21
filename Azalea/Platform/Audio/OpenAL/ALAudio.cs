@@ -203,7 +203,6 @@ internal class ALAudio : PlatformAudio
 
 				AL.SourceQueueBuffers(audioSource.Handle, audioSource.Buffers.Length, ref audioSource.Buffers[0]);
 				AL.Sourcef(audioSource.Handle, AL.GAIN, instance.Gain);
-				AL.Sourcei(audioSource.Handle, AL.LOOPING, instance.Looping ? 1 : 0);
 
 				AL.SourcePlay(audioSource.Handle);
 

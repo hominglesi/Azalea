@@ -1,7 +1,6 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
 using Azalea.IO.Resources;
-using Azalea.Platform.Windowing;
 
 namespace Azalea;
 

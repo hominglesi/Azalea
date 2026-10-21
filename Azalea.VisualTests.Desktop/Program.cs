@@ -16,7 +16,7 @@ internal class Program
 
 		host.CreateApplication(EditorWrapper.Wrap(new VisualTests()), "Azalea Visual Tests", new Vector2Int(1600, 900));
 
-		host.WaitUntilEmpty();
+		host.WaitUntilClosed();
 		host.SaveConfig();
 	}
 }

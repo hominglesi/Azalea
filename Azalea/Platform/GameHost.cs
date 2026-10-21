@@ -102,17 +102,17 @@ public abstract class GameHost
 		Applications.Remove(application);
 
 		if (Applications.Count == 0)
-			_empty.Set();
+			_closed.Set();
 	}
 
-	private readonly ManualResetEvent _empty = new(false);
+	private readonly ManualResetEvent _closed = new(false);
 
-	public void WaitUntilEmpty()
+	public void WaitUntilClosed()
 	{
 		if (Applications.Count == 0)
 			return;
 
-		_empty.WaitOne();
-		_empty.Reset();
+		_closed.WaitOne();
+		_closed.Reset();
 	}
 }

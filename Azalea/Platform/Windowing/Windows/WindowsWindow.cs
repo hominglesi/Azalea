@@ -47,7 +47,8 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible, bool 
 		ClassAtom = Win32.RegisterClassExW(ref wndClass);
 		Marshal.FreeHGlobal(classNamePtr);
 
-		_windowStyles = Win32.WindowStyles.OVERLAPPEDWINDOW;
+		_windowStyles = Win32.WindowStyles.CAPTION | Win32.WindowStyles.SIZEBOX |
+			Win32.WindowStyles.SYSMENU | Win32.WindowStyles.MINIMIZEBOX | Win32.WindowStyles.MAXIMIZEBOX;
 		if (Shown) _windowStyles |= Win32.WindowStyles.VISIBLE;
 
 		_windowExtendedStyles = Win32.WindowStylesExtended.APPWINDOW;
@@ -234,7 +235,6 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible, bool 
 				break;
 			case SetCursorVisibleCommand(var isVisible):
 				Win32.ShowCursor(isVisible);
-				CursorVisible = isVisible;
 				break;
 			case SetIconCommand(var image):
 				iconHandle = IntPtr.Zero;
@@ -254,16 +254,12 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible, bool 
 				Win32.SetWindowPos(Handle, IntPtr.Zero, position.X, position.Y, 0, 0, Win32.SetWindowPosFlags.NOSIZE);
 				break;
 			case SetResizableCommand(var resizable):
-				if (Resizable == resizable)
-					break;
-
 				if (resizable)
 					_windowStyles |= Win32.WindowStyles.SIZEBOX | Win32.WindowStyles.MAXIMIZEBOX;
 				else
 					_windowStyles &= ~(Win32.WindowStyles.SIZEBOX | Win32.WindowStyles.MAXIMIZEBOX);
 
 				Win32.SetWindowLongPtrW(Handle, Win32.WindowLongValue.Style, (nint)_windowStyles);
-				Resizable = resizable;
 				break;
 			case SetSizeCommand(var size):
 				Win32.SetWindowPos(Handle, IntPtr.Zero, 0, 0, size.X, size.Y, Win32.SetWindowPosFlags.NOMOVE);

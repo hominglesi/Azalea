@@ -5,8 +5,15 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugSymbols>true</DebugSymbols>
+    <EmbedAllSources>true</EmbedAllSources>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>$(AssemblyName)</PackageId>
     <Title>$(AssemblyName)</Title>
-    <Version>1.6.5</Version>
+    <Version>2.0.0</Version>
     <Authors>hominglesi</Authors>
     <Company>Azalea</Company>
     <Description>A lightweight 2D game framework.</Description>
@@ -15,10 +22,6 @@
     <RepositoryUrl>https://github.com/hominglesi/Azalea</RepositoryUrl>
     <PackageReleaseNotes>https://github.com/hominglesi/Azalea/releases</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageId>$(AssemblyName)</PackageId>
-    <DebugSymbols>true</DebugSymbols>
-    <EmbedAllSources>true</EmbedAllSources>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Azalea.SourceGeneration\Azalea.SourceGeneration.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Azalea.SourceGeneration\Azalea.SourceGeneration.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
   </ItemGroup>
 
   <ItemGroup>

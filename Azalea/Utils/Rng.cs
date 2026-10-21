@@ -117,6 +117,17 @@ public static class Rng
 	}
 
 	/// <summary>
+	/// Returns a random object from a List collection or null if the List is empty
+	/// </summary>
+	public static T? RandomOrNull<T>(this IList<T> list)
+		where T : class
+	{
+		if (list.Count <= 0) return null;
+
+		return Random(list);
+	}
+
+	/// <summary>
 	/// Returns a random object from a Dictionary collection
 	/// </summary>
 	public static (T1, T2) Random<T1, T2>(this IDictionary<T1, T2> dictionary)

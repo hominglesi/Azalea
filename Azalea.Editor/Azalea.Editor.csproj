@@ -4,8 +4,15 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <DebugSymbols>true</DebugSymbols>
+    <EmbedAllSources>true</EmbedAllSources>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>$(AssemblyName)</PackageId>
     <Title>$(AssemblyName)</Title>
-    <Version>1.0.2</Version>
+    <Version>1.1.0</Version>
     <Authors>hominglesi</Authors>
     <Company>Azalea</Company>
     <Description>An editor wrapper for Azalea projects.</Description>
@@ -14,10 +21,6 @@
     <RepositoryUrl>https://github.com/hominglesi/Azalea</RepositoryUrl>
     <PackageReleaseNotes>https://github.com/hominglesi/Azalea/releases</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageId>$(AssemblyName)</PackageId>
-    <DebugSymbols>true</DebugSymbols>
-    <EmbedAllSources>true</EmbedAllSources>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
