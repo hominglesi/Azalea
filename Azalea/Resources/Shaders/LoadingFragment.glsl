@@ -8,27 +8,17 @@ uniform vec2 u_Resolution;
 uniform vec2 u_ScreenResolution;
 uniform float u_Time;
 
+uniform vec4 u_BackgroundColor;
+uniform vec4 u_RingColor;
+uniform vec4 u_CircleColor;
+
 out vec4 FragColor;
 
 #define PI 3.14159265
 
-float scale        = 0.5;
 float anim_speed   = 1.5;
 float aa_level     = 1.375;
 float r_small_rate = 1.0 / 7.0;
-
-vec3 bg_col   = vec3(1.0);
-vec3 ring_col = vec3(0.625);
-vec3 cir_col  = vec3(0.1, 0.3, 1.0) * 0.375;
-
-float ring_trans = 0.375;
-float cir_trans  = 1.0;
-
-vec2 GetClipCoord(in vec2 coord, in vec2 ar, in vec2 resolution)
-{
-    coord = (coord / resolution) * 2.0 - 1.0;
-    return coord * ar;
-}
 
 float sdCircle(in vec2 p, in float r)
 {
@@ -37,24 +27,21 @@ float sdCircle(in vec2 p, in float r)
 
 void main()
 {
-    vec2 regionSize = vec2(100, 100);
-
+    vec2 regionSize = vec2(50, 50);
     vec2 resCenter = u_Resolution / 2;
 
     vec2 pixelCoordinate = vec2(gl_FragCoord.x - u_Offset.x, (u_Resolution.y - gl_FragCoord.y) + (u_ScreenResolution.y - (u_Offset.y + u_Resolution.y)));
-
     vec2 regionPosition = (u_Resolution - regionSize) / 2;
 
     if(pixelCoordinate.x < regionPosition.x || pixelCoordinate.y < regionPosition.y 
     || pixelCoordinate.x > regionSize.x + regionPosition.x || pixelCoordinate.y > regionSize.y + regionPosition.y){
-        FragColor = vec4(bg_col, 1.0);
+        FragColor = u_BackgroundColor;
         return;
     }
 
-    vec2 ar = max(regionSize.xy / regionSize.yx, vec2(1.0));
-    vec2 uv = GetClipCoord(pixelCoordinate.xy - regionPosition, ar, regionSize) / scale;
+    vec2 uv = ((pixelCoordinate.xy - regionPosition) / regionSize) * 2.0 - 1.0;
 
-    vec3 col = bg_col;
+    vec4 col = u_BackgroundColor;
 
     float aa_width = aa_level / min(regionSize.x, regionSize.y);
 
@@ -66,7 +53,7 @@ void main()
     float t_ring = abs(sdCircle(uv, r_big)) - r_small;
     t_ring = 1.0 - smoothstep(-aa_width, aa_width, t_ring);
 
-    col = mix(col, ring_col, t_ring * ring_trans);
+    col = mix(col, u_RingColor, t_ring);
 
     vec2  a = vec2(4.0 / 5.0, 5.0 / 4.0);
           a = (pow(vec2(mod(time, 3.0) / 3.0), a) * 3.0) * PI * 2.0;
@@ -86,11 +73,8 @@ void main()
 
     vec2 b_uv = a_uv + a_floor * PI * 2.0;
          b_uv = step(vec2(0.0), min(b_uv - a.y, a.x - b_uv));
-    t_cir = min(1.0, max(b_uv.x, b_uv.y) + t_cir) * t_ring * cir_trans;
-    col = mix(col, cir_col, t_cir);
+    t_cir = min(1.0, max(b_uv.x, b_uv.y) + t_cir) * t_ring;
+    col = mix(col, u_CircleColor, t_cir);
 
-
-    // Output
-    col = pow(col, vec3(1.0 / 2.2));
-    FragColor = vec4(col, 1.0);
+    FragColor = col;
 }

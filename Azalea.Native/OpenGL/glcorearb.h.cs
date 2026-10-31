@@ -35,6 +35,9 @@ public static partial class GL
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glAttachShader.xhtml")]
 	private delegate void AttachShaderDelegate(uint program, uint shader);
 
+	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindBufferBase.xhtml")]
+	private delegate void BindBufferBaseDelegate(int target, uint index, uint buffer);
+
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glBindBuffer.xhtml")]
 	private delegate void BindBufferDelegate(int target, uint buffer);
 
@@ -113,6 +116,9 @@ public static partial class GL
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetShader.xhtml")]
 	private delegate void GetShaderivDelegate(uint shader, int pname, ref int _params);
 
+	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetUniformBlockIndex.xhtml")]
+	private delegate uint GetUniformBlockIndexDelegate(uint program, byte[] uniformBlockName);
+
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGetUniformLocation.xhtml")]
 	private delegate int GetUniformLocationDelegate(uint program, byte[] name);
 
@@ -138,6 +144,9 @@ public static partial class GL
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml")]
 	private delegate void Uniform4fDelegate(int location, float v0, float v1, float v2, float v3);
+
+	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniformBlockBinding.xhtml")]
+	private delegate void UniformBlockBindingDelegate(uint program, uint blockIndex, uint blockBinding);
 
 	[OpenGLLoadedFunction("https://registry.khronos.org/OpenGL-Refpages/gl4/html/glUniform.xhtml")]
 	private delegate void UniformMatrix4fvDelegate(int location, int count, bool transpose, ref Matrix4x4 value);

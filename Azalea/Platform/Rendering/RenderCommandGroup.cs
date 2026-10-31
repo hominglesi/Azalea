@@ -1,4 +1,5 @@
-﻿using Azalea.Threading;
+﻿using Azalea.Graphics.Shaders;
+using Azalea.Threading;
 
 namespace Azalea.Platform.Rendering;
 
@@ -7,7 +8,7 @@ namespace Azalea.Platform.Rendering;
 /// </summary>
 public class RenderCommandGroup : CommandGroup<RenderCommand>
 {
-	private Program? _currentProgram;
+	private Shader? _currentProgram;
 	private VertexArray? _currentVertexArray;
 
 	public override ICommandAwaitable? Enqueue(RenderCommand command)
@@ -23,10 +24,10 @@ public class RenderCommandGroup : CommandGroup<RenderCommand>
 
 				_currentVertexArray = vertexArray;
 				break;
-			case UseProgramCommand(var program) useProgramCommand:
+			case BindShaderCommand(var program) bindShaderCommand:
 				if (_currentProgram == program)
 				{
-					useProgramCommand.Return();
+					bindShaderCommand.Return();
 					return null;
 				}
 

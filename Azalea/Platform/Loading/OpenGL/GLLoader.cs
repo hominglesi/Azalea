@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.Textures;
+﻿using Azalea.Graphics.Shaders;
+using Azalea.Graphics.Textures;
 using Azalea.IO.Resources;
 using Azalea.Native.OpenGL;
 using Azalea.Platform.Rendering;
@@ -28,12 +29,17 @@ internal class GLLoader : PlatformLoader
 
 		WhitePixel = this.CreateTexture(1, 1, [byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue], false, TextureFiltering.Nearest);
 
-		var quadVertex = Assets.GetText("Shaders/DefaultQuadVertex.glsl")!;
-		var quadFragment = Assets.GetText("Shaders/DefaultQuadFragment.glsl")!;
-		DefaultQuadShader = LoadShader(quadVertex, quadFragment);
+		DefaultQuadShader = new Shader(
+			vertexCode: Assets.GetText("Shaders/DefaultQuadVertex.glsl")!,
+			fragmentCode: Assets.GetText("Shaders/DefaultQuadFragment.glsl")!,
+			autoInitialize: false);
+		InitializeShader(DefaultQuadShader);
 
-		var textFragment = Assets.GetText("Shaders/DefaultTextFragment.glsl")!;
-		DefaultTextShader = LoadShader(quadVertex, textFragment);
+		DefaultTextShader = new Shader(
+			vertexCode: Assets.GetText("Shaders/DefaultQuadVertex.glsl")!,
+			fragmentCode: Assets.GetText("Shaders/DefaultTextFragment.glsl")!,
+			autoInitialize: false);
+		InitializeShader(DefaultTextShader);
 	}
 
 	protected override void HandleCommandLogic(LoadingCommand command)
@@ -65,13 +71,14 @@ internal class GLLoader : PlatformLoader
 				LoadedTextures.Add(texture);
 
 				break;
-			case CreateProgramCommand(var program, var vertexShaderCode, var fragmentShaderCode):
+			case InitializeShaderCommand(var shader):
 				var vertexShader = GL.CreateShader(GL.VERTEX_SHADER);
 				var fragmentShader = GL.CreateShader(GL.FRAGMENT_SHADER);
+
 				unsafe
 				{
-					var vertexCodeBuffer = Encoding.UTF8.GetBytes(vertexShaderCode);
-					var fragmentCodeBuffer = Encoding.UTF8.GetBytes(fragmentShaderCode);
+					var vertexCodeBuffer = Encoding.UTF8.GetBytes(shader.VertexCode);
+					var fragmentCodeBuffer = Encoding.UTF8.GetBytes(shader.FragmentCode);
 					fixed (byte* vsP = &vertexCodeBuffer[0])
 					fixed (byte* fsP = &fragmentCodeBuffer[0])
 					{
@@ -128,7 +135,10 @@ internal class GLLoader : PlatformLoader
 				GL.DeleteShader(fragmentShader);
 				GL.Flush();
 
-				program.Initialize(programHandle);
+				shader.Program = new Program();
+				shader.Program.Initialize(programHandle);
+
+				shader.InitializationLogic();
 				break;
 			case RebindContextCommand():
 				Debug.Assert(Context is not null);
