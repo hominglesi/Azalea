@@ -2,22 +2,24 @@
 using Azalea.Numerics;
 using System;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace Azalea.Graphics.Primitives;
 
+[StructLayout(LayoutKind.Sequential)]
 public readonly struct Quad
 {
 	public readonly Vector2 TopLeft;
-	public readonly Vector2 BottomLeft;
-	public readonly Vector2 BottomRight;
 	public readonly Vector2 TopRight;
+	public readonly Vector2 BottomRight;
+	public readonly Vector2 BottomLeft;
 
-	public Quad(Vector2 topLeft, Vector2 bottomLeft, Vector2 bottomRight, Vector2 topRight)
+	public Quad(Vector2 topLeft, Vector2 topRight, Vector2 bottomRight, Vector2 bottomLeft)
 	{
 		TopLeft = topLeft;
-		BottomLeft = bottomLeft;
-		BottomRight = bottomRight;
 		TopRight = topRight;
+		BottomRight = bottomRight;
+		BottomLeft = bottomLeft;
 	}
 
 	public Quad(float x, float y, float width, float height)
@@ -35,15 +37,15 @@ public readonly struct Quad
 
 	public static Quad FromRectangle(Rectangle rectangle) =>
 		new(rectangle.TopLeft,
-			rectangle.BottomLeft,
+			rectangle.TopRight,
 			rectangle.BottomRight,
-			rectangle.TopRight);
+			rectangle.BottomLeft);
 
 	public static Quad operator *(Quad r, Matrix3 m) =>
 		new(Vector2Extentions.Transform(r.TopLeft, m),
-			Vector2Extentions.Transform(r.BottomLeft, m),
+			Vector2Extentions.Transform(r.TopRight, m),
 			Vector2Extentions.Transform(r.BottomRight, m),
-			Vector2Extentions.Transform(r.TopRight, m));
+			Vector2Extentions.Transform(r.BottomLeft, m));
 
 	public float Width => Vector2Extentions.Distance(TopLeft, TopRight);
 	public float Height => Vector2Extentions.Distance(TopLeft, BottomLeft);

@@ -5,6 +5,7 @@ using Azalea.Numerics;
 using Azalea.Platform;
 using Azalea.Platform.Rendering;
 using Azalea.Platform.Rendering.Coordination;
+using System;
 using System.Numerics;
 
 namespace Azalea.Graphics.Sprites;
@@ -66,9 +67,13 @@ public class Sprite : GameObject
 
 	protected override void Update()
 	{
-		base.Update();
+		try
+		{
+			_time += App.Scheduler.DeltaTime;
+		}
+		catch (Exception) { }
 
-		_time += App.Scheduler.DeltaTime;
+		base.Update();
 	}
 
 	public override void Draw(RenderCoordinator coordinator)

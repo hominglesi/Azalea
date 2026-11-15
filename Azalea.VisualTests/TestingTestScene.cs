@@ -166,25 +166,6 @@ public class TestingTestScene : TestScene
 			]
 		});
 
-
-
-		Add(new Box()
-		{
-			Size = new(100, 100),
-			Origin = Anchor.BottomRight,
-			Color = Palette.Blue,
-			Anchor = Anchor.BottomRight
-		});
-		var modifiedColor = Palette.Blue;
-		modifiedColor.Luminance += 0.3f;
-		Add(new Box()
-		{
-			Size = new(100, 100),
-			Origin = Anchor.TopRight,
-			Color = modifiedColor,
-			Anchor = Anchor.TopRight
-		});
-
 		Add(new Composition()
 		{
 			Size = new(200, 200),

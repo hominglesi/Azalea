@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Numerics;
 
 namespace Azalea.Graphics.Colors;
 
@@ -65,50 +64,7 @@ public partial struct Color(byte r, byte g, byte b, byte a)
 		A = (byte)(A * alpha);
 	}
 
-	public readonly float Brightness
-	{
-		get
-		{
-			return ((R * 299) + (G * 587) + (B * 114)) / 1000;
-		}
-	}
-
-	#region Linear
-
-	private static float toLinear(float srgb)
-	{
-		if (srgb == 1.0f) return 1.0f;
-
-		return srgb <= 0.04045f ? srgb / 12.92f : MathF.Pow((srgb + 0.055f) / 1.055f, 2.4f);
-	}
-
-	public readonly Color ToLinear() => new(toLinear(RNormalized), toLinear(GNormalized), toLinear(BNormalized), ANormalized);
-
-	private static float toSRBG(float linear)
-	{
-		if (linear == 1.0f) return 1.0f;
-
-		return linear < 0.0031308f ? 12.92f * linear : 1.055f * MathF.Pow(linear, 1.0f / 2.4f) - 0.055f;
-	}
-
-	public readonly Color ToSRBG() => new(toSRBG(RNormalized), toSRBG(GNormalized), toSRBG(BNormalized), ANormalized);
-
-	public static Color operator *(Color first, Color second)
-	{
-		var firstLinear = first.ToLinear();
-		var secondLinear = second.ToLinear();
-
-		return new Color(
-			firstLinear.RNormalized * secondLinear.RNormalized,
-			firstLinear.GNormalized * secondLinear.GNormalized,
-			firstLinear.BNormalized * secondLinear.BNormalized,
-			firstLinear.ANormalized * secondLinear.ANormalized
-			).ToSRBG();
-	}
-
-	#endregion
-
-	#region Normalized
+	public readonly float Brightness => ((R * 299) + (G * 587) + (B * 114)) / 1000;
 
 	/// <summary>
 	/// Value of the Red channel represented by a float between 0 and 1
@@ -129,10 +85,6 @@ public partial struct Color(byte r, byte g, byte b, byte a)
 	/// Value of the Alpha channel represented by a float between 0 and 1
 	/// </summary>
 	public readonly float ANormalized => (float)A / byte.MaxValue;
-
-	#endregion Normalized
-
-	#region Hex
 
 	/// <summary>
 	/// Returns the color represented as a string of hexadecimal values
@@ -173,154 +125,13 @@ public partial struct Color(byte r, byte g, byte b, byte a)
 		}
 	}
 
-	#endregion
-
-	#region HSL
-
-	private readonly Vector4 toHSL()
+	public static Color operator *(Color first, Color second)
 	{
-		var max = Math.Max(RNormalized, Math.Max(GNormalized, BNormalized));
-		var min = Math.Min(RNormalized, Math.Min(GNormalized, BNormalized));
-		var diff = max - min;
+		var firstLinear = ColorSpace.Linear.FromColor(first);
+		var secondLinear = ColorSpace.Linear.FromColor(second);
 
-		var h = 0.0f;
-		if (max == RNormalized) h = ((GNormalized - BNormalized) / diff) % 6;
-		else if (max == GNormalized) h = ((BNormalized - RNormalized) / diff) + 2f;
-		else if (max == BNormalized) h = ((RNormalized - GNormalized) / diff) + 4f;
-
-
-		if (h < 0) h += 6;
-		else if (h > 6) h -= 6;
-		else if (float.IsNaN(h)) h = 0;
-
-		var hue = h * 60f;
-
-		var luminance = (max + min) / 2f;
-
-		var saturation = 0.0f;
-		if ((1.0f - Math.Abs((2.0f * luminance) - 1.0f)) != 0)
-			saturation = diff / (1.0f - Math.Abs((2.0f * luminance) - 1.0f));
-
-		return new Vector4(hue, saturation, luminance, ANormalized);
-
+		return ColorSpace.Linear.ToColor(firstLinear * secondLinear);
 	}
-
-	private void fromHSL(Vector4 hsl)
-	{
-		var hue = hsl.X;
-		var saturation = hsl.Y;
-		var luminance = hsl.Z;
-		var alpha = hsl.W;
-
-		var c = (1.0f - Math.Abs((2.0f * luminance) - 1.0f)) * saturation;
-
-		var h = hue / 60f;
-		var x = c * (1.0f - Math.Abs((h % 2.0f) - 1.0f));
-
-		float r = 0.0f, g = 0.0f, b = 0.0f;
-
-		if (h >= 0.0f && h < 1.0f)
-		{
-			r = c;
-			g = x;
-			b = 0.0f;
-		}
-		else if (h >= 1.0f && h < 2.0f)
-		{
-			r = x;
-			g = c;
-			b = 0.0f;
-		}
-		else if (h >= 2.0f && h < 3.0f)
-		{
-			r = 0.0f;
-			g = c;
-			b = x;
-		}
-		else if (h >= 3.0f && h < 4.0f)
-		{
-			r = 0.0f;
-			g = x;
-			b = c;
-		}
-		else if (h >= 4.0f && h < 5.0f)
-		{
-			r = x;
-			g = 0.0f;
-			b = c;
-		}
-		else if (h >= 5.0f && h < 6.0f)
-		{
-			r = c;
-			g = 0.0f;
-			b = x;
-		}
-
-		var m = luminance - (c / 2.0f);
-		if (m < 0)
-		{
-			m = 0;
-		}
-
-		R = (byte)((r + m) * byte.MaxValue);
-		G = (byte)((g + m) * byte.MaxValue);
-		B = (byte)((b + m) * byte.MaxValue);
-		A = (byte)(alpha * byte.MaxValue);
-	}
-
-	public static Color FromHSL(Vector4 hslValues)
-	{
-		var color = new Color();
-		color.fromHSL(hslValues);
-		return color;
-	}
-
-	/// <summary>
-	/// The luminance of the color
-	/// </summary>
-	public float Luminance
-	{
-		readonly get => toHSL().Z;
-		set
-		{
-			var clamped = Math.Clamp(value, 0, 1);
-
-			var hsl = toHSL();
-			hsl.Z = clamped;
-			fromHSL(hsl);
-		}
-	}
-
-	/// <summary>
-	/// The saturation of the color
-	/// </summary>
-	public float Saturation
-	{
-		readonly get => toHSL().Y;
-		set
-		{
-			var clamped = Math.Clamp(value, 0, 1);
-
-			var hsl = toHSL();
-			hsl.Y = clamped;
-			fromHSL(hsl);
-		}
-	}
-
-	public float Hue
-	{
-		readonly get => toHSL().X;
-		set
-		{
-			var clamped = Math.Clamp(value, 0, 360);
-
-			var hsl = toHSL();
-			hsl.X = clamped;
-			fromHSL(hsl);
-		}
-	}
-
-	#endregion
 
 	public override readonly bool Equals(object? obj)
 	{

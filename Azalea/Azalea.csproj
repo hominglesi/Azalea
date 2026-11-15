@@ -13,7 +13,7 @@
   <PropertyGroup>
     <PackageId>$(AssemblyName)</PackageId>
     <Title>$(AssemblyName)</Title>
-    <Version>2.0.1-dev1</Version>
+    <Version>2.0.1-dev5</Version>
     <Authors>hominglesi</Authors>
     <Company>Azalea</Company>
     <Description>A lightweight 2D game framework.</Description>
