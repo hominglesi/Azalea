@@ -19,6 +19,13 @@ public class UnitTestsScene : TestScene
 	{
 		_manager = new UnitTestsManager();
 
+		Add(_testContainer = new UnitTestContainer()
+		{
+			Position = new(__sidebarWidth, __menuBarHeight),
+			RelativeSizeAxes = Axes.Both,
+			NegativeSize = new(__sidebarWidth, __menuBarHeight)
+		});
+
 		Add(_menuBar = new UnitTestMenuBar()
 		{
 			RelativeSizeAxes = Axes.X,
@@ -64,13 +71,6 @@ public class UnitTestsScene : TestScene
 		_sidebar.AddHeaderButton("runStep", _sidebar.RunNextStep);
 		_sidebar.AddHeaderButton("runAllSteps", _sidebar.RunAllSteps);
 		_sidebar.AddHeaderButton("reset", resetUnitTest);
-
-		Add(_testContainer = new UnitTestContainer()
-		{
-			Position = new(__sidebarWidth, __menuBarHeight),
-			RelativeSizeAxes = Axes.Both,
-			NegativeSize = new(__sidebarWidth, __menuBarHeight)
-		});
 
 		displayUnitTest(_manager.SelectedUnitTest);
 	}

@@ -124,7 +124,7 @@ internal class ALAudio : PlatformAudio
 				_context = ALC.CreateContext(_device, ref _contextAttributes[0]);
 				ALC.MakeContextCurrent(_context);
 
-				_deviceNotificationClient.DefaultDeviceChanged += () => ALC.ReopenDeviceSOFT(_device, null, ref _contextAttributes[0]);
+				//_deviceNotificationClient.DefaultDeviceChanged += () => ALC.ReopenDeviceSOFT(_device, null, ref _contextAttributes[0]);
 
 				AL.DistanceModel(0);
 				AL.Listener3f(AL.POSITION, 0, 0, 0);

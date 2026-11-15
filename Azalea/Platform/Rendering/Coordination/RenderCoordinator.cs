@@ -1,4 +1,5 @@
-﻿using Azalea.Native.OpenGL;
+﻿using Azalea.Graphics.Shaders;
+using Azalea.Native.OpenGL;
 using Azalea.Numerics;
 using Azalea.Utils;
 using System;
@@ -88,8 +89,8 @@ public class RenderCoordinator
 
 	#endregion
 	#region Shader
-	private IShader? _boundShader;
-	public void BindShader(IShader shader)
+	private Shader? _boundShader;
+	public void BindShader(Shader shader)
 	{
 		Debug.Assert(shader is not null);
 		if (_boundShader == shader)
@@ -97,18 +98,9 @@ public class RenderCoordinator
 
 		FlushRenderBatch();
 
-		getCommandQueue().UseProgram((Program)shader);
+		getCommandQueue().BindShader(shader);
 		_boundShader = shader;
 	}
-
-	private Program getBoundProgram()
-	{
-		Debug.Assert(_boundShader is not null);
-		return (Program)_boundShader;
-	}
-
-	public void Uniform(string uniformName, float v) => getCommandQueue().Uniform1f(getBoundProgram(), uniformName, v);
-	public void Uniform(string uniformName, float v1, float v2) => getCommandQueue().Uniform2f(getBoundProgram(), uniformName, v1, v2);
 
 	#endregion
 	#region Texture

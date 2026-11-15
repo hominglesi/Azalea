@@ -16,6 +16,9 @@ public sealed class Application
 	public readonly PlatformScheduler Scheduler;
 	public readonly InputProcessor Input;
 
+	private float _accumulator = 0;
+	private const float _fixedUpdateInterval = 1f / 60;
+
 	internal Application(AzaleaGame game, string title, Vector2Int clientSize, bool visible)
 	{
 		Game = game;
@@ -51,6 +54,13 @@ public sealed class Application
 
 			if (clientSize == Vector2Int.Zero)
 				return;
+
+			_accumulator += Scheduler.DeltaTime;
+			while (_accumulator > _fixedUpdateInterval)
+			{
+				Game.FixedUpdateSubTree();
+				_accumulator -= _fixedUpdateInterval;
+			}
 
 			Game.Size = clientSize;
 			Game.UpdateSubTree();

@@ -82,7 +82,7 @@ public class BreakoutTest : TestScene
 		var hue = MathUtils.Map(x, 0, GameWidth, 0, 350);
 		var luminance = MathUtils.Map(y, 0, BlocksHeight, 0.25f, 0.85f);
 
-		return Graphics.Colors.Color.FromHSL(new(hue, 0.95f, luminance, 1));
+		return ColorSpace.HSL.ToColor(new(hue, 0.95f, luminance, 1));
 	}
 
 	private readonly List<BreakoutBall> _createdBalls = [];

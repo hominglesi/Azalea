@@ -10,7 +10,7 @@ internal class WindowsAudioDeviceNotificationClient : Win32.IMMNotificationClien
 
 	public WindowsAudioDeviceNotificationClient()
 	{
-		_deviceEnumerator = (Win32.IMMDeviceEnumerator)new Win32.MMDeviceEnumerator();
+		_deviceEnumerator = (Win32.IMMDeviceEnumerator)new Win32.MMDeviceEnumeratorComObject();
 		_deviceEnumerator.RegisterEndpointNotificationCallback(this);
 	}
 

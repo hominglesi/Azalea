@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace Azalea.Platform.Rendering;
 
-public class Program : IShader
+public class Program
 {
 	internal uint? Handle { get; private set; }
 	internal Dictionary<string, int>? UniformLocations;
@@ -35,5 +35,3 @@ public class Program : IShader
 		Debug.Assert(Handle is not null);
 	}
 }
-
-public interface IShader;

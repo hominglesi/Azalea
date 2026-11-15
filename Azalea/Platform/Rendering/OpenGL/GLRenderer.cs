@@ -347,15 +347,27 @@ internal partial class GLRenderer : PlatformRenderer
 				_activeScreenFramebuffer = (_activeScreenFramebuffer + 1) % __screenFramebufferCount;
 				Monitor.Exit(screenFramebuffer.TextureLock);
 				break;
-			case Uniform1fCommand(var program, var uniformName, var int0):
-				GL.Uniform1f(getUniformLocation(program, uniformName), int0);
+			case Uniform1fCommand(var shader, var uniformName, var int0):
+				Debug.Assert(shader.Program is not null);
+				GL.UseProgram(shader.Program.Handle!.Value);
+				GL.Uniform1f(getUniformLocation(shader.Program, uniformName), int0);
 				break;
-			case Uniform2fCommand(var program, var uniformName, var float0, var float1):
-				GL.Uniform2f(getUniformLocation(program, uniformName), float0, float1);
+			case Uniform2fCommand(var shader, var uniformName, var float0, var float1):
+				Debug.Assert(shader.Program is not null);
+				GL.UseProgram(shader.Program.Handle!.Value);
+				GL.Uniform2f(getUniformLocation(shader.Program, uniformName), float0, float1);
 				break;
-			case UseProgramCommand(var program):
-				program.AssureInitialized();
-				GL.UseProgram(program.Handle.Value);
+			case Uniform4fCommand(var shader, var uniformName, var float0, var float1, var float2, var float3):
+				Debug.Assert(shader.Program is not null);
+				GL.UseProgram(shader.Program.Handle!.Value);
+				GL.Uniform4f(getUniformLocation(shader.Program, uniformName), float0, float1, float2, float3);
+				break;
+			case BindShaderCommand(var shader):
+				while (shader.Program is null)
+					System.Threading.Thread.Sleep(1);
+
+				shader.Program.AssureInitialized();
+				GL.UseProgram(shader.Program.Handle.Value);
 				break;
 			case VertexAttribPointerCommand(var index, var size, var type, var normalized, int stride, nint pointer):
 				GL.VertexAttribPointer(index, size, type, normalized, stride, pointer);

@@ -143,8 +143,9 @@ public partial class GameObject : Amendable, IGameObject
 			_initialized = true;
 		}
 
-		UpdateAmends();
 		Update();
+
+		UpdateAmends();
 		updateComponents();
 		OnUpdate?.Invoke(this);
 	}
@@ -496,9 +497,15 @@ public partial class GameObject : Amendable, IGameObject
 		{
 			if (_alpha == value) return;
 
+			var wasPresent = _alpha > visibility_cutoff;
+
 			_alpha = Math.Clamp(value, 0, 1);
 
-			Invalidate(Invalidation.Color);
+			var invalidation = Invalidation.Color;
+			if (wasPresent != _alpha > visibility_cutoff)
+				invalidation |= Invalidation.Presence;
+
+			Invalidate(invalidation);
 		}
 	}
 

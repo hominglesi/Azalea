@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics.Colors;
+using Azalea.Graphics.Shaders;
 using Azalea.Numerics;
 using Azalea.Platform.Rendering.Coordination;
 using Azalea.Threading;
@@ -39,6 +40,12 @@ internal partial class BindFramebufferCommand : RenderCommand
 {
 	public int Type;
 	public Framebuffer Framebuffer;
+}
+
+[ThreadCommand(generateHandler: true)]
+internal partial class BindShaderCommand : RenderCommand
+{
+	public Shader Shader;
 }
 
 [ThreadCommand(generateHandler: true)]
@@ -267,29 +274,32 @@ internal partial class SetClearColorCommand : RenderCommand
 [ThreadCommand(generateHandler: true)]
 internal partial class SwapBuffersCommand : RenderCommand { }
 
-[ThreadCommand(generateHandler: true)]
+[ThreadCommand]
 internal partial class Uniform1fCommand : RenderCommand
 {
-	public Program Program;
+	public Shader Shader;
 	public string UniformName;
 	public float Float;
 }
 
-[ThreadCommand(generateHandler: true)]
+[ThreadCommand]
 internal partial class Uniform2fCommand : RenderCommand
 {
-	public Program Program;
+	public Shader Shader;
 	public string UniformName;
 	public float Float1;
 	public float Float2;
 }
 
-[ThreadCommand(generateHandler: true)]
-internal partial class UseProgramCommand : RenderCommand
+[ThreadCommand]
+internal partial class Uniform4fCommand : RenderCommand
 {
-	public Program Program;
-
-	public override string ToString() => $"UseProgram({Program.Handle})";
+	public Shader Shader;
+	public string UniformName;
+	public float Float1;
+	public float Float2;
+	public float Float3;
+	public float Float4;
 }
 
 [ThreadCommand(generateHandler: true)]

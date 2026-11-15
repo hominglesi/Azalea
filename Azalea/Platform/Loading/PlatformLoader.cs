@@ -1,4 +1,5 @@
-﻿using Azalea.Lists;
+﻿using Azalea.Graphics.Shaders;
+using Azalea.Lists;
 using Azalea.Platform.Rendering;
 using Azalea.Threading;
 using System;
@@ -26,8 +27,8 @@ public abstract partial class PlatformLoader : ICommandHandler<LoadingCommand>
 	protected abstract void HandleCommandLogic(LoadingCommand command);
 
 	internal NativeTexture WhitePixel { get; set; }
-	public IShader DefaultQuadShader { get; internal set; }
-	public IShader DefaultTextShader { get; internal set; }
+	public Shader DefaultQuadShader { get; internal set; }
+	public Shader DefaultTextShader { get; internal set; }
 	internal abstract NativeTexture CreateEmptyTexture();
 
 	internal ObservableList<NativeTexture> LoadedTextures { get; } = [];
@@ -56,20 +57,15 @@ public abstract partial class PlatformLoader : ICommandHandler<LoadingCommand>
 
 	#region Shaders
 
-	internal Dictionary<(string, string), IShader> LoadedShaders = [];
-	internal event Action<IShader>? OnShaderLoaded;
+	internal List<Shader> LoadedShaders = [];
+	internal event Action<Shader>? OnShaderLoaded;
 
-	public IShader LoadShader(string vertexCode, string fragmentCode)
+	public void InitializeShader(Shader shader)
 	{
-		if (LoadedShaders.TryGetValue((vertexCode, fragmentCode), out var existing))
-			return existing;
+		Enqueue(InitializeShaderCommand.Borrow(shader));
 
-		var program = new Program();
-		Enqueue(CreateProgramCommand.Borrow(program, vertexCode, fragmentCode));
-
-		LoadedShaders.Add((vertexCode, fragmentCode), program);
-		OnShaderLoaded?.Invoke(program);
-		return program;
+		LoadedShaders.Add(shader);
+		OnShaderLoaded?.Invoke(shader);
 	}
 
 	#endregion

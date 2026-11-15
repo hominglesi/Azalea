@@ -1,4 +1,5 @@
-﻿using Azalea.Graphics.Textures;
+﻿using Azalea.Graphics.Shaders;
+using Azalea.Graphics.Textures;
 using Azalea.Platform.Rendering;
 using Azalea.Threading;
 
@@ -17,14 +18,6 @@ public abstract class LoadingCommand : ThreadCommand
 public abstract partial class PlatformLoader
 {
 	[ThreadCommand]
-	internal partial class CreateProgramCommand : LoadingCommand
-	{
-		public Program Program;
-		public string VertexShaderCode;
-		public string FragmentShaderCode;
-	}
-
-	[ThreadCommand]
 	internal partial class CreateTextureCommand : LoadingCommand
 	{
 		public NativeTexture Texture;
@@ -42,6 +35,12 @@ public abstract partial class PlatformLoader
 		texture.Height = height;
 		Enqueue(CreateTextureCommand.Borrow(texture, width, height, pixels, generateMipmap, filtering));
 		return texture;
+	}
+
+	[ThreadCommand]
+	internal partial class InitializeShaderCommand : LoadingCommand
+	{
+		public Shader Shader;
 	}
 
 	[ThreadCommand(awaitable: true)]
