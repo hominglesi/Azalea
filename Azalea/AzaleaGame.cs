@@ -1,21 +1,41 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Graphics;
-using Azalea.IO.Resources;
+using Azalea.Platform;
+using Azalea.Platform.Rendering.Coordination;
+using Azalea.Scenes;
+using System.Collections.Generic;
+using System.Numerics;
 
 namespace Azalea;
 
-public abstract class AzaleaGame : Composition
+public abstract class AzaleaGame : Composition, IScene
 {
 	public AzaleaGame()
 	{
 		RelativeSizeAxes = Axes.Both;
-
-		Assets.MainStore.AddMsdfFont("Roboto-Regular", "Fonts/Roboto-Regular.csv", "Fonts/Roboto-Regular.bmp");
 	}
 
-	protected override void Initialize()
+	void IScene.Update() => UpdateSubTree();
+	void IScene.FixedUpdate() => FixedUpdateSubTree();
+	void IScene.Draw(RenderCoordinator coordinator) => Draw(coordinator);
+	void IScene.UpdateSize(Vector2 newSize) => Size = newSize;
+	void IScene.SetApplication(Application? app) => App = app;
+
+	IEnumerable<ISceneObject> IScene.BuildNonPositionalInputQueue()
 	{
-		App.Window.SetIcon(Assets.MainStore.GetImage("Textures/azalea-icon.png"));
-		base.Initialize();
+		var inputQueue = new List<GameObject>();
+		BuildNonPositionalInputQueue(inputQueue);
+		inputQueue.Reverse();
+
+		return inputQueue;
+	}
+
+	IEnumerable<ISceneObject> IScene.BuildPositionalInputQueue(Vector2 position)
+	{
+		var inputQueue = new List<GameObject>();
+		BuildPositionalInputQueue(position, inputQueue);
+		inputQueue.Reverse();
+
+		return inputQueue;
 	}
 }

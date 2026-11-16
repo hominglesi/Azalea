@@ -10,6 +10,7 @@ using Azalea.Layout;
 using Azalea.Numerics;
 using Azalea.Platform;
 using Azalea.Platform.Rendering.Coordination;
+using Azalea.Scenes;
 using Azalea.Utils;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ using System.Numerics;
 
 namespace Azalea.Graphics;
 
-public partial class GameObject : Amendable, IGameObject
+public partial class GameObject : Amendable, IGameObject, ISceneObject
 {
 	public GameObject()
 	{
@@ -898,6 +899,7 @@ public partial class GameObject : Amendable, IGameObject
 	/// Check if this <see cref="GameObject"/> has focus
 	/// </summary>
 	public bool HasFocus { get; internal set; }
+	bool ISceneObject.HasFocus { get => HasFocus; set => HasFocus = value; }
 
 	/// <summary>
 	/// Controls if this <see cref="GameObject"/> should be able to be focused
@@ -913,6 +915,7 @@ public partial class GameObject : Amendable, IGameObject
 	/// Check if this <see cref="GameObject"/> is hovered
 	/// </summary>
 	public bool Hovered { get; internal set; }
+	bool ISceneObject.Hovered { get => Hovered; set => Hovered = value; }
 
 	protected virtual bool Handle(InputEvent e) => false;
 

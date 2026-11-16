@@ -1,5 +1,4 @@
 ﻿using Azalea.Platform.Rendering.Coordination;
-using Azalea.Platform.Rendering.OpenGL;
 using Azalea.Threading;
 using Azalea.Utils;
 using System;
@@ -132,15 +131,4 @@ public abstract partial class PlatformRenderer : ICommandHandler<RenderCommand>
 	}
 
 	#endregion
-
-	public static PlatformRenderer AttachRenderer(Windowing.PlatformWindow window)
-	{
-		var deviceContext = window.BorrowDeviceContext();
-
-		// For now OpenGL is hardcoded
-		var renderer = new GLRenderer(deviceContext);
-
-		window.Subscribe(renderer);
-		return renderer;
-	}
 }

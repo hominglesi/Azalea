@@ -1,8 +1,8 @@
-﻿using Azalea.Graphics;
+﻿using Azalea.Scenes;
 
 namespace Azalea.Inputs.Events;
 
-public class FocusEvent(GameObject? previuosFocused) : InputEvent
+public class FocusEvent(ISceneObject? previuosFocused) : InputEvent
 {
-	public readonly GameObject? PreviousFocused = previuosFocused;
+	public readonly ISceneObject? PreviousFocused = previuosFocused;
 }

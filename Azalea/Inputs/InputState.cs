@@ -1,4 +1,4 @@
-﻿using Azalea.Graphics;
+﻿using Azalea.Scenes;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -8,9 +8,9 @@ namespace Azalea.Inputs;
 public class InputState
 {
 	public Vector2 MousePosition { get; internal set; }
-	public GameObject? FocusedObject { get; internal set; }
-	internal List<GameObject> HoveredObjectsInternal { get; } = [];
-	public IReadOnlyList<GameObject> HoveredObjects => HoveredObjectsInternal;
+	public ISceneObject? FocusedObject { get; internal set; }
+	internal List<ISceneObject> HoveredObjectsInternal { get; } = [];
+	public IReadOnlyList<ISceneObject> HoveredObjects => HoveredObjectsInternal;
 
 	#region MouseButtons
 

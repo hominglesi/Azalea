@@ -1,38 +1,48 @@
-﻿using Azalea.Extentions;
-using Azalea.Native.OpenGL;
+﻿using Azalea.Native.OpenGL;
 using Azalea.Platform.Rendering;
 using Azalea.Platform.Scheduling;
 using Azalea.Platform.Windowing;
+using Azalea.Scenes;
 using Azalea.Utils;
 using System;
 
 namespace Azalea.Platform;
 
-public sealed class Application
+public class Application
 {
-	public readonly AzaleaGame Game;
-	public readonly PlatformWindow Window;
-	public readonly PlatformRenderer Renderer;
-	public readonly PlatformScheduler Scheduler;
-	public readonly InputProcessor Input;
+	private PlatformWindow? _window;
+	private PlatformRenderer? _renderer;
+	private PlatformScheduler? _scheduler;
+	private InputProcessor? _input;
+	public IScene? Scene
+	{
+		get;
+		set
+		{
+			if (field == value) return;
+
+			field?.SetApplication(null);
+			_input?.Scene = null;
+
+			field = value;
+			field?.SetApplication(this);
+			_input?.Scene = value;
+		}
+	}
 
 	private float _accumulator = 0;
 	private const float _fixedUpdateInterval = 1f / 60;
 
-	internal Application(AzaleaGame game, string title, Vector2Int clientSize, bool visible)
+	internal void Start(PlatformWindow window, PlatformRenderer renderer,
+		PlatformScheduler scheduler, InputProcessor input)
 	{
-		Game = game;
-		Game.App = this;
+		_window = window;
+		_renderer = renderer;
+		_scheduler = scheduler;
+		_input = input;
 
-		Window = PlatformWindow.Create(clientSize, visible);
-		Window.Title = title;
-		Window.Center();
-
-		Renderer = PlatformRenderer.AttachRenderer(Window);
-		Scheduler = PlatformScheduler.AttachScheduler(Window);
-		Input = new InputProcessor(Game, Window.GamepadInput, Window.CreateProxy<bool>("ShowDroppableCursor"));
-
-		Window.OnClosed += () => OnClosed?.Invoke();
+		if (Scene is not null)
+			_input.Scene = Scene;
 
 		var commandGroup = ObjectPool<RenderCommandGroup>.Borrow();
 
@@ -43,45 +53,49 @@ public sealed class Application
 
 		Renderer.Thread.SubmitCommandGroup(commandGroup);
 
-		var coordinator = Renderer.Coordinator;
-		var quadBatch = coordinator.DefaultQuadBatch;
-
 		Renderer.PrintErrors();
 
-		Scheduler.InjectProtocol((win, rend) =>
-		{
-			var clientSize = win.ClientSize;
-
-			if (clientSize == Vector2Int.Zero)
-				return;
-
-			_accumulator += Scheduler.DeltaTime;
-			while (_accumulator > _fixedUpdateInterval)
-			{
-				Game.FixedUpdateSubTree();
-				_accumulator -= _fixedUpdateInterval;
-			}
-
-			Game.Size = clientSize;
-			Game.UpdateSubTree();
-
-			Input.Process(win.PendingInputEvents);
-
-			var renderQueue = coordinator.BeginCommandQueue();
-			renderQueue.PrepareRendering(clientSize);
-
-			Game.Draw(Renderer.Coordinator);
-
-			quadBatch.Draw(renderQueue);
-
-			renderQueue.PrintErrors();
-
-			renderQueue.SwapBuffers();
-
-			Renderer.StageQueue(coordinator.EndCommandQueue());
-		});
+		Scheduler.InjectProtocol(processUpdate);
 	}
 
-	public Action? OnClosed;
-	public void Close() => Window.Close();
+	private void processUpdate(PlatformWindow window, PlatformRenderer renderer)
+	{
+		if (Scene is null) return;
+
+		var clientSize = window.ClientSize;
+
+		if (clientSize == Vector2Int.Zero)
+			return;
+
+		Scene.UpdateSize(clientSize);
+
+		_accumulator += Scheduler.DeltaTime;
+		while (_accumulator > _fixedUpdateInterval)
+		{
+			Scene.FixedUpdate();
+			_accumulator -= _fixedUpdateInterval;
+		}
+
+		Scene.Update();
+
+		Input.Process(window.PendingInputEvents);
+
+		var renderQueue = renderer.Coordinator.BeginCommandQueue();
+		renderQueue.PrepareRendering(clientSize);
+
+		Scene.Draw(Renderer.Coordinator);
+
+		renderer.Coordinator.DefaultQuadBatch.Draw(renderQueue);
+
+		renderQueue.PrintErrors();
+
+		renderQueue.SwapBuffers();
+
+		Renderer.StageQueue(renderer.Coordinator.EndCommandQueue());
+	}
+
+	public PlatformWindow Window => _window ?? throw new Exception("Application has not been started yet!");
+	public PlatformRenderer Renderer => _renderer ?? throw new Exception("Application has not been started yet!");
+	public PlatformScheduler Scheduler => _scheduler ?? throw new Exception("Application has not been started yet!");
+	public InputProcessor Input => _input ?? throw new Exception("Application has not been started yet!");
 }

@@ -1,8 +1,12 @@
-﻿using Azalea.IO.Configs;
+﻿using Azalea.Extentions;
+using Azalea.IO.Configs;
 using Azalea.IO.Resources;
 using Azalea.Lists;
 using Azalea.Platform.Audio;
 using Azalea.Platform.Loading;
+using Azalea.Platform.Rendering;
+using Azalea.Platform.Scheduling;
+using Azalea.Platform.Windowing;
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -19,9 +23,6 @@ public abstract class GameHost
 
 	public static GameHost Create()
 	{
-		if (_instance is not null)
-			throw new InvalidOperationException("Only one instance of GameHost may be created!");
-
 		if (NativeLibrary.TryLoad("soft_oal", out var _) == false)
 		{
 			throw new Exception("Native binaries could not be loaded!\n" +
@@ -36,20 +37,24 @@ public abstract class GameHost
 			var webAssembly = Assembly.Load("Azalea.Web");
 			var webHostType = webAssembly.GetType("Azalea.Web.Platform.WebHost")!;
 			var bindingFlags = BindingFlags.NonPublic | BindingFlags.Instance;
-			_instance = (GameHost)Activator.CreateInstance(webHostType, bindingFlags, null, null, null)!;
-			return _instance;
+			return (GameHost)Activator.CreateInstance(webHostType, bindingFlags, null, null, null)!;
 		}
 
-		_instance = new DesktopGameHost();
-		return _instance;
+		return new DesktopGameHost();
 	}
 
 	internal GameHost()
 	{
+		if (_instance is not null)
+			throw new InvalidOperationException("Only one instance of GameHost may be created!");
+
+		_instance = this;
+
 		Loader = CreateLoader();
 		Audio = CreateAudio();
 
 		Clipboard = CreateClipboard();
+		Assets.MainStore.AddMsdfFont("Roboto-Regular", "Fonts/Roboto-Regular.csv", "Fonts/Roboto-Regular.bmp");
 	}
 
 	public PlatformLoader Loader { get; }
@@ -83,17 +88,30 @@ public abstract class GameHost
 	public void SetupPersistentDirectory(string path) => Assets.SetupPersistentStore(path);
 	public void SetupReflectedDirectory(string path) => Assets.SetupReflectedStore(path);
 
+	internal abstract PlatformWindow CreateWindow(Vector2Int size, bool initiallyVisible = true, bool initializeOle = true);
+	internal abstract PlatformRenderer CreateRenderer(IPlatformDeviceContext deviceContext);
+
 	public readonly ObservableList<Application> Applications = [];
-	public Application CreateApplication(AzaleaGame game, string? title = null, Vector2Int? clientSize = null, bool visible = true)
+	public Application StartApplication(Application application, string? title = null, Vector2Int? clientSize = null, bool visible = true)
 	{
-		clientSize ??= new(800, 600);
-		title ??= "Azalea Application";
+		var window = CreateWindow(clientSize ?? new(800, 600), visible);
+		window.Title = title ?? "Azalea Application";
+		window.Center();
+		window.SetIcon(Assets.MainStore.GetImage("Textures/azalea-icon.png"));
+		window.OnClosed += () => onApplicationClosed(application);
 
-		var application = new Application(game, title, clientSize.Value, visible);
+		var deviceContext = window.BorrowDeviceContext();
+		var renderer = CreateRenderer(deviceContext);
+		window.Subscribe(renderer);
+
+		var scheduler = new PlatformScheduler(window);
+		window.Subscribe(scheduler);
+
+		var input = new InputProcessor(window.GamepadInput, window.CreateProxy<bool>("ShowDroppableCursor"));
+
+		application.Start(window, renderer, scheduler, input);
+
 		Applications.Add(application);
-
-		application.OnClosed += () => onApplicationClosed(application);
-
 		return application;
 	}
 
