@@ -1,4 +1,5 @@
-﻿using Azalea.Scenes;
+﻿using Azalea.Design.Containers;
+using Azalea.Scenes;
 
 namespace Azalea.VisualTests.UnitTesting.UnitTests.Scenes;
 
@@ -6,17 +7,17 @@ public class InteractiveSceneTests : UnitTestSuite
 {
 	public class MouseFollow : UnitTest
 	{
-		private CustomForestContainer? _container;
+		private CustomScene2DContainer? _container;
 
 		public MouseFollow()
 		{
-			AddOperation("Create container", () => TestContainer!.Add(_container = new CustomForestContainer()));
-			AddOperation("Add sprite", () => _container!.Forest.Add(new Sprite()
+			AddOperation("Create container", () => TestContainer!.Add(_container = new CustomScene2DContainer()));
+			AddOperation("Add sprite", () => _container!.Scene.Add(new Sprite()
 			{
 				Position = new(900, 500),
 				Size = new(200, 100)
 			}));
-			AddOperation("Sprite follows mouse", () => _container!.FollowTarget = _container.Forest.Children[0]);
+			AddOperation("Sprite follows mouse", () => _container!.FollowTarget = _container.Scene.Children[0]);
 		}
 
 		public override void TearDown(UnitTestContainer scene)
@@ -25,7 +26,7 @@ public class InteractiveSceneTests : UnitTestSuite
 				scene.Remove(_container);
 		}
 
-		class CustomForestContainer : ForestContainer
+		class CustomScene2DContainer : Scene2DContainer
 		{
 			public Leaf? FollowTarget = null;
 

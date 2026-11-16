@@ -1,10 +1,12 @@
-﻿using Azalea.Platform.Rendering.Coordination;
+﻿using Azalea.Platform;
+using Azalea.Platform.Rendering.Coordination;
 using Azalea.Scenes.Physics;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace Azalea.Scenes;
 
-public class Forest : Leaf
+public class Scene2D : Leaf, IScene
 {
 	private int _nextUpdatable = 0;
 	private List<Leaf>? _updateables;
@@ -12,19 +14,6 @@ public class Forest : Leaf
 	private List<Leaf>? _drawables;
 
 	private PhysicsWorld2D? _physics;
-
-	public override void Draw(RenderCoordinator coordinator)
-	{
-		if (_drawables is null) return;
-
-		foreach (var drawable in _drawables)
-			drawable.Draw(coordinator);
-	}
-
-	public override void FixedUpdate()
-	{
-		_physics?.ProcessStep();
-	}
 
 	public override void Invalidate(Invalidation invalidation, Leaf? source = null)
 	{
@@ -63,7 +52,7 @@ public class Forest : Leaf
 
 	private void validate(Leaf leaf, bool presence)
 	{
-		if (presence && leaf is not Forest)
+		if (presence && leaf is not Scene2D)
 		{
 			var childOverrides = GetOverrideFlags(leaf);
 			if (childOverrides.HasFlag(OverrideFlags.Update))
@@ -103,4 +92,25 @@ public class Forest : Leaf
 		while (list.Count > next)
 			list.RemoveAt(next);
 	}
+
+	void IScene.FixedUpdate()
+	{
+		Validate();
+		_physics?.ProcessStep();
+	}
+
+	void IScene.Draw(RenderCoordinator coordinator)
+	{
+		if (_drawables is null) return;
+
+		Validate();
+
+		foreach (var drawable in _drawables)
+			drawable.Draw(coordinator);
+	}
+
+	void IScene.UpdateSize(Vector2 newSize) => Size = newSize;
+	void IScene.SetApplication(Application? app) { }
+	IEnumerable<ISceneObject> IScene.BuildNonPositionalInputQueue() => [];
+	IEnumerable<ISceneObject> IScene.BuildPositionalInputQueue(Vector2 position) => [];
 }

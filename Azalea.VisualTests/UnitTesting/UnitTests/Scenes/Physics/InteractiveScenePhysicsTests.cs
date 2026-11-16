@@ -1,4 +1,5 @@
-﻿using Azalea.Inputs;
+﻿using Azalea.Design.Containers;
+using Azalea.Inputs;
 using Azalea.IO.Resources;
 using Azalea.Scenes;
 using Azalea.Scenes.Physics;
@@ -12,12 +13,12 @@ public class InteractiveScenePhysicsTests : UnitTestSuite
 {
 	public class RandomCreation : UnitTest
 	{
-		private CustomForestContainer? _forestContainer;
+		private CustomScene2DContainer? _container;
 		private RigidBody2D? _moveable;
 
 		public override void Setup(UnitTestContainer scene)
 		{
-			scene.Add(_forestContainer = new CustomForestContainer());
+			scene.Add(_container = new CustomScene2DContainer());
 
 			for (int i = 0; i < 15; i++)
 			{
@@ -43,11 +44,11 @@ public class InteractiveScenePhysicsTests : UnitTestSuite
 						Size = rigidBody.Size
 					});
 
-					_forestContainer.Rotating.Add(rigidBody);
+					_container.Rotating.Add(rigidBody);
 				}
 
 				rigidBody.Position = Rng.Vector2(new Vector2(500, 1400), new Vector2(100, 750));
-				_forestContainer.Forest.Add(rigidBody);
+				_container.Scene.Add(rigidBody);
 			}
 
 			_moveable = new RigidBody2D
@@ -65,13 +66,13 @@ public class InteractiveScenePhysicsTests : UnitTestSuite
 				]
 			};
 
-			_forestContainer.Forest.Add(_moveable);
-			_forestContainer.Moveable = _moveable;
+			_container.Scene.Add(_moveable);
+			_container.Moveable = _moveable;
 		}
 
-		public override void TearDown(UnitTestContainer scene) => scene.Remove(_forestContainer!);
+		public override void TearDown(UnitTestContainer scene) => scene.Remove(_container!);
 
-		class CustomForestContainer : ForestContainer
+		class CustomScene2DContainer : Scene2DContainer
 		{
 			public Leaf? Moveable;
 			public List<Leaf> Rotating = [];
