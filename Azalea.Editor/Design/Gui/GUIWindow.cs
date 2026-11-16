@@ -77,7 +77,10 @@ public class GUIWindow : BasicWindowContainer
 	public static GUIWindow Create(Application app, string title, Vector2 position, Vector2 size)
 	{
 		var window = new GUIWindow(app, title, position, size);
-		app.Game.Add(window);
+
+		if (app.Scene is Composition comp)
+			comp.Add(window);
+
 		return window;
 	}
 
@@ -171,7 +174,8 @@ public class GUIWindow : BasicWindowContainer
 		if (Parent is null)
 			return;
 
-		_app.Game.Remove(this);
+		if (_app.Scene is Composition comp)
+			comp.Remove(this);
 	}
 
 	public void Show()
@@ -179,7 +183,8 @@ public class GUIWindow : BasicWindowContainer
 		if (Parent is not null)
 			return;
 
-		_app.Game.Add(this);
+		if (_app.Scene is Composition comp)
+			comp.Add(this);
 	}
 
 	protected override bool OnHover(HoverEvent e) => true;

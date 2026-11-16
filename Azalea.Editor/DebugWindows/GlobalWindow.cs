@@ -42,7 +42,7 @@ internal class GlobalWindow(AzaleaGame game)
 			{
 				_window!.SelectGroup(applicationsGroup);
 				var group = _window!.AddGroup("Application");
-				_window.AddButton("Close", () => application.Close());
+				_window.AddButton("Close", () => application.Window.Close());
 
 				_window.AddButton("Inspect PlatformWindow",
 					() => PlatformWindowInspector.Create(_game.App, application.Window, _window));

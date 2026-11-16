@@ -1,4 +1,5 @@
 ﻿using Azalea.Platform.Rendering;
+using Azalea.Platform.Windowing;
 using Azalea.Threading;
 using System;
 using System.Diagnostics;
@@ -8,7 +9,7 @@ namespace Azalea.Platform.Scheduling;
 
 public class PlatformScheduler : ICommandHandler<ThreadCommand>
 {
-	protected PlatformScheduler(Windowing.PlatformWindow window)
+	internal PlatformScheduler(PlatformWindow window)
 	{
 		Thread = new ScheduleThread(window, 1);
 		Thread.Start();
@@ -24,7 +25,7 @@ public class PlatformScheduler : ICommandHandler<ThreadCommand>
 
 	public ICommandAwaitable? Enqueue(ThreadCommand command) => Thread.Enqueue(command);
 
-	public void InjectProtocol(Action<Windowing.PlatformWindow, PlatformRenderer> protocol)
+	public void InjectProtocol(Action<PlatformWindow, PlatformRenderer> protocol)
 		=> Thread.InjectProtocol(protocol);
 
 	public DateTime GetRunningTime() => Thread.GetRunningTime();
@@ -37,12 +38,12 @@ public class PlatformScheduler : ICommandHandler<ThreadCommand>
 
 	internal class ScheduleThread : GameThread
 	{
-		internal readonly Windowing.PlatformWindow Window;
+		internal readonly PlatformWindow Window;
 		internal readonly PlatformRenderer Renderer;
 
 		public override string DisplayName => "Schedule Thread";
 
-		public ScheduleThread(Windowing.PlatformWindow window, int interval)
+		public ScheduleThread(PlatformWindow window, int interval)
 			: base(interval)
 		{
 			Window = window;
@@ -69,9 +70,9 @@ public class PlatformScheduler : ICommandHandler<ThreadCommand>
 		}
 
 		private readonly Lock _protocolInjectionLock = new();
-		internal Action<Windowing.PlatformWindow, PlatformRenderer>? Protocol = null;
+		internal Action<PlatformWindow, PlatformRenderer>? Protocol = null;
 
-		public void InjectProtocol(Action<Windowing.PlatformWindow, PlatformRenderer> protocol)
+		public void InjectProtocol(Action<PlatformWindow, PlatformRenderer> protocol)
 		{
 			lock (_protocolInjectionLock)
 			{
@@ -84,12 +85,4 @@ public class PlatformScheduler : ICommandHandler<ThreadCommand>
 	}
 
 	#endregion
-
-	public static PlatformScheduler AttachScheduler(Windowing.PlatformWindow window)
-	{
-		var scheduler = new PlatformScheduler(window);
-
-		window.Subscribe(scheduler);
-		return scheduler;
-	}
 }

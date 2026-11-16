@@ -1,9 +1,10 @@
-﻿using Azalea.Graphics;
-using Azalea.Inputs;
+﻿using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using Azalea.Inputs.Gamepads;
+using Azalea.Scenes;
 using Azalea.Utils.Proxies;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 using System.Threading.Channels;
 
@@ -11,15 +12,14 @@ namespace Azalea.Platform.Scheduling;
 
 public class InputProcessor
 {
-	private readonly GameObject _root;
 	private readonly IProxy<bool> _droppableCursorProxy;
 	private bool _droppableCursor;
 	private readonly IGamepadManager _gamepadInput;
 	public readonly InputState State;
+	public IScene? Scene { get; internal set; }
 
-	internal InputProcessor(GameObject root, IGamepadManager gamepadInput, IProxy<bool> droppableCursorProxy)
+	internal InputProcessor(IGamepadManager gamepadInput, IProxy<bool> droppableCursorProxy)
 	{
-		_root = root;
 		_droppableCursorProxy = droppableCursorProxy;
 		_gamepadInput = gamepadInput;
 		State = new InputState();
@@ -27,7 +27,7 @@ public class InputProcessor
 		_droppableCursorProxy.HasNewValue(out _droppableCursor);
 	}
 
-	private readonly List<GameObject> _clickDownGameObjects = [];
+	private readonly List<ISceneObject> _clickDownGameObjects = [];
 
 	public void Process(Channel<InputEvent> inputChannel)
 	{
@@ -37,6 +37,8 @@ public class InputProcessor
 
 	private void handleEvent(InputEvent e)
 	{
+		if (Scene is null) return;
+
 		e.State = State;
 
 		switch (e)
@@ -51,7 +53,7 @@ public class InputProcessor
 
 				bool focusAccepted = false;
 
-				foreach (var obj in getPositionalInputQueue(position))
+				foreach (var obj in Scene.BuildPositionalInputQueue(position))
 				{
 					_clickDownGameObjects.Add(obj);
 
@@ -72,7 +74,7 @@ public class InputProcessor
 				State.SetMouseButtonPressed(button, false);
 
 				ClickEvent? clickEvent = null;
-				foreach (var obj in getPositionalInputQueue(position))
+				foreach (var obj in Scene.BuildPositionalInputQueue(position))
 				{
 					if (_clickDownGameObjects.Contains(obj))
 					{
@@ -82,25 +84,25 @@ public class InputProcessor
 					}
 				}
 
-				foreach (var obj in getNonPositionalInputQueue())
+				foreach (var obj in Scene.BuildNonPositionalInputQueue())
 					obj.TriggerEvent(e);
 
 				break;
 			case KeyDownEvent(var key, var _):
 				State.SetKeyPressed(key, true);
-				foreach (var obj in getNonPositionalInputQueue())
+				foreach (var obj in Scene.BuildNonPositionalInputQueue())
 					if (obj.TriggerEvent(e) == true) break;
 				break;
 			case KeyUpEvent(var key):
 				State.SetKeyPressed(key, false);
-				foreach (var obj in getNonPositionalInputQueue())
+				foreach (var obj in Scene.BuildNonPositionalInputQueue())
 					if (obj.TriggerEvent(e) == true) break;
 				break;
 			case CharInputEvent(var chr):
 				State.TriggerCharInput(chr);
 				break;
 			case ScrollEvent:
-				foreach (var obj in getNonPositionalInputQueue())
+				foreach (var obj in Scene.BuildNonPositionalInputQueue())
 					obj.TriggerEvent(e);
 
 				// For now we recalculate hovered objects since a scroll
@@ -108,36 +110,18 @@ public class InputProcessor
 				reprocessHoveredObjects(State.MousePosition);
 				break;
 			case FileDroppedEvent:
-				foreach (var obj in getPositionalInputQueue(State.MousePosition))
+				foreach (var obj in Scene.BuildPositionalInputQueue(State.MousePosition))
 					if (obj.TriggerEvent(e)) break;
 				break;
 		}
 	}
 
-	private List<GameObject> getNonPositionalInputQueue()
-	{
-		var inputQueue = new List<GameObject>();
-		_root.BuildNonPositionalInputQueue(inputQueue);
-		inputQueue.Reverse();
-
-		return inputQueue;
-	}
-
-	private List<GameObject> getPositionalInputQueue(Vector2 position)
-	{
-		var inputQueue = new List<GameObject>();
-		_root.BuildPositionalInputQueue(position, inputQueue);
-		inputQueue.Reverse();
-
-		return inputQueue;
-	}
-
-	private readonly List<GameObject> _lastHoveredObjects = [];
-	private GameObject? _hoverHandledObject;
+	private readonly List<ISceneObject> _lastHoveredObjects = [];
+	private ISceneObject? _hoverHandledObject;
 
 	private void reprocessHoveredObjects(Vector2 newPosition)
 	{
-		GameObject? lastHoverHandledObject = _hoverHandledObject;
+		ISceneObject? lastHoverHandledObject = _hoverHandledObject;
 		var hoveredObjects = State.HoveredObjectsInternal;
 
 		_hoverHandledObject = null;
@@ -149,7 +133,8 @@ public class InputProcessor
 
 		var showDroppableCursor = false;
 
-		var positionalQueue = getPositionalInputQueue(newPosition);
+		Debug.Assert(Scene is not null);
+		var positionalQueue = Scene.BuildPositionalInputQueue(newPosition);
 
 		foreach (var obj in positionalQueue)
 		{
@@ -194,7 +179,7 @@ public class InputProcessor
 		}
 	}
 
-	public bool ChangeFocus(GameObject? newFocus)
+	public bool ChangeFocus(ISceneObject? newFocus)
 	{
 		if (State.FocusedObject == newFocus)
 			return true;
