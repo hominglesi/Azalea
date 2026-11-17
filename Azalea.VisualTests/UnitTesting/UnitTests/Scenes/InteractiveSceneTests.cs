@@ -1,5 +1,6 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Scenes;
+using Azalea.Scenes.Drawables2D;
 
 namespace Azalea.VisualTests.UnitTesting.UnitTests.Scenes;
 

@@ -5,11 +5,11 @@ using Azalea.Numerics;
 using Azalea.Platform;
 using Azalea.Platform.Rendering.Coordination;
 
-namespace Azalea.Scenes;
+namespace Azalea.Scenes.Drawables2D;
 
 public class Sprite : Leaf
 {
-	public ITexture? Texture { get; set; }
+	public virtual ITexture? Texture { get; set; }
 
 	public override void Draw(RenderCoordinator coordinator)
 	{

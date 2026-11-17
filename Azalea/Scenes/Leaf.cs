@@ -81,6 +81,22 @@ public class Leaf : IComparer<Leaf>
 		}
 	}
 
+	public Axes RelativeSizeAxes
+	{
+		get;
+		set
+		{
+			if (field == value) return;
+
+			field = value;
+
+			if (field.HasFlag(Axes.X) && Width == 0) Width = 1;
+			if (field.HasFlag(Axes.Y) && Height == 0) Height = 1;
+
+			Invalidate(Invalidation.Transform);
+		}
+	}
+
 	public float Rotation
 	{
 		get;
@@ -92,17 +108,34 @@ public class Leaf : IComparer<Leaf>
 		}
 	}
 
+	public virtual Vector2 GetChildSpace(bool childPerspective = true) => LocalSize;
+	public virtual Vector2 ChildOffset => Vector2.Zero;
+	public virtual Vector2 ChildScale => Vector2.One;
 	internal void RecalculateTransform()
 	{
 		_drawInfo = Parent?.DrawInfo ?? new DrawInfo(null, null);
 
+		var childOffset = Parent?.ChildOffset;
+		if (childOffset is not null && childOffset != Vector2.Zero)
+			_drawInfo.ApplyTranslation(childOffset.Value);
+
+		if (Parent is not null && Parent.ChildScale != Vector2.One) _drawInfo.ApplyScale(Parent.ChildScale);
+
 		if (Position != Vector2.Zero) _drawInfo.ApplyTranslation(Position);
 		if (Rotation != 0) _drawInfo.ApplyRotation(Rotation);
 
-		_worldQuad = new Quad(Vector2.Zero, Size) * _drawInfo.Matrix;
+		_localSize = Size;
+		if (RelativeSizeAxes != Axes.None && Parent is not null)
+		{
+			var parentSize = Parent.GetChildSpace(false);
+			parentSize /= Parent.ChildScale;
+			if (RelativeSizeAxes.HasFlag(Axes.X)) _localSize.X *= parentSize.X;
+			if (RelativeSizeAxes.HasFlag(Axes.Y)) _localSize.Y *= parentSize.Y;
+		}
 
-		if (float.IsNaN(_worldQuad.TopLeft.X))
-			Console.WriteLine("a");
+		_worldQuad = new Quad(Vector2.Zero, _localSize) * _drawInfo.Matrix;
+
+		Invalidations &= ~Invalidation.Transform;
 	}
 
 	private DrawInfo _drawInfo = new(null, null);
@@ -110,11 +143,9 @@ public class Leaf : IComparer<Leaf>
 	{
 		get
 		{
-			if (Invalidations.HasFlag(Invalidation.Transform) == false)
-				return _drawInfo;
+			if (Invalidations.HasFlag(Invalidation.Transform))
+				RecalculateTransform();
 
-			RecalculateTransform();
-			Invalidations &= ~Invalidation.Transform;
 			return _drawInfo;
 		}
 	}
@@ -124,12 +155,22 @@ public class Leaf : IComparer<Leaf>
 	{
 		get
 		{
-			if (Invalidations.HasFlag(Invalidation.Transform) == false)
-				return _worldQuad;
+			if (Invalidations.HasFlag(Invalidation.Transform))
+				RecalculateTransform();
 
-			RecalculateTransform();
-			Invalidations &= ~Invalidation.Transform;
 			return _worldQuad;
+		}
+	}
+
+	private Vector2 _localSize;
+	public Vector2 LocalSize
+	{
+		get
+		{
+			if (Invalidations.HasFlag(Invalidation.Transform))
+				RecalculateTransform();
+
+			return _localSize;
 		}
 	}
 
@@ -174,7 +215,21 @@ public class Leaf : IComparer<Leaf>
 		}
 	}
 
-	public int ChildCount => _children?.Count ?? 0;
+	public Leaf Child
+	{
+		get
+		{
+			if (Children.Count != 1)
+				throw new Exception("The 'Child' property can only be used when this Leaf has exactly one child");
+
+			return _children![0];
+		}
+		set
+		{
+			Clear();
+			Add(value);
+		}
+	}
 
 	public int Compare(Leaf? x, Leaf? y)
 	{
@@ -295,14 +350,17 @@ public class Leaf : IComparer<Leaf>
 		{
 			var flags = OverrideFlags.None;
 
+			if (type.GetMethod("Validate", BindingFlags.Instance | BindingFlags.Public)?.DeclaringType != typeof(Leaf))
+				flags |= OverrideFlags.Draw;
+
 			if (type.GetMethod("Update", BindingFlags.Instance | BindingFlags.Public)?.DeclaringType != typeof(Leaf))
 				flags |= OverrideFlags.Update;
 
 			if (type.GetMethod("Draw", BindingFlags.Instance | BindingFlags.Public)?.DeclaringType != typeof(Leaf))
 				flags |= OverrideFlags.Draw;
 
-			if (type.GetMethod("Validate", BindingFlags.Instance | BindingFlags.Public)?.DeclaringType != typeof(Leaf))
-				flags |= OverrideFlags.Draw;
+			if (type.GetMethod("DrawAfterChildren", BindingFlags.Instance | BindingFlags.Public)?.DeclaringType != typeof(Leaf))
+				flags |= OverrideFlags.DrawAfterChildren;
 
 			return flags;
 		});
@@ -310,8 +368,9 @@ public class Leaf : IComparer<Leaf>
 
 	public virtual void Validate() { }
 	public virtual void Update() { }
-	public virtual void Draw(RenderCoordinator coordinator) { }
 	public virtual void FixedUpdate() { }
+	public virtual void Draw(RenderCoordinator coordinator) { }
+	public virtual void DrawAfterChildren(RenderCoordinator coordinator) { }
 
 	#endregion
 
@@ -320,8 +379,9 @@ public class Leaf : IComparer<Leaf>
 		None = 0,
 		Validate = 1,
 		Update = 1 << 1,
-		Draw = 1 << 2,
-		FixedUpdate = 1 << 3
+		FixedUpdate = 1 << 2,
+		Draw = 1 << 3,
+		DrawAfterChildren = 1 << 4
 	}
 }
 

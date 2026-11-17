@@ -6,12 +6,12 @@ using System.Numerics;
 
 namespace Azalea.Scenes;
 
-public class Scene2D : Leaf, IScene
+public class Scene2D : Container, IScene
 {
 	private int _nextUpdatable = 0;
 	private List<Leaf>? _updateables;
 	private int _nextDrawable = 0;
-	private List<Leaf>? _drawables;
+	private List<Drawable>? _drawables;
 
 	private PhysicsWorld2D? _physics;
 
@@ -52,14 +52,14 @@ public class Scene2D : Leaf, IScene
 
 	private void validate(Leaf leaf, bool presence)
 	{
-		if (presence && leaf is not Scene2D)
+		if (presence)
 		{
-			var childOverrides = GetOverrideFlags(leaf);
-			if (childOverrides.HasFlag(OverrideFlags.Update))
-				insertOverride(leaf, ref _updateables, ref _nextUpdatable);
+			var overrideFlags = GetOverrideFlags(leaf);
+			if (overrideFlags.HasFlag(OverrideFlags.Update))
+				insertObject(leaf, ref _updateables, ref _nextUpdatable);
 
-			if (childOverrides.HasFlag(OverrideFlags.Draw))
-				insertOverride(leaf, ref _drawables, ref _nextDrawable);
+			if (overrideFlags.HasFlag(OverrideFlags.Draw))
+				insertObject(new Drawable(leaf, false), ref _drawables, ref _nextDrawable);
 		}
 
 		if (leaf.Invalidations.HasFlag(Invalidation.Transform))
@@ -69,22 +69,29 @@ public class Scene2D : Leaf, IScene
 			if (child.Invalidations != Invalidation.None)
 				validate(child, presence);
 
+		if (presence)
+		{
+			var overrideFlags = GetOverrideFlags(leaf);
+			if (overrideFlags.HasFlag(OverrideFlags.DrawAfterChildren))
+				insertObject(new Drawable(leaf, true), ref _drawables, ref _nextDrawable);
+		}
+
 		leaf.Invalidations = Invalidation.None;
 	}
 
-	private static void insertOverride(Leaf leaf, ref List<Leaf>? list, ref int next)
+	private static void insertObject<T>(T obj, ref List<T>? list, ref int next)
 	{
 		list ??= [];
 
 		if (list.Count < (next + 1))
-			list.Add(leaf);
+			list.Add(obj);
 		else
-			list[next] = leaf;
+			list[next] = obj;
 
 		next++;
 	}
 
-	private static void removeStale(ref List<Leaf>? list, ref int next)
+	private static void removeStale<T>(ref List<T>? list, ref int next)
 	{
 		if (list is null)
 			return;
@@ -93,24 +100,45 @@ public class Scene2D : Leaf, IScene
 			list.RemoveAt(next);
 	}
 
-	void IScene.FixedUpdate()
+	void IScene.RunUpdate()
+	{
+		if (_updateables is null) return;
+
+		Validate();
+
+		foreach (var updateable in _updateables)
+			updateable.Update();
+	}
+
+	void IScene.RunFixedUpdate()
 	{
 		Validate();
 		_physics?.ProcessStep();
 	}
 
-	void IScene.Draw(RenderCoordinator coordinator)
+	void IScene.RunDraw(RenderCoordinator coordinator)
 	{
 		if (_drawables is null) return;
 
 		Validate();
 
 		foreach (var drawable in _drawables)
-			drawable.Draw(coordinator);
+		{
+			if (drawable.AfterChildren == false)
+				drawable.Target.Draw(coordinator);
+			else
+				drawable.Target.DrawAfterChildren(coordinator);
+		}
 	}
 
 	void IScene.UpdateSize(Vector2 newSize) => Size = newSize;
 	void IScene.SetApplication(Application? app) { }
 	IEnumerable<ISceneObject> IScene.BuildNonPositionalInputQueue() => [];
 	IEnumerable<ISceneObject> IScene.BuildPositionalInputQueue(Vector2 position) => [];
+
+	readonly struct Drawable(Leaf target, bool afterChildren)
+	{
+		public readonly Leaf Target = target;
+		public readonly bool AfterChildren = afterChildren;
+	}
 }

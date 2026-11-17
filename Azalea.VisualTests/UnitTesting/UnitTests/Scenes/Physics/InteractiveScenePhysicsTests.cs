@@ -2,6 +2,7 @@
 using Azalea.Inputs;
 using Azalea.IO.Resources;
 using Azalea.Scenes;
+using Azalea.Scenes.Drawables2D;
 using Azalea.Scenes.Physics;
 using Azalea.Utils;
 using System.Collections.Generic;

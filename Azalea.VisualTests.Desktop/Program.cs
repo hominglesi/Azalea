@@ -2,6 +2,7 @@
 using Azalea.IO.Resources;
 using Azalea.Platform;
 using Azalea.Scenes;
+using Azalea.Scenes.Drawables2D;
 using Azalea.VisualTests;
 using System;
 
@@ -22,17 +23,32 @@ internal class Program
 		//app.Scene = EditorWrapper.Wrap(new VisualTests());
 		app.Scene = new Scene2D()
 		{
-			Children = [
-				new Sprite(){
-					Position = new(400),
-					Size = new(150),
-					Texture = Assets.GetTexture("Textures/azalea-icon.png")
-				},
-				new Sprite(){
-					Position = new(800, 300),
-					Size = new(75)
-				}
-			]
+			Child = new Container()
+			{
+				RelativeSizeAxes = Axes.Both,
+				ChildAspectRatio = 16f / 9,
+				ChildSpace = new(1600, 900),
+				Children = [
+					new Sprite(){
+						RelativeSizeAxes = Axes.Both,
+						Texture = Assets.WhitePixel
+					},
+					new Sprite(){
+						Position = new(20),
+						Size = new(150),
+						Texture = Assets.GetTexture("Textures/azalea-icon.png")
+					},
+					new Sprite(){
+						Position = new(50, 300),
+						Size = new(75),
+						Child = new Sprite()
+						{
+							RelativeSizeAxes = Axes.Both,
+							Texture = Assets.GetTexture("Textures/azalea-icon.png")
+						}
+					}
+				]
+			}
 		};
 
 		host.WaitUntilClosed();
