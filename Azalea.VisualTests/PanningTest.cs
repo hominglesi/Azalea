@@ -1,5 +1,6 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Design.UserInterface;
+using Azalea.Graphics;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
 using System.Numerics;
@@ -14,8 +15,8 @@ public class PanningTest : TestScene
 	{
 		Add(_container = new CameraContainer()
 		{
-			RelativeSizeAxes = Graphics.Axes.Both,
-			Origin = Graphics.Anchor.Center,
+			RelativeSizeAxes = Axes.Both,
+			Origin = Anchor.Center,
 			Children = [
 				new BasicButton()
 				{

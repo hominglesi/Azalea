@@ -1068,17 +1068,6 @@ public enum Anchor
 	Custom = 1 << 6,
 }
 
-[Flags]
-public enum Axes
-{
-	None = 0,
-
-	X = 1,
-	Y = 1 << 1,
-
-	Both = X | Y
-}
-
 public enum FillMode
 {
 	Stretch,

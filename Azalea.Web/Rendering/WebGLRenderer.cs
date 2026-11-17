@@ -2,7 +2,6 @@
 using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
 using Azalea.Numerics;
-using Azalea.Platform;
 using System;
 
 namespace Azalea.Web.Rendering;

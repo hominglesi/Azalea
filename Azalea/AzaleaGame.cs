@@ -15,9 +15,9 @@ public abstract class AzaleaGame : Composition, IScene
 		RelativeSizeAxes = Axes.Both;
 	}
 
-	void IScene.Update() => UpdateSubTree();
-	void IScene.FixedUpdate() => FixedUpdateSubTree();
-	void IScene.Draw(RenderCoordinator coordinator) => Draw(coordinator);
+	void IScene.RunUpdate() => UpdateSubTree();
+	void IScene.RunFixedUpdate() => FixedUpdateSubTree();
+	void IScene.RunDraw(RenderCoordinator coordinator) => Draw(coordinator);
 	void IScene.UpdateSize(Vector2 newSize) => Size = newSize;
 	void IScene.SetApplication(Application? app) => App = app;
 

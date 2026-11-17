@@ -1,5 +1,4 @@
 ﻿using Azalea.Design.Containers;
-using Azalea.Graphics;
 using Azalea.Utils.Proxies;
 
 namespace Azalea.Editor.Design.Gui;

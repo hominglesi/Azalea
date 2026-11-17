@@ -1,6 +1,5 @@
 ﻿using Azalea.Graphics.Rendering;
 using Azalea.Graphics.Rendering.Vertices;
-using Azalea.Platform;
 using Azalea.Utils;
 using System;
 using System.Numerics;

@@ -1,4 +1,3 @@
-using Azalea;
 using Azalea.VisualTests;
 
 

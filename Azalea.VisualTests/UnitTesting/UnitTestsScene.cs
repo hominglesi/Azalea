@@ -1,5 +1,4 @@
-﻿using Azalea.Graphics;
-using Azalea.IO.Configs;
+﻿using Azalea.IO.Configs;
 using Azalea.Platform.Rendering;
 using System;
 

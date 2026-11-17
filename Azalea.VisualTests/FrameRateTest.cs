@@ -14,7 +14,7 @@ public class FrameRateTest : TestScene
 	{
 		Add(new FlexContainer()
 		{
-			RelativeSizeAxes = Graphics.Axes.Both,
+			RelativeSizeAxes = Axes.Both,
 			Direction = FlexDirection.Vertical,
 			Children = [
 				_elapsedTimeText = createText(),

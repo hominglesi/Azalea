@@ -1,6 +1,5 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Design.Shapes;
-using Azalea.Graphics;
 using Azalea.Utils;
 
 namespace Azalea.VisualTests;
