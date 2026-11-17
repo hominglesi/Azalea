@@ -1,4 +1,5 @@
 ﻿using Azalea.Graphics.Colors;
+using Azalea.Graphics.Primitives;
 using Azalea.IO.Resources;
 using Azalea.Numerics;
 using Azalea.Platform;
@@ -9,7 +10,18 @@ namespace Azalea.Scenes;
 
 public class Container : Leaf
 {
-	public bool Masking { get; set; }
+	public bool Masking
+	{
+		get;
+		set
+		{
+			if (field == value) return;
+			field = value;
+			Invalidate(Invalidation.Tree);
+		}
+	}
+
+	private RectangleInt _maskingRectangle;
 
 	public ColorQuad? BackgroundColor
 	{
@@ -19,6 +31,22 @@ public class Container : Leaf
 			if (field == value) return;
 			field = value;
 			// Invalidate here
+		}
+	}
+
+	public override void Validate()
+	{
+		if (Masking)
+		{
+			var scissorDrawInfo = DrawInfo;
+			scissorDrawInfo.ApplyTranslation(ChildOffset);
+
+			var scissorQuad = new Quad(Vector2.Zero, ChildSize) * scissorDrawInfo.Matrix;
+			var scissorRect = scissorQuad.AABBFloat;
+
+			_maskingRectangle = new RectangleInt(
+				(int)float.Ceiling(scissorRect.Position.X), (int)float.Ceiling(scissorRect.Position.Y),
+				(int)float.Ceiling(scissorRect.Size.X), (int)float.Ceiling(scissorRect.Size.Y));
 		}
 	}
 
@@ -32,16 +60,7 @@ public class Container : Leaf
 		}
 
 		if (Masking)
-		{
-			var pos = ChildOffset;
-			var size = GetChildSpace(false);
-
-			var maskingRect = new RectangleInt(
-				(int)float.Ceiling(pos.X), (int)float.Ceiling(pos.Y),
-				(int)float.Ceiling(size.X), (int)float.Ceiling(size.Y));
-
-			coordinator.PushScissor(maskingRect);
-		}
+			coordinator.PushScissor(_maskingRectangle);
 	}
 
 	public override void DrawAfterChildren(RenderCoordinator coordinator)
@@ -72,29 +91,29 @@ public class Container : Leaf
 		}
 	}
 
-	public override Vector2 GetChildSpace(bool childPerspective = true)
+	public override Vector2 ChildSize
 	{
-		if (childPerspective && ChildSpace != Vector2.Zero)
-			return ChildSpace;
+		get
+		{
+			if (ChildAspectRatio == 0) return LocalSize;
 
-		if (ChildAspectRatio == 0) return LocalSize;
+			var neededHeight = LocalSize.X / ChildAspectRatio;
+			if (neededHeight <= LocalSize.Y)
+				return new(LocalSize.X, neededHeight);
 
-		var neededHeight = LocalSize.X / ChildAspectRatio;
-		if (neededHeight <= LocalSize.Y)
-			return new(LocalSize.X, neededHeight);
-
-		var neededWidth = LocalSize.Y * ChildAspectRatio;
-		return new(neededWidth, LocalSize.Y);
+			var neededWidth = LocalSize.Y * ChildAspectRatio;
+			return new(neededWidth, LocalSize.Y);
+		}
 	}
 
-	public override Vector2 ChildOffset => (LocalSize - GetChildSpace(false)) / 2;
+	public override Vector2 ChildOffset => (LocalSize - ChildSize) / 2;
 	public override Vector2 ChildScale
 	{
 		get
 		{
 			if (ChildSpace == Vector2.Zero) return Vector2.One;
 
-			return GetChildSpace(false) / ChildSpace;
+			return ChildSize / ChildSpace;
 		}
 	}
 }

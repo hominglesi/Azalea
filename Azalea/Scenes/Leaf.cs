@@ -108,7 +108,7 @@ public class Leaf : IComparer<Leaf>
 		}
 	}
 
-	public virtual Vector2 GetChildSpace(bool childPerspective = true) => LocalSize;
+	public virtual Vector2 ChildSize => LocalSize;
 	public virtual Vector2 ChildOffset => Vector2.Zero;
 	public virtual Vector2 ChildScale => Vector2.One;
 	internal void RecalculateTransform()
@@ -127,7 +127,7 @@ public class Leaf : IComparer<Leaf>
 		_localSize = Size;
 		if (RelativeSizeAxes != Axes.None && Parent is not null)
 		{
-			var parentSize = Parent.GetChildSpace(false);
+			var parentSize = Parent.ChildSize;
 			parentSize /= Parent.ChildScale;
 			if (RelativeSizeAxes.HasFlag(Axes.X)) _localSize.X *= parentSize.X;
 			if (RelativeSizeAxes.HasFlag(Axes.Y)) _localSize.Y *= parentSize.Y;
@@ -351,7 +351,7 @@ public class Leaf : IComparer<Leaf>
 			var flags = OverrideFlags.None;
 
 			if (type.GetMethod("Validate", BindingFlags.Instance | BindingFlags.Public)?.DeclaringType != typeof(Leaf))
-				flags |= OverrideFlags.Draw;
+				flags |= OverrideFlags.Validate;
 
 			if (type.GetMethod("Update", BindingFlags.Instance | BindingFlags.Public)?.DeclaringType != typeof(Leaf))
 				flags |= OverrideFlags.Update;

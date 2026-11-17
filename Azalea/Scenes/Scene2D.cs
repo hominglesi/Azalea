@@ -52,9 +52,10 @@ public class Scene2D : Container, IScene
 
 	private void validate(Leaf leaf, bool presence)
 	{
+		var overrideFlags = GetOverrideFlags(leaf);
+
 		if (presence)
 		{
-			var overrideFlags = GetOverrideFlags(leaf);
 			if (overrideFlags.HasFlag(OverrideFlags.Update))
 				insertObject(leaf, ref _updateables, ref _nextUpdatable);
 
@@ -69,9 +70,11 @@ public class Scene2D : Container, IScene
 			if (child.Invalidations != Invalidation.None)
 				validate(child, presence);
 
+		if (overrideFlags.HasFlag(OverrideFlags.Validate) && leaf is not Scene2D)
+			leaf.Validate();
+
 		if (presence)
 		{
-			var overrideFlags = GetOverrideFlags(leaf);
 			if (overrideFlags.HasFlag(OverrideFlags.DrawAfterChildren))
 				insertObject(new Drawable(leaf, true), ref _drawables, ref _nextDrawable);
 		}
