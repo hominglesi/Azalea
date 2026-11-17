@@ -16,14 +16,14 @@ public class AutoSizeTest : TestScene
 		Add(new Composition()
 		{
 			Position = new(100),
-			AutoSizeAxes = Graphics.Axes.Both,
+			AutoSizeAxes = Axes.Both,
 			BorderColor = Palette.Blue,
 			BorderThickness = 2,
 			Child = _flex = new FlexContainer()
 			{
 				Direction = FlexDirection.Vertical,
 				Size = new(200),
-				AutoSizeAxes = Graphics.Axes.Y,
+				AutoSizeAxes = Axes.Y,
 				BorderColor = Palette.Green,
 				BorderThickness = 2,
 			}
@@ -56,8 +56,8 @@ public class AutoSizeTest : TestScene
 		{
 			_flex.Add(new TextContainer()
 			{
-				RelativeSizeAxes = Graphics.Axes.X,
-				AutoSizeAxes = Graphics.Axes.Y,
+				RelativeSizeAxes = Axes.X,
+				AutoSizeAxes = Axes.Y,
 				Text = TextUtils.GenerateLoremIpsum(20)
 			});
 		}

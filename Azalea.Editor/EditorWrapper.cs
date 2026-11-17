@@ -4,7 +4,6 @@ using Azalea.Editor.DebugWindows;
 using Azalea.Editor.Views.Gamepads;
 using Azalea.Editor.Views.MsdfGen;
 using Azalea.Editor.Views.ResourceExploring;
-using Azalea.Graphics;
 using Azalea.Graphics.Colors;
 using Azalea.Inputs;
 using Azalea.Inputs.Events;
@@ -53,7 +52,7 @@ public class EditorWrapper : AzaleaGame
 		_classWindow = new(game);
 	}
 
-	public static EditorWrapper Wrap(AzaleaGame game) => new EditorWrapper(game);
+	public static EditorWrapper Wrap(AzaleaGame game) => new(game);
 
 	private readonly GlobalWindow _globalWindow;
 	private readonly ClassWindow _classWindow;

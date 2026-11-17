@@ -7,9 +7,9 @@ namespace Azalea.Scenes;
 
 public interface IScene
 {
-	internal void Update();
-	internal void FixedUpdate();
-	internal void Draw(RenderCoordinator coordinator);
+	internal void RunUpdate();
+	internal void RunFixedUpdate();
+	internal void RunDraw(RenderCoordinator coordinator);
 	internal void UpdateSize(Vector2 newSize);
 	internal void SetApplication(Application? app);
 

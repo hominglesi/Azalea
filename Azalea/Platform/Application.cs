@@ -72,18 +72,18 @@ public class Application
 		_accumulator += Scheduler.DeltaTime;
 		while (_accumulator > _fixedUpdateInterval)
 		{
-			Scene.FixedUpdate();
+			Scene.RunFixedUpdate();
 			_accumulator -= _fixedUpdateInterval;
 		}
 
-		Scene.Update();
+		Scene.RunUpdate();
 
 		Input.Process(window.PendingInputEvents);
 
 		var renderQueue = renderer.Coordinator.BeginCommandQueue();
 		renderQueue.PrepareRendering(clientSize);
 
-		Scene.Draw(Renderer.Coordinator);
+		Scene.RunDraw(Renderer.Coordinator);
 
 		renderer.Coordinator.DefaultQuadBatch.Draw(renderQueue);
 

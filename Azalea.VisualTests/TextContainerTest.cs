@@ -24,8 +24,8 @@ public class TextContainerTest : TestScene
 
 		_scrollable.Add(_flex = new FlexContainer()
 		{
-			AutoSizeAxes = Graphics.Axes.Y,
-			RelativeSizeAxes = Graphics.Axes.X,
+			AutoSizeAxes = Axes.Y,
+			RelativeSizeAxes = Axes.X,
 			Direction = FlexDirection.Vertical,
 			Spacing = new(0, 50)
 		});
@@ -34,8 +34,8 @@ public class TextContainerTest : TestScene
 		{
 			var container = new TextContainer((t) => { t.Font = FontUsage.Default.With(size: 24); })
 			{
-				AutoSizeAxes = Graphics.Axes.Y,
-				RelativeSizeAxes = Graphics.Axes.X,
+				AutoSizeAxes = Axes.Y,
+				RelativeSizeAxes = Axes.X,
 				Width = 0.6f,
 				Origin = i % 2 == 0 ? Graphics.Anchor.TopLeft : Graphics.Anchor.TopRight,
 				Anchor = i % 2 == 0 ? Graphics.Anchor.TopLeft : Graphics.Anchor.TopRight,

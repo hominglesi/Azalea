@@ -1,7 +1,6 @@
 ﻿using Azalea.Design.Containers;
 using Azalea.Editor.Design.Gui;
 using Azalea.Extentions;
-using Azalea.Graphics;
 using Azalea.IO.Resources;
 using Azalea.Platform;
 using Azalea.Platform.Audio;
