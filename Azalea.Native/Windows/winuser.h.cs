@@ -161,6 +161,16 @@ public static partial class Win32
 	[LibraryImport(User32Path, StringMarshalling = StringMarshalling.Utf16)]
 	public static partial nint LoadCursorW(nint hInstance, uint lpCursorName);
 
+	[StructLayout(LayoutKind.Sequential)]
+	public struct MINMAXINFO
+	{
+		public POINT ptReserved;
+		public POINT ptMaxSize;
+		public POINT ptMaxPosition;
+		public POINT ptMinTrackSize;
+		public POINT ptMaxTrackSize;
+	}
+
 	/// <summary><see href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-monitorfromwindow">Official Documentation</see></summary>
 	[LibraryImport(User32Path)]
 	public static partial nint MonitorFromWindow(nint hwnd, MonitorFromWindowFlags dwFlags);

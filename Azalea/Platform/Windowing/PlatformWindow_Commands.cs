@@ -115,6 +115,23 @@ public abstract partial class PlatformWindow
 		}
 	}
 
+	public Vector2Int MinClientSize
+	{
+		get;
+		set
+		{
+			if (field == value) return;
+
+			field = value;
+
+			if (field.X > _clientSize.X || field.Y > _clientSize.Y)
+			{
+				_clientSize = new Vector2Int(Math.Max(_clientSize.X, field.X), Math.Max(_clientSize.Y, field.Y));
+				Enqueue(SetClientSizeCommand.Borrow(_clientSize));
+			}
+		}
+	} = new Vector2Int(240, 150);
+
 	[ThreadCommand]
 	internal partial class SetResizableCommand : WindowCommand
 	{

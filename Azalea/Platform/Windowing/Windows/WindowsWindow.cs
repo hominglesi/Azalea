@@ -321,6 +321,22 @@ internal class WindowsWindow(Vector2Int clientSize, bool initiallyVisible, bool 
 				_clientSize = BitwiseUtils.SplitValue(lParam);
 				InvokeOnResized();
 				return 0;
+			case Win32.WindowMessage.GETMINMAXINFO:
+				if (MinClientSize.X <= 0 && MinClientSize.Y <= 0)
+					break;
+
+				unsafe
+				{
+					Win32.MINMAXINFO* minMaxInfo = (Win32.MINMAXINFO*)lParam;
+
+					var minSize = new Win32.RECT(0, 0, MinClientSize.X, MinClientSize.Y);
+					Win32.AdjustWindowRectEx(ref minSize, _windowStyles, false, _windowExtendedStyles);
+
+					minMaxInfo->ptMinTrackSize.x = minSize.Width;
+					minMaxInfo->ptMinTrackSize.y = minSize.Height;
+				}
+
+				return 0;
 			case Win32.WindowMessage.SHOWWINDOW:
 				Shown = wParam != nint.Zero;
 				break;

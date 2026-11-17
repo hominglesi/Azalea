@@ -39,6 +39,9 @@ internal class PlatformWindowInspector
 		guiWindow.AddButton("Set Size to {800, 600}", () => window.Size = new(800, 600));
 		guiWindow.AddPropertyLabel("Client Size", window.CreateProxy<Vector2Int>("ClientSize"));
 		guiWindow.AddButton("Set Client Size to {800, 600}", () => window.ClientSize = new(800, 600));
+		guiWindow.AddPropertyLabel("Min Client Size", window.CreateProxy<Vector2Int>("MinClientSize"));
+		guiWindow.AddButton("Set Min Client Size to {400, 400}", () => window.MinClientSize = new(400, 400));
+		guiWindow.AddButton("Set Min Client Size to {0, 0}", () => window.MinClientSize = Vector2Int.Zero);
 		guiWindow.AddPropertyLabel("Cursor Visible", window.CreateProxy<bool>("CursorVisible"));
 		guiWindow.AddButton("Toggle Cursor Visible", () => window.CursorVisible = !window.CursorVisible);
 		guiWindow.AddPropertyLabel("Resizable", window.CreateProxy<bool>("Resizable"));
