@@ -105,7 +105,7 @@ public class RenderCoordinator
 	#endregion
 	#region Texture
 	private NativeTexture? _boundTexture;
-	internal void BindTexture(NativeTexture texture)
+	public void BindTexture(NativeTexture texture)
 	{
 		Debug.Assert(texture is not null);
 		if (_boundTexture == texture)

@@ -9,6 +9,7 @@ namespace Azalea.Scenes.Drawables2D;
 
 public class Sprite : Leaf
 {
+	public Color Color { get; set; } = Palette.White;
 	public virtual ITexture? Texture { get; set; }
 
 	public override void Draw(RenderCoordinator coordinator)
@@ -17,13 +18,13 @@ public class Sprite : Leaf
 		{
 			coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);
 			coordinator.BindTexture(tex.NativeTexture);
-			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, WorldQuad, Palette.White, Rectangle.One);
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, WorldQuad, Color, Rectangle.One);
 		}
 		else
 		{
 			coordinator.BindShader(GameHost.Instance.Loader.DefaultQuadShader);
 			coordinator.BindTexture(Assets.MissingTexture.NativeTexture);
-			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, WorldQuad, Palette.White, Rectangle.One);
+			coordinator.DefaultQuadBatch.Add(coordinator.CommandQueue, WorldQuad, Color, Rectangle.One);
 		}
 	}
 }

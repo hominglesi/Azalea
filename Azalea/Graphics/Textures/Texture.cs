@@ -5,7 +5,7 @@ namespace Azalea.Graphics.Textures;
 
 public class Texture : ITexture
 {
-	internal readonly NativeTexture NativeTexture;
+	public readonly NativeTexture NativeTexture;
 
 	internal Texture(NativeTexture newTexture) => NativeTexture = newTexture;
 

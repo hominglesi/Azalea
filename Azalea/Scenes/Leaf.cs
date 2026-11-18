@@ -47,6 +47,43 @@ public class Leaf : IComparer<Leaf>
 		}
 	}
 
+	public Anchor Origin
+	{
+		get;
+		set
+		{
+			if (field == value) return;
+			field = value;
+			Invalidate(Invalidation.Transform);
+		}
+	}
+
+	public Anchor Anchor
+	{
+		get;
+		set
+		{
+			if (field == value) return;
+			field = value;
+			Invalidate(Invalidation.Transform);
+		}
+	} = Anchor.TopLeft;
+
+	private static Vector2 getAnchorRelative(Anchor anchor)
+	{
+		Vector2 result = Vector2.Zero;
+		if (anchor.HasFlag(Anchor.x1))
+			result.X = 0.5f;
+		else if (anchor.HasFlag(Anchor.x2))
+			result.X = 1;
+
+		if (anchor.HasFlag(Anchor.y1))
+			result.Y = 0.5f;
+		else if (anchor.HasFlag(Anchor.y2))
+			result.Y = 1;
+		return result;
+	}
+
 	public float Width
 	{
 		get;
@@ -111,31 +148,59 @@ public class Leaf : IComparer<Leaf>
 	public virtual Vector2 ChildSize => LocalSize;
 	public virtual Vector2 ChildOffset => Vector2.Zero;
 	public virtual Vector2 ChildScale => Vector2.One;
-	internal void RecalculateTransform()
+	public void RecalculateTransform()
 	{
 		_drawInfo = Parent?.DrawInfo ?? new DrawInfo(null, null);
+
+		var childScale = Parent?.ChildScale ?? Vector2.One;
 
 		var childOffset = Parent?.ChildOffset;
 		if (childOffset is not null && childOffset != Vector2.Zero)
 			_drawInfo.ApplyTranslation(childOffset.Value);
 
-		if (Parent is not null && Parent.ChildScale != Vector2.One) _drawInfo.ApplyScale(Parent.ChildScale);
+		if (childScale != Vector2.One)
+			_drawInfo.ApplyScale(childScale);
 
-		if (Position != Vector2.Zero) _drawInfo.ApplyTranslation(Position);
+		var position = Position;
+
+		if (Parent is not null)
+			position += (getAnchorRelative(Anchor) * (Parent.ChildSize / childScale));
+
+		if (position != Vector2.Zero) _drawInfo.ApplyTranslation(position);
 		if (Rotation != 0) _drawInfo.ApplyRotation(Rotation);
 
 		_localSize = Size;
 		if (RelativeSizeAxes != Axes.None && Parent is not null)
 		{
 			var parentSize = Parent.ChildSize;
-			parentSize /= Parent.ChildScale;
+			parentSize /= childScale;
 			if (RelativeSizeAxes.HasFlag(Axes.X)) _localSize.X *= parentSize.X;
 			if (RelativeSizeAxes.HasFlag(Axes.Y)) _localSize.Y *= parentSize.Y;
 		}
 
+		if (Origin != Anchor.Custom)
+			_originPosition = getAnchorRelative(Origin) * _localSize;
+
+		if (_originPosition != Vector2.Zero) _drawInfo.ApplyOrigin(_originPosition);
+
 		_worldQuad = new Quad(Vector2.Zero, _localSize) * _drawInfo.Matrix;
 
 		Invalidations &= ~Invalidation.Transform;
+	}
+
+	private Vector2 _originPosition;
+	public Vector2 OriginPosition
+	{
+		get => _originPosition;
+		set
+		{
+			if (Origin != Anchor.Custom)
+				throw new InvalidOperationException("Origin must be Custom to be able to set OriginPosition!");
+
+			if (_originPosition == value) return;
+			_originPosition = value;
+			Invalidate(Invalidation.Transform);
+		}
 	}
 
 	private DrawInfo _drawInfo = new(null, null);
